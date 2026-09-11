@@ -1,4 +1,5 @@
 import { ArrowRight, MessageSquare, Layers } from "lucide-react";
+import { ButtonLink } from "./ui/Button";
 
 const services = [
   {
@@ -54,21 +55,13 @@ export function CTA() {
             ヒアリングから一緒に整理します。
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:rascal.devops@gmail.com"
-              aria-label="無料で相談する（メールを送る）"
-              className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-xl transition-colors text-lg"
-            >
+            <ButtonLink href="mailto:rascal.devops@gmail.com" aria-label="無料で相談する（メールを送る）" size="lg">
               無料で相談する
               <ArrowRight className="w-5 h-5" aria-hidden="true" />
-            </a>
-            <a
-              href="#mvps"
-              aria-label="MVP事例を見る（事例セクションへ移動）"
-              className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-surface-800 hover:bg-surface-700 text-surface-50 font-semibold rounded-xl transition-colors text-lg"
-            >
+            </ButtonLink>
+            <ButtonLink href="#mvps" aria-label="MVP事例を見る（事例セクションへ移動）" variant="secondary" size="lg">
               MVP事例を見る
-            </a>
+            </ButtonLink>
           </div>
         </div>
       </div>

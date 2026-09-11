@@ -1,21 +1,19 @@
 import { ArrowRight } from "lucide-react";
 import { projects } from "@/content/projects";
 import { MVPCard } from "./MVPCard";
+import { ButtonLink } from "./ui/Button";
+import { SectionHeader } from "./ui/SectionHeader";
 
 export function MVPGrid() {
   return (
     <section id="mvps" className="py-24 px-6" aria-labelledby="mvps-heading">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="mb-12">
-          <p className="text-brand-500 text-sm font-semibold mb-3">MVP CASES</p>
-          <h2 id="mvps-heading" className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
-            実際に動く、業務改善の事例
-          </h2>
-          <p className="text-surface-400 max-w-xl">
-            機能を作るのではなく、業務の課題を解くことを目的に設計しています。
-          </p>
-        </div>
+        <SectionHeader
+          id="mvps-heading"
+          label="MVP CASES"
+          title="実際に動く、業務改善の事例"
+          description="機能を作るのではなく、業務の課題を解くことを目的に設計しています。"
+        />
 
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
@@ -32,13 +30,10 @@ export function MVPGrid() {
           <p className="text-surface-500 text-sm mb-6">
             まずは気軽にご相談ください
           </p>
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-brand-700 hover:bg-brand-800 text-white font-semibold rounded-xl transition-colors"
-          >
+          <ButtonLink href="#contact">
             無料相談
             <ArrowRight className="w-4 h-4" aria-hidden="true" />
-          </a>
+          </ButtonLink>
         </div>
       </div>
     </section>

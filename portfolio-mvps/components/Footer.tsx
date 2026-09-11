@@ -1,4 +1,6 @@
 import { ArrowRight, Github, Mail } from "lucide-react";
+import { ButtonLink } from "./ui/Button";
+import { TextLink } from "./ui/TextLink";
 
 export function Footer() {
   return (
@@ -14,14 +16,10 @@ export function Footer() {
             <br />
             まずヒアリングから始めます。
           </p>
-          <a
-            href="mailto:rascal.devops@gmail.com"
-              aria-label="無料で相談する（メールを送る）"
-            className="inline-flex items-center gap-2 px-10 py-4 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-xl transition-colors text-lg"
-          >
+          <ButtonLink href="mailto:rascal.devops@gmail.com" aria-label="無料で相談する（メールを送る）" size="lg">
             無料で相談する
             <ArrowRight className="w-5 h-5" aria-hidden="true" />
-          </a>
+          </ButtonLink>
         </div>
 
         {/* Bottom bar */}
@@ -36,24 +34,20 @@ export function Footer() {
           </div>
 
           <div className="flex items-center gap-6">
-            <a
+            <TextLink
               href="https://github.com/Rascal7-7-7"
               target="_blank"
               rel="noopener noreferrer"
+              tone="subtle"
               aria-label="設計・コードを見る（GitHubプロフィール・新しいタブで開く）"
-              className="inline-flex items-center gap-2 py-2 text-surface-500 hover:text-surface-200 text-sm transition-colors"
             >
               <Github className="w-4 h-4" aria-hidden="true" />
               設計・コードを見る
-            </a>
-            <a
-              href="mailto:rascal.devops@gmail.com"
-              aria-label="お問い合わせ（メールを送る）"
-              className="inline-flex items-center gap-2 py-2 text-surface-500 hover:text-surface-200 text-sm transition-colors"
-            >
+            </TextLink>
+            <TextLink href="mailto:rascal.devops@gmail.com" tone="subtle" aria-label="お問い合わせ（メールを送る）">
               <Mail className="w-4 h-4" aria-hidden="true" />
               お問い合わせ
-            </a>
+            </TextLink>
           </div>
         </div>
 

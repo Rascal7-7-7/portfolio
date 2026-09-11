@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { cn } from "@/lib/cn";
+import { button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
   title: "ページが見つかりません",
@@ -26,14 +28,14 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href="/"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-700 hover:bg-brand-800 text-white font-semibold rounded-xl transition-colors"
+            className={cn(button({ variant: "primary" }))}
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             トップページへ戻る
           </Link>
           <Link
             href="/#mvps"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-surface-800 hover:bg-surface-800/80 text-surface-50 font-semibold rounded-xl transition-colors"
+            className={cn(button({ variant: "secondary" }))}
           >
             制作したものを見る
           </Link>

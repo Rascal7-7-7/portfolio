@@ -1,4 +1,5 @@
 import { User, FileText, Zap } from "lucide-react";
+import { SectionHeader } from "./ui/SectionHeader";
 
 const points = [
   {
@@ -22,14 +23,11 @@ export function Trust() {
   return (
     <section className="py-24 px-6 bg-surface-900/40" aria-labelledby="trust-heading">
       <div className="max-w-5xl mx-auto">
-        <div className="mb-12">
-          <p className="text-brand-500 text-sm font-semibold mb-3">
-            WHY CHOOSE
-          </p>
-          <h2 id="trust-heading" className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
-            選ばれる理由
-          </h2>
-        </div>
+        <SectionHeader
+          id="trust-heading"
+          label="WHY CHOOSE"
+          title="選ばれる理由"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {points.map(({ icon: Icon, title, desc }) => (

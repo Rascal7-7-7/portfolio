@@ -1,3 +1,5 @@
+import { SectionHeader } from "./ui/SectionHeader";
+
 const steps = [
   {
     number: "01",
@@ -35,18 +37,13 @@ export function Process() {
   return (
     <section className="py-24 px-6" aria-labelledby="process-heading">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="mb-16">
-          <p className="text-brand-500 text-sm font-semibold mb-3">
-            PROCESS
-          </p>
-          <h2 id="process-heading" className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
-            依頼から納品までの流れ
-          </h2>
-          <p className="text-surface-400 max-w-xl">
-            相談から最短5日で動くシステムを届けます。
-          </p>
-        </div>
+        <SectionHeader
+          id="process-heading"
+          label="PROCESS"
+          title="依頼から納品までの流れ"
+          description="相談から最短5日で動くシステムを届けます。"
+          className="mb-16"
+        />
 
         {/* Steps */}
         <div className="relative">

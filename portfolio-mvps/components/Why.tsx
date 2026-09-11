@@ -1,4 +1,5 @@
 import { Search, Layout, Code2 } from "lucide-react";
+import { SectionHeader } from "./ui/SectionHeader";
 
 const steps = [
   {
@@ -22,16 +23,13 @@ export function Why() {
   return (
     <section className="py-24 px-6 bg-surface-900/40" aria-labelledby="why-heading">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="mb-16">
-          <p className="text-brand-500 text-sm font-semibold mb-3">WHY ME</p>
-          <h2 id="why-heading" className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
-            なぜこの設計ができるのか
-          </h2>
-          <p className="text-surface-400 max-w-xl">
-            技術を知っているだけでなく、業務改善の視点で設計できることが強みです。
-          </p>
-        </div>
+        <SectionHeader
+          id="why-heading"
+          label="WHY ME"
+          title="なぜこの設計ができるのか"
+          description="技術を知っているだけでなく、業務改善の視点で設計できることが強みです。"
+          className="mb-16"
+        />
 
         {/* Steps */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
