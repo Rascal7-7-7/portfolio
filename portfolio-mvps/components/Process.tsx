@@ -33,14 +33,14 @@ const steps = [
 
 export function Process() {
   return (
-    <section className="py-24 px-6">
+    <section className="py-24 px-6" aria-labelledby="process-heading">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-16">
           <p className="text-brand-500 text-sm font-semibold mb-3">
             PROCESS
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
+          <h2 id="process-heading" className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
             依頼から納品までの流れ
           </h2>
           <p className="text-surface-400 max-w-xl">

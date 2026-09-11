@@ -4,12 +4,12 @@ import { MVPCard } from "./MVPCard";
 
 export function MVPGrid() {
   return (
-    <section id="mvps" className="py-24 px-6">
+    <section id="mvps" className="py-24 px-6" aria-labelledby="mvps-heading">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-12">
           <p className="text-brand-500 text-sm font-semibold mb-3">MVP CASES</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
+          <h2 id="mvps-heading" className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
             実際に動く、業務改善の事例
           </h2>
           <p className="text-surface-400 max-w-xl">
@@ -37,7 +37,7 @@ export function MVPGrid() {
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-brand-700 hover:bg-brand-800 text-white font-semibold rounded-xl transition-colors"
           >
             無料相談
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </a>
         </div>
       </div>

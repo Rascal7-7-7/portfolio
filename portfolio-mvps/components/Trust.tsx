@@ -20,13 +20,13 @@ const points = [
 
 export function Trust() {
   return (
-    <section className="py-24 px-6 bg-surface-900/40">
+    <section className="py-24 px-6 bg-surface-900/40" aria-labelledby="trust-heading">
       <div className="max-w-5xl mx-auto">
         <div className="mb-12">
           <p className="text-brand-500 text-sm font-semibold mb-3">
             WHY CHOOSE
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
+          <h2 id="trust-heading" className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
             選ばれる理由
           </h2>
         </div>
@@ -38,7 +38,7 @@ export function Trust() {
               className="bg-surface-900 rounded-2xl p-6"
             >
               <div className="w-10 h-10 rounded-xl bg-brand-600/20 flex items-center justify-center mb-4">
-                <Icon className="w-5 h-5 text-brand-500" />
+                <Icon className="w-5 h-5 text-brand-500" aria-hidden="true" />
               </div>
               <h3 className="text-base font-bold text-surface-50 mb-2">
                 {title}

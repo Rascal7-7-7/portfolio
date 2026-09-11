@@ -39,7 +39,7 @@ export function MVPCard({ project }: { project: Project }) {
               key={label}
               className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-brand-600/15 text-brand-400 text-xs font-medium rounded-lg"
             >
-              <Icon className="w-3 h-3" />
+              <Icon className="w-3 h-3" aria-hidden="true" />
               {label}
             </span>
           );
@@ -65,10 +65,14 @@ export function MVPCard({ project }: { project: Project }) {
             href={links.demo}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-brand-500 hover:text-brand-400 font-medium transition-colors"
+            aria-label={`${name}のデモを見る（新しいタブで開く）`}
+            className="inline-flex items-center gap-1.5 py-2 text-sm text-brand-500 hover:text-brand-400 font-medium transition-colors"
           >
             デモを見る
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight
+              className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform"
+              aria-hidden="true"
+            />
           </a>
         )}
         {links.github && (
@@ -76,10 +80,11 @@ export function MVPCard({ project }: { project: Project }) {
             href={links.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-surface-400 hover:text-surface-200 font-medium transition-colors"
+            aria-label={`${name}の設計・コードを見る（新しいタブで開く）`}
+            className="inline-flex items-center gap-1.5 py-2 text-sm text-surface-400 hover:text-surface-200 font-medium transition-colors"
           >
             設計・コードを見る
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
           </a>
         )}
       </div>

@@ -20,7 +20,7 @@ const services = [
 
 export function CTA() {
   return (
-    <section id="contact" className="py-20 px-6 bg-brand-600/5">
+    <section id="contact" className="py-20 px-6 bg-brand-600/5" aria-labelledby="contact-heading">
       <div className="max-w-5xl mx-auto">
         {/* Service chips */}
         <div className="flex flex-wrap gap-4 justify-center mb-12">
@@ -30,7 +30,7 @@ export function CTA() {
               className="flex items-start gap-3 px-5 py-4 bg-surface-900 rounded-2xl min-w-[200px] flex-1 max-w-[260px]"
             >
               <div className="w-8 h-8 rounded-lg bg-brand-600/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Icon className="w-4 h-4 text-brand-500" />
+                <Icon className="w-4 h-4 text-brand-500" aria-hidden="true" />
               </div>
               <div>
                 <p className="font-semibold text-surface-50 text-sm">{label}</p>
@@ -45,7 +45,7 @@ export function CTA() {
           <p className="text-surface-400 text-sm font-medium mb-3">
             まずは気軽に
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
+          <h2 id="contact-heading" className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
             業務の課題、聞かせてください。
           </h2>
           <p className="text-surface-300 mb-8 max-w-xl mx-auto">
@@ -56,13 +56,15 @@ export function CTA() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="mailto:rascal.devops@gmail.com"
+              aria-label="無料で相談する（メールを送る）"
               className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-xl transition-colors text-lg"
             >
               無料で相談する
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-5 h-5" aria-hidden="true" />
             </a>
             <a
               href="#mvps"
+              aria-label="MVP事例を見る（事例セクションへ移動）"
               className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-surface-800 hover:bg-surface-700 text-surface-50 font-semibold rounded-xl transition-colors text-lg"
             >
               MVP事例を見る
