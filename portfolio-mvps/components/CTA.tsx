@@ -56,7 +56,7 @@ export function CTA() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="mailto:rascal.devops@gmail.com"
-              className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl transition-colors text-lg"
+              className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-xl transition-colors text-lg"
             >
               無料で相談する
               <ArrowRight className="w-5 h-5" />

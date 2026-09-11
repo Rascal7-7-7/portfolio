@@ -39,7 +39,7 @@ export function Hero() {
         <div className="flex flex-col sm:flex-row gap-4">
           <a
             href="#contact"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition-colors text-base"
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-700 hover:bg-brand-800 text-white font-semibold rounded-xl transition-colors text-base"
           >
             無料で相談する
             <ArrowRight className="w-4 h-4" />

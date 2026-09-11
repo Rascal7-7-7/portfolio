@@ -2,7 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap');
+/*
+ * フォントは next/font（app/layout.tsx）で読み込み、
+ * --font-inter / --font-noto-sans-jp として注入している。
+ * 以前ここにあった Google Fonts の @import は、@tailwind の後ろに置かれており
+ * CSS 仕様上（@import は先頭でなければ無効）読み込まれていなかったため削除した。
+ */
 
 :root {
   --background: #09090b;
@@ -20,11 +25,26 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Inter", "Noto Sans JP", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
   background: #0ea5e9;
   color: #fff;
+}
+
+/* モーションを減らす設定の利用者には、スムーススクロールとアニメーションを無効化する */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
