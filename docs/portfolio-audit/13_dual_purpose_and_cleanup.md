@@ -149,7 +149,7 @@ Phase 2（技術タグ修正・favicon等）
 | dashboard-v3 | 13日前 | automation の管理画面。維持 |
 | ai-prompt | 70日前 | 現役でない |
 | lp-generator | 70日前 | `mvp-lp-generator` とは**別物**（private・HTML・69コミット） |
-| 2026-project | 91日前 | **ここまね。README記載の mockup URL は 404 を実測** |
+| 2026-project | 91日前 | **モックアップ配信用**（実アプリではない）。URL は `2026-project-mu.vercel.app`。Git 連携なし |
 | attendance-tracking-app | 92日前 | **掲載予定。維持** |
 | mvp-booking-system | 112日前 | **掲載中。維持** |
 | mvp-lp-generator | 113日前 | **掲載中。維持** |
@@ -165,7 +165,7 @@ Phase 2（技術タグ修正・favicon等）
 
 ### やるべきことは2つだけ
 
-1. **`2026-project` のデプロイ状態を確認する** — README には mockup が Vercel で配信されていると書かれているが、実測で `2026-project.vercel.app` は **404**。Case Study から参照するなら、動く URL を確定させる（またはデモ動画に切り替える）
+1. ~~`2026-project` のデプロイ状態を確認する~~ → **確認済み・対応不要**。Vercel の `2026-project` はモックアップ配信用で、実アプリではない（2026-09-12 本人確認）
 2. **`portfolio-mvps` のプロジェクト名変更は v2完成時にまとめて** — 途中で変えると、共有済みのURLが切れる
 
 ---

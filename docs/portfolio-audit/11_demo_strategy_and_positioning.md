@@ -161,7 +161,11 @@ Prompt Injection / Jailbreak への興味は語れるが、**証拠がない状�
 
 **構成**: Flutter（モバイル）+ FastAPI + Neon PostgreSQL + Redis + **ローカルGPU上の Ollama**
 
-**実測**: `2026-project.vercel.app` は **404**。現状、外部から触れる公開デモは存在しない。
+**実測と訂正**: 当初「`2026-project.vercel.app` が404」と記載したが、これは誤りだった。
+Vercel 上の `2026-project` プロジェクトは **モックアップ配信用**（`docs/mockup/prototype.html`）であり、
+ここまねの実アプリではない（URL は `2026-project-mu.vercel.app`、Git 連携なしの CLI デプロイ）。
+実アプリの公開デモは存在せず、バックエンドの DB は**本人ではない別アカウントの Neon** にあり、
+本人はコラボレーターとして参加している。
 
 | 課題 | 内容 |
 |---|---|
