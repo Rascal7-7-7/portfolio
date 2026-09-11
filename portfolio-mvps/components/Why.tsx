@@ -20,12 +20,12 @@ const steps = [
 
 export function Why() {
   return (
-    <section className="py-24 px-6 bg-surface-900/40">
+    <section className="py-24 px-6 bg-surface-900/40" aria-labelledby="why-heading">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-16">
           <p className="text-brand-500 text-sm font-semibold mb-3">WHY ME</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
+          <h2 id="why-heading" className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
             なぜこの設計ができるのか
           </h2>
           <p className="text-surface-400 max-w-xl">
@@ -39,7 +39,7 @@ export function Why() {
             <div key={title} className="flex flex-col">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-brand-600/20 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-5 h-5 text-brand-500" />
+                  <Icon className="w-5 h-5 text-brand-500" aria-hidden="true" />
                 </div>
                 <span className="text-surface-600 text-sm font-mono">
                   0{i + 1}

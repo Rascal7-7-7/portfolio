@@ -28,6 +28,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * フォーカス表示。
+ * ブラウザ既定の outline は rgb(0,95,204) で、surface-950(#09090b) の
+ * 暗い背景に対してコントラストが足りず、キーボード操作時に位置を見失う。
+ * :focus-visible に限定しているため、マウス操作では表示されない。
+ */
+:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 ::selection {
   background: #0ea5e9;
   color: #fff;

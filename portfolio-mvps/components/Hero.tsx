@@ -2,7 +2,7 @@ import { ArrowRight, Zap } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex flex-col justify-center px-6 py-24 overflow-hidden">
+    <section className="relative min-h-screen flex flex-col justify-center px-6 py-24 overflow-hidden" aria-labelledby="hero-heading">
       {/* Background gradient layers */}
       <div className="absolute inset-0 bg-surface-950" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-brand-600/10 rounded-full blur-[120px] pointer-events-none" />
@@ -11,12 +11,12 @@ export function Hero() {
       <div className="relative max-w-5xl mx-auto w-full">
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-600/15 text-brand-500 text-sm font-medium mb-8">
-          <Zap className="w-3.5 h-3.5" />
+          <Zap className="w-3.5 h-3.5" aria-hidden="true" />
           小規模事業者・チーム向け　業務改善 &amp; MVP開発
         </div>
 
         {/* Main headline */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight tracking-tight text-surface-50 mb-6">
+        <h1 id="hero-heading" className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight tracking-tight text-surface-50 mb-6">
           非効率な業務を、
           <br />
           <span className="text-brand-500">最短で「使えるシステム」</span>
@@ -39,13 +39,15 @@ export function Hero() {
         <div className="flex flex-col sm:flex-row gap-4">
           <a
             href="#contact"
+            aria-label="無料で相談する（お問い合わせセクションへ移動）"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-700 hover:bg-brand-800 text-white font-semibold rounded-xl transition-colors text-base"
           >
             無料で相談する
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </a>
           <a
             href="#mvps"
+            aria-label="MVP事例を見る（事例セクションへ移動）"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-surface-800 hover:bg-surface-800/80 text-surface-50 font-semibold rounded-xl transition-colors text-base"
           >
             MVP事例を見る
