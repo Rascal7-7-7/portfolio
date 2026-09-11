@@ -1,8 +1,8 @@
-import { ArrowRight, TrendingDown, CheckCircle, Database } from "lucide-react";
+import { ArrowRight, CheckCircle, Database } from "lucide-react";
 
 export type Effect = {
   label: string;
-  type: "reduce" | "check" | "data";
+  type: "check" | "data";
 };
 
 export type MVPCardProps = {
@@ -18,7 +18,6 @@ export type MVPCardProps = {
 };
 
 const effectIcons = {
-  reduce: TrendingDown,
   check: CheckCircle,
   data: Database,
 };

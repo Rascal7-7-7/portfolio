@@ -16,7 +16,7 @@ export function Footer() {
           </p>
           <a
             href="mailto:rascal.devops@gmail.com"
-            className="inline-flex items-center gap-2 px-10 py-4 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl transition-colors text-lg"
+            className="inline-flex items-center gap-2 px-10 py-4 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-xl transition-colors text-lg"
           >
             無料で相談する
             <ArrowRight className="w-5 h-5" />
@@ -55,7 +55,7 @@ export function Footer() {
         </div>
 
         <p className="text-center text-surface-700 text-xs mt-8">
-          © 2025 All rights reserved.
+          © {new Date().getFullYear()} All rights reserved.
         </p>
       </div>
     </footer>

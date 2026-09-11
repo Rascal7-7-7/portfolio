@@ -14,7 +14,11 @@ const config: Config = {
           100: "#e0f2fe",
           500: "#0ea5e9",
           600: "#0284c7",
+          // 700 / 800 は白文字を載せる CTA 用。
+          // 600 は白文字とのコントラストが 4.1:1 で WCAG AA（4.5:1）に届かないため、
+          // 塗りつぶしボタンの背景には 700（5.8:1）以上を使う。
           700: "#0369a1",
+          800: "#075985",
           900: "#0c4a6e",
         },
         surface: {
@@ -27,7 +31,12 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["Inter", "Noto Sans JP", "sans-serif"],
+        sans: [
+          "var(--font-inter)",
+          "var(--font-noto-sans-jp)",
+          "system-ui",
+          "sans-serif",
+        ],
       },
     },
   },
