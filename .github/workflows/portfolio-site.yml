@@ -1,0 +1,81 @@
+name: portfolio site
+
+# ポートフォリオ本体（portfolio-mvps/）の検証。
+# Vercel のビルドは「デプロイできるか」しか見ていないため、
+# 型・作品データの整合・主要導線を、マージ前にここで確認する。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "portfolio-mvps/**"
+      - ".github/workflows/portfolio-site.yml"
+  pull_request:
+    paths:
+      - "portfolio-mvps/**"
+      - ".github/workflows/portfolio-site.yml"
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: portfolio-mvps
+
+jobs:
+  verify:
+    name: 型・データ整合・ビルド
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: portfolio-mvps/package-lock.json
+
+      - name: 依存関係のインストール
+        run: npm ci
+
+      - name: 型チェック
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: 作品データの整合テスト
+        # 表示している技術スタックが、各作品の package.json と一致するかを検証する
+        run: npm test
+
+      - name: ビルド
+        run: npm run build
+
+  e2e:
+    name: 主要導線の E2E
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: portfolio-mvps/package-lock.json
+
+      - name: 依存関係のインストール
+        run: npm ci
+
+      - name: ブラウザのインストール
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E 実行
+        # playwright.config.ts の webServer が本番ビルドを起動する
+        run: npm run test:e2e
+
+      - name: 失敗時のレポートを保存
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: portfolio-mvps/playwright-report/
+          retention-days: 7
