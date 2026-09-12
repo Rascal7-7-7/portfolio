@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowUpRight, Github } from "lucide-react";
 import {
   getProjectBySlug,
   getProjectsWithCaseStudy,
+  hasCaseStudy,
   type Project,
 } from "@/content/projects";
 import { Badge } from "@/components/ui/Badge";
@@ -12,13 +13,20 @@ import { TextLink } from "@/components/ui/TextLink";
 
 type Params = { slug: string };
 
+/**
+ * generateStaticParams に無い slug は 404 にする。
+ * 既定（true）のままだと、Case Study の無い作品でも中身の薄いページが
+ * オンデマンドで生成されてしまう。
+ */
+export const dynamicParams = false;
+
 export function generateStaticParams(): Params[] {
   return getProjectsWithCaseStudy().map((project) => ({ slug: project.slug }));
 }
 
 export function generateMetadata({ params }: { params: Params }): Metadata {
   const project = getProjectBySlug(params.slug);
-  if (!project) return {};
+  if (!project || !hasCaseStudy(project)) return {};
 
   return {
     title: `${project.name} | 制作の記録`,
@@ -95,7 +103,8 @@ function buildToc(project: Project) {
 
 export default function ProjectDetail({ params }: { params: Params }) {
   const project = getProjectBySlug(params.slug);
-  if (!project) notFound();
+  // 読ませる内容が無い作品はページを持たない
+  if (!project || !hasCaseStudy(project)) notFound();
 
   const periodLabel = project.period.end
     ? `${project.period.start.replace("-", "/")}〜${project.period.end.replace("-", "/")}`
