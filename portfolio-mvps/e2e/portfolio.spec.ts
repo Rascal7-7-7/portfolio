@@ -158,6 +158,18 @@ test.describe("作品詳細（Case Study）", () => {
     });
   }
 
+  test("Case Study の無い作品の詳細ページは 404 を返す", async ({ page }) => {
+    const withoutCaseStudy = projects.filter(
+      (p) => !withCaseStudy.some((w) => w.slug === p.slug),
+    );
+    expect(withoutCaseStudy.length).toBeGreaterThan(0);
+
+    for (const project of withoutCaseStudy) {
+      const response = await page.goto(`/projects/${project.slug}`);
+      expect(response?.status(), `${project.slug}`).toBe(404);
+    }
+  });
+
   test("sitemap に詳細ページが含まれる", async ({ request }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
     for (const project of withCaseStudy) {
