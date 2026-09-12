@@ -1,4 +1,6 @@
 import type { Category, Project, Tier } from "./types";
+import { jarvisVoiceAgent } from "./jarvis-voice-agent";
+import { ouchiCafe } from "./ouchi-cafe";
 import { mvpLpGenerator } from "./mvp-lp-generator";
 import { mvpBookingSystem } from "./mvp-booking-system";
 import { mvpEstimateManager } from "./mvp-estimate-manager";
@@ -10,6 +12,8 @@ import { mvpFreelanceManager } from "./mvp-freelance-manager";
  * 作品を追加するときは、ファイルを1つ作ってこの配列に足すだけでよい。
  */
 export const projects: readonly Project[] = [
+  jarvisVoiceAgent,
+  ouchiCafe,
   mvpLpGenerator,
   mvpBookingSystem,
   mvpEstimateManager,
