@@ -21,6 +21,18 @@ export const projects: readonly Project[] = [
   mvpFreelanceManager,
 ];
 
+/**
+ * Case Study として読ませる内容があるか。
+ * 中身の薄い詳細ページを作らないための判定に使う。
+ */
+export function hasCaseStudy(project: Project): boolean {
+  return Boolean(project.problem || project.decisions?.length || project.challenges?.length);
+}
+
+export function getProjectsWithCaseStudy(): readonly Project[] {
+  return projects.filter(hasCaseStudy);
+}
+
 export function getProjectBySlug(slug: string): Project | undefined {
   return projects.find((project) => project.slug === slug);
 }
