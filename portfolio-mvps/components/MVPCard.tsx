@@ -1,5 +1,6 @@
 import { ArrowRight, CheckCircle, Database } from "lucide-react";
-import type { Highlight, Project } from "@/content/projects";
+import Link from "next/link";
+import { hasCaseStudy, type Highlight, type Project } from "@/content/projects";
 import { Badge } from "./ui/Badge";
 import { TextLink } from "./ui/TextLink";
 
@@ -60,7 +61,20 @@ export function MVPCard({ project }: { project: Project }) {
       </div>
 
       {/* Actions */}
-      <div className="mt-auto flex gap-3">
+      <div className="mt-auto flex flex-wrap gap-x-4 gap-y-1">
+        {hasCaseStudy(project) && (
+          <Link
+            href={`/projects/${project.slug}`}
+            className="inline-flex items-center gap-1.5 py-2 text-sm text-brand-500 hover:text-brand-400 font-medium transition-colors"
+            aria-label={`${name}の制作の記録を読む`}
+          >
+            制作の記録を読む
+            <ArrowRight
+              className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform"
+              aria-hidden="true"
+            />
+          </Link>
+        )}
         {links.demo && (
           <TextLink
             href={links.demo}

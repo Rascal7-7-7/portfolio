@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { projects } from "../content/projects";
+import { getProjectsWithCaseStudy, projects } from "../content/projects";
 
 /**
  * 主要導線が壊れていないことを確認する。
@@ -117,5 +117,51 @@ test.describe("HTTP とメタデータ", () => {
   test("OG 画像と favicon が配信される", async ({ request }) => {
     expect((await request.get("/opengraph-image.png")).status()).toBe(200);
     expect((await request.get("/icon.svg")).status()).toBe(200);
+  });
+});
+
+test.describe("作品詳細（Case Study）", () => {
+  const withCaseStudy = getProjectsWithCaseStudy();
+
+  test("Case Study のある作品にだけ詳細への導線がある", async ({ page }) => {
+    await page.goto("/");
+    for (const project of projects) {
+      const link = page.locator(`a[href="/projects/${project.slug}"]`);
+      await expect(link, `${project.slug} の詳細リンク`).toHaveCount(
+        withCaseStudy.some((p) => p.slug === project.slug) ? 1 : 0,
+      );
+    }
+  });
+
+  for (const project of withCaseStudy) {
+    test(`${project.slug} の詳細ページが表示される`, async ({ page }) => {
+      const response = await page.goto(`/projects/${project.slug}`);
+      expect(response?.status()).toBe(200);
+
+      // 見出しは1つだけ、内容は作品の一言説明
+      await expect(page.locator("h1")).toHaveCount(1);
+      await expect(page.locator("h1")).toContainText(project.headline);
+
+      // 一覧へ戻れる
+      await expect(page.locator('a[href="/#projects"]').first()).toBeVisible();
+    });
+
+    test(`${project.slug} の見出し階層が飛ばない`, async ({ page }) => {
+      await page.goto(`/projects/${project.slug}`);
+      const levels = await page
+        .locator("h1,h2,h3")
+        .evaluateAll((els) => els.map((e) => Number(e.tagName[1])));
+      expect(levels[0]).toBe(1);
+      for (let i = 1; i < levels.length; i++) {
+        expect(levels[i] - levels[i - 1]).toBeLessThanOrEqual(1);
+      }
+    });
+  }
+
+  test("sitemap に詳細ページが含まれる", async ({ request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+    for (const project of withCaseStudy) {
+      expect(xml, `${project.slug}`).toContain(`/projects/${project.slug}`);
+    }
   });
 });
