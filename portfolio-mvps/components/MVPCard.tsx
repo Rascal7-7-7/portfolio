@@ -9,16 +9,21 @@ const highlightIcons = {
 } satisfies Record<Highlight["type"], unknown>;
 
 export function MVPCard({ project }: { project: Project }) {
-  const { name, headline, summary, stack, highlights, duration, audience, links } =
-    project;
+  const { name, headline, summary, stack, highlights, period, team, links } = project;
+
+  const periodLabel = period.end
+    ? `${period.start.replace("-", "/")}〜${period.end.replace("-", "/")}`
+    : `${period.start.replace("-", "/")}〜`;
+  const teamLabel =
+    team.kind === "team" ? `チーム開発（${team.members}人）` : "個人開発";
 
   return (
     <article className="flex flex-col bg-surface-900 rounded-2xl p-6 hover:bg-surface-800/80 transition-colors group">
       {/* Meta */}
       <div className="flex items-center gap-3 mb-4 text-xs text-surface-500">
-        {duration && <span>開発期間 {duration}</span>}
-        {duration && audience && <span>·</span>}
-        {audience && <span>{audience}</span>}
+        <span>{periodLabel}</span>
+        <span aria-hidden="true">·</span>
+        <span>{teamLabel}</span>
       </div>
 
       {/* Value message — the headline */}
