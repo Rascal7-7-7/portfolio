@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Noto_Sans_JP } from "next/font/google";
+import { profile } from "@/content/profile";
 import "./globals.css";
 
 const inter = Inter({
@@ -21,18 +22,19 @@ const notoSansJP = Noto_Sans_JP({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://portfolio-mvps.vercel.app"),
-  title: "業務改善・MVP開発 | フリーランスエンジニア",
+  title: `${profile.name} | ポートフォリオ`,
   description:
-    "非効率な業務を、最短で使えるシステムに落とし込む。小規模事業者・チーム向けに、課題ヒアリング〜設計〜実装まで対応します。",
+    "AI × セキュリティに関心があるIT系専門学生のポートフォリオ。生成AIをアプリへ組み込むなかで、Prompt Injection などAI特有のセキュリティ問題に関心を持つようになりました。作ったものは公開URLで触れる状態にしています。",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "業務改善・MVP開発 | フリーランスエンジニア",
-    description: "非効率な業務を、最短で使えるシステムに落とし込む。",
+    title: `${profile.name} | ポートフォリオ`,
+    description:
+      "AI × セキュリティに関心があるIT系専門学生のポートフォリオ。",
     type: "website",
     url: "/",
-    siteName: "業務改善・MVP開発",
+    siteName: `${profile.name} | ポートフォリオ`,
   },
   twitter: {
     card: "summary_large_image",

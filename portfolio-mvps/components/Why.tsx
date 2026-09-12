@@ -21,13 +21,13 @@ const steps = [
 
 export function Why() {
   return (
-    <section className="py-24 px-6 bg-surface-900/40" aria-labelledby="why-heading">
+    <section id="approach" className="py-24 px-6" aria-labelledby="why-heading">
       <div className="max-w-5xl mx-auto">
         <SectionHeader
           id="why-heading"
-          label="WHY ME"
-          title="なぜこの設計ができるのか"
-          description="技術を知っているだけでなく、業務改善の視点で設計できることが強みです。"
+          label="APPROACH"
+          title="開発で大事にしていること"
+          description="動くものを作るだけでなく、なぜそう作ったかを説明できる状態にしておきたいと考えています。"
           className="mb-16"
         />
 
