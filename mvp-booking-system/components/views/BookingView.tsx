@@ -279,7 +279,7 @@ function Confirmed({ done, onAgain, onAdmin }: { done: Done; onAgain: () => void
         <Row label="受付番号"><span className="tabular-nums">#{String(done.id).padStart(4, '0')}</span></Row>
       </dl>
       <div className="mt-6 flex flex-col gap-2">
-        <Link href={`/schedule?date=${done.date}&staff=${encodeURIComponent(done.staff)}`} onClick={onAdmin} className={btn('accent', 'lg')}>
+        <Link href={`/schedule?date=${done.date}&staff=${encodeURIComponent(done.staff)}&id=${done.id}`} onClick={onAdmin} className={btn('accent', 'lg')}>
           お店側の画面で確認する
         </Link>
         <button type="button" onClick={onAgain} className={btn('secondary', 'lg')}>別の予約をする</button>
