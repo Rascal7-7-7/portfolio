@@ -25,14 +25,6 @@
 }
 
 @layer utilities {
-  .label-editorial {
-    font-family: var(--font-label), sans-serif;
-    font-size: 0.6875rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
   /* 金額は桁がそろう等幅数字で（Stripe の tnum） */
   .tnum {
     font-variant-numeric: tabular-nums;

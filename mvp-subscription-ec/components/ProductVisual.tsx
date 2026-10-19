@@ -17,7 +17,7 @@ export function ProductVisual({ product, className, decorative = false }: Props)
   return (
     <div
       className={cn('relative overflow-hidden', className)}
-      style={{ backgroundImage: `linear-gradient(150deg, ${visual.from} 0%, ${visual.to} 100%)` }}
+      style={{ backgroundColor: visual.from }}
     >
       <svg
         viewBox="0 0 240 300"
@@ -27,7 +27,6 @@ export function ProductVisual({ product, className, decorative = false }: Props)
         aria-hidden={decorative || undefined}
         aria-label={decorative ? undefined : `${product.name}のパッケージイメージ`}
       >
-        <circle cx="186" cy="66" r="58" fill={visual.accent} opacity="0.35" />
         <path d="M18 262 C 30 200, 80 180, 104 196 C 82 214, 52 238, 18 262 Z" fill={visual.ink} opacity="0.1" />
         <path d="M18 262 L 96 200" stroke={visual.ink} strokeOpacity="0.14" strokeWidth="1.5" fill="none" />
         <ellipse cx="120" cy="252" rx="66" ry="7" fill="#000" opacity="0.12" />
