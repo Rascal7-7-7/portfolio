@@ -88,8 +88,10 @@ function Hero(props: TemplateProps) {
         </p>
         <div className={cx(wide ? 'mt-16 grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-12' : 'mt-12')}>
           <div className="min-w-0">
-            {/* 1行ずつ白い箱で切り抜く。折り返した行にも箱が付くよう box-decoration-break: clone */}
-            <h1 className={cx('font-extrabold', wide ? 'text-[clamp(30px,4.4cqw,46px)] leading-[1.9]' : 'text-[24px] leading-[1.95]')}>
+            {/* 1行ずつ白い箱で切り抜く。折り返した行にも箱が付くよう box-decoration-break: clone。
+                palt で「。」「、」の字幅を詰め、行末の句点の後ろに空きが残って箱の右側だけ広く見えるのを防ぐ（詰まりすぎないよう字間を少し足す）。
+                text-spacing-trim は文節の inline-block 内では効かなかったので使わない */}
+            <h1 className={cx('font-extrabold tracking-[0.04em] [font-feature-settings:"palt"]', wide ? 'text-[clamp(30px,4.4cqw,46px)] leading-[1.9]' : 'text-[24px] leading-[1.95]')}>
               <span className="rounded-md bg-white px-3 py-1 [-webkit-box-decoration-break:clone] [box-decoration-break:clone]">
                 <Phrases text={catchCopy(store)} />
               </span>

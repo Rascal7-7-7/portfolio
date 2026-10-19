@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { cx } from '@/lib/cx'
 import type { StoreInfo } from '@/lib/types'
+import { ctaLabel } from './shared'
 
 export interface BarTone {
   /** バー全体の地色と上の線 */
@@ -17,7 +18,7 @@ export interface BarTone {
 export const HERO_CTA = { 'data-hero-cta': '' } as const
 
 /**
- * スマホ幅の LP の下部に固定する「電話｜WEB予約」の2ボタン（街の整体院サイトでよく見る形）。
+ * スマホ幅の LP の下部に固定する「電話｜予約」の2ボタン（予約側は本文のボタンと同じ文言）（街の整体院サイトでよく見る形）。
  * position: fixed だとエディタのスマホ枠からはみ出すので、LP の末尾に置いた sticky で下端に貼り付ける。
  * スクロール領域が画面でも枠でも同じように動く。
  */
@@ -55,7 +56,7 @@ export default function MobileBar({ store, tone }: { store: StoreInfo; tone: Bar
         </a>
       )}
       <a href="#reserve" className={cx(btn, tone.web)}>
-        WEB予約
+        {ctaLabel(store)}
       </a>
     </div>
   )
