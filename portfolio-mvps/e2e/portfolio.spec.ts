@@ -200,6 +200,16 @@ test.describe("作品詳細（Case Study）", () => {
       await expect(page.locator("main#main")).toHaveCount(1);
     });
 
+    test(`${project.slug} に og:image があり、画像が配信される`, async ({ page, request }) => {
+      await page.goto(`/projects/${project.slug}`);
+      const og = page.locator('meta[property="og:image"]');
+      await expect(og).toHaveCount(1);
+      const content = await og.getAttribute("content");
+      expect(content).toBeTruthy();
+      // 本番ドメインの絶対 URL になるため、パスだけをローカルで確かめる
+      expect((await request.get(new URL(content!).pathname)).status()).toBe(200);
+    });
+
     test(`${project.slug} の見出し階層が飛ばない`, async ({ page }) => {
       await page.goto(`/projects/${project.slug}`);
       const levels = await page
