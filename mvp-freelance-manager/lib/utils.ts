@@ -15,3 +15,12 @@ export function formatYen(amount: number): string {
 export function formatManYen(amount: number): string {
   return `${Math.round(amount / 10_000).toLocaleString("ja-JP")}万`;
 }
+
+/** "２２0,000円" → "220000"。数字以外は捨て、先頭の 0 は落とす */
+export function toDigits(value: string): string {
+  return value
+    .replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
+    .replace(/\D/g, "")
+    .replace(/^0+/, "")
+    .slice(0, 12);
+}
