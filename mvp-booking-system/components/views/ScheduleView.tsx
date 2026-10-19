@@ -52,19 +52,31 @@ export default function ScheduleView() {
   // デスクトップは週表示から。スマホは幅が足りないので常に日表示（タブも出さない）
   const [mode, setMode] = useState<Mode>('week');
   const [staff, setStaff] = useState<Staff>(STAFF[0]);
+  const [focusId, setFocusId] = useState<string | null>(null);
   const now = useNowMinutes();
-  // 予約ページの「お店側の画面で確認する」から ?date=&staff= で来たら、その日を含む週（スマホは日表示の担当タブ）を開く。再読み込みで繰り返さないよう URL からは消す
+  // 予約ページの「お店側の画面で確認する」から ?date=&staff=&id= で来たら、その日の日表示（スマホは担当タブも）を開く。再読み込みで繰り返さないよう URL からは消す
   useEffect(() => {
     if (!today) return;
     const params = new URLSearchParams(window.location.search);
     const s = STAFF.find(x => x === params.get('staff'));
     if (s) setStaff(s);
     const d = params.get('date');
-    if (params.has('date') || params.has('staff')) window.history.replaceState(null, '', window.location.pathname);
+    const id = params.get('id');
+    setFocusId(id && /^\d+$/.test(id) ? id : null);
+    if (params.has('date') || params.has('staff') || params.has('id')) window.history.replaceState(null, '', window.location.pathname);
     if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
     const days = diffDays(today, d);
-    if (Number.isFinite(days)) setOffset(days);
+    if (!Number.isFinite(days)) return;
+    setOffset(days);
+    setMode('day');
   }, [today]);
+  // 入った予約を画面の中ほどへ。下（デスクトップ）や上（スマホ）に出る通知と重ならないように。表示中の方（日表示 or スマホの一覧）を選ぶ
+  useEffect(() => {
+    if (!focusId) return;
+    const links = document.querySelectorAll<HTMLElement>(`a[href="/reservations/${focusId}"]`);
+    Array.from(links).find(el => el.offsetParent !== null)?.scrollIntoView({ block: 'center' });
+    setFocusId(null);
+  }, [focusId]);
   if (!reservations) return <LoadingState />;
 
   const date = addDays(today, offset);

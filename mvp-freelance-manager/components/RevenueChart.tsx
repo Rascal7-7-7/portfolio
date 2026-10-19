@@ -17,14 +17,16 @@ interface RevenueChartProps {
   data: readonly MonthlyRevenue[];
   /** 今月の入金が増えた直後だけ渡す。増える前の高さ（比率 0〜1）から伸ばす */
   growFrom?: number | null;
+  /** 目盛りの上限に含める額。今月の入金＋未回収の合計を渡すと、どの請求を入金済にしても目盛りが変わらない */
+  ceiling?: number;
 }
 
 /**
  * CSS の棒グラフ。Stripe ホームの売上グラフに倣い、目盛りは「¥0 / ¥60万 / ¥120万」の3本、
  * 罫線は点線で薄く、底辺だけ実線。値と月のラベルは小さな灰色の数字で、今月だけ濃くする
  */
-export function RevenueChart({ data, growFrom }: RevenueChartProps) {
-  const max = niceMax(Math.max(...data.map((m) => m.paid + m.expected)));
+export function RevenueChart({ data, growFrom, ceiling = 0 }: RevenueChartProps) {
+  const max = niceMax(Math.max(ceiling, ...data.map((m) => m.paid + m.expected)));
   const pct = (v: number) => `${(v / max) * 100}%`;
   const summary = data.map((m) => `${formatMonthLabel(m.month)} 入金${formatYen(m.paid)}`).join("、");
 
