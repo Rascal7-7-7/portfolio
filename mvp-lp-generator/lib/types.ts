@@ -1,73 +1,44 @@
-export type LPStatus = 'draft' | 'published'
+export type CategoryKey = 'cafe' | 'salon' | 'seitai' | 'other'
+export type TemplateKey = 'natural' | 'modern' | 'pop'
+export type SectionKey = 'features' | 'menu' | 'voices' | 'access' | 'cta'
 
-export interface Service {
-  id: number
-  landing_page_id: number
-  name: string
-  description: string | null
-  price_text: string | null
-  sort_order: number
+export interface MenuItem {
+  readonly emoji: string
+  readonly name: string
+  readonly description: string
+  readonly price: string
 }
 
-export interface Notice {
-  id: number
-  landing_page_id: number
-  title: string
-  body: string | null
-  published_date: string | null
-  sort_order: number
+export interface Feature {
+  readonly emoji: string
+  readonly title: string
+  readonly text: string
 }
 
-export interface LandingPage {
-  id: number
-  title: string
-  store_name: string
-  category: string
-  catch_copy: string
-  description: string
-  business_hours: string
-  closed_days: string
-  address: string
-  phone: string
-  instagram_url: string | null
-  line_url: string | null
-  main_image_url: string | null
-  cta_label: string
-  cta_link: string
-  template_key: string
-  slug: string
-  status: LPStatus
-  created_at: string
-  updated_at: string
-  published_at: string | null
+export interface Voice {
+  readonly name: string
+  readonly text: string
 }
 
-export interface LandingPageWithRelations extends LandingPage {
-  services: Service[]
-  notices: Notice[]
+export interface StoreInfo {
+  readonly storeName: string
+  readonly category: CategoryKey
+  readonly catchCopy: string
+  readonly description: string
+  readonly address: string
+  readonly hours: string
+  readonly closed: string
+  readonly phone: string
+  readonly ctaLabel: string
+  readonly features: readonly Feature[]
+  readonly menu: readonly MenuItem[]
+  readonly voices: readonly Voice[]
 }
 
-export type ServiceInput = Omit<Service, 'id' | 'landing_page_id'>
-export type NoticeInput = Omit<Notice, 'id' | 'landing_page_id'>
-
-export interface LandingPageInput {
-  title: string
-  store_name: string
-  category: string
-  catch_copy: string
-  description: string
-  business_hours: string
-  closed_days: string
-  address: string
-  phone: string
-  instagram_url: string
-  line_url: string
-  main_image_url: string
-  cta_label: string
-  cta_link: string
-  template_key: string
-  slug: string
-  status: LPStatus
-  services: ServiceInput[]
-  notices: NoticeInput[]
+export interface LPDoc {
+  readonly id: string
+  readonly slug: string
+  readonly template: TemplateKey
+  readonly sections: Readonly<Record<SectionKey, boolean>>
+  readonly store: StoreInfo
 }

@@ -3,17 +3,18 @@ import type { Project } from "./types";
 export const mvpLpGenerator: Project = {
   slug: "mvp-lp-generator",
   name: "LP生成サービス",
-  headline: "店舗情報を入力してLPを組み立てるエディタ",
+  headline: "店舗情報を入れるだけで、その場でLPが完成するエディタ",
   summary:
-    "業種・店舗情報・訴求軸をフォームに入力すると、右側のプレビューに反映されます。テンプレートを組み合わせる方式で、公開用のURLを発行できます。",
+    "店舗名・業種・キャッチコピーなど5項目を入力すると、右側のプレビューにLPが即座に反映されます。3種類のテンプレートの切替、PC/スマホ表示、セクションの表示切替、公開イメージ（モック）まで、ブラウザ内だけで体験できます。",
   tier: "standard",
   categories: ["web"],
   team: { kind: "solo" },
   period: { start: "2026-03" },
-  stack: ["Next.js", "API Routes", "Neon (PostgreSQL)"],
+  stack: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
   highlights: [
     { label: "入力とプレビューが連動", type: "check" },
-    { label: "公開URL（slug）を発行", type: "data" },
+    { label: "3テンプレートをワンクリックで切替", type: "check" },
+    { label: "PC / スマホ表示を切替", type: "check" },
   ],
   verification: "live-demo",
   links: {

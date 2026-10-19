@@ -1,52 +1,24 @@
 import type { Config } from 'tailwindcss'
 
+// 外部フォントは読み込まない（オフラインでも同じ見た目にするため OS 標準の和文フォントを使う）
+const gothic = ['"Hiragino Sans"', '"Hiragino Kaku Gothic ProN"', '"Noto Sans JP"', '"Yu Gothic"', 'Meiryo', 'system-ui', 'sans-serif']
+const mincho = ['"Hiragino Mincho ProN"', '"Yu Mincho"', '"Noto Serif JP"', 'serif']
+
 const config: Config = {
-  content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', './lib/**/*.ts'],
   theme: {
     extend: {
       colors: {
-        primary: '#002045',
-        'on-primary': '#ffffff',
-        'primary-container': '#1a365d',
-        'on-primary-container': '#86a0cd',
-        'primary-fixed': '#d6e3ff',
-        'primary-fixed-dim': '#adc7f7',
-        secondary: '#2c694e',
-        'on-secondary': '#ffffff',
-        'secondary-container': '#aeeecb',
-        'on-secondary-container': '#316e52',
-        'secondary-fixed': '#b1f0ce',
-        'secondary-fixed-dim': '#95d4b3',
-        surface: '#f7fafc',
-        'on-surface': '#181c1e',
-        'surface-variant': '#e0e3e5',
-        'on-surface-variant': '#43474e',
-        'surface-dim': '#d7dadc',
-        'surface-bright': '#f7fafc',
-        'surface-container-lowest': '#ffffff',
-        'surface-container-low': '#f1f4f6',
-        'surface-container': '#ebeef0',
-        'surface-container-high': '#e5e9eb',
-        'surface-container-highest': '#e0e3e5',
-        outline: '#74777f',
-        'outline-variant': '#c4c6cf',
-        background: '#f7fafc',
-        'on-background': '#181c1e',
-        error: '#ba1a1a',
-        'on-error': '#ffffff',
-        'error-container': '#ffdad6',
-        'on-error-container': '#93000a',
-        'tertiary-fixed': '#ffdcc5',
-        'tertiary-fixed-dim': '#ffb783',
+        accent: '#0099ff',
+        'ed-bg': '#0a0a0a',
+        'ed-panel': '#141414',
+        'ed-muted': '#a6a6a6',
       },
-      fontFamily: {
-        headline: ['"Plus Jakarta Sans"', '"Noto Sans JP"', 'sans-serif'],
-        body: ['Inter', '"Noto Sans JP"', 'sans-serif'],
+      fontFamily: { gothic, mincho },
+      keyframes: {
+        'fade-in': { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'none' } },
       },
+      animation: { 'fade-in': 'fade-in 0.45s ease-out both' },
     },
   },
   plugins: [],
