@@ -3,11 +3,12 @@ import { CHANNEL_NOTIFY_VIA, type Reservation } from '@/lib/types';
 
 interface Props {
   reservation: Reservation;
+  today:       string;
   onSend:      (kind: 'confirmation' | 'reminder') => void;
 }
 
 /** 通知はモック。ボタンを押すとフラグが立ち、トーストが出るだけ */
-export default function NotificationPanel({ reservation: r, onSend }: Props) {
+export default function NotificationPanel({ reservation: r, today, onSend }: Props) {
   const via = CHANNEL_NOTIFY_VIA[r.channel];
   const disabled = r.status === 'canceled';
   return (
@@ -18,7 +19,8 @@ export default function NotificationPanel({ reservation: r, onSend }: Props) {
       </h2>
       <div className="space-y-3">
         <Row label="予約確認" sent={r.confirmation_sent} via={via} disabled={disabled} onSend={() => onSend('confirmation')} />
-        <Row label="前日連絡" sent={r.reminder_sent} via={via} disabled={disabled} onSend={() => onSend('reminder')} />
+        <Row label="前日連絡" sent={r.reminder_sent} via={via} disabled={disabled} onSend={() => onSend('reminder')}
+          notApplicable={r.reservation_date <= today} />
       </div>
       {/* 「LINEで手打ちしていた文面が自動で入る」ことを見せるための文面例 */}
       <figure className="mt-4">
@@ -35,8 +37,8 @@ export default function NotificationPanel({ reservation: r, onSend }: Props) {
   );
 }
 
-function Row({ label, sent, via, disabled, onSend }: {
-  label: string; sent: boolean; via: string; disabled: boolean; onSend: () => void;
+function Row({ label, sent, via, disabled, onSend, notApplicable = false }: {
+  label: string; sent: boolean; via: string; disabled: boolean; onSend: () => void; notApplicable?: boolean;
 }) {
   return (
     // 幅が足りないときはボタンを次の行へ回す（ラベルとボタンが重ならないように）
@@ -50,6 +52,8 @@ function Row({ label, sent, via, disabled, onSend }: {
       </div>
       {sent ? (
         <span className="text-xs font-bold text-[#005313]">送信済み</span>
+      ) : notApplicable ? (
+        <span className="text-xs font-bold text-[#444653]">対象外（当日・過去の予約）</span>
       ) : (
         <button type="button" onClick={onSend} disabled={disabled}
           aria-label={`${label}を${via}で送る`}

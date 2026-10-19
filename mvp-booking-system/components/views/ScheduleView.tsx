@@ -4,16 +4,27 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { addDays, formatFullDate, toMinutes } from '@/lib/date';
 import { sortByDateTime, useStore } from '@/lib/store';
-import type { Reservation } from '@/lib/types';
+import { findMenu, type Reservation } from '@/lib/types';
 import ChannelBadge from '@/components/ChannelBadge';
 import LoadingState from '@/components/LoadingState';
 import { needsAttention } from '@/components/ReservationRow';
 import StatusBadge from '@/components/StatusBadge';
 
 const SLOT_H = 112;
-/** タイムライン上でカード1枚が占める時間（カードの高さ ≒ 1時間分） */
-const CARD_MIN = 60;
+/** メニューに無い施術名のときの所要時間 */
+const DEFAULT_MIN = 60;
+/** これより低いカードは1行目に名前まで詰める */
+const COMPACT_H = 100;
 const OPEN_HOURS = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+
+function durationMin(r: Reservation): number {
+  return findMenu(r.service_name)?.minutes ?? DEFAULT_MIN;
+}
+
+function endTime(r: Reservation): string {
+  const end = toMinutes(r.reservation_time) + durationMin(r);
+  return `${String(Math.floor(end / 60)).padStart(2, '0')}:${String(end % 60).padStart(2, '0')}`;
+}
 
 function accentColor(r: Reservation): string {
   if (r.status === 'canceled')  return '#c4c5d5';
@@ -30,7 +41,7 @@ export default function ScheduleView() {
 
   const date = addDays(today, offset);
   const list = sortByDateTime(reservations.filter(r => r.reservation_date === date));
-  const active = list.filter(r => r.status !== 'canceled');
+  const active = list.filter(r => r.status === 'pending' || r.status === 'confirmed');
   const unnotified = list.filter(needsAttention);
 
   return (
@@ -116,8 +127,9 @@ export function placeInLanes(list: Reservation[]): Placed[] {
     if (laneEnds.length > 0 && laneEnds.every(end => end <= start)) flush();
     const free = laneEnds.findIndex(end => end <= start);
     const lane = free === -1 ? laneEnds.length : free;
-    laneEnds = laneEnds.map((end, i) => (i === lane ? start + CARD_MIN : end));
-    if (lane === laneEnds.length) laneEnds = [...laneEnds, start + CARD_MIN];
+    const end = start + durationMin(r);
+    laneEnds = laneEnds.map((e, i) => (i === lane ? end : e));
+    if (lane === laneEnds.length) laneEnds = [...laneEnds, end];
     cluster = [...cluster, { r, lane }];
   }
   flush();
@@ -145,9 +157,11 @@ function Timeline({ list }: { list: Reservation[] }) {
             const top = Math.max(0, ((toMinutes(r.reservation_time) - startMin) / 60) * SLOT_H + 3);
             const width = `calc((100% - 24px - ${(lanes - 1) * 8}px) / ${lanes})`;
             const left = `calc(12px + (${width} + 8px) * ${lane})`;
+            // カードの高さ = 所要時間（区切りが見えるよう 4px 詰める）
+            const height = (durationMin(r) / 60) * SLOT_H - 4;
             return (
-              <div key={r.id} className="absolute" style={{ top, left, width }}>
-                <Card r={r} />
+              <div key={r.id} className="absolute" style={{ top, left, width, height }}>
+                <Card r={r} height={height} />
               </div>
             );
           })}
@@ -157,13 +171,16 @@ function Timeline({ list }: { list: Reservation[] }) {
   );
 }
 
-function Card({ r }: { r: Reservation }) {
+/** height 指定時（タイムライン）は枠いっぱいに伸ばし、はみ出た行は隠す */
+function Card({ r, height }: { r: Reservation; height?: number }) {
+  if (height !== undefined && height < COMPACT_H) return <CompactCard r={r} />;
   return (
     <Link href={`/reservations/${r.id}`}
-      className={`flex items-start gap-3 rounded-lg px-4 py-3 ring-1 ring-black/5 hover:shadow-md transition-shadow focus-visible:outline-2 focus-visible:outline-[#00288e] ${r.status === 'canceled' ? 'bg-[#f3f4f5]' : 'bg-white shadow-sm'}`}
+      className={`flex items-start gap-3 rounded-lg px-4 py-3 ${height !== undefined ? 'h-full overflow-hidden' : ''} ring-1 ring-black/5 hover:shadow-md transition-shadow focus-visible:outline-2 focus-visible:outline-[#00288e] ${r.status === 'canceled' ? 'bg-[#f3f4f5]' : 'bg-white shadow-sm'}`}
       style={{ borderLeft: `4px solid ${accentColor(r)}` }}>
-      <div className="shrink-0 w-14">
+      <div className="shrink-0 w-[4.5rem]">
         <p className="text-base font-black text-[#191c1d]">{r.reservation_time}</p>
+        <p className="text-[11px] font-bold text-[#444653]">〜{endTime(r)}</p>
         <div className="mt-1"><StatusBadge status={r.status} /></div>
       </div>
       <div className="flex-1 min-w-0">
@@ -175,6 +192,25 @@ function Card({ r }: { r: Reservation }) {
         {needsAttention(r) && <p className="text-[11px] text-[#ba1a1a] font-bold mt-1">確認通知 未送信</p>}
         {r.note && <p className="text-[11px] text-[#444653] mt-0.5 truncate">備考: {r.note}</p>}
       </div>
+    </Link>
+  );
+}
+
+/** 30〜45分の短い予約用。1行目に時刻・名前・状態をまとめる */
+function CompactCard({ r }: { r: Reservation }) {
+  return (
+    <Link href={`/reservations/${r.id}`}
+      className={`block h-full overflow-hidden rounded-lg px-3 py-1.5 ring-1 ring-black/5 hover:shadow-md transition-shadow focus-visible:outline-2 focus-visible:outline-[#00288e] ${r.status === 'canceled' ? 'bg-[#f3f4f5]' : 'bg-white shadow-sm'}`}
+      style={{ borderLeft: `4px solid ${accentColor(r)}` }}>
+      <p className="flex items-center gap-2 min-w-0">
+        <span className="text-sm font-black text-[#191c1d] shrink-0">{r.reservation_time}〜{endTime(r)}</span>
+        <span className="text-sm font-bold text-[#191c1d] truncate">{r.customer_name} <span className="font-normal text-xs text-[#444653]">様</span></span>
+        <StatusBadge status={r.status} />
+      </p>
+      <p className="text-xs text-[#444653] truncate">
+        {r.service_name}
+        {needsAttention(r) && <span className="text-[11px] text-[#ba1a1a] font-bold ml-2">確認通知 未送信</span>}
+      </p>
     </Link>
   );
 }
