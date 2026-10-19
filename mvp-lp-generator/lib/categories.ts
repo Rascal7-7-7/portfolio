@@ -15,6 +15,7 @@ export const CATEGORY_KEYS = Object.keys(CATEGORIES) as CategoryKey[]
 
 export const SECTION_LABELS: Record<SectionKey, string> = {
   features: '選ばれる理由',
+  greeting: 'ごあいさつ（院長・店主）',
   menu: 'メニュー・料金',
   voices: 'お客様の声',
   access: 'アクセス・営業時間',
