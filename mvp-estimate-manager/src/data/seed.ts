@@ -4,9 +4,9 @@ import { addDays } from "@/lib/utils";
 /** 見積書の発行元（デモ用の架空の会社） */
 export const ISSUER = {
   name: "株式会社デモワークス",
-  address: "東京都千代田区丸の内 0-0-0 デモビル 5F",
+  address: "東京都千代田区架空町 1-2-3 デモワークスビル 5F",
   tel: "03-0000-0000",
-  registration: "T0000000000000",
+  registration: "T1234567890123（デモ）",
 } as const;
 
 export const VALID_DAYS = 30;
@@ -68,18 +68,6 @@ const ROWS: SeedRow[] = [
     ],
   },
   {
-    client: "医療法人社団ひだまり会",
-    contact: "鈴木 由紀",
-    subject: "Web予約導線の改善",
-    daysAgo: 25,
-    status: "sent",
-    items: [
-      ["現状分析・改善提案", "式", 150000, 1],
-      ["予約フォーム改修", "式", 220000, 1],
-      ["保守運用サポート", "ヶ月", 25000, 6],
-    ],
-  },
-  {
     client: "株式会社北斗精機",
     contact: "高橋 誠",
     subject: "製品カタログ LP 制作",
@@ -104,6 +92,18 @@ const ROWS: SeedRow[] = [
       ["コーディング（レスポンシブ対応）", "ページ", 30000, 6],
       ["CMS導入・設定", "式", 120000, 1],
       ["社員インタビュー撮影", "日", 80000, 2],
+    ],
+  },
+  {
+    client: "医療法人社団ひだまり会",
+    contact: "鈴木 由紀",
+    subject: "Web予約導線の改善",
+    daysAgo: 25,
+    status: "sent",
+    items: [
+      ["現状分析・改善提案", "式", 150000, 1],
+      ["予約フォーム改修", "式", 220000, 1],
+      ["保守運用サポート", "ヶ月", 25000, 6],
     ],
   },
   {
@@ -141,7 +141,7 @@ const ROWS: SeedRow[] = [
   },
 ];
 
-/** 今日を基準にした相対日付でダミー見積を作る */
+/** 今日を基準にした相対日付でダミー見積を作る。ROWS は新しい順（daysAgo 昇順）に並べ、番号順＝発行日順にする */
 export function buildSeed(today: string): Estimate[] {
   return ROWS.map((row, index) => {
     const id = ROWS.length - index;

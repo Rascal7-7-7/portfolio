@@ -7,7 +7,7 @@ import { buildSeed } from "@/data/seed";
 import { todayISO } from "@/lib/utils";
 
 // ponytail: localStorage のみ。複数端末・複数人で共有するならサーバー保存が必要
-const STORAGE_KEY = "mvp-estimate-manager:v1";
+const STORAGE_KEY = "mvp-estimate-manager:v2";
 
 interface EstimatesContextValue {
   /** マウント前（localStorage 読み込み前）は null */

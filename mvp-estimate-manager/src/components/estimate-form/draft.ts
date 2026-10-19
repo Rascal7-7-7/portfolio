@@ -1,6 +1,7 @@
 import type { Estimate, EstimateInput, LineItem } from "@/types";
 import { PRESET_ITEMS, VALID_DAYS } from "@/data/seed";
 import { addDays, todayISO } from "@/lib/utils";
+import { itemErrors, parseAmount } from "./item-check";
 
 /** フォーム入力中の明細。数値は入力途中の文字列のまま持つ */
 export interface DraftItem {
@@ -14,10 +15,6 @@ export interface DraftItem {
 export interface Draft extends Omit<EstimateInput, "items"> {
   items: DraftItem[];
 }
-
-const MAX_AMOUNT = 1_000_000_000;
-/** 数量は小数2桁まで（例：12.5 ㎡）。金額計算 lineAmount の精度と揃える */
-const QUANTITY_PATTERN = /^\d{1,6}(\.\d{1,2})?$/;
 
 export function newItemId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -34,7 +31,7 @@ export function toDraftItem(item: Omit<LineItem, "id">): DraftItem {
 }
 
 export function emptyItem(): DraftItem {
-  return { id: newItemId(), name: "", unit: "式", unitPrice: "", quantity: "1" };
+  return { id: newItemId(), name: "", unit: "", unitPrice: "", quantity: "1" };
 }
 
 export function emptyDraft(): Draft {
@@ -72,24 +69,16 @@ export function draftFromEstimate(estimate: Estimate): Draft {
   };
 }
 
-function parseAmount(value: string): number {
-  return Number(value.replace(/,/g, "").trim());
+/** 数量・単価が正しければ数値に直した明細、誤りがあれば null */
+export function parseItem(item: DraftItem): LineItem | null {
+  const e = itemErrors(item);
+  if (e.quantity || e.unitPrice) return null;
+  return { ...item, unitPrice: parseAmount(item.unitPrice), quantity: parseAmount(item.quantity) };
 }
 
-/** プレビュー用：不正な数値は 0 として扱う */
+/** プレビュー用：数量・単価が不正な行は見積書にも合計にも入れない */
 export function toPreview(draft: Draft): EstimateInput {
-  return {
-    ...draft,
-    items: draft.items.map((item) => {
-      const unitPrice = parseAmount(item.unitPrice);
-      const quantity = parseAmount(item.quantity);
-      return {
-        ...item,
-        unitPrice: Number.isFinite(unitPrice) ? unitPrice : 0,
-        quantity: Number.isFinite(quantity) ? quantity : 0,
-      };
-    }),
-  };
+  return { ...draft, items: draft.items.flatMap((item) => parseItem(item) ?? []) };
 }
 
 export type ValidationResult = { ok: true; value: EstimateInput } | { ok: false; errors: string[] };
@@ -107,16 +96,17 @@ export function validateDraft(draft: Draft): ValidationResult {
   if (filled.length === 0) errors.push("明細を1行以上入力してください");
 
   const items: LineItem[] = filled.map((item, i) => {
-    const unitPrice = parseAmount(item.unitPrice);
-    const quantity = parseAmount(item.quantity);
     const label = `明細${i + 1}「${item.name.trim()}」`;
-    if (!QUANTITY_PATTERN.test(item.quantity.replace(/,/g, "").trim()) || quantity <= 0) {
-      errors.push(`${label}の数量は0より大きい数（小数は2桁まで）にしてください`);
-    }
-    if (!Number.isInteger(unitPrice) || unitPrice < 0 || unitPrice > MAX_AMOUNT) {
-      errors.push(`${label}の単価は0〜10億円の整数（円）で入力してください`);
-    }
-    return { id: item.id, name: item.name.trim(), unit: item.unit.trim(), unitPrice, quantity };
+    const e = itemErrors(item);
+    if (e.quantity) errors.push(`${label}の${e.quantity}`);
+    if (e.unitPrice) errors.push(`${label}の${e.unitPrice}`);
+    return {
+      id: item.id,
+      name: item.name.trim(),
+      unit: item.unit.trim(),
+      unitPrice: parseAmount(item.unitPrice),
+      quantity: parseAmount(item.quantity),
+    };
   });
 
   if (errors.length > 0) return { ok: false, errors };
