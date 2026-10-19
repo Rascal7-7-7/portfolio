@@ -22,7 +22,7 @@ export function Hero() {
         </p>
         <p className="text-3xl sm:text-4xl font-bold text-surface-50 mb-2">
           {profile.name}
-          <span className="ml-3 text-sm font-normal text-surface-500">
+          <span className="ml-3 text-sm font-normal text-surface-400">
             {profile.nameReading}
           </span>
         </p>

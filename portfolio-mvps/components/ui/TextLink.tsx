@@ -14,7 +14,7 @@ const textLink = cva(
       tone: {
         accent: "text-brand-500 hover:text-brand-400",
         muted: "text-surface-400 hover:text-surface-200",
-        subtle: "text-surface-500 hover:text-surface-200",
+        subtle: "text-surface-400 hover:text-surface-200",
       },
     },
     defaultVariants: { tone: "muted" },

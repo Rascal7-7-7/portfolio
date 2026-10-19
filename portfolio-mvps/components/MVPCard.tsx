@@ -34,7 +34,7 @@ export function MVPCard({ project }: { project: Project }) {
   return (
     <article className="flex flex-col bg-surface-900 rounded-2xl p-6 hover:bg-surface-800/80 transition-colors group">
       {/* Meta */}
-      <div className="flex items-center gap-3 mb-4 text-xs text-surface-500">
+      <div className="flex items-center gap-3 mb-4 text-xs text-surface-400">
         <span>{periodLabel}</span>
         <span aria-hidden="true">·</span>
         <span>{teamLabel}</span>
