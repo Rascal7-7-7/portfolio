@@ -36,6 +36,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Link>
             <p className="text-xs text-dim mt-1 leading-relaxed">デモ：お客様の画面で予約すると、管理画面に入ってきます</p>
             <p className="text-xs text-dim mt-4">受付スタッフ ・ ダミーデータ</p>
+            {/* 制作側（フリーランス管理MVP）で、この予約システムを案件として管理している画面へ */}
+            <a href="https://mvp-freelance-manager.vercel.app/projects/p2" target="_blank" rel="noopener noreferrer"
+              className="block text-xs text-dim mt-2 underline underline-offset-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-brand rounded">
+              この予約システムの制作案件（Hikae）<span className="sr-only">（新しいタブで開きます）</span>
+            </a>
           </div>
         </div>
       </aside>
