@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { findConflict } from '@/lib/slots';
 import { useStore } from '@/lib/store';
 import { STAFF, type ReservationInput } from '@/lib/types';
 import LoadingState from '@/components/LoadingState';
@@ -43,7 +44,8 @@ export default function NewReservationView() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
         <div className="md:col-span-2">
-          <ReservationForm id={FORM_ID} defaults={defaults} minDate={today} onSubmit={handleSubmit} />
+          <ReservationForm id={FORM_ID} defaults={defaults} minDate={today}
+            findConflict={input => findConflict(reservations, input)} onSubmit={handleSubmit} />
           <div className="flex gap-3 mt-5 md:hidden">
             <Link href="/reservations" className={`${btn('secondary', 'lg')} flex-1`}>キャンセル</Link>
             <button type="submit" form={FORM_ID} className={`${btn('primary', 'lg')} flex-1`}>予約を登録する</button>

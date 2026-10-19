@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { todayStr } from './date';
 import { createSeed } from './seed';
-import type { Reservation, ReservationInput } from './types';
+import { isChannel, isStaff, isStatus, type Reservation, type ReservationInput } from './types';
 
 /**
  * デモ用のクライアント側ストア。API・DB は使わない。
@@ -35,12 +35,28 @@ interface Store {
 
 const StoreContext = createContext<Store | null>(null);
 
+const STRING_KEYS = [
+  'customer_name', 'customer_email', 'customer_phone', 'service_name', 'note', 'created_at', 'updated_at',
+] as const;
+
+/** localStorage の中身は信用しない。1件でも形が違えばダミーデータに戻す */
+function isReservation(v: unknown): v is Reservation {
+  if (typeof v !== 'object' || v === null) return false;
+  const r = v as Record<string, unknown>;
+  return Number.isInteger(r.id)
+    && STRING_KEYS.every(k => typeof r[k] === 'string')
+    && typeof r.reservation_date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.reservation_date)
+    && typeof r.reservation_time === 'string' && /^\d{2}:\d{2}$/.test(r.reservation_time)
+    && isStaff(r.staff) && isChannel(r.channel) && isStatus(r.status)
+    && typeof r.confirmation_sent === 'boolean' && typeof r.reminder_sent === 'boolean';
+}
+
 function load(today: string): Reservation[] {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const saved = JSON.parse(raw) as Partial<Saved>;
-      if (saved.seededOn === today && Array.isArray(saved.reservations)) {
+      if (saved.seededOn === today && Array.isArray(saved.reservations) && saved.reservations.every(isReservation)) {
         return saved.reservations;
       }
     }

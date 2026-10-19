@@ -43,3 +43,20 @@ export function availableSlots(
   }
   return slots;
 }
+
+/** 管理画面の時間の選択肢（営業時間内・30分刻み） */
+export const TIME_OPTIONS = Array.from({ length: (CLOSE_MIN - OPEN_MIN) / STEP_MIN }, (_, i) => toTime(OPEN_MIN + i * STEP_MIN));
+
+/** 同じ担当・同じ日で時間帯が重なる予約（キャンセル済みと、編集中の予約自身は除く） */
+export function findConflict(
+  reservations: Reservation[],
+  input: Pick<Reservation, 'reservation_date' | 'reservation_time' | 'service_name' | 'staff'>,
+  excludeId?: number,
+): Reservation | undefined {
+  const start = toMinutes(input.reservation_time);
+  const end = start + durationMin(input);
+  return reservations.find(r =>
+    r.id !== excludeId && r.status !== 'canceled'
+    && r.staff === input.staff && r.reservation_date === input.reservation_date
+    && toMinutes(r.reservation_time) < end && start < toMinutes(r.reservation_time) + durationMin(r));
+}

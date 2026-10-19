@@ -1,22 +1,26 @@
 'use client';
 
-import { CHANNELS, CHANNEL_LABEL, MENUS, STAFF, isStaff, type Channel, type ReservationInput } from '@/lib/types';
+import { useState } from 'react';
+import { formatFullDate } from '@/lib/date';
+import { TIME_OPTIONS } from '@/lib/slots';
+import {
+  CHANNELS, CHANNEL_LABEL, MENUS, STAFF, isChannel, isStaff,
+  type Reservation, type ReservationInput,
+} from '@/lib/types';
 
 interface Props {
   id:        string;
   defaults:  ReservationInput;
   minDate?:  string;
+  /** 同じ担当・時間帯に入っている予約を返す。あれば登録せずエラーを出す */
+  findConflict: (input: ReservationInput) => Reservation | undefined;
   onSubmit:  (input: ReservationInput) => void;
 }
 
 export const inputCls =
   'w-full bg-canvas border border-line-strong rounded-md px-3 py-2 text-sm text-ink ' +
-  'focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none ' +
+  'focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none aria-[invalid=true]:border-attn ' +
   'placeholder:text-dim';
-
-function isChannel(v: string): v is Channel {
-  return (CHANNELS as string[]).includes(v);
-}
 
 function readForm(form: HTMLFormElement): ReservationInput {
   const fd = new FormData(form);
@@ -36,12 +40,26 @@ function readForm(form: HTMLFormElement): ReservationInput {
   };
 }
 
-/** 新規登録と編集で共通のフォーム。必須チェックはブラウザ標準（required）に任せる */
-export default function ReservationForm({ id, defaults, minDate, onSubmit }: Props) {
+/** 新規登録と編集で共通のフォーム。必須チェックはブラウザ標準（required）、二重予約だけここで確かめる */
+export default function ReservationForm({ id, defaults, minDate, findConflict, onSubmit }: Props) {
+  const [conflict, setConflict] = useState<{ staff: string; hit: Reservation } | null>(null);
+  const errorId = `${id}-conflict`;
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit(readForm(e.currentTarget));
+    const input = readForm(e.currentTarget);
+    const hit = findConflict(input);
+    if (hit) {
+      setConflict({ staff: input.staff, hit });
+      return;
+    }
+    setConflict(null);
+    onSubmit(input);
   };
+
+  // 担当・日時・メニューを変えたら、前のエラーは消す
+  const clear = () => setConflict(null);
+  const invalid = conflict ? { 'aria-invalid': true, 'aria-describedby': errorId } : {};
 
   return (
     <form id={id} onSubmit={handleSubmit} className="space-y-5">
@@ -51,8 +69,9 @@ export default function ReservationForm({ id, defaults, minDate, onSubmit }: Pro
             <input id={`${id}-name`} type="text" name="customer_name" required autoComplete="off"
               defaultValue={defaults.customer_name} placeholder="山田 花子" className={inputCls} />
           </Field>
-          <Field id={`${id}-phone`} label="電話番号">
-            <input id={`${id}-phone`} type="tel" name="customer_phone" autoComplete="off"
+          {/* お客様の予約ページと同じく電話番号は必須（メールが無いときの SMS の宛先になる） */}
+          <Field id={`${id}-phone`} label="電話番号" required>
+            <input id={`${id}-phone`} type="tel" name="customer_phone" required autoComplete="off"
               defaultValue={defaults.customer_phone} placeholder="090-0000-0000" className={inputCls} />
           </Field>
           <Field id={`${id}-email`} label="メールアドレス">
@@ -68,14 +87,18 @@ export default function ReservationForm({ id, defaults, minDate, onSubmit }: Pro
       </FormSection>
 
       <FormSection title="予約内容">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" onChange={clear}>
           <Field id={`${id}-date`} label="予約日" required>
-            <input id={`${id}-date`} type="date" name="reservation_date" required
-              defaultValue={defaults.reservation_date} min={minDate} className={inputCls} />
+            <DateInput id={`${id}-date`} name="reservation_date" defaultValue={defaults.reservation_date} min={minDate} />
           </Field>
           <Field id={`${id}-time`} label="予約時間" required>
-            <input id={`${id}-time`} type="time" name="reservation_time" required step={1800}
-              defaultValue={defaults.reservation_time} className={inputCls} />
+            <select id={`${id}-time`} name="reservation_time" required defaultValue={defaults.reservation_time}
+              className={inputCls} {...invalid}>
+              {!TIME_OPTIONS.includes(defaults.reservation_time) && defaults.reservation_time && (
+                <option value={defaults.reservation_time}>{defaults.reservation_time}</option>
+              )}
+              {TIME_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
           </Field>
           <Field id={`${id}-menu`} label="メニュー" required>
             <select id={`${id}-menu`} name="service_name" required defaultValue={defaults.service_name} className={inputCls}>
@@ -88,10 +111,18 @@ export default function ReservationForm({ id, defaults, minDate, onSubmit }: Pro
             </select>
           </Field>
           <Field id={`${id}-staff`} label="担当" required>
-            <select id={`${id}-staff`} name="staff" required defaultValue={defaults.staff} className={inputCls}>
+            <select id={`${id}-staff`} name="staff" required defaultValue={defaults.staff} className={inputCls} {...invalid}>
               {STAFF.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </Field>
+          {conflict && (
+            <p id={errorId} role="alert" className="sm:col-span-2 -mt-1 text-sm text-attn font-medium text-pretty">
+              {conflict.staff}さんは同じ時間帯に{conflict.hit.customer_name} 様
+              <span className="whitespace-nowrap">（{conflict.hit.reservation_time}〜・</span>
+              <span className="whitespace-nowrap">{conflict.hit.service_name}）</span>
+              の予約があります。担当か時間を変えてください。
+            </p>
+          )}
           <Field id={`${id}-note`} label="備考" wide>
             <textarea id={`${id}-note`} name="note" rows={3} defaultValue={defaults.note}
               placeholder="アレルギーの有無やご要望など" className={`${inputCls} resize-none`} />
@@ -99,6 +130,33 @@ export default function ReservationForm({ id, defaults, minDate, onSubmit }: Pro
         </div>
       </FormSection>
     </form>
+  );
+}
+
+/**
+ * ネイティブの日付ピッカーは使いつつ、表示はブラウザの言語設定に関係なく「2026年10月19日（月）」にする。
+ * 透明な input を下に敷いて和式の表示を重ねる（クリック・キーボード操作は input が受ける）。
+ */
+function DateInput({ id, name, defaultValue, min }: { id: string; name: string; defaultValue: string; min?: string }) {
+  const [value, setValue] = useState(defaultValue);
+  const openPicker = (e: React.MouseEvent<HTMLInputElement>) => {
+    try {
+      e.currentTarget.showPicker();
+    } catch {
+      // showPicker 非対応のブラウザでは通常の input 操作にまかせる
+    }
+  };
+  return (
+    <span className="relative block">
+      <input id={id} type="date" name={name} required value={value} min={min}
+        onChange={e => setValue(e.target.value)} onClick={openPicker}
+        className="peer absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+      <span aria-hidden="true"
+        className={`${inputCls} pointer-events-none flex items-center justify-between peer-focus:border-brand peer-focus:ring-2 peer-focus:ring-brand/20`}>
+        <span className={value ? 'tabular-nums' : 'text-dim'}>{value ? formatFullDate(value) : '日付を選択'}</span>
+        <span className="material-symbols-outlined text-dim">calendar_today</span>
+      </span>
+    </span>
   );
 }
 
