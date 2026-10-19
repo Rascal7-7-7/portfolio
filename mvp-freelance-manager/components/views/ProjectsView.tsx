@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ChevronRight, Plus } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { formatDate } from "@/lib/dates";
-import { projectProgress } from "@/lib/selectors";
+import { dueLabel, projectProgress } from "@/lib/selectors";
 import { cn, formatYen } from "@/lib/utils";
 import { buttonStyles, Card, Page, PageHeader, PageSkeleton } from "@/components/ui";
 import { ProjectStatusBadge } from "@/components/StatusBadge";
@@ -90,7 +90,7 @@ export function ProjectsView() {
                       {/* 区切りごとに折り返し、語の途中で改行しない */}
                       <p className="mt-0.5 flex flex-wrap gap-x-1 text-xs text-warm-500">
                         <span className="min-w-0 break-words">{p.client}</span>
-                        <span className="num whitespace-nowrap">・ 納期 {formatDate(p.dueDate)}</span>
+                        <span className="num whitespace-nowrap">・ {dueLabel(p)} {formatDate(p.dueDate)}</span>
                         <span className="num whitespace-nowrap">・ タスク {prog.done}/{prog.total}</span>
                       </p>
                     </div>
