@@ -1,0 +1,51 @@
+name: mvps
+
+# 5つの MVP がビルドできることを、マージ前に確認する。
+# lint は 3 つの MVP で未設定のため、ビルドのみ。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mvp-*/**"
+      - ".github/workflows/mvps.yml"
+  pull_request:
+    paths:
+      - "mvp-*/**"
+      - ".github/workflows/mvps.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ビルド (${{ matrix.mvp }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # ponytail: 1つの変更でも全 MVP をビルドする。遅くなったら変更検出を入れる
+      matrix:
+        mvp:
+          - mvp-booking-system
+          - mvp-estimate-manager
+          - mvp-freelance-manager
+          - mvp-lp-generator
+          - mvp-subscription-ec
+    defaults:
+      run:
+        working-directory: ${{ matrix.mvp }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: ${{ matrix.mvp }}/package-lock.json
+
+      - name: 依存関係のインストール
+        run: npm ci
+
+      - name: ビルド
+        # ビルド時に DB へは接続しないが、未設定だと例外を投げる MVP がある
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost/dummy
