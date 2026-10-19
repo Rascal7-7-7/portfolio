@@ -1,8 +1,8 @@
 import type { LPDoc } from './types'
 
-const ALL_SECTIONS = { features: true, menu: true, voices: true, access: true, cta: true } as const
+const ALL_SECTIONS = { features: true, greeting: true, menu: true, voices: true, access: true, cta: true } as const
 
-// 住所・電話番号はすべて架空のダミーです
+// 住所・電話番号・人名はすべて架空のダミーです
 export const SAMPLES: readonly LPDoc[] = [
   {
     id: '1',
@@ -34,6 +34,11 @@ export const SAMPLES: readonly LPDoc[] = [
         { name: '30代・会社員', text: '朝の通勤前に寄るのが日課に。深煎りの香りで一日が始まります。' },
         { name: '20代・学生', text: '窓際の席が落ち着いて、レポートがはかどりました。スコーンが絶品です。' },
       ],
+      owner: {
+        role: '店主',
+        name: '森 和也',
+        message: '焙煎機の前に立って十年になります。豆の具合は季節や天気で毎日変わるので、いちばんおいしい焼き加減を毎朝確かめています。「今日のおすすめは？」と気軽に聞いてください。',
+      },
     },
   },
   {
@@ -66,6 +71,11 @@ export const SAMPLES: readonly LPDoc[] = [
         { name: '20代・会社員', text: 'くせ毛が悩みでしたが、乾かすだけでまとまるようになりました。' },
         { name: '40代・主婦', text: '個室で落ち着いて過ごせます。カラーの提案がいつも的確です。' },
       ],
+      owner: {
+        role: '担当スタイリスト',
+        name: '篠原 葵',
+        message: '「朝、乾かすだけでまとまる」を目標に、毎回カウンセリングから始めます。くせや生えぐせも、活かし方しだいで扱いやすいデザインになります。気になっていることは何でもお話しください。',
+      },
     },
   },
   {
@@ -98,6 +108,11 @@ export const SAMPLES: readonly LPDoc[] = [
         { name: '30代・エンジニア', text: '長年の肩こりがかなり楽に。姿勢の写真で変化が分かるのが嬉しいです。' },
         { name: '50代・自営業', text: '痛くない施術で安心しました。夜遅くまで開いているので通いやすいです。' },
       ],
+      owner: {
+        role: '院長',
+        name: '日向 誠',
+        message: '開業前は整形外科で8年間リハビリを担当していました。痛みを我慢しながら通う方を多く見てきたので、ここでは強く押したり鳴らしたりしない施術にこだわっています。まずはお体の状態を一緒に確かめるところから始めましょう。',
+      },
     },
   },
 ]

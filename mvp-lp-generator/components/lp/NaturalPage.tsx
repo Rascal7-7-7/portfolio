@@ -1,6 +1,7 @@
 import { CATEGORIES } from '@/lib/categories'
 import { cx } from '@/lib/cx'
-import { catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, Phrases, storeName, type TemplateProps } from './shared'
+import MobileBar, { HERO_CTA } from './MobileBar'
+import { catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, ownerOf, Phrases, storeName, type TemplateProps } from './shared'
 
 /*
  * ナチュラル: 個人経営のカフェ・和の店のサイト（STUDIO「Cafe Flat」の細い額縁線、
@@ -80,7 +81,7 @@ function Hero({ store, wide }: TemplateProps) {
             </ul>
           )}
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-            <a href="#reserve" className={BTN}>{ctaLabel(store)}</a>
+            <a href="#reserve" className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
             <a href="#menu" className="border-b border-[#2e2620]/40 pb-0.5 text-sm tracking-[0.12em] hover:border-[#2e2620]">メニューを見る</a>
           </div>
         </div>
@@ -115,6 +116,26 @@ function Features({ store, wide }: TemplateProps) {
           </li>
         ))}
       </ol>
+    </section>
+  )
+}
+
+/**
+ * 店主のひと言。紙ものの「店主より」の添え書きのように、明朝の短い文と署名だけで組む（頭文字の飾りも置かない）
+ */
+function Greeting({ store, wide }: TemplateProps) {
+  const owner = ownerOf(store)
+  if (!owner) return null
+  return (
+    <section className={pad(wide)}>
+      <div className="mx-auto max-w-2xl">
+        <H2 text={`${owner.role}より`} wide={wide} />
+        <p className={cx('mt-12 font-mincho leading-[2.2] tracking-[0.08em]', wide ? 'text-[17px]' : 'text-base')}>{owner.message}</p>
+        <p className="mt-8 text-right font-mincho text-sm tracking-[0.14em]">
+          <span className={cx(MUTED, 'mr-3 text-xs')}>{owner.role}</span>
+          {owner.name}
+        </p>
+      </div>
     </section>
   )
 }
@@ -192,6 +213,7 @@ export default function NaturalPage(props: TemplateProps) {
         <Nav {...props} />
         <Hero {...props} />
         {sections.features && <Features {...props} />}
+        {sections.greeting && <Greeting {...props} />}
         {sections.menu && <Menu {...props} />}
         {sections.voices && <Voices {...props} />}
         {sections.access && <Access {...props} />}
@@ -199,6 +221,12 @@ export default function NaturalPage(props: TemplateProps) {
         <footer className={cx(LINE, MUTED, 'border-t px-6 py-10 text-center text-xs tracking-[0.12em]')}>
           © {storeName(store)}
         </footer>
+        {!wide && (
+          <MobileBar
+            store={store}
+            tone={{ bar: 'border-[#2e2620]/15 bg-[#f7f3ec]', tel: 'border-[#2e2620] text-[#2e2620]', web: 'bg-[#2e2620] text-[#f7f3ec]' }}
+          />
+        )}
       </div>
     </div>
   )
