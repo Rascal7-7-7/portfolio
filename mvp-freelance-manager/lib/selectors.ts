@@ -39,6 +39,8 @@ export interface DashboardSummary {
   readonly outstandingCount: number;
   readonly overdueCount: number;
   readonly overdueTotal: number;
+  /** 来月以降が期日の未入金（月次グラフの今月分には入らない額） */
+  readonly laterDueTotal: number;
   readonly activeProjectCount: number;
   readonly activeProjectAmount: number;
   readonly todayTaskCount: number;
@@ -58,6 +60,7 @@ export function dashboardSummary(data: AppData, today: ISODate): DashboardSummar
     outstandingCount: unpaid.length,
     overdueCount: overdue.length,
     overdueTotal: overdue.reduce((sum, inv) => sum + inv.amount, 0),
+    laterDueTotal: unpaid.filter((inv) => monthKey(inv.dueOn) > revenue.month).reduce((sum, inv) => sum + inv.amount, 0),
     activeProjectCount: active.length,
     activeProjectAmount: active.reduce((sum, p) => sum + p.amount, 0),
     todayTaskCount: openTasks.filter((t) => diffDays(today, t.dueDate) <= 0).length,

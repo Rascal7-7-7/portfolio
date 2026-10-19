@@ -1,5 +1,10 @@
-import type { AppData, Invoice, ISODate, Project, Task } from "@/types";
+import type { AppData, Invoice, InvoiceItem, ISODate, Project, Task } from "@/types";
 import { addDays, parseISODate, shiftMonth } from "./dates.ts";
+import { taxIncluded } from "./utils.ts";
+
+/** 見積マネージャーの EST-0014（みなと不動産）から作った請求。シリーズ間で id・金額を固定する */
+export const ESTIMATE_INVOICE_ID = "est-0014";
+const ESTIMATE_NO = "EST-0014";
 
 /** offset ヶ月前の day 日。今月分は今日を越えないように丸める */
 function dayInMonth(today: ISODate, offset: number, day: number): ISODate {
@@ -11,14 +16,15 @@ function dayInMonth(today: ISODate, offset: number, day: number): ISODate {
 function projects(today: ISODate): Project[] {
   const d = (n: number) => addDays(today, n);
   return [
-    { id: "p1", name: "コーポレートサイトリニューアル", client: "株式会社ミナトデザイン工房", amount: 880_000, status: "in_progress", dueDate: d(18) },
-    { id: "p2", name: "予約管理システム開発", client: "整体院こもれび", amount: 1_200_000, status: "in_progress", dueDate: d(32) },
+    { id: "p11", name: "コーポレートサイト リニューアル", client: "株式会社みなと不動産", amount: 1_243_000, status: "in_progress", dueDate: d(54), estimateNo: ESTIMATE_NO },
+    { id: "p1", name: "サービスサイト制作", client: "合同会社ノギク企画", amount: 880_000, status: "in_progress", dueDate: d(18) },
+    { id: "p2", name: "予約管理システム開発", client: "Hair Salon Lien 表参道店", amount: 1_200_000, status: "in_progress", dueDate: d(32), deliverableUrl: "https://mvp-booking-system.vercel.app/reservations" },
     { id: "p3", name: "採用LP制作", client: "株式会社アオバ物流", amount: 360_000, status: "in_progress", dueDate: d(6) },
     { id: "p4", name: "ECサイト保守（年間契約・月11万円）", client: "有限会社まるやま茶園", amount: 1_320_000, status: "in_progress", dueDate: d(165) },
     { id: "p5", name: "社内ポータル改修", client: "北斗建設株式会社", amount: 640_000, status: "estimate", dueDate: d(45) },
     { id: "p6", name: "ブランドサイト制作", client: "ベーカリー麦と陽", amount: 420_000, status: "estimate", dueDate: d(40) },
     { id: "p7", name: "会員アプリUI設計", client: "株式会社リンクスフィット", amount: 750_000, status: "completed", dueDate: d(-24) },
-    { id: "p8", name: "秋キャンペーンLP", client: "株式会社ミナトデザイン工房", amount: 280_000, status: "completed", dueDate: d(-120) },
+    { id: "p8", name: "秋キャンペーンLP", client: "合同会社ノギク企画", amount: 280_000, status: "completed", dueDate: d(-120) },
     { id: "p9", name: "多言語観光サイト構築", client: "おもてなし観光協会", amount: 950_000, status: "lost", dueDate: d(-10) },
     { id: "p10", name: "店舗サイト制作", client: "カフェ ソラノイロ", amount: 330_000, status: "completed", dueDate: d(-150) },
   ];
@@ -44,6 +50,8 @@ function tasks(today: ISODate): Task[] {
     ["p5", "見積書の提出", 2, false],
     ["p5", "ヒアリング議事録のまとめ", -2, true],
     ["p6", "提案資料の作成", 7, false],
+    ["p11", "キックオフ議事録の共有", -2, true],
+    ["p11", "サイトマップと原稿の確定", 5, false],
   ];
   return rows.map(([projectId, title, offset, done], i) => ({
     id: `t${i + 1}`,
@@ -54,6 +62,35 @@ function tasks(today: ISODate): Task[] {
     doneOn: done ? d(offset) : null,
   }));
 }
+
+/** 案件ごとの明細の内訳（重み）。見積と同じ粒度で 2〜4 行 */
+const ITEM_TEMPLATES: Record<string, readonly (readonly [string, number])[]> = {
+  p1: [["デザイン（トップ・下層5ページ）", 4], ["コーディング", 4], ["CMS組込・公開作業", 2]],
+  p2: [["要件定義・画面設計", 3], ["予約カレンダー・管理画面の実装", 5], ["通知メール設定", 1], ["テスト・操作説明", 1]],
+  p3: [["構成・原稿整理", 3], ["デザイン", 4], ["コーディング・公開", 3]],
+  p4: [["サイト保守（月額）", 7], ["商品ページの更新作業", 3]],
+  p7: [["画面設計（ワイヤーフレーム）", 4], ["UIデザイン", 5], ["デザインガイド作成", 1]],
+  p8: [["デザイン", 5], ["コーディング", 4], ["公開作業", 1]],
+  p10: [["デザイン", 5], ["コーディング", 4], ["Googleマップ・SNS連携設定", 1]],
+};
+
+/** 税抜額を重みで按分（千円単位で切り捨て、端数は最後の行へ）。合計は必ず税抜額と一致する */
+function splitItems(projectId: string, amount: number): InvoiceItem[] | undefined {
+  const template = ITEM_TEMPLATES[projectId];
+  if (!template) return undefined;
+  const subtotal = amount - taxIncluded(amount);
+  const total = template.reduce((sum, [, w]) => sum + w, 0);
+  const rows = template.map(([name, w]) => ({ name, qty: "1 式", amount: Math.floor((subtotal * w) / total / 1000) * 1000 }));
+  const rest = subtotal - rows.reduce((sum, r) => sum + r.amount, 0);
+  return rows.map((r, i) => (i === rows.length - 1 ? { ...r, amount: r.amount + rest } : r));
+}
+
+const ESTIMATE_ITEMS: readonly InvoiceItem[] = [
+  { name: "要件定義・サイト設計", qty: "1 式", amount: 180_000 },
+  { name: "デザイン（トップ＋下層8ページ）", qty: "1 式", amount: 420_000 },
+  { name: "コーディング・CMS組込", qty: "1 式", amount: 450_000 },
+  { name: "公開作業・初期設定", qty: "1 式", amount: 80_000 },
+];
 
 function invoices(today: ISODate): Invoice[] {
   const m = (offset: number, day: number) => dayInMonth(today, offset, day);
@@ -84,11 +121,24 @@ function invoices(today: ISODate): Invoice[] {
     { projectId: "p4", amount: 110_000, issuedOn: addDays(today, -3), dueOn: addDays(today, 11), paidOn: null },
     { projectId: "p3", amount: 180_000, issuedOn: addDays(today, -1), dueOn: addDays(today, 29), paidOn: null },
   ];
-  return [...paidInvoices, ...unpaidInvoices].map((invoice, i) => ({
+  const numbered: Invoice[] = [...paidInvoices, ...unpaidInvoices].map((invoice, i) => ({
     ...invoice,
     id: `i${i + 1}`,
     number: `INV-${String(i + 1).padStart(4, "0")}`,
+    items: splitItems(invoice.projectId, invoice.amount),
   }));
+  const fromEstimate: Invoice = {
+    id: ESTIMATE_INVOICE_ID,
+    number: `INV-${String(numbered.length + 1).padStart(4, "0")}`,
+    projectId: "p11",
+    amount: 1_243_000,
+    issuedOn: today,
+    dueOn: addDays(today, 30),
+    paidOn: null,
+    estimateNo: ESTIMATE_NO,
+    items: ESTIMATE_ITEMS,
+  };
+  return [...numbered, fromEstimate];
 }
 
 export function createSeed(today: ISODate): AppData {

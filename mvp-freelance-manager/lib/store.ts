@@ -9,7 +9,7 @@ import { createSeed } from "./seed.ts";
  * デモ用のクライアント側ストア。API・DB は使わず、操作内容は localStorage に保存する。
  * ponytail: 日付が変わるとダミーデータを作り直す（相対日付を常に「今日」基準に保つため）。
  */
-const STORAGE_KEY = "freelancehub-demo-v1";
+const STORAGE_KEY = "freelancehub-demo-v2";
 
 interface Snapshot {
   readonly today: ISODate;
