@@ -3,12 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cx } from '@/lib/cx'
 import type { LPDoc, MenuItem, SectionKey, StoreInfo, TemplateKey } from '@/lib/types'
-import Icon from '../Icon'
 import EditorForm from './EditorForm'
+import { GENERATE_MS } from './GeneratingOverlay'
 import PreviewPane from './PreviewPane'
 import PublishDialog from './PublishDialog'
 
-const GENERATE_MS = 1300
 type Tab = 'form' | 'preview'
 
 export default function Editor({ initial }: { initial: LPDoc }) {
@@ -43,31 +42,29 @@ export default function Editor({ initial }: { initial: LPDoc }) {
   const setTemplate = (template: TemplateKey) => setDoc((d) => ({ ...d, template }))
 
   return (
-    <div className="flex min-h-dvh flex-col bg-ed-bg text-white lg:h-dvh">
-      <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-white/[0.08] px-4 lg:px-6">
-        <div className="flex items-center gap-2.5">
-          <span aria-hidden className="h-6 w-6 rounded-lg bg-gradient-to-br from-accent to-[#7b5cff]" />
-          <span className="text-sm font-semibold tracking-tight">LP Concierge</span>
-          <span className="hidden rounded-full border border-white/10 px-2 py-0.5 text-[10px] text-ed-muted sm:inline">DEMO</span>
-        </div>
+    <div className="flex min-h-dvh flex-col bg-ed-bg text-ed-ink lg:h-dvh">
+      <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-ed-line bg-ed-panel px-4 lg:px-6">
+        <p className="flex items-baseline gap-2">
+          <span className="text-[15px] font-semibold">LP Concierge</span>
+          <span className="hidden text-xs text-ed-muted sm:inline">デモ版</span>
+        </p>
         <ol className="hidden items-center gap-2 text-xs text-ed-muted md:flex">
-          <li>① 入力</li>
-          <li aria-hidden>→</li>
-          <li>② 生成・テンプレート選択</li>
-          <li aria-hidden>→</li>
-          <li>③ 公開</li>
+          <li>1. 入力</li>
+          <li aria-hidden>—</li>
+          <li>2. 生成・テンプレート選択</li>
+          <li aria-hidden>—</li>
+          <li>3. 公開</li>
         </ol>
         <button
           type="button"
           onClick={() => setPublishOpen(true)}
-          className="flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-black transition hover:bg-white/90"
+          className="rounded-md bg-ed-ink px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#33333a]"
         >
-          <Icon name="rocket" className="h-3.5 w-3.5" />
           公開する
         </button>
       </header>
 
-      <div role="tablist" aria-label="表示切替" className="flex gap-1 border-b border-white/[0.08] p-2 lg:hidden">
+      <div role="tablist" aria-label="表示切替" className="flex border-b border-ed-line bg-ed-panel lg:hidden">
         {(['form', 'preview'] as const).map((k) => (
           <button
             key={k}
@@ -75,15 +72,18 @@ export default function Editor({ initial }: { initial: LPDoc }) {
             type="button"
             aria-selected={tab === k}
             onClick={() => setTab(k)}
-            className={cx('flex-1 rounded-full py-2 text-xs font-medium', tab === k ? 'bg-white/10 text-white' : 'text-ed-muted')}
+            className={cx(
+              '-mb-px flex-1 border-b-2 py-3 text-sm font-medium transition-colors',
+              tab === k ? 'border-ed-ink text-ed-ink' : 'border-transparent text-ed-muted',
+            )}
           >
             {k === 'form' ? '入力' : 'プレビュー'}
           </button>
         ))}
       </div>
 
-      <div className="min-h-0 flex-1 lg:grid lg:grid-cols-[400px_1fr] lg:grid-rows-[minmax(0,1fr)]">
-        <aside className={cx('overflow-y-auto border-white/[0.08] lg:block lg:border-r', tab === 'form' ? 'block' : 'hidden')}>
+      <div className="min-h-0 flex-1 lg:grid lg:grid-cols-[380px_1fr] lg:grid-rows-[minmax(0,1fr)]">
+        <aside className={cx('overflow-y-auto border-ed-line bg-ed-panel lg:block lg:border-r', tab === 'form' ? 'block' : 'hidden')}>
           <EditorForm
             doc={doc}
             onStore={updateStore}

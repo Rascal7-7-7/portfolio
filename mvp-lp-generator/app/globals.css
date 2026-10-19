@@ -6,4 +6,12 @@
   body {
     -webkit-font-smoothing: antialiased;
   }
+  /* 黒い輪を白で挟んだフォーカス枠。明るい地・黒地・珊瑚色のどのテンプレートの上でも見える */
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid #18181b;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px #fff;
+  }
 }
