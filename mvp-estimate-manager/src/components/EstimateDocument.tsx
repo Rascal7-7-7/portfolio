@@ -76,7 +76,7 @@ export default function EstimateDocument({ estimate, id, annotate = false }: Pro
         <address className="pt-8 text-xs not-italic leading-relaxed text-body">
           <p className="relative w-fit text-sm font-semibold text-navy">
             {ISSUER.name}
-            <CompanySeal className="absolute bottom-0 left-full -ml-3 h-10 w-10 sm:-ml-6 sm:h-12 sm:w-12" />
+            <CompanySeal className="absolute bottom-0 left-full -ml-3 h-10 w-10 sm:h-12 sm:w-12" />
           </p>
           {/* 住所は語の途中で折らず、空白の位置でだけ改行する */}
           <p>
@@ -169,8 +169,8 @@ function Annotation({ label, vertical = false, className }: { label: string; ver
   );
 }
 
-/** 架空社名「株式会社デモワークス之印」の角印（デモ用・朱色1色）。右の列から縦に読む */
-const SEAL_COLUMNS = ["株式会社", "デモワー", "クス之印"];
+/** 架空の屋号「デモワークス之印」の角印（デモ用・朱色1色）。右の列から縦に読む（2列×4字） */
+const SEAL_COLUMNS = ["デモワー", "クス之印"];
 
 function CompanySeal({ className }: { className?: string }) {
   return (
@@ -183,7 +183,7 @@ function CompanySeal({ className }: { className?: string }) {
       <rect x="2" y="2" width="60" height="60" rx="2" fill="none" stroke="currentColor" strokeWidth="3" />
       <g
         fill="currentColor"
-        fontSize="12"
+        fontSize="13"
         fontWeight="700"
         textAnchor="middle"
         fontFamily='"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif'
@@ -192,11 +192,11 @@ function CompanySeal({ className }: { className?: string }) {
           Array.from(column).map((char, r) => (
             <text
               key={`${c}-${r}`}
-              x={49 - c * 17}
-              y={12.5 + r * 13}
+              x={43 - c * 22}
+              y={12 + r * 13.3}
               dominantBaseline="central"
               // 縦組みなので長音符は90度回して縦棒にする
-              transform={char === "ー" ? `rotate(90 ${49 - c * 17} ${12.5 + r * 13})` : undefined}
+              transform={char === "ー" ? `rotate(90 ${43 - c * 22} ${12 + r * 13.3})` : undefined}
             >
               {char}
             </text>

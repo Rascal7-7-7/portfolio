@@ -1,9 +1,9 @@
 import type { Estimate, EstimateStatus, LineItem } from "@/types";
 import { addDays } from "@/lib/utils";
 
-/** 見積書の発行元（デモ用の架空の会社） */
+/** 見積書の発行元（デモ用の架空の屋号。Hikae の発行元と同じ） */
 export const ISSUER = {
-  name: "株式会社デモワークス",
+  name: "デモワークス",
   address: "東京都千代田区架空町 1-2-3 デモワークスビル 5F",
   tel: "03-0000-0000",
   registration: "T1234567890123（デモ）",

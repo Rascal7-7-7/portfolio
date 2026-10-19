@@ -78,9 +78,12 @@ export default function EstimateList() {
 
       <section aria-label="見積一覧">
         <div className="flex flex-col gap-3 border-b border-line sm:flex-row sm:items-end sm:justify-between">
-          {/* 狭い幅ではタブが横にスクロールする。右端のフェードで続きがあることを示す（末尾は余白に掛かるだけ） */}
-          <div className="relative -mx-4 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-10 after:bg-gradient-to-l after:from-white after:content-[''] sm:mx-0 sm:after:hidden">
-          <div role="group" aria-label="ステータスで絞り込み" className="flex overflow-x-auto pl-4 pr-10 sm:px-0">
+          {/*
+            390px では5つのタブが1行に収まる詰め方にする。それより狭いと横スクロールになり、
+            右端のフェードが切れた続きを示す（収まっている間は右の余白 pr-6 に掛かるだけ）
+          */}
+          <div className="relative -mx-4 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-6 after:bg-gradient-to-l after:from-white after:content-[''] sm:mx-0 sm:after:hidden">
+          <div role="group" aria-label="ステータスで絞り込み" className="flex overflow-x-auto pl-4 pr-6 sm:px-0">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -88,7 +91,7 @@ export default function EstimateList() {
                 aria-pressed={filter === tab.key}
                 onClick={() => setFilter(tab.key)}
                 className={cn(
-                  "-mb-px inline-flex shrink-0 items-baseline gap-1.5 whitespace-nowrap border-b-2 px-3 py-2.5 text-sm first:pl-0",
+                  "-mb-px inline-flex shrink-0 items-baseline gap-1.5 whitespace-nowrap border-b-2 px-2 py-2.5 text-sm first:pl-0 sm:px-3 sm:first:pl-0",
                   "focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary",
                   filter === tab.key
                     ? "border-primary font-semibold text-primary"

@@ -1,6 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { calcTotals, lineAmount, monthlyWon, summarize } from "./calc.ts";
+import { hikaeInvoiceUrl } from "./utils.ts";
+
+test("Hikae の請求書リンクは連携済みの EST-0014 だけ", () => {
+  assert.equal(hikaeInvoiceUrl(14), "https://mvp-freelance-manager.vercel.app/invoices/est-0014");
+  assert.equal(hikaeInvoiceUrl(13), null);
+});
 
 test("月別受注額は直近Nヶ月を古い順に、受注のみ・年またぎで集計", () => {
   const item = [{ unitPrice: 1000, quantity: 1 }];
