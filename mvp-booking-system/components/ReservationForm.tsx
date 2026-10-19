@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { formatFullDate } from '@/lib/date';
 import { TIME_OPTIONS } from '@/lib/slots';
+import Icon from '@/components/Icon';
 import {
   CHANNELS, CHANNEL_LABEL, MENUS, STAFF, isChannel, isStaff,
   type Reservation, type ReservationInput,
@@ -154,7 +155,7 @@ function DateInput({ id, name, defaultValue, min }: { id: string; name: string; 
       <span aria-hidden="true"
         className={`${inputCls} pointer-events-none flex items-center justify-between peer-focus:border-brand peer-focus:ring-2 peer-focus:ring-brand/20`}>
         <span className={value ? 'tabular-nums' : 'text-dim'}>{value ? formatFullDate(value) : '日付を選択'}</span>
-        <span className="material-symbols-outlined text-dim">calendar_today</span>
+        <Icon name="calendar_today" className="text-dim" />
       </span>
     </span>
   );

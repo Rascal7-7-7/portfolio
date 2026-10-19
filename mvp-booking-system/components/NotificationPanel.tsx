@@ -2,6 +2,7 @@ import { formatShortDate } from '@/lib/date';
 import { SHOP } from '@/lib/seed';
 import { notifyVia, type NotifyVia, type Reservation } from '@/lib/types';
 import { btn } from './ui';
+import Icon from '@/components/Icon';
 
 interface Props {
   reservation: Reservation;
@@ -88,7 +89,7 @@ function Row({ label, sent, via, disabled, onSend, notApplicable = false }: {
       <span className="text-sm text-ink whitespace-nowrap">{label}</span>
       {sent ? (
         <span className="inline-flex items-center gap-0.5 text-xs font-medium text-ink">
-          <span className="material-symbols-outlined" style={{ fontSize: '14px' }} aria-hidden="true">check</span>
+          <Icon name="check" size={14} />
           送信済み
         </span>
       ) : notApplicable ? (

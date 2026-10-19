@@ -11,6 +11,7 @@ import LoadingState from '@/components/LoadingState';
 import MonthCalendar from '@/components/MonthCalendar';
 import { inputCls } from '@/components/ReservationForm';
 import { STAFF_TONE, btn } from '@/components/ui';
+import Icon, { type IconName } from '@/components/Icon';
 
 /** 予約を受け付ける期間（今日から何日先まで） */
 const BOOK_DAYS = 30;
@@ -134,10 +135,7 @@ export default function BookingView() {
                         </span>
                         <span className="block text-xs text-dim tabular-nums">{m.minutes}分 · ¥{m.price.toLocaleString()}</span>
                       </span>
-                      {/* Material Symbols の CSS が display を上書きするため、表示切り替えは外側の span で行う */}
-                      {m.name === menu.name && (
-                        <span className="hidden md:inline"><span className="material-symbols-outlined text-accent" aria-hidden="true">check</span></span>
-                      )}
+                      {m.name === menu.name && <Icon name="check" className="hidden md:block text-accent" />}
                     </label>
                   ))}
                 </div>
@@ -159,7 +157,7 @@ export default function BookingView() {
                 <h2 id="form-title" ref={formHeading} tabIndex={-1} className="text-base font-bold text-ink outline-none">
                   お客様情報の入力
                 </h2>
-                <p className="text-sm text-dim mt-1 tabular-nums">{formatFullDate(selectedDate)} {time}–{end} · <span className="whitespace-nowrap">{menu.name}</span></p>
+                <p className="text-sm text-dim mt-1 tabular-nums">{formatFullDate(selectedDate)} {time}–{end}<span className="hidden md:inline" aria-hidden="true"> · </span><br className="md:hidden" /><span className="whitespace-nowrap">{menu.name}</span></p>
                 <p className="mt-2 md:hidden"><DurationChip minutes={menu.minutes} /></p>
                 <form onSubmit={handleSubmit} className="mt-5 space-y-4 max-w-md">
                   <TextField id="book-name" name="name" label="お名前" required autoComplete="name" placeholder="山田 花子" />
@@ -235,7 +233,7 @@ function DemoBar() {
       <div className="mx-auto max-w-5xl px-4 h-11 flex items-center justify-between gap-3 text-xs">
         <p className="text-dim truncate">お客様が見る予約ページ（デモ）</p>
         <Link href="/reservations" className="shrink-0 inline-flex items-center gap-1 text-ink font-medium underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-brand rounded">
-          <span className="material-symbols-outlined" style={{ fontSize: '16px' }} aria-hidden="true">arrow_back</span>
+          <Icon name="arrow_back" size={16} />
           管理画面に戻る
         </Link>
       </div>
@@ -243,10 +241,10 @@ function DemoBar() {
   );
 }
 
-function Meta({ icon, children }: { icon: string; children: React.ReactNode }) {
+function Meta({ icon, children }: { icon: IconName; children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-2">
-      <span className="material-symbols-outlined text-dim mt-px" aria-hidden="true">{icon}</span>
+      <Icon name={icon} className="text-dim mt-px" />
       <span className="min-w-0">{children}</span>
     </li>
   );
@@ -256,7 +254,7 @@ function Meta({ icon, children }: { icon: string; children: React.ReactNode }) {
 function DurationChip({ minutes }: { minutes: number }) {
   return (
     <span className="inline-flex items-center gap-1 rounded-md bg-accent-soft px-2 py-1 text-xs font-medium text-accent tabular-nums">
-      <span className="material-symbols-outlined" style={{ fontSize: '14px' }} aria-hidden="true">schedule</span>
+      <Icon name="schedule" size={14} />
       {minutes}分
     </span>
   );
@@ -280,7 +278,7 @@ function Confirmed({ done, onAgain, onAdmin }: { done: Done; onAgain: () => void
   const end = toTime(toMinutes(done.time) + done.menu.minutes);
   return (
     <section aria-labelledby="done-title" className="mx-auto max-w-lg bg-canvas border border-line rounded-xl p-6 md:p-8 text-center">
-      <span className="material-symbols-outlined text-accent" style={{ fontSize: '32px' }} aria-hidden="true">check_circle</span>
+      <Icon name="check_circle" size={32} className="text-accent" />
       <h1 id="done-title" className="text-xl font-bold text-ink mt-2">ご予約を受け付けました</h1>
       <p className="text-sm text-dim mt-1 text-balance">お店で確認したあと、確定のご連絡をお送りします。</p>
       <dl className="mt-6 text-left text-sm border-y border-line divide-y divide-line">

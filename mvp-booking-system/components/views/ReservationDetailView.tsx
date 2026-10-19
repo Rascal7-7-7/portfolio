@@ -14,6 +14,7 @@ import NotificationPanel from '@/components/NotificationPanel';
 import ReservationForm from '@/components/ReservationForm';
 import StatusBadge from '@/components/StatusBadge';
 import { btn } from '@/components/ui';
+import Icon from '@/components/Icon';
 
 const FORM_ID = 'edit-reservation';
 
@@ -72,7 +73,7 @@ export default function ReservationDetailView({ id }: { id: number }) {
     <div className="px-4 md:px-10 py-6 md:py-10 max-w-5xl">
       <nav aria-label="パンくず" className="flex items-center gap-1 text-xs text-dim mb-4">
         <Link href="/reservations" className="hover:text-ink underline-offset-2 hover:underline">予約一覧</Link>
-        <span className="material-symbols-outlined" style={{ fontSize: '14px' }} aria-hidden="true">chevron_right</span>
+        <Icon name="chevron_right" size={14} />
         <span className="text-body tabular-nums" aria-current="page">予約 #{String(r.id).padStart(4, '0')}</span>
       </nav>
 
@@ -86,7 +87,7 @@ export default function ReservationDetailView({ id }: { id: number }) {
               <StatusBadge status={r.status} />
             </div>
             <p className="text-sm text-body mt-1.5 tabular-nums">
-              {formatFullDate(r.reservation_date)} {r.reservation_time}〜<span className="text-dim mx-1.5" aria-hidden="true">·</span><span className="whitespace-nowrap">{r.service_name}</span>
+              {formatFullDate(r.reservation_date)} {r.reservation_time}〜<span className="hidden md:inline text-dim mx-1.5" aria-hidden="true">·</span><br className="md:hidden" /><span className="whitespace-nowrap">{r.service_name}</span>
               {menu && <span className="text-dim whitespace-nowrap">（{menu.minutes}分・¥{menu.price.toLocaleString()}）</span>}
             </p>
             <p className="text-xs text-dim mt-1">担当：{r.staff}<span className="mx-1.5" aria-hidden="true">·</span>受付：{CHANNEL_LABEL[r.channel]}</p>
