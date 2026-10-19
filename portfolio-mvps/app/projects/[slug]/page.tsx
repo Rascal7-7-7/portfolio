@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, Github } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Github } from "lucide-react";
 import { cn } from "@/lib/cn";
 import {
+  getNextProjectWithCaseStudy,
   getProjectBySlug,
   getProjectsWithCaseStudy,
   hasCaseStudy,
@@ -142,9 +143,10 @@ export default function ProjectDetail({ params }: { params: Params }) {
   const period = periodLabel(project);
   const team = teamLabel(project);
   const toc = buildToc(project);
-  // 図の信頼境界と同じ語を本文でも同じ色にする（境界を持つ図の作品だけ）
+  // 図の信頼境界と同じ語を本文でも強調する（境界を持つ図の作品だけ）
   const terms = boundaryTerms(project);
   const rich = (text: string) => <RichText text={text} terms={terms} />;
+  const next = getNextProjectWithCaseStudy(project.slug);
 
   return (
     <>
@@ -300,14 +302,19 @@ export default function ProjectDetail({ params }: { params: Params }) {
           {/* テスト（動作環境・CI/CD があれば「テストと運用」） */}
           {project.testing || project.deployment || project.cicd ? (
             <Section id="quality" title={qualityTitle(project)}>
-              <Facts
-                terms={terms}
-                rows={[
-                  ["テスト", project.testing],
-                  ["動作環境", project.deployment],
-                  ["CI/CD", project.cicd],
-                ]}
-              />
+              {/* テストだけなら見出しと同じ語の項目名を重ねず、文章で置く */}
+              {project.deployment || project.cicd ? (
+                <Facts
+                  terms={terms}
+                  rows={[
+                    ["テスト", project.testing],
+                    ["動作環境", project.deployment],
+                    ["CI/CD", project.cicd],
+                  ]}
+                />
+              ) : (
+                <Paragraph>{rich(project.testing ?? "")}</Paragraph>
+              )}
             </Section>
           ) : null}
 
@@ -324,11 +331,20 @@ export default function ProjectDetail({ params }: { params: Params }) {
             </Section>
           ) : null}
 
-          <div className="mt-12 pt-4 border-t border-rule">
+          <div className="mt-12 pt-4 border-t border-rule flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
             <Link href="/#projects" className={cn(textLink({ tone: "muted" }), "text-sm")}>
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               作品一覧へ戻る
             </Link>
+            {next && (
+              <Link
+                href={`/projects/${next.slug}`}
+                className={cn(textLink({ tone: "accent" }), "text-sm")}
+              >
+                <span className="whitespace-nowrap">次の制作の記録：{next.name}</span>
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
+            )}
           </div>
         </div>
       </main>

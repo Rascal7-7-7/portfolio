@@ -30,8 +30,8 @@ export function ProjectRow({ project }: { project: Project }) {
           alt={`${name}のデモ画面`}
           width={800}
           height={500}
-          sizes="(min-width: 640px) 224px, 320px"
-          className="w-full max-w-[320px] sm:w-56 sm:mt-1 h-auto shrink-0 rounded-[4px] border border-rule"
+          sizes="(min-width: 640px) 288px, 320px"
+          className="w-full max-w-[320px] sm:w-72 sm:mt-1 h-auto shrink-0 rounded-[4px] border border-rule"
         />
       )}
     </article>

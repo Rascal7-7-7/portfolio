@@ -33,6 +33,14 @@ export function getProjectsWithCaseStudy(): readonly Project[] {
   return projects.filter(hasCaseStudy);
 }
 
+/** 次の Case Study（掲載順で次、最後なら先頭に戻る）。自分しか無ければ undefined。 */
+export function getNextProjectWithCaseStudy(slug: string): Project | undefined {
+  const list = getProjectsWithCaseStudy();
+  const index = list.findIndex((project) => project.slug === slug);
+  const next = list[(index + 1) % list.length];
+  return index === -1 || next.slug === slug ? undefined : next;
+}
+
 export function getProjectBySlug(slug: string): Project | undefined {
   return projects.find((project) => project.slug === slug);
 }
