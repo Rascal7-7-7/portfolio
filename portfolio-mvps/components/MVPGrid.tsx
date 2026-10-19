@@ -8,7 +8,7 @@ export function MVPGrid() {
   const standard = getProjectsByTier("standard");
 
   return (
-    <section id="projects" className="py-32 px-6" aria-labelledby="projects-heading">
+    <section id="projects" className="py-20 sm:py-32 px-6" aria-labelledby="projects-heading">
       <div className="max-w-6xl mx-auto">
         <SectionHeader
           id="projects-heading"
@@ -18,7 +18,7 @@ export function MVPGrid() {
         />
 
         {/* 代表作は全幅で1件ずつ見せる */}
-        <div className="space-y-6 mb-20">
+        <div className="space-y-6 mb-16 sm:mb-20">
           {featured.map((project) => (
             <FeaturedProject key={project.slug} project={project} />
           ))}
@@ -27,7 +27,7 @@ export function MVPGrid() {
         <h3 className="font-mono text-xs uppercase tracking-widest text-surface-400 mb-2">
           そのほかに作ったもの
         </h3>
-        <ul className="group/list divide-y divide-white/5">
+        <ul className="divide-y divide-white/5">
           {standard.map((project) => (
             <li key={project.slug}>
               <ProjectRow project={project} />

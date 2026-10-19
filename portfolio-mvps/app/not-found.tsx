@@ -34,7 +34,7 @@ export default function NotFound() {
             トップページへ戻る
           </Link>
           <Link
-            href="/#mvps"
+            href="/#projects"
             className={cn(button({ variant: "secondary" }))}
           >
             制作したものを見る

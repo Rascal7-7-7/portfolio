@@ -48,9 +48,13 @@ test.describe("トップページ", () => {
 
   test("セクション内アンカーの移動先が存在する", async ({ page }) => {
     await page.goto("/");
-    const anchors = await page.locator('a[href^="#"]').evaluateAll((links) =>
-      links.map((l) => (l as HTMLAnchorElement).getAttribute("href")),
-    );
+    // ヘッダーは Case Study と共用のため "/#..." を使う。トップ上ではこれもページ内アンカー。
+    const anchors = await page
+      .locator('a[href^="#"], a[href^="/#"]')
+      .evaluateAll((links) =>
+        links.map((l) => (l as HTMLAnchorElement).getAttribute("href")?.replace(/^\//, "")),
+      );
+    expect(anchors).toContain("#projects");
     for (const href of anchors) {
       if (!href || href === "#") continue;
       await expect(page.locator(href), `アンカー ${href} の移動先`).toHaveCount(1);
@@ -126,10 +130,16 @@ test.describe("作品詳細（Case Study）", () => {
   test("Case Study のある作品にだけ詳細への導線がある", async ({ page }) => {
     await page.goto("/");
     for (const project of projects) {
-      const link = page.locator(`a[href="/projects/${project.slug}"]`);
-      await expect(link, `${project.slug} の詳細リンク`).toHaveCount(
-        withCaseStudy.some((p) => p.slug === project.slug) ? 1 : 0,
-      );
+      const selector = `a[href="/projects/${project.slug}"]`;
+      const has = withCaseStudy.some((p) => p.slug === project.slug);
+      // 作品カード内には1つだけ。代表作は Hero にも導線があるため、ページ全体では数えない
+      await expect(
+        page.locator("article").locator(selector),
+        `${project.slug} のカード内の詳細リンク`,
+      ).toHaveCount(has ? 1 : 0);
+      if (!has) {
+        await expect(page.locator(selector), `${project.slug} の詳細リンク`).toHaveCount(0);
+      }
     }
   });
 
@@ -143,7 +153,14 @@ test.describe("作品詳細（Case Study）", () => {
       await expect(page.locator("h1")).toContainText(project.headline);
 
       // 一覧へ戻れる
-      await expect(page.locator('a[href="/#projects"]').first()).toBeVisible();
+      await expect(
+        page.locator('a[href="/#projects"]', { hasText: "作品一覧へ戻る" }).first(),
+      ).toBeVisible();
+
+      // 共通ヘッダーとスキップリンクがある（共有されたURLから直接来ても、誰のサイトか分かる）
+      await expect(page.locator("header")).toBeVisible();
+      await expect(page.locator('a[href="#main"]')).toHaveCount(1);
+      await expect(page.locator("main#main")).toHaveCount(1);
     });
 
     test(`${project.slug} の見出し階層が飛ばない`, async ({ page }) => {
