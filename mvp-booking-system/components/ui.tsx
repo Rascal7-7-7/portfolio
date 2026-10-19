@@ -45,16 +45,21 @@ export function PageHeader({ title, description, action }: {
 
 /** 3つの数字を1枚の枠に並べる。alert のときだけ attention 色にし、文字でも「要対応」と書く */
 export function StatStrip({ items }: {
-  items: { label: string; value: number; unit?: string; note?: string; alert?: boolean }[];
+  /** value が文字列のとき（「本日の受付は終了」など）は数字ではないので小さめに出し、単位を付けない */
+  items: { label: string; value: number | string; unit?: string; note?: string; alert?: boolean }[];
 }) {
   return (
     <dl className="grid grid-cols-3 border border-line rounded-lg divide-x divide-line mb-8">
       {items.map(({ label, value, unit = '件', note, alert }) => (
         <div key={label} className="px-3 py-3 md:px-5 md:py-4 min-w-0">
           <dt className="text-xs text-dim">{label}</dt>
-          <dd className={`mt-1 text-2xl font-bold tabular-nums ${alert ? 'text-attn' : 'text-ink'}`}>
-            {value}<span className="text-xs font-normal text-dim ml-0.5">{unit}</span>
-          </dd>
+          {typeof value === 'string' ? (
+            <dd className="mt-1 min-h-8 flex items-center text-sm font-bold text-ink text-pretty">{value}</dd>
+          ) : (
+            <dd className={`mt-1 text-2xl font-bold tabular-nums ${alert ? 'text-attn' : 'text-ink'}`}>
+              {value}<span className="text-xs font-normal text-dim ml-0.5">{unit}</span>
+            </dd>
+          )}
           {note && <dd className={`hidden sm:block text-xs mt-1 ${alert ? 'text-attn font-medium' : 'text-dim'}`}>{note}</dd>}
         </div>
       ))}

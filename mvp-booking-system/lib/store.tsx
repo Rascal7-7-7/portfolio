@@ -171,12 +171,13 @@ export function sortByDateTime(list: Reservation[]): Reservation[] {
   );
 }
 
+/** スマホでは画面上部（ヘッダーの下）に出す。下に出すと、送った文面のプレビューなど直前に見ていた内容を隠すため */
 function Toast({ message }: { message: string | null }) {
   return (
     <div
       role="status"
       aria-live="polite"
-      className="fixed z-[60] left-4 right-4 bottom-24 md:bottom-8 md:left-auto md:right-8 md:max-w-sm pointer-events-none"
+      className="fixed z-[60] left-4 right-4 top-14 md:top-auto md:bottom-8 md:left-auto md:right-8 md:max-w-sm pointer-events-none"
     >
       {message && (
         <div className="flex items-start gap-2.5 bg-ink text-white rounded-md px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
