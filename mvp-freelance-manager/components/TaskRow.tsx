@@ -37,7 +37,7 @@ export function TaskRow({ task, today, project, deletable }: TaskRowProps) {
         className="h-[18px] w-[18px] shrink-0 cursor-pointer accent-[#0075de]"
       />
       <div className="min-w-0 flex-1">
-        <p className={cn("truncate text-sm", task.done ? "text-warm-300 line-through" : "text-ink")}>
+        <p className={cn("line-clamp-2 text-sm break-words", task.done ? "text-warm-300 line-through" : "text-ink")}>
           {task.title}
         </p>
         {project && (

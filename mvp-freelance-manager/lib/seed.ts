@@ -14,7 +14,7 @@ function projects(today: ISODate): Project[] {
     { id: "p1", name: "コーポレートサイトリニューアル", client: "株式会社ミナトデザイン工房", amount: 880_000, status: "in_progress", dueDate: d(18) },
     { id: "p2", name: "予約管理システム開発", client: "整体院こもれび", amount: 1_200_000, status: "in_progress", dueDate: d(32) },
     { id: "p3", name: "採用LP制作", client: "株式会社アオバ物流", amount: 360_000, status: "in_progress", dueDate: d(6) },
-    { id: "p4", name: "ECサイト保守（月額）", client: "有限会社まるやま茶園", amount: 110_000, status: "in_progress", dueDate: d(12) },
+    { id: "p4", name: "ECサイト保守（年間契約・月11万円）", client: "有限会社まるやま茶園", amount: 1_320_000, status: "in_progress", dueDate: d(165) },
     { id: "p5", name: "社内ポータル改修", client: "北斗建設株式会社", amount: 640_000, status: "estimate", dueDate: d(45) },
     { id: "p6", name: "ブランドサイト制作", client: "ベーカリー麦と陽", amount: 420_000, status: "estimate", dueDate: d(40) },
     { id: "p7", name: "会員アプリUI設計", client: "株式会社リンクスフィット", amount: 750_000, status: "completed", dueDate: d(-24) },

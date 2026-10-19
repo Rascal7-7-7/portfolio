@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { addDays, diffDays, shiftMonth } from "./dates.ts";
 import { createSeed } from "./seed.ts";
-import { dashboardSummary, invoiceStatus, monthlyRevenue, taskGroup } from "./selectors.ts";
+import { dashboardSummary, invoiceStatus, monthlyRevenue, projectProgress, taskGroup } from "./selectors.ts";
 
 const today = "2026-03-01";
 assert.equal(addDays(today, -1), "2026-02-28");
@@ -20,6 +20,11 @@ assert.equal(summary.thisMonthPaid, revenue[5].paid);
 assert.equal(summary.outstandingCount, 3);
 assert.equal(summary.overdueCount, 1);
 assert.ok(summary.todayTaskCount >= summary.overdueTaskCount);
+
+for (const p of data.projects) {
+  const prog = projectProgress(p, data);
+  assert.ok(prog.invoiced <= p.amount, `${p.name}: 請求額が受注額を超えている`);
+}
 
 const base = { id: "x", number: "INV", projectId: "p1", amount: 1, issuedOn: today };
 assert.equal(invoiceStatus({ ...base, dueOn: addDays(today, -1), paidOn: null }, today), "overdue");
