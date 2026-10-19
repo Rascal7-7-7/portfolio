@@ -51,7 +51,7 @@ export function PlanPicker({ product }: { product: Product }) {
       </fieldset>
 
       {mode === 'subscription' && (
-        <fieldset className="mt-5">
+        <fieldset className="mt-4">
           <legend className="mb-2 text-sm font-semibold text-on-surface">お届け間隔</legend>
           <div className="grid grid-cols-2 gap-2">
             {SUBSCRIPTION_INTERVALS.map((value) => (
@@ -79,14 +79,14 @@ export function PlanPicker({ product }: { product: Product }) {
         </fieldset>
       )}
 
-      <div className="mt-5 flex items-center justify-between gap-4">
+      <div className="mt-4 flex items-center justify-between gap-4">
         <span className="text-sm font-semibold text-on-surface" id="qty-label">
           数量
         </span>
         <QuantityStepper value={quantity} onChange={setQuantity} labelledBy="qty-label" />
       </div>
 
-      <div className="mt-5 flex items-baseline justify-between border-t border-outline-variant/50 pt-4">
+      <div className="mt-4 flex items-baseline justify-between border-t border-outline-variant/50 pt-4">
         <span className="text-sm text-on-surface-variant">
           {mode === 'subscription' ? `${INTERVAL_LABEL[frequency]}・1回のお支払い` : 'お支払い'}
         </span>
