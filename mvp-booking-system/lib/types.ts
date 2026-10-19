@@ -3,13 +3,13 @@ export type ReservationStatus = 'pending' | 'confirmed' | 'completed' | 'cancele
 export const STATUSES: ReservationStatus[] = ['pending', 'confirmed', 'completed', 'canceled'];
 
 export const STATUS_LABEL: Record<ReservationStatus, string> = {
-  pending:   '受付',
+  pending:   '確定待ち',
   confirmed: '確定',
   completed: '完了',
   canceled:  'キャンセル',
 };
 
-// 受付=グレー / 確定=青 / 完了=緑 / キャンセル=赤
+// 確定待ち=グレー / 確定=青 / 完了=緑 / キャンセル=赤
 export const STATUS_COLOR: Record<ReservationStatus, string> = {
   pending:   'bg-[#e7e8e9] text-[#444653]',
   confirmed: 'bg-[#dde1ff] text-[#173bab]',
