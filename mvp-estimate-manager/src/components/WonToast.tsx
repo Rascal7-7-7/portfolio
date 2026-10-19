@@ -7,7 +7,8 @@ import { useEstimates } from "@/lib/store";
 import { estimateNumber, formatYen, hikaeInvoiceUrl } from "@/lib/utils";
 import Icon from "@/components/Icon";
 
-const SHOW_MS = 6000;
+// 発表者が見逃さないよう長めに出す（動きは globals.css で prefers-reduced-motion に従う）
+const SHOW_MS = 10000;
 const TOAST_LINK =
   "mt-1 inline-block text-xs font-semibold underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
