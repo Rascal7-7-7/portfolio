@@ -1,8 +1,8 @@
 // デモの状態遷移（カート・注文・定期便）。すべて新しいオブジェクトを返す純粋関数。
 import type { CartItem, Interval, Order, Subscription } from './types';
-import { findProduct } from './catalog';
-import { addDays, addMonths, firstDelivery, nextAfter } from './date';
-import { calcTotals, unitPrice } from './pricing';
+import { findProduct } from './catalog.ts';
+import { FIRST_DELIVERY_LEAD_DAYS, addDays, addMonths, firstDelivery, nextAfter } from './date.ts';
+import { calcTotals, unitPrice } from './pricing.ts';
 
 export const MAX_QUANTITY = 9;
 
@@ -29,8 +29,18 @@ const sameLine = (a: Pick<CartItem, 'productId' | 'interval'>, b: Pick<CartItem,
 
 const clampQty = (n: number) => Math.min(MAX_QUANTITY, Math.max(1, Math.floor(n)));
 
+/** 初回（支払い済み・完了画面で日付を約束済み）はスキップさせない */
+export function canSkip(sub: Subscription): boolean {
+  return sub.status === 'active' && sub.nextDelivery !== null && sub.deliveredCount > 0;
+}
+
+const SEED_DELIVERED = 4;
+
 /** マイページを空にしないための、契約済みデモ定期便 */
 export function seedState(today: string): StoreState {
+  const nextDelivery = addDays(today, 6);
+  // 初回 = 開始日 + 3日、以降毎月。お届け済み回数と次回日から開始日を逆算する
+  const startedAt = addDays(addMonths(nextDelivery, -SEED_DELIVERED), -FIRST_DELIVERY_LEAD_DAYS);
   return {
     cart: [],
     lastOrder: null,
@@ -42,9 +52,9 @@ export function seedState(today: string): StoreState {
         quantity: 1,
         unitPrice: unitPrice(findProduct('uji-gyokuro')?.price ?? 0, 'monthly'),
         status: 'active',
-        nextDelivery: addDays(today, 6),
-        startedAt: addMonths(today, -4),
-        deliveredCount: 4,
+        nextDelivery,
+        startedAt,
+        deliveredCount: SEED_DELIVERED,
       },
     ],
   };
@@ -121,7 +131,7 @@ export function storeReducer(state: StoreState, action: StoreAction): StoreState
       return placeOrder(state, action.today, action.orderId);
     case 'skip':
       return updateSub(state, action.id, (s) =>
-        s.status === 'active' && s.nextDelivery ? { ...s, nextDelivery: nextAfter(s.nextDelivery, s.interval) } : s,
+        canSkip(s) && s.nextDelivery ? { ...s, nextDelivery: nextAfter(s.nextDelivery, s.interval) } : s,
       );
     case 'pause':
       return updateSub(state, action.id, (s) => (s.status === 'active' ? { ...s, status: 'paused', nextDelivery: null } : s));

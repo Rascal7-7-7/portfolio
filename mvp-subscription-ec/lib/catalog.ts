@@ -21,6 +21,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
   {
     id: 'forest-roast',
     name: '深森ブレンド コーヒー豆',
+    nameParts: ['深森ブレンド', ' ', 'コーヒー豆'],
     nameEn: 'Forest Roast',
     category: 'コーヒー',
     tagline: '杉の香りとベリーの余韻。朝いちばんの一杯に。',
@@ -28,7 +29,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       'エチオピアとグアテマラの豆を、焙煎所で一回あたり5kgずつ小釜焙煎。深煎りなのに重すぎず、冷めても甘さが残ります。焙煎から3日以内に発送します。',
     price: 2480,
     taxRate: 8,
-    badge: '人気 No.1',
+    badge: '人気No.1',
     specs: [
       { label: '内容量', value: '200g（約20杯分）' },
       { label: '焙煎度', value: '深煎り' },
@@ -39,6 +40,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
   {
     id: 'uji-gyokuro',
     name: '宇治 特選玉露',
+    nameParts: ['宇治', ' ', '特選玉露'],
     nameEn: 'Uji Gyokuro',
     category: '日本茶',
     tagline: 'とろりとした旨み。ぬるめのお湯でゆっくりと。',
@@ -56,6 +58,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
   {
     id: 'honey-granola',
     name: '森のはちみつグラノーラ',
+    nameParts: ['森の', 'はちみつ', 'グラノーラ'],
     nameEn: 'Honey Granola',
     category: 'フード',
     tagline: '国産はちみつと雑穀を、低温でじっくり焼き上げて。',
@@ -73,6 +76,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
   {
     id: 'hinoki-soap',
     name: 'ひのきのハンドソープ',
+    nameParts: ['ひのきの', 'ハンドソープ'],
     nameEn: 'Hinoki Hand Soap',
     category: 'ボディケア',
     tagline: '木曽ひのきの精油で、手洗いを森林浴に。',
@@ -90,6 +94,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
   {
     id: 'wild-toner',
     name: '和草の化粧水',
+    nameParts: ['和草の', '化粧水'],
     nameEn: 'Wild Herb Toner',
     category: 'スキンケア',
     tagline: 'どくだみと月桃。ゆらぎやすい肌のための一本。',
@@ -107,6 +112,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
   {
     id: 'herb-tea',
     name: '和ハーブ ブレンドティー',
+    nameParts: ['和ハーブ', ' ', 'ブレンドティー'],
     nameEn: 'Herbal Blend',
     category: 'お茶',
     tagline: 'ヨモギ・クロモジ・柚子皮。夜にほっと一息。',

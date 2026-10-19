@@ -6,7 +6,9 @@ import { INTERVAL_LABEL, findProduct } from '@/lib/catalog';
 import { formatJa, formatJaLong } from '@/lib/date';
 import { yen } from '@/lib/pricing';
 import { ProductVisual } from '@/components/ProductVisual';
+import { Phrases } from '@/components/Phrases';
 import { cn } from '@/lib/cn';
+import { canSkip } from '@/lib/store';
 
 export type SubscriptionCommand = 'skip' | 'pause' | 'resume' | 'cancel';
 
@@ -28,6 +30,7 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
 
   const status = STATUS[sub.status];
   const canceled = sub.status === 'canceled';
+  const firstPending = sub.status === 'active' && !canSkip(sub);
   const run = (cmd: SubscriptionCommand) => {
     setConfirming(false);
     onCommand(cmd, product.name);
@@ -44,9 +47,13 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
       <div className="flex gap-4">
         <ProductVisual product={product} decorative className="h-24 w-20 flex-shrink-0 rounded-md" />
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-medium text-on-surface">{product.name}</h3>
-            <span className={cn('rounded px-2 py-0.5 text-[11px] font-semibold', status.className)}>{status.label}</span>
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="min-w-0 font-medium text-on-surface">
+              <Phrases parts={product.nameParts} />
+            </h3>
+            <span className={cn('flex-shrink-0 rounded px-2 py-0.5 text-[11px] font-semibold', status.className)}>
+              {status.label}
+            </span>
           </div>
           <p className="tnum mt-1 text-xs text-on-surface-variant">
             {INTERVAL_LABEL[sub.interval]} · {sub.quantity}点 · 1回 {yen(sub.unitPrice * sub.quantity)}（税込・送料無料）
@@ -58,7 +65,7 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
           <div className="mt-3">
             {sub.status === 'active' && sub.nextDelivery && (
               <p className="text-sm">
-                <span className="text-on-surface-variant">次回お届け </span>
+                <span className="text-on-surface-variant">{firstPending ? '初回お届け ' : '次回お届け '}</span>
                 <span className="tnum font-headline text-lg font-semibold text-on-surface">{formatJa(sub.nextDelivery)}</span>
               </p>
             )}
@@ -81,12 +88,12 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
               </div>
             </div>
           ) : (
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-3 gap-2 sm:flex">
               {sub.status === 'active' ? (
                 <>
-                  <ActionButton onClick={() => run('skip')} tone="primary">
+                  <ActionButton onClick={() => run('skip')} tone="primary" disabled={firstPending}>
                     <SkipForward className="h-4 w-4" aria-hidden />
-                    次回をスキップ
+                    {firstPending ? '初回発送準備中' : '次回をスキップ'}
                   </ActionButton>
                   <ActionButton onClick={() => run('pause')}>
                     <Pause className="h-4 w-4" aria-hidden />
@@ -99,7 +106,7 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
                   再開する
                 </ActionButton>
               )}
-              <ActionButton onClick={() => setConfirming(true)} className="sm:ml-auto">
+              <ActionButton onClick={() => setConfirming(true)} className="col-start-3 sm:ml-auto">
                 <X className="h-4 w-4" aria-hidden />
                 解約
               </ActionButton>
@@ -116,16 +123,20 @@ type ActionButtonProps = {
   children: React.ReactNode;
   tone?: 'neutral' | 'primary' | 'danger';
   className?: string;
+  disabled?: boolean;
 };
 
-function ActionButton({ onClick, children, tone = 'neutral', className }: ActionButtonProps) {
+function ActionButton({ onClick, children, tone = 'neutral', className, disabled = false }: ActionButtonProps) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-        tone === 'primary' && 'bg-primary text-on-primary hover:opacity-90',
+        // スマホは3列グリッドに収めるため、アイコンを上に積む
+        'inline-flex flex-col items-center justify-center gap-1 whitespace-nowrap rounded-md px-1 py-2 text-xs font-medium transition-colors sm:flex-row sm:gap-1.5 sm:px-3 sm:text-sm',
+        disabled && 'cursor-not-allowed bg-surface-container text-on-surface-variant',
+        !disabled && tone === 'primary' && 'bg-primary text-on-primary hover:opacity-90',
         tone === 'danger' && 'bg-error text-on-error hover:opacity-90',
         tone === 'neutral' && 'text-on-surface-variant ring-1 ring-outline-variant hover:bg-surface-container',
         className,
