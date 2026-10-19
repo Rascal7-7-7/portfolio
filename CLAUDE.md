@@ -2,8 +2,15 @@
 
 ## 目的
 
-このワークスペースは、取引先に「依頼したくなる」と思わせるための5つのMVPポートフォリオです。
-**完成品を作ることが目的ではなく、「作れる人」ではなく「依頼したい人」に見せることが目的です。**
+このワークスペースは、**就活**と**個人での依頼獲得**を兼ねるポートフォリオです（2026-10 に方針を更新）。
+1つのサイトに、読み手ごとの入口を2つ置きます。
+
+| 入口 | 読み手 | 伝えること |
+|---|---|---|
+| `/`（就活用） | 新卒エンジニアの採用担当 | 何を学び、どう考えて作ったか（AI × セキュリティが軸） |
+| `/services`（依頼用） | 小さなお店・個人事業の方（X から流入） | どんな困りごとを、どう解決できるか |
+
+5つのMVPは両方の入口から使う作例です。**完成品ではなく、3分でデモできるモックアップ**として作ります。
 
 ## MVPs
 
@@ -14,6 +21,12 @@
 | `mvp-estimate-manager` | 営業の手作業を自動化できる | 営業（見積） |
 | `mvp-subscription-ec` | D2C ECを作れる | 販売（EC） |
 | `mvp-freelance-manager` | 個人事業の業務をまとめて管理できる | 管理（バックオフィス） |
+
+## MVPの前提
+
+- API・DB・外部通信は使わない。ダミーデータとブラウザ内の状態（必要なら localStorage）で動かす
+- ダミーデータの日付は今日を基準にした相対日付にする（固定日付だと画面が空になる）
+- 各MVPの Vercel プロジェクトは Git 連携しておらず、CLI でデプロイする（merge しても自動では更新されない）
 
 ## Priority
 
@@ -86,13 +99,15 @@ MVP の UI 実装前に以下のデザインシステムを読み込む:
 
 | MVP | 推奨デザインシステム | ファイルパス |
 |-----|-----------------|------------|
-| mvp-lp-generator | framer / webflow | `awesome-design-md-main/design-md/framer/framer.md` |
-| mvp-booking-system | notion / cal | `awesome-design-md-main/design-md/notion/notion.md` |
-| mvp-estimate-manager | stripe / airtable | `awesome-design-md-main/design-md/stripe/stripe.md` |
-| mvp-subscription-ec | stripe / coinbase | `awesome-design-md-main/design-md/stripe/stripe.md` |
-| mvp-freelance-manager | notion / airtable | `awesome-design-md-main/design-md/notion/notion.md` |
+| mvp-lp-generator | framer / webflow | `framer/DESIGN.md` |
+| mvp-booking-system | notion / cal | `notion/DESIGN.md` |
+| mvp-estimate-manager | stripe / airtable | `stripe/DESIGN.md` |
+| mvp-subscription-ec | stripe / coinbase | `stripe/DESIGN.md` |
+| mvp-freelance-manager | notion / airtable | `notion/DESIGN.md` |
+| portfolio-mvps `/` | linear.app / vercel | `linear.app/DESIGN.md` |
+| portfolio-mvps `/services` | notion / cal | `notion/DESIGN.md` |
 
-ベースパス: `/home/rascal/work/awesome-design-md-main/design-md/`
+ベースパス: `/Users/Rascal/work/_assets/design-md/`
 
 ### Pixa MCP（デモ用画像・OGP・バナー生成）
 
