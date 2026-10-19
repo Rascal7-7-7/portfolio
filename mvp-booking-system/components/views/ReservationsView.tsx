@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { formatFullDate } from '@/lib/date';
 import { sortByDateTime, useStore } from '@/lib/store';
 import { CHANNELS, CHANNEL_LABEL, type Reservation } from '@/lib/types';
 import LoadingState from '@/components/LoadingState';
@@ -33,7 +34,7 @@ export default function ReservationsView() {
     <div className="px-4 md:px-10 py-6 md:py-10 max-w-5xl">
       <PageHeader
         title="予約一覧"
-        description="LINE・電話・Web予約・店頭の予約を1つに集め、確定・連絡・来店完了までこの画面で管理します。"
+        description={<span className="tabular-nums">{formatFullDate(today)}</span>}
         action={
           <Link href="/reservations/new" className={btn('primary')}>
             <Icon name="add" />
@@ -108,7 +109,7 @@ function Group({ label, rows, arrived, empty = '該当する予約はありま�
 }
 
 /**
- * 予約ページの「管理画面で確認する」から ?new=ID で来たとき、その行まで送ってハイライトする（デモの山場）。
+ * 予約ページの「お店側の画面で確認する」から ?new=ID で来たとき、その行まで送ってハイライトする（デモの山場）。
  * 再読み込みで繰り返さないよう、URL からはすぐ消す。
  */
 function useArrived(loaded: boolean): number | null {

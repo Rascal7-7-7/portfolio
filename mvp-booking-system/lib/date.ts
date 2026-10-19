@@ -21,6 +21,23 @@ export function addDays(dateStr: string, days: number): string {
   return toDateStr(d);
 }
 
+/** from から to まで何日か（to が後なら正） */
+export function diffDays(from: string, to: string): number {
+  return Math.round((parse(to).getTime() - parse(from).getTime()) / 86_400_000);
+}
+
+/** その日を含む週（日曜はじまり）の7日分 */
+export function weekOf(dateStr: string): string[] {
+  const start = addDays(dateStr, -parse(dateStr).getDay());
+  return Array.from({ length: 7 }, (_, i) => addDays(start, i));
+}
+
+/** 週表示の列見出し用：日付の数字と曜日 */
+export function dayParts(dateStr: string): { day: number; weekday: string } {
+  const d = parse(dateStr);
+  return { day: d.getDate(), weekday: WEEKDAYS[d.getDay()] };
+}
+
 /** 10/19(月) */
 export function formatShortDate(dateStr: string): string {
   const d = parse(dateStr);
