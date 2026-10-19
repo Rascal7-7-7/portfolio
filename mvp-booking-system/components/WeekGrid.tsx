@@ -9,6 +9,8 @@ const HOUR_H = 72;
 const HOURS = Array.from({ length: (CLOSE_MIN - OPEN_MIN) / 60 }, (_, i) => OPEN_MIN / 60 + i);
 /** これより低いブロックは2行（時刻・名前 / 担当）だけにする */
 const TALL_H = 64;
+/** これより低い（30分の）ブロックは1行（時刻・姓）だけにする。2行目以降が途中で切れるため */
+const SHORT_H = 48;
 
 type MenuKind = 'cut' | 'color' | 'perm' | 'care';
 
@@ -97,7 +99,7 @@ function DayColumn({ list, nowMin, past }: { list: Reservation[]; nowMin: number
         const height = (durationMin(r) / 60) * HOUR_H - 3;
         return (
           <div key={r.id} className="absolute" style={{ top: Math.max(0, y(toMinutes(r.reservation_time))) + 2, left, width, height }}>
-            <WeekBlock r={r} tall={height >= TALL_H} narrow={lanes > 1} />
+            <WeekBlock r={r} tall={height >= TALL_H} short={height < SHORT_H} narrow={lanes > 1} />
           </div>
         );
       })}
@@ -106,31 +108,34 @@ function DayColumn({ list, nowMin, past }: { list: Reservation[]; nowMin: number
   );
 }
 
-/** 横に並ぶ（narrow）ときは名前を2行目に回し、担当は時刻の横に出す */
-function WeekBlock({ r, tall, narrow }: { r: Reservation; tall: boolean; narrow: boolean }) {
+/** 横に並ぶ（narrow）ときは名前を2行目に回し、担当は時刻の横に出す。低い（short）ときは1行に姓まで */
+function WeekBlock({ r, tall, short, narrow }: { r: Reservation; tall: boolean; short: boolean; narrow: boolean }) {
   const canceled = r.status === 'canceled';
   const kind = KIND[menuKind(r.service_name)];
   const look = canceled
     ? 'bg-canvas border border-dashed border-line-strong text-dim'
     : `border ${kind.block}`;
   // 新着はメニュー色の地でも 4.5:1 を保てるよう accent より一段濃い色（text-accent-hover）にする
-  // 横に並んで幅が狭いときは姓だけにする（全文は aria-label と詳細画面で）
+  // 横に並んで幅が狭いとき・低いときは姓だけにする。狭くて低いときは時刻も省く（位置で分かる。全文は aria-label と詳細画面で）
+  const fresh = isNew(r);
   const name = (
     <span className={`font-medium text-ink truncate ${canceled ? 'line-through' : ''}`}>
-      {narrow ? r.customer_name.split(' ')[0] : r.customer_name}
+      {narrow || short ? r.customer_name.split(' ')[0] : r.customer_name}
     </span>
   );
+  const freshMark = <span className="shrink-0 font-medium text-accent-hover">新着</span>;
   return (
     <Link href={`/reservations/${r.id}`}
       aria-label={`${r.reservation_time}–${endTime(r)} ${r.customer_name}様 ${r.service_name} 担当${r.staff} ${STATUS_LABEL[r.status]}${needsAttention(r) ? ' 確認通知未送信' : ''}${isNew(r) ? ' 新着' : ''}`}
-      className={`block h-full overflow-hidden rounded-[5px] px-1.5 py-1 text-[11px] leading-[15px] hover:brightness-[0.97] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${look}`}>
+      className={`block h-full overflow-hidden rounded-[5px] px-1.5 py-1 text-[11px] leading-[15px] hover:brightness-[0.97] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${look} ${fresh ? 'ring-1 ring-accent' : ''}`}>
       <p className="flex items-center gap-1 min-w-0">
-        <span className="tabular-nums text-body shrink-0">{r.reservation_time}</span>
-        {!narrow && name}
+        {!(short && narrow) && <span className="tabular-nums text-body shrink-0">{r.reservation_time}</span>}
+        {(!narrow || short) && name}
+        {short && fresh && freshMark}
         {r.status === 'pending' && <span aria-hidden="true" className="ml-auto size-2 shrink-0 rounded-full bg-attn" />}
       </p>
-      {narrow && <p className="flex min-w-0">{name}</p>}
-      <p className="text-dim truncate">{isNew(r) && <span className="mr-1 font-medium text-accent-hover">新着</span>}{r.staff}{tall && !narrow && <><span aria-hidden="true"> · </span>{r.service_name}</>}</p>
+      {!short && narrow && <p className="flex min-w-0">{name}</p>}
+      {!short && <p className="text-dim truncate">{fresh && <span className="mr-1 font-medium text-accent-hover">新着</span>}{r.staff}{tall && !narrow && <><span aria-hidden="true"> · </span>{r.service_name}</>}</p>}
     </Link>
   );
 }
