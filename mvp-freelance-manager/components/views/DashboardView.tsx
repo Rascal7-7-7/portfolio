@@ -126,7 +126,7 @@ function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
 function MonthlyTable({ rows }: { rows: readonly MonthlyRevenue[] }) {
   const th = "px-2 py-1.5 font-medium";
   return (
-    <table className="num mt-4 w-full text-xs">
+    <table className="num mt-2 w-full text-xs">
       <caption className="sr-only">月別の入金と入金見込み</caption>
       <thead className="text-warm-500">
         <tr className="border-b border-line">
@@ -194,8 +194,12 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
           <RevenueChart
             data={revenue}
             growFrom={paidDelta > 0 ? (s.thisMonthPaid - paidDelta) / s.thisMonthPaid : null}
+            ceiling={s.thisMonthPaid + s.outstandingTotal}
           />
-          <MonthlyTable rows={revenue} />
+          <details className="mt-4">
+            <summary className="cursor-pointer text-xs text-warm-500 hover:text-ink">数値で見る</summary>
+            <MonthlyTable rows={revenue} />
+          </details>
         </div>
       </Card>
 
