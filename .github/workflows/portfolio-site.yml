@@ -9,12 +9,19 @@ on:
     branches: [main]
     paths:
       - "portfolio-mvps/**"
+      # 作品データの整合テストが、各作品の package.json を読むため
+      - "mvp-*/package.json"
       - ".github/workflows/portfolio-site.yml"
   pull_request:
     paths:
       - "portfolio-mvps/**"
+      # 作品データの整合テストが、各作品の package.json を読むため
+      - "mvp-*/package.json"
       - ".github/workflows/portfolio-site.yml"
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 defaults:
   run:
