@@ -11,7 +11,7 @@ import { cn } from '@/lib/cn';
 export type SubscriptionCommand = 'skip' | 'pause' | 'resume' | 'cancel';
 
 const STATUS: Record<SubscriptionStatus, { label: string; className: string }> = {
-  active: { label: '配送中', className: 'bg-primary/10 text-primary' },
+  active: { label: '継続中', className: 'bg-primary/10 text-primary' },
   paused: { label: 'お休み中', className: 'bg-tertiary/10 text-tertiary' },
   canceled: { label: '解約済み', className: 'bg-surface-container text-on-surface-variant' },
 };

@@ -33,7 +33,7 @@ export default async function ProductDetailPage({ params }: Params) {
 
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <ProductVisual product={product} className="aspect-[4/5] rounded-lg shadow-elevation-2" />
+          <ProductVisual product={product} className="aspect-[5/4] rounded-lg shadow-elevation-2 lg:aspect-[4/5]" />
         </div>
 
         <div>
@@ -41,7 +41,7 @@ export default async function ProductDetailPage({ params }: Params) {
             {product.category}
             {product.badge && <span className="ml-2 text-on-surface-variant">· {product.badge}</span>}
           </p>
-          <h1 className="mt-2 font-headline text-3xl font-light leading-snug tracking-[-0.01em] text-on-background sm:text-4xl">
+          <h1 className="mt-2 font-headline text-3xl [word-break:auto-phrase] font-light leading-snug tracking-[-0.01em] text-on-background sm:text-4xl">
             {product.name}
           </h1>
           <p className="mt-3 text-base text-on-surface">{product.tagline}</p>

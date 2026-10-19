@@ -105,7 +105,7 @@ const SHAPES: Record<PackageShape, (v: Visual) => ReactNode> = {
 const LABEL_BOX: Record<PackageShape, { x: number; y: number; w: number; h: number }> = {
   bag: { x: 82, y: 136, w: 76, h: 70 },
   tin: { x: 84, y: 144, w: 72, h: 62 },
-  jar: { x: 86, y: 168, w: 68, h: 48 },
+  jar: { x: 86, y: 162, w: 68, h: 60 },
   pump: { x: 92, y: 150, w: 56, h: 74 },
   bottle: { x: 99, y: 150, w: 42, h: 70 },
   box: { x: 80, y: 128, w: 80, h: 80 },
