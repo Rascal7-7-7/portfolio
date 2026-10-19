@@ -96,21 +96,28 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
     <Page>
       <PageHeader eyebrow={formatLongDate(today)} title="ダッシュボード" />
 
-      {s.overdueCount > 0 && (
-        <p role="status" className="num -mt-3 mb-5 text-sm text-orange">
-          支払期限を過ぎた未入金が {s.overdueCount}件（{formatYen(s.overdueTotal)}）あります。
-          <Link href="/invoices" className="ml-1 rounded font-medium underline underline-offset-2 hover:no-underline">
-            請求一覧で確認
-          </Link>
-        </p>
-      )}
+      {/* 入金処理で警告が解消しても下の要素が動かないよう、同じ場所・同じ高さで文言だけ置き換える。
+          390px 幅では警告が2行に折り返すため、スマホでは2行分の高さを確保する */}
+      <p role="status" className="num -mt-3 mb-5 min-h-[2lh] text-sm sm:min-h-0">
+        {s.overdueCount > 0 ? (
+          <span className="text-orange">
+            支払期限を過ぎた未入金が {s.overdueCount}件（{formatYen(s.overdueTotal)}）あります。
+            <Link href="/invoices" className="ml-1 rounded font-medium underline underline-offset-2 hover:no-underline">
+              請求一覧で確認
+            </Link>
+          </span>
+        ) : (
+          <span className="text-warm-500">期限超過の請求はありません</span>
+        )}
+      </p>
 
       <div className="mb-6 grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 px-4 pt-4 sm:px-5 sm:pt-5">
             <div className="min-w-0">
               <h2 className="text-[13px] text-warm-500">今月の入金</h2>
-              <div className="mt-1 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+              {/* 増減バッジの出入りで高さが変わらないよう、行の高さを数字に固定する */}
+              <div className="mt-1 flex h-7 items-center gap-x-2.5">
                 <p
                   key={s.thisMonthPaid}
                   className={cn("num text-[28px] leading-none font-semibold tracking-tight text-ink", paidDelta && "anim-rise")}
@@ -130,7 +137,8 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
                 見込み込み {formatYen(s.thisMonthPaid + s.thisMonthExpected)}
               </p>
             </div>
-            <p className="num text-xs text-warm-500">
+            {/* スマホでは常に独立した行にする。金額の桁やバッジ幅で折り返し位置が変わると下が動くため */}
+            <p className="num w-full text-xs text-warm-500 sm:w-auto">
               {firstMonth}〜 6ヶ月計 <span className="font-medium text-ink">{formatYen(sixMonthTotal)}</span>
             </p>
           </div>
@@ -161,7 +169,8 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
             </ul>
           )}
         </Card>
-        <Card title="未入金の請求" className="lg:col-span-3" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
+        {/* スマホでは「入金済にする」まで早く届くよう、今日やることより先に出す */}
+        <Card title="未入金の請求" className="order-first lg:order-none lg:col-span-3" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
           <InvoiceList invoices={unpaid} data={data} today={today} empty="未入金の請求はありません" />
         </Card>
       </div>
