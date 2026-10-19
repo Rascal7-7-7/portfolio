@@ -61,9 +61,15 @@ export function estimateNumber(id: number): string {
 
 /** 受注後の請求は姉妹デモ「Hikae」で管理する。デモで連携しているのは EST-0014 だけ */
 export const HIKAE_INVOICES_URL = "https://mvp-freelance-manager.vercel.app/invoices";
-const HIKAE_LINKED_IDS: readonly number[] = [14];
+/** 連携済みの見積 id → Hikae 側の請求書番号（Hikae の seed と一致させる） */
+const HIKAE_INVOICE_NUMBERS: Readonly<Record<number, string>> = { 14: "INV-0017" };
 
 /** 連携済みの見積なら Hikae の請求書 URL、それ以外は null */
 export function hikaeInvoiceUrl(id: number): string | null {
-  return HIKAE_LINKED_IDS.includes(id) ? `${HIKAE_INVOICES_URL}/${estimateNumber(id).toLowerCase()}` : null;
+  return id in HIKAE_INVOICE_NUMBERS ? `${HIKAE_INVOICES_URL}/${estimateNumber(id).toLowerCase()}` : null;
+}
+
+/** 連携済みの見積なら Hikae 側の請求書番号、それ以外は null */
+export function hikaeInvoiceNumber(id: number): string | null {
+  return HIKAE_INVOICE_NUMBERS[id] ?? null;
 }

@@ -4,7 +4,8 @@ import { formatYen } from "@/lib/utils";
 interface Kpi {
   label: string;
   value: string;
-  delta?: number;
+  /** 承認直前からの差分の表示文字列（例「+¥1,243,000」「+2pt」）。変化がなければ出さない */
+  delta?: string;
   note: string;
   extra?: React.ReactNode;
 }
@@ -13,18 +14,18 @@ interface Props {
   summary: Summary;
   /** 月別受注額（古い順）。受注金額の欄にスパークラインで添える */
   monthly: MonthlyAmount[];
-  /** 承認直後に一覧へ戻ったとき、受注金額の横に数秒だけ出す増分（税込）。0 なら出さない */
-  wonDelta?: number;
+  /** 承認直前の集計。承認後に一覧へ戻ったとき、受注金額・受注率の横に数秒だけ差分を出す。null なら出さない */
+  base?: Summary | null;
 }
 
 /** Stripe Dashboard の概要欄にならい、カードではなく罫線で区切った1本の帯で並べる */
-export default function KpiCards({ summary, monthly, wonDelta = 0 }: Props) {
+export default function KpiCards({ summary, monthly, base = null }: Props) {
   const { count, pendingAmount, wonAmount, winRatePercent } = summary;
   const kpis: Kpi[] = [
     {
       label: "受注金額（税込）",
       value: formatYen(wonAmount),
-      delta: wonDelta,
+      delta: base ? signed(wonAmount - base.wonAmount, formatYen) : undefined,
       note: `受注 ${count.won} 件`,
       extra: <WonTrend monthly={monthly} />,
     },
@@ -32,6 +33,10 @@ export default function KpiCards({ summary, monthly, wonDelta = 0 }: Props) {
     {
       label: "受注率",
       value: winRatePercent === null ? "—" : `${winRatePercent}%`,
+      delta:
+        base && winRatePercent !== null && base.winRatePercent !== null
+          ? signed(winRatePercent - base.winRatePercent, (n) => `${n}pt`)
+          : undefined,
       note: `受注 ${count.won} / 決着 ${count.won + count.lost} 件`,
     },
     { label: "下書き", value: `${count.draft} 件`, note: "送付前の見積" },
@@ -46,7 +51,8 @@ export default function KpiCards({ summary, monthly, wonDelta = 0 }: Props) {
             {kpi.value}
             {kpi.delta ? (
               <span className="delta-in rounded bg-primary-soft px-1.5 py-0.5 text-xs font-semibold text-primary">
-                +{formatYen(kpi.delta)}
+                <span className="sr-only">承認前から</span>
+                {kpi.delta}
               </span>
             ) : null}
           </dd>
@@ -56,6 +62,12 @@ export default function KpiCards({ summary, monthly, wonDelta = 0 }: Props) {
       ))}
     </dl>
   );
+}
+
+/** 0 なら undefined（差分を出さない）。符号は文字で付ける */
+function signed(diff: number, format: (abs: number) => string): string | undefined {
+  if (diff === 0) return undefined;
+  return `${diff > 0 ? "+" : "−"}${format(Math.abs(diff))}`;
 }
 
 const SPARK_W = 64;
