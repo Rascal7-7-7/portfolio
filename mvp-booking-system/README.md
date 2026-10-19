@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 予約管理システム（モックアップ）
 
-## Getting Started
+紙の台帳や LINE のやり取りで管理していた予約を、1つの画面にまとめるデモです。
+API・データベース・外部送信は使いません。ダミーデータ（架空の美容室）をブラウザ内で操作します。
 
-First, run the development server:
+## 起動
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci
+npm run dev   # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+環境変数は不要です。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## できること
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- 予約一覧：本日・近日・過去の予約、確定待ち・確認通知の未送信件数、受付経路（LINE・電話・Web・店頭）の内訳
+- 新規登録・編集・削除
+- ステータス変更：受付 → 確定 → 完了 をワンクリックで更新（キャンセルも可）
+- 確認通知・前日リマインド：ボタンを押すと送信済みになり、通知が出る（モック。実際には送信しない）
+- 日別スケジュール：営業時間の時間軸で1日の予約を表示
 
-## Learn More
+## データ
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- ダミーデータは `lib/seed.ts`。日付は「今日からの相対日数」で持つため、いつ開いても本日の予約が表示されます
+- 操作内容は localStorage に保存します（使えない環境ではメモリのみ）。日付が変わるとダミーデータに戻ります
+- 一覧の下にある「デモデータに戻す」で初期状態に戻せます

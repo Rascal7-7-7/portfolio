@@ -1,5 +1,5 @@
-import LPForm from '@/components/LPForm'
+import { redirect } from 'next/navigation'
 
-export default function EditorPage() {
-  return <LPForm />
+export default function EditorIndex() {
+  redirect('/editor/1')
 }

@@ -2,7 +2,6 @@ import { profile } from "@/content/profile";
 
 const navItems = [
   { href: "#projects", label: "作品" },
-  { href: "#approach", label: "考え方" },
   { href: "#about", label: "About" },
   { href: "#contact", label: "連絡先" },
 ];

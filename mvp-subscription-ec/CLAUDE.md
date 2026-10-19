@@ -1,12 +1,13 @@
 # mvp-subscription-ec
 
-portfolio-mvps の1つ。サブスク型 D2C EC のデモ用 MVP。
+portfolio-mvps の1つ。サブスク型 D2C EC のデモ用モックアップ（架空ブランド「MORI ATELIER / 森の定期便」）。
 
 ## Stack
 
 - Next.js (App Router) / React / TypeScript
 - Tailwind CSS、clsx + tailwind-merge、lucide-react
-- PostgreSQL（`pg` 直接利用。ORM なし）
+- DB・API・外部通信なし。商品はリポジトリ内のダミーデータ、状態は React context + localStorage
+- 決済はモック UI のみ（カード情報の入力欄なし）。認証なし（マイページはデモユーザー固定）
 - Vercel（`vercel.json` は現状空）
 
 ## Commands
@@ -16,18 +17,15 @@ npm run dev
 npm run build
 npm start
 npm run lint
-npm run db:init   # node --env-file=.env.local scripts/init-db.mjs
+npm test   # 金額・お届け日計算の assert テスト（node --test）
 ```
-
-`db:init` は `.env.local` を要求する。値はコミットせず、ログにも出さない。
 
 ## Layout
 
 ```
-app/{products, subscriptions, cart, checkout, complete, api}
-lib/{db.ts, types.ts}
-sql/{schema.sql, seed.sql}
-scripts/init-db.mjs
+app/{products, products/[id], cart, checkout, complete, mypage}
+components/   StoreProvider（状態）・ProductVisual（SVG の商品ビジュアル）ほか
+lib/{catalog.ts, pricing.ts, date.ts, store.ts, cart.ts, types.ts}
 ```
 
 ## Project rules

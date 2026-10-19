@@ -6,7 +6,7 @@ import { TextLink } from "./ui/TextLink";
 export function Contact() {
   return (
     <section id="contact" className="py-24 px-6" aria-labelledby="contact-heading">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <SectionHeader
           id="contact-heading"
           label="CONTACT"

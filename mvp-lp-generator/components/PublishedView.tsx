@@ -1,0 +1,46 @@
+'use client'
+
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { findSampleBySlug } from '@/lib/samples'
+import { loadPublished, mockPublicUrl } from '@/lib/storage'
+import type { LPDoc } from '@/lib/types'
+import LandingPage from './lp/LandingPage'
+
+type State = { status: 'loading' } | { status: 'missing' } | { status: 'ready'; doc: LPDoc }
+
+export default function PublishedView({ slug }: { slug: string }) {
+  const [state, setState] = useState<State>({ status: 'loading' })
+
+  useEffect(() => {
+    // エディタで「公開」したデータ → 無ければ同じ slug のサンプル
+    const doc = loadPublished(slug) ?? findSampleBySlug(slug)
+    setState(doc ? { status: 'ready', doc } : { status: 'missing' })
+  }, [slug])
+
+  if (state.status === 'loading') return <div className="min-h-dvh bg-white" />
+
+  if (state.status === 'missing') {
+    return (
+      <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-ed-bg px-6 text-center text-white">
+        <p className="text-4xl" aria-hidden>🔍</p>
+        <h1 className="text-lg font-semibold">ページが見つかりません</h1>
+        <p className="text-sm text-ed-muted">このURLのLPは、このブラウザではまだ公開されていません。</p>
+        <Link href="/editor/1" className="mt-3 rounded-full bg-accent px-5 py-2 text-sm font-semibold">エディタでLPを作る</Link>
+      </main>
+    )
+  }
+
+  return (
+    <>
+      <div className="flex items-center justify-between gap-3 bg-ed-bg px-4 py-2 text-[11px] text-white/80">
+        <span className="truncate">
+          <span className="mr-2 rounded-full bg-accent px-2 py-0.5 font-semibold text-white">公開イメージ</span>
+          {mockPublicUrl(state.doc.slug)}
+        </span>
+        <Link href={`/editor/${state.doc.id}`} className="shrink-0 underline-offset-2 hover:underline">← エディタに戻る</Link>
+      </div>
+      <LandingPage doc={state.doc} />
+    </>
+  )
+}

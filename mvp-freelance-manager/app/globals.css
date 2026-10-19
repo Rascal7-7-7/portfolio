@@ -1,92 +1,45 @@
 @import "tailwindcss";
 
-/* ── Material Design 3 Color Palette ────────────────────────── */
+/* ── Notion 系デザイントークン（warm neutral + 単一アクセント） ── */
 @theme {
-  --color-surface:                  #f8f9fa;
-  --color-surface-bright:           #f8f9fa;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low:    #f3f4f5;
-  --color-surface-container:        #edeeef;
-  --color-surface-container-high:   #e7e8e9;
-  --color-surface-container-highest:#e1e3e4;
-  --color-surface-dim:              #d9dadb;
-  --color-surface-variant:          #e1e3e4;
-  --color-background:               #f8f9fa;
+  --color-canvas: #ffffff;
+  --color-ink: rgba(0, 0, 0, 0.95);
+  --color-warm-50: #fbfaf9;
+  --color-warm-100: #f6f5f4;
+  --color-warm-200: #ebe9e7;
+  --color-warm-300: #a39e98;
+  --color-warm-500: #615d59;
+  --color-warm-900: #31302e;
+  --color-line: rgba(0, 0, 0, 0.1);
 
-  --color-on-surface:               #191c1d;
-  --color-on-surface-variant:       #414754;
-  --color-on-background:            #191c1d;
+  --color-blue: #0075de;
+  --color-blue-active: #005bab;
+  --color-blue-tint: #cfe5fa;
+  --color-badge-blue: #f2f9ff;
+  --color-badge-blue-text: #097fe8;
 
-  --color-primary:                  #005bbf;
-  --color-primary-container:        #1a73e8;
-  --color-primary-fixed:            #d8e2ff;
-  --color-primary-fixed-dim:        #adc7ff;
-  --color-on-primary:               #ffffff;
-  --color-on-primary-container:     #ffffff;
-  --color-on-primary-fixed:         #001a41;
-  --color-on-primary-fixed-variant: #004493;
-  --color-inverse-primary:          #adc7ff;
+  --color-green: #1a7f37;
+  --color-green-soft: #e9f7ec;
+  --color-orange: #c24e00;
+  --color-orange-soft: #fff1e6;
 
-  --color-secondary:                #006e2c;
-  --color-secondary-container:      #86f898;
-  --color-secondary-fixed:          #89fa9b;
-  --color-secondary-fixed-dim:      #6ddd81;
-  --color-on-secondary:             #ffffff;
-  --color-on-secondary-container:   #00722f;
-  --color-on-secondary-fixed:       #002108;
-  --color-on-secondary-fixed-variant:#005320;
-
-  --color-tertiary:                 #8f4d00;
-  --color-tertiary-container:       #b36200;
-  --color-tertiary-fixed:           #ffdcc2;
-  --color-tertiary-fixed-dim:       #ffb77b;
-  --color-on-tertiary:              #ffffff;
-  --color-on-tertiary-container:    #ffffff;
-  --color-on-tertiary-fixed:        #2e1500;
-  --color-on-tertiary-fixed-variant:#6d3a00;
-
-  --color-error:                    #ba1a1a;
-  --color-error-container:          #ffdad6;
-  --color-on-error:                 #ffffff;
-  --color-on-error-container:       #93000a;
-
-  --color-outline:                  #727785;
-  --color-outline-variant:          #c1c6d6;
-  --color-inverse-surface:          #2e3132;
-  --color-inverse-on-surface:       #f0f1f2;
+  --shadow-card: rgba(0, 0, 0, 0.04) 0px 4px 18px, rgba(0, 0, 0, 0.027) 0px 2px 8px,
+    rgba(0, 0, 0, 0.02) 0px 0.8px 3px;
+  --font-sans: var(--font-noto-jp), Inter, -apple-system, system-ui, sans-serif;
 }
 
-/* ── Base ────────────────────────────────────────────────────── */
 body {
-  font-family: "Noto Sans JP", "Plus Jakarta Sans", sans-serif;
-  background-color: #f8f9fa;
-  color: #191c1d;
+  background-color: var(--color-warm-50);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
 }
 
-.font-jakarta {
-  font-family: "Plus Jakarta Sans", "Noto Sans JP", sans-serif;
+.num {
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.02em;
 }
 
-/* ── Material Symbols ────────────────────────────────────────── */
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  vertical-align: middle;
-  line-height: 1;
-}
-
-/* ── Utilities ───────────────────────────────────────────────── */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-
-.signature-gradient {
-  background: linear-gradient(135deg, #005bbf 0%, #1a73e8 100%);
-}
-
-.task-urgent {
-  background-color: #fff5f5;
-  border-left: 3px solid #ba1a1a;
-}
-
-.task-soon {
-  background-color: #fffaf0;
-  border-left: 3px solid #8f4d00;
+:focus-visible {
+  outline: 2px solid #097fe8;
+  outline-offset: 2px;
 }

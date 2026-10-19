@@ -2,20 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FolderKanban, LayoutDashboard, ListChecks, Receipt, RotateCcw } from "lucide-react";
+import { actions } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { href: "/dashboard", label: "ダッシュボード", icon: "dashboard" },
-  { href: "/projects",  label: "案件一覧",       icon: "list_alt"  },
-  { href: "/projects/new", label: "案件登録",    icon: "add_box"   },
-];
+const NAV_ITEMS = [
+  { href: "/dashboard", label: "ダッシュボード", short: "ホーム", icon: LayoutDashboard },
+  { href: "/projects", label: "案件", short: "案件", icon: FolderKanban },
+  { href: "/tasks", label: "タスク", short: "タスク", icon: ListChecks },
+  { href: "/invoices", label: "請求・入金", short: "請求", icon: Receipt },
+] as const;
 
-function isActive(itemHref: string, pathname: string): boolean {
-  if (itemHref === "/projects/new") return pathname === "/projects/new";
-  if (itemHref === "/projects") {
-    return pathname.startsWith("/projects") && pathname !== "/projects/new";
-  }
-  return pathname === itemHref || pathname === "/";
+function isActive(href: string, pathname: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function resetDemo(): void {
+  if (window.confirm("操作内容を消して、ダミーデータの状態に戻しますか？")) actions.reset();
+}
+
+function Logo() {
+  return (
+    <Link href="/dashboard" className="flex items-center gap-2">
+      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-xs font-bold text-white">
+        F
+      </span>
+      <span className="text-[15px] font-bold tracking-tight text-ink">FreelanceHub</span>
+    </Link>
+  );
 }
 
 export function Sidebar() {
@@ -23,79 +37,78 @@ export function Sidebar() {
 
   return (
     <>
-      {/* ── Desktop sidebar ─────────────────────────────────────── */}
-      <aside className="h-screen w-64 hidden md:flex flex-col bg-slate-50 sticky top-0 shrink-0">
-        {/* Logo */}
-        <div className="px-6 py-7">
-          <h1 className="text-lg font-bold tracking-tight text-slate-900 font-jakarta">
-            FreelanceHub
-          </h1>
-          <p className="text-[11px] text-slate-500 mt-0.5 uppercase tracking-widest font-jakarta">
-            Freelance OS
-          </p>
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line bg-warm-100 md:flex">
+        <div className="px-5 py-5">
+          <Logo />
+          <p className="mt-1.5 text-xs text-warm-500">個人事業のバックオフィス</p>
         </div>
-
-        {/* Nav */}
-        <nav className="flex-1 px-3 space-y-0.5">
-          {navItems.map(({ href, label, icon }) => {
+        <nav aria-label="メイン" className="flex-1 space-y-0.5 px-3">
+          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
             const active = isActive(href, pathname);
             return (
               <Link
                 key={href}
                 href={href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-200",
+                  "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
                   active
-                    ? "bg-white text-primary font-bold shadow-sm"
-                    : "text-slate-500 hover:bg-slate-200/50 hover:text-slate-700"
+                    ? "bg-black/[0.06] font-semibold text-ink"
+                    : "text-warm-500 hover:bg-black/[0.04] hover:text-ink",
                 )}
               >
-                <span
-                  className="material-symbols-outlined text-[20px] leading-none"
-                  style={active ? { fontVariationSettings: "'FILL' 1" } : undefined}
-                >
-                  {icon}
-                </span>
-                <span>{label}</span>
+                <Icon size={17} aria-hidden />
+                {label}
               </Link>
             );
           })}
         </nav>
-
-        {/* User */}
-        <div className="m-4 p-4 bg-slate-100 rounded-xl">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-xs font-jakarta">
-              FH
-            </div>
-            <div>
-              <p className="text-xs font-bold text-slate-900">User Workspace</p>
-              <p className="text-[10px] text-slate-500">フリーランス管理ツール</p>
-            </div>
-          </div>
+        <div className="m-3 rounded-lg border border-line bg-canvas p-3">
+          <p className="text-xs font-semibold text-ink">デモ用モックアップ</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-warm-500">
+            データはダミーです。操作はこのブラウザにだけ保存されます。
+          </p>
+          <button
+            type="button"
+            onClick={resetDemo}
+            className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-blue hover:underline"
+          >
+            <RotateCcw size={12} aria-hidden />
+            初期状態に戻す
+          </button>
         </div>
       </aside>
 
-      {/* ── Mobile bottom nav ────────────────────────────────────── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-100 flex justify-around items-center py-2.5 z-50">
-        {navItems.map(({ href, label, icon }) => {
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-canvas/90 px-4 py-3 backdrop-blur md:hidden">
+        <Logo />
+        <button
+          type="button"
+          onClick={resetDemo}
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-warm-500 hover:bg-black/5"
+        >
+          <RotateCcw size={12} aria-hidden />
+          リセット
+        </button>
+      </header>
+
+      <nav
+        aria-label="メイン"
+        className="fixed inset-x-0 bottom-0 z-50 flex justify-around border-t border-line bg-canvas/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      >
+        {NAV_ITEMS.map(({ href, short, icon: Icon }) => {
           const active = isActive(href, pathname);
           return (
             <Link
               key={href}
               href={href}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "flex flex-col items-center gap-1",
-                active ? "text-primary" : "text-slate-400"
+                "flex min-w-16 flex-col items-center gap-0.5 py-2 text-[11px] font-medium",
+                active ? "text-blue" : "text-warm-500",
               )}
             >
-              <span
-                className="material-symbols-outlined text-[22px] leading-none"
-                style={active ? { fontVariationSettings: "'FILL' 1" } : undefined}
-              >
-                {icon}
-              </span>
-              <span className="text-[10px] font-medium">{label}</span>
+              <Icon size={20} aria-hidden />
+              {short}
             </Link>
           );
         })}

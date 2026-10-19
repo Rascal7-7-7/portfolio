@@ -1,5 +1,6 @@
 import { getProjectsByTier } from "@/content/projects";
-import { MVPCard } from "./MVPCard";
+import { FeaturedProject } from "./FeaturedProject";
+import { ProjectRow } from "./ProjectRow";
 import { SectionHeader } from "./ui/SectionHeader";
 
 export function MVPGrid() {
@@ -7,8 +8,8 @@ export function MVPGrid() {
   const standard = getProjectsByTier("standard");
 
   return (
-    <section id="projects" className="py-24 px-6" aria-labelledby="projects-heading">
-      <div className="max-w-5xl mx-auto">
+    <section id="projects" className="py-32 px-6" aria-labelledby="projects-heading">
+      <div className="max-w-6xl mx-auto">
         <SectionHeader
           id="projects-heading"
           label="PROJECTS"
@@ -16,23 +17,23 @@ export function MVPGrid() {
           description="関心のある領域で手を動かしたものと、個人で作った業務系Webアプリです。"
         />
 
-        {/* Grid */}
-        {/* 代表作は2カラムで大きく見せる */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+        {/* 代表作は全幅で1件ずつ見せる */}
+        <div className="space-y-6 mb-20">
           {featured.map((project) => (
-            <MVPCard key={project.slug} project={project} />
+            <FeaturedProject key={project.slug} project={project} />
           ))}
         </div>
 
-        <h3 className="text-surface-400 text-sm font-semibold mb-4">
+        <h3 className="font-mono text-xs uppercase tracking-widest text-surface-400 mb-2">
           そのほかに作ったもの
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <ul className="group/list divide-y divide-white/5">
           {standard.map((project) => (
-            <MVPCard key={project.slug} project={project} />
+            <li key={project.slug}>
+              <ProjectRow project={project} />
+            </li>
           ))}
-        </div>
-
+        </ul>
       </div>
     </section>
   );

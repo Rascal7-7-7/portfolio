@@ -1,48 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #fbf8fc;
-  --foreground: #1b1b1e;
-}
-
 body {
-  font-family: 'Noto Sans JP', sans-serif;
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: #f6f9fc;
+  color: #425466;
+  -webkit-font-smoothing: antialiased;
 }
 
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  vertical-align: middle;
-  line-height: 1;
+.tnum {
+  font-variant-numeric: tabular-nums;
 }
 
-.glass-effect {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
-}
-
-.editorial-shadow {
-  box-shadow: 0 12px 40px rgba(27, 27, 30, 0.06);
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #e4e2e5;
-  border-radius: 10px;
-}
-
-/* iOS safe area for bottom navigation */
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  body {
+    background: #fff;
+  }
 }

@@ -17,6 +17,11 @@
     scrollbar-width: thin;
     scrollbar-color: #c1c9bb transparent;
   }
+
+  :focus-visible {
+    outline: 2px solid #4a6741;
+    outline-offset: 2px;
+  }
 }
 
 @layer utilities {
@@ -24,7 +29,21 @@
     font-family: var(--font-label), sans-serif;
     font-size: 0.6875rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+  }
+
+  /* 金額は桁がそろう等幅数字で（Stripe の tnum） */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }

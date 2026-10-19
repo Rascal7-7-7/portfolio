@@ -1,6 +1,6 @@
 name: mvps
 
-# 5つの MVP がビルドできることを、マージ前に確認する。
+# 5つの MVP がビルドできることと、テストが通ることを、マージ前に確認する。
 # lint は booking-system に script が無く、estimate-manager・lp-generator に
 # ESLint の設定が無いため、ビルドのみ。
 
@@ -49,6 +49,10 @@ jobs:
       - name: 依存関係のインストール
         run: npm ci
 
+      - name: テスト
+        # 金額計算などのテストがある MVP だけで実行する
+        run: npm test --if-present
+
       - name: ビルド
-        # DB を使うページは動的レンダリングのため、ビルド時に DATABASE_URL は不要
+        # 5本ともダミーデータで動くモックアップのため、DB の設定は不要
         run: npm run build

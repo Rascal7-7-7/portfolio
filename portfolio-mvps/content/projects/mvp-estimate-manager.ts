@@ -5,16 +5,16 @@ export const mvpEstimateManager: Project = {
   name: "見積管理ツール",
   headline: "明細から合計を自動計算する見積作成ツール",
   summary:
-    "品目・数量・単価を入力すると、小計・税・合計を自動計算します。下書き／送付済み／承認済みのステータスで案件を管理し、承認済みの金額を集計します。",
+    "品目・数量・単価を入力すると、小計・消費税（10%）・合計と見積書プレビューをその場で更新します。下書き→送付済み→受注／失注のステータスで管理し、受注金額・回答待ち金額・受注率を一覧で集計します。デモはダミーデータとブラウザ内保存で動き、外部通信はしません。",
   tier: "standard",
   categories: ["web"],
   team: { kind: "solo" },
   period: { start: "2026-03" },
-  stack: ["Next.js", "Server Actions", "PostgreSQL"],
+  stack: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
   highlights: [
-    { label: "小計・税・合計を自動計算", type: "check" },
-    { label: "ステータス管理", type: "data" },
-    { label: "承認金額の集計", type: "data" },
+    { label: "小計・消費税・合計を自動計算", type: "check" },
+    { label: "入力と連動する見積書プレビュー", type: "check" },
+    { label: "受注・失注のステータス管理と受注率の集計", type: "data" },
   ],
   verification: "live-demo",
   links: {

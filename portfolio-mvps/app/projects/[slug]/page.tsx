@@ -128,7 +128,7 @@ export default function ProjectDetail({ params }: { params: Params }) {
         </h1>
         <p className="text-surface-300 leading-relaxed mb-6">{project.summary}</p>
 
-        <div className="flex flex-wrap items-center gap-3 text-sm text-surface-500 mb-6">
+        <div className="flex flex-wrap items-center gap-3 text-sm text-surface-400 mb-6">
           <span>{periodLabel}</span>
           <span aria-hidden="true">·</span>
           <span>
@@ -210,7 +210,7 @@ export default function ProjectDetail({ params }: { params: Params }) {
         <Section id="role" title="体制と構成">
           <dl className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:gap-4">
-              <dt className="text-surface-500 text-sm sm:w-32 shrink-0">体制</dt>
+              <dt className="text-surface-400 text-sm sm:w-32 shrink-0">体制</dt>
               <dd className="text-surface-300">
                 {project.team.kind === "team"
                   ? `チーム開発（${project.team.members}人）`
@@ -219,17 +219,17 @@ export default function ProjectDetail({ params }: { params: Params }) {
             </div>
             {project.team.kind === "team" && (
               <div className="flex flex-col sm:flex-row sm:gap-4">
-                <dt className="text-surface-500 text-sm sm:w-32 shrink-0">担当範囲</dt>
+                <dt className="text-surface-400 text-sm sm:w-32 shrink-0">担当範囲</dt>
                 <dd className="text-surface-300">{project.team.myRole}</dd>
               </div>
             )}
             <div className="flex flex-col sm:flex-row sm:gap-4">
-              <dt className="text-surface-500 text-sm sm:w-32 shrink-0">制作時期</dt>
+              <dt className="text-surface-400 text-sm sm:w-32 shrink-0">制作時期</dt>
               <dd className="text-surface-300">{periodLabel}</dd>
             </div>
             {project.architecture && (
               <div className="flex flex-col sm:flex-row sm:gap-4">
-                <dt className="text-surface-500 text-sm sm:w-32 shrink-0">構成</dt>
+                <dt className="text-surface-400 text-sm sm:w-32 shrink-0">構成</dt>
                 <dd className="text-surface-300">{project.architecture}</dd>
               </div>
             )}
@@ -304,19 +304,19 @@ export default function ProjectDetail({ params }: { params: Params }) {
             <dl className="space-y-3">
               {project.testing && (
                 <div className="flex flex-col sm:flex-row sm:gap-4">
-                  <dt className="text-surface-500 text-sm sm:w-32 shrink-0">テスト</dt>
+                  <dt className="text-surface-400 text-sm sm:w-32 shrink-0">テスト</dt>
                   <dd className="text-surface-300">{project.testing}</dd>
                 </div>
               )}
               {project.deployment && (
                 <div className="flex flex-col sm:flex-row sm:gap-4">
-                  <dt className="text-surface-500 text-sm sm:w-32 shrink-0">動作環境</dt>
+                  <dt className="text-surface-400 text-sm sm:w-32 shrink-0">動作環境</dt>
                   <dd className="text-surface-300">{project.deployment}</dd>
                 </div>
               )}
               {project.cicd && (
                 <div className="flex flex-col sm:flex-row sm:gap-4">
-                  <dt className="text-surface-500 text-sm sm:w-32 shrink-0">CI/CD</dt>
+                  <dt className="text-surface-400 text-sm sm:w-32 shrink-0">CI/CD</dt>
                   <dd className="text-surface-300">{project.cicd}</dd>
                 </div>
               )}

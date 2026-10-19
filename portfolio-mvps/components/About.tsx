@@ -22,8 +22,8 @@ const blocks = [
 
 export function About() {
   return (
-    <section id="about" className="py-24 px-6 bg-surface-900/40" aria-labelledby="about-heading">
-      <div className="max-w-5xl mx-auto">
+    <section id="about" className="py-20 px-6 bg-surface-900/40" aria-labelledby="about-heading">
+      <div className="max-w-6xl mx-auto">
         <SectionHeader
           id="about-heading"
           label="ABOUT"
