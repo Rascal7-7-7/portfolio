@@ -10,9 +10,9 @@ interface Props {
 }
 
 export const inputCls =
-  'w-full bg-[#f3f4f5] border-none rounded-lg px-4 py-3 text-sm text-[#191c1d] ' +
-  'ring-1 ring-[#c4c5d5]/60 focus:ring-2 focus:ring-[#00288e] outline-none transition-all ' +
-  'placeholder:text-[#757684]';
+  'w-full bg-canvas border border-line-strong rounded-md px-3 py-2 text-sm text-ink ' +
+  'focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none ' +
+  'placeholder:text-dim';
 
 function isChannel(v: string): v is Channel {
   return (CHANNELS as string[]).includes(v);
@@ -42,9 +42,9 @@ export default function ReservationForm({ id, defaults, minDate, onSubmit }: Pro
   };
 
   return (
-    <form id={id} onSubmit={handleSubmit} className="space-y-6">
-      <FormSection icon="person" title="お客様情報">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+    <form id={id} onSubmit={handleSubmit} className="space-y-5">
+      <FormSection title="お客様情報">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field id={`${id}-name`} label="お名前" required>
             <input id={`${id}-name`} type="text" name="customer_name" required autoComplete="off"
               defaultValue={defaults.customer_name} placeholder="山田 花子" className={inputCls} />
@@ -65,8 +65,8 @@ export default function ReservationForm({ id, defaults, minDate, onSubmit }: Pro
         </div>
       </FormSection>
 
-      <FormSection icon="calendar_today" title="予約内容">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+      <FormSection title="予約内容">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field id={`${id}-date`} label="予約日" required>
             <input id={`${id}-date`} type="date" name="reservation_date" required
               defaultValue={defaults.reservation_date} min={minDate} className={inputCls} />
@@ -95,29 +95,25 @@ export default function ReservationForm({ id, defaults, minDate, onSubmit }: Pro
   );
 }
 
-function FormSection({ icon, title, children }: { icon: string; title: string; children: React.ReactNode }) {
+function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <fieldset className="bg-white rounded-xl p-5 md:p-7 shadow-sm">
+    <fieldset className="border border-line rounded-lg">
       <legend className="sr-only">{title}</legend>
-      <div className="flex items-center gap-2 mb-4 md:mb-5 pb-4 border-b border-[#f3f4f5]" aria-hidden="true">
-        <span className="material-symbols-outlined text-[#00288e]" aria-hidden="true">{icon}</span>
-        <span className="text-sm font-bold text-[#1a3844]">{title}</span>
-      </div>
-      {children}
+      <p className="px-5 py-3 border-b border-line text-sm font-medium text-ink" aria-hidden="true">{title}</p>
+      <div className="p-5">{children}</div>
     </fieldset>
   );
 }
 
+/** 必須の項目が多いので、Cal.com と同じく「任意」の方だけに印を付ける */
 function Field({ id, label, required = false, wide = false, children }: {
   id: string; label: string; required?: boolean; wide?: boolean; children: React.ReactNode;
 }) {
   return (
     <div className={wide ? 'sm:col-span-2' : ''}>
-      <label htmlFor={id} className="flex items-center gap-1.5 text-xs font-bold text-[#444653] mb-1.5">
+      <label htmlFor={id} className="block text-sm font-medium text-ink mb-1.5">
         {label}
-        {required
-          ? <span className="text-[10px] px-1.5 py-0.5 bg-[#ffdad6] text-[#93000a] rounded-full font-bold">必須</span>
-          : <span className="text-[10px] px-1.5 py-0.5 bg-[#e7e8e9] text-[#444653] rounded-full font-bold">任意</span>}
+        {!required && <span className="ml-1.5 text-xs font-normal text-dim">任意</span>}
       </label>
       {children}
     </div>
