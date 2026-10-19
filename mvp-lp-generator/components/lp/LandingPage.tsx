@@ -39,7 +39,7 @@ export default function LandingPage({ doc }: Props) {
   const props = { store, t, wide }
 
   return (
-    <div ref={ref} className={cx(t.root, 'font-gothic min-h-full antialiased')}>
+    <div ref={ref} className={cx(t.root, 'font-gothic min-h-full antialiased [container-type:inline-size]')}>
       <Nav {...props} />
       <Hero {...props} />
       {sections.features && <Features {...props} />}

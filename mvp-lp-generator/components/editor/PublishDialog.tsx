@@ -76,11 +76,12 @@ export default function PublishDialog({ doc, open, onClose }: Props) {
         {!published ? (
           <div className="mt-6 space-y-2">
             <label htmlFor="f-slug" className="text-xs font-medium text-white/80">公開URL</label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-ed-muted">https://</span>
-              <input id="f-slug" value={slug} onChange={(e) => setSlug(sanitizeSlug(e.target.value))} className={inputCls} />
-              <span className="shrink-0 text-sm text-ed-muted">.{MOCK_DOMAIN}</span>
+            {/* 390px でも入力欄が切れないよう、スマホでは縦積みにしてドメインは下に小さく出す */}
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
+              <span className="text-xs text-ed-muted sm:text-sm">https://</span>
+              <input id="f-slug" value={slug} onChange={(e) => setSlug(sanitizeSlug(e.target.value))} className={`${inputCls} min-w-0`} />
             </div>
+            <p className="text-xs text-ed-muted">.{MOCK_DOMAIN}</p>
           </div>
         ) : (
           <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/10 p-4">
