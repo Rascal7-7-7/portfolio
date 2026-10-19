@@ -8,7 +8,7 @@ import { sortByDateTime, useStore } from '@/lib/store';
 import { MENUS, STAFF, type Reservation, type Staff } from '@/lib/types';
 import ChannelBadge from '@/components/ChannelBadge';
 import LoadingState from '@/components/LoadingState';
-import { needsAttention } from '@/components/ReservationRow';
+import { isNew, needsAttention } from '@/components/ReservationRow';
 import StatusBadge from '@/components/StatusBadge';
 import { PageHeader, STAFF_TONE, StatStrip, btn } from '@/components/ui';
 import Icon, { type IconName } from '@/components/Icon';
@@ -53,6 +53,18 @@ export default function ScheduleView() {
   const [mode, setMode] = useState<Mode>('week');
   const [staff, setStaff] = useState<Staff>(STAFF[0]);
   const now = useNowMinutes();
+  // 予約ページの「お店側の画面で確認する」から ?date=&staff= で来たら、その日を含む週（スマホは日表示の担当タブ）を開く。再読み込みで繰り返さないよう URL からは消す
+  useEffect(() => {
+    if (!today) return;
+    const params = new URLSearchParams(window.location.search);
+    const s = STAFF.find(x => x === params.get('staff'));
+    if (s) setStaff(s);
+    const d = params.get('date');
+    if (params.has('date') || params.has('staff')) window.history.replaceState(null, '', window.location.pathname);
+    if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+    const days = diffDays(today, d);
+    if (Number.isFinite(days)) setOffset(days);
+  }, [today]);
   if (!reservations) return <LoadingState />;
 
   const date = addDays(today, offset);
@@ -306,6 +318,9 @@ function Name({ r, canceled }: { r: Reservation; canceled: boolean }) {
   return (
     <span className={`text-sm font-medium text-ink truncate ${canceled ? 'line-through' : ''}`}>
       {r.customer_name}<span className="font-normal text-xs text-dim ml-0.5">様</span>
+      {isNew(r) && (
+        <span className="ml-2 inline-block rounded-[4px] bg-accent-soft px-1 py-0.5 text-[11px] leading-none font-medium text-accent no-underline align-[1px]">新着</span>
+      )}
     </span>
   );
 }

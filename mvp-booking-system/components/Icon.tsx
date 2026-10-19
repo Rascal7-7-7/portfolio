@@ -6,7 +6,6 @@
 const PATHS = {
   add: 'M12 5v14M5 12h14',
   check: 'M5 12.5l4.5 4.5L19 7.5',
-  check_circle: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12.5l2.8 2.8L16 10',
   chevron_left: 'M15 6l-6 6 6 6',
   chevron_right: 'M9 6l6 6-6 6',
   arrow_back: 'M19 12H5M11 6l-6 6 6 6',
