@@ -6,7 +6,7 @@ import { addDays, formatFullDate, formatShortDate, toMinutes } from '@/lib/date'
 import { SHOP } from '@/lib/seed';
 import { availableSlots, toTime } from '@/lib/slots';
 import { useStore } from '@/lib/store';
-import { MENUS, STAFF, type Menu } from '@/lib/types';
+import { MENUS, STAFF, type Menu, type Staff } from '@/lib/types';
 import LoadingState from '@/components/LoadingState';
 import MonthCalendar from '@/components/MonthCalendar';
 import { inputCls } from '@/components/ReservationForm';
@@ -16,7 +16,7 @@ import Icon, { type IconName } from '@/components/Icon';
 /** 予約を受け付ける期間（今日から何日先まで） */
 const BOOK_DAYS = 30;
 
-interface Done { id: number; name: string; menu: Menu; date: string; time: string }
+interface Done { id: number; name: string; menu: Menu; date: string; time: string; staff: Staff }
 
 function nowMinutes(): number {
   const d = new Date();
@@ -86,7 +86,7 @@ export default function BookingView() {
       reservation_date: selectedDate, reservation_time: time, service_name: menu.name,
       note: get('note'), channel: 'web', staff: slot.staff,
     });
-    setDone({ id, name, menu, date: selectedDate, time });
+    setDone({ id, name, menu, date: selectedDate, time, staff: slot.staff });
   };
 
   const end = time ? toTime(toMinutes(time) + menu.minutes) : null;
@@ -279,7 +279,7 @@ function Confirmed({ done, onAgain, onAdmin }: { done: Done; onAgain: () => void
         <Row label="受付番号"><span className="tabular-nums">#{String(done.id).padStart(4, '0')}</span></Row>
       </dl>
       <div className="mt-6 flex flex-col gap-2">
-        <Link href={`/schedule?date=${done.date}`} onClick={onAdmin} className={btn('accent', 'lg')}>
+        <Link href={`/schedule?date=${done.date}&staff=${encodeURIComponent(done.staff)}`} onClick={onAdmin} className={btn('accent', 'lg')}>
           お店側の画面で確認する
         </Link>
         <button type="button" onClick={onAgain} className={btn('secondary', 'lg')}>別の予約をする</button>

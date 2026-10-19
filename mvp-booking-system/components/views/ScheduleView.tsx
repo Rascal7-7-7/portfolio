@@ -53,12 +53,15 @@ export default function ScheduleView() {
   const [mode, setMode] = useState<Mode>('week');
   const [staff, setStaff] = useState<Staff>(STAFF[0]);
   const now = useNowMinutes();
-  // 予約ページの「お店側の画面で確認する」から ?date= で来たら、その日を含む週を開く。再読み込みで繰り返さないよう URL からは消す
+  // 予約ページの「お店側の画面で確認する」から ?date=&staff= で来たら、その日を含む週（スマホは日表示の担当タブ）を開く。再読み込みで繰り返さないよう URL からは消す
   useEffect(() => {
     if (!today) return;
-    const d = new URLSearchParams(window.location.search).get('date');
+    const params = new URLSearchParams(window.location.search);
+    const s = STAFF.find(x => x === params.get('staff'));
+    if (s) setStaff(s);
+    const d = params.get('date');
+    if (params.has('date') || params.has('staff')) window.history.replaceState(null, '', window.location.pathname);
     if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
-    window.history.replaceState(null, '', window.location.pathname);
     const days = diffDays(today, d);
     if (Number.isFinite(days)) setOffset(days);
   }, [today]);
