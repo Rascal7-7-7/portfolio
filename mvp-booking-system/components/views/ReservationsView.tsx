@@ -30,7 +30,7 @@ export default function ReservationsView() {
     <div className="px-4 md:px-10 py-6 md:py-10 max-w-5xl">
       <PageHeader
         title="予約一覧"
-        description="紙の台帳やLINEの履歴に散らばっていた予約を、受付から来店完了までこの画面で管理します。"
+        description="LINE・電話・Web予約・店頭の予約を1つに集め、確定・連絡・来店完了までこの画面で管理します。"
         action={
           <Link href="/reservations/new" className={btn('primary')}>
             <span className="material-symbols-outlined" aria-hidden="true">add</span>
@@ -41,14 +41,25 @@ export default function ReservationsView() {
 
       <StatStrip items={[
         { label: '本日の予約', value: active.length, note: `キャンセル除く・全${todayList.length}件` },
-        { label: '確定待ち', value: pending.length, note: pending.length > 0 ? '詳細画面から確定できます' : '確定待ちなし' },
+        { label: '本日 確定待ち', value: pending.length, note: pending.length > 0 ? '詳細画面から確定できます' : '確定待ちなし' },
         { label: '確認通知 未送信', value: unnotified.length, alert: unnotified.length > 0,
           note: unnotified.length > 0 ? '要対応：お客様へ未連絡' : 'すべて送信済み' },
       ]} />
 
+      {/* デモ台本の起点：お客様側で予約 → ここに「Web・確定待ち」で入ってくる */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 px-4 py-3 border border-line rounded-lg">
+        <p className="text-sm text-body text-pretty">
+          お客様がスマホから予約すると、<span className="font-medium text-ink">受付経路「Web」・確定待ち</span>でこの一覧に入ってきます。
+        </p>
+        <Link href="/book" className={`${btn('secondary', 'sm')} self-start sm:self-auto`}>
+          <span className="material-symbols-outlined" aria-hidden="true">storefront</span>
+          お客様の予約ページを開く
+        </Link>
+      </div>
+
       <div className="border border-line rounded-lg overflow-hidden [&>section:last-child>:last-child]:border-b-0">
         <ReservationTableHeader />
-        <Group label="本日" rows={todayList} />
+        <Group label="本日" rows={todayList} empty="本日の予約はまだありません。お客様の予約ページから予約すると、ここに表示されます" />
         <Group label="近日" rows={upcomingList} />
         <Group label="過去" rows={pastList} />
       </div>
@@ -70,14 +81,14 @@ export default function ReservationsView() {
 }
 
 /** Cal.com の予約一覧と同じく、1枚の表の中を区切り行（本日 / 近日 / 過去）で分ける */
-function Group({ label, rows }: { label: string; rows: Reservation[] }) {
+function Group({ label, rows, empty = '該当する予約はありません' }: { label: string; rows: Reservation[]; empty?: string }) {
   return (
     <section aria-label={`${label}の予約`}>
       <h2 className="px-4 py-2 bg-muted border-b border-line text-xs font-medium text-body">
         {label}<span className="text-dim font-normal ml-1.5 tabular-nums">{rows.length}件</span>
       </h2>
       {rows.length === 0 ? (
-        <p className="px-4 py-6 text-sm text-dim border-b border-line">該当する予約はありません</p>
+        <p className="px-4 py-6 text-sm text-dim border-b border-line">{empty}</p>
       ) : (
         <ul className="divide-y divide-line border-b border-line">
           {rows.map(r => <li key={r.id}><ReservationRow r={r} /></li>)}

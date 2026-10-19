@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { addDays, formatFullDate, toMinutes } from '@/lib/date';
+import { CLOSE_MIN, OPEN_MIN, durationMin, endTime } from '@/lib/slots';
 import { sortByDateTime, useStore } from '@/lib/store';
-import { findMenu, type Reservation } from '@/lib/types';
+import { STAFF, type Reservation, type Staff } from '@/lib/types';
 import ChannelBadge from '@/components/ChannelBadge';
 import LoadingState from '@/components/LoadingState';
 import { needsAttention } from '@/components/ReservationRow';
@@ -12,20 +13,9 @@ import StatusBadge from '@/components/StatusBadge';
 import { PageHeader, StatStrip, btn } from '@/components/ui';
 
 const SLOT_H = 112;
-/** メニューに無い施術名のときの所要時間 */
-const DEFAULT_MIN = 60;
 /** これより低いカードは1行目に名前まで詰める */
 const COMPACT_H = 100;
-const OPEN_HOURS = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
-
-function durationMin(r: Reservation): number {
-  return findMenu(r.service_name)?.minutes ?? DEFAULT_MIN;
-}
-
-function endTime(r: Reservation): string {
-  const end = toMinutes(r.reservation_time) + durationMin(r);
-  return `${String(Math.floor(end / 60)).padStart(2, '0')}:${String(end % 60).padStart(2, '0')}`;
-}
+const OPEN_HOURS = Array.from({ length: (CLOSE_MIN - OPEN_MIN) / 60 }, (_, i) => OPEN_MIN / 60 + i);
 
 /** 予定ブロックの見た目。色は「要対応」だけに使い、ほかは地の色と枠の形（キャンセル=破線）で区別する */
 function blockCls(r: Reservation): string {
@@ -38,16 +28,18 @@ function blockCls(r: Reservation): string {
 export default function ScheduleView() {
   const { reservations, today } = useStore();
   const [offset, setOffset] = useState(0);
+  const [staff, setStaff] = useState<Staff>(STAFF[0]);
   if (!reservations) return <LoadingState />;
 
   const date = addDays(today, offset);
   const list = sortByDateTime(reservations.filter(r => r.reservation_date === date));
   const active = list.filter(r => r.status === 'pending' || r.status === 'confirmed');
   const unnotified = list.filter(needsAttention);
+  const byStaff = (s: Staff) => list.filter(r => r.staff === s);
 
   return (
-    <div className="px-4 md:px-10 py-6 md:py-10 max-w-4xl">
-      <PageHeader title="日別スケジュール" description="ホワイトボードや紙の予定表の代わりに、1日の流れを確認できます。" />
+    <div className="px-4 md:px-10 py-6 md:py-10 max-w-5xl">
+      <PageHeader title="日別スケジュール" description="ホワイトボードや紙の予定表の代わりに、担当ごとの1日の流れを確認できます。" />
 
       <div className="flex items-center justify-between gap-2 mb-6">
         <div className="min-w-0" aria-live="polite">
@@ -75,10 +67,17 @@ export default function ScheduleView() {
         <p className="border border-line rounded-lg px-6 py-14 text-center text-sm text-dim">この日の予約はありません</p>
       ) : (
         <>
-          <Timeline list={list} />
-          <ul className="md:hidden border border-line rounded-lg divide-y divide-line">
-            {list.map(r => <li key={r.id}><MobileRow r={r} /></li>)}
-          </ul>
+          <Timeline byStaff={byStaff} />
+          <div className="md:hidden">
+            <StaffSwitcher current={staff} counts={STAFF.map(s => byStaff(s).length)} onChange={setStaff} />
+            {byStaff(staff).length === 0 ? (
+              <p className="border border-line rounded-lg px-6 py-10 text-center text-sm text-dim">{staff} さんの予約はありません</p>
+            ) : (
+              <ul className="border border-line rounded-lg divide-y divide-line">
+                {byStaff(staff).map(r => <li key={r.id}><MobileRow r={r} /></li>)}
+              </ul>
+            )}
+          </div>
         </>
       )}
     </div>
@@ -94,9 +93,28 @@ function DayButton({ label, icon, onClick }: { label: string; icon: string; onCl
   );
 }
 
+/** スマホ: 担当の切り替え（詳細画面のステータス切り替えと同じ形） */
+function StaffSwitcher({ current, counts, onChange }: { current: Staff; counts: number[]; onChange: (s: Staff) => void }) {
+  return (
+    <div role="group" aria-label="担当を切り替え" className="grid grid-cols-2 gap-0.5 p-0.5 mb-3 rounded-md border border-line bg-muted">
+      {STAFF.map((s, i) => {
+        const active = s === current;
+        return (
+          <button key={s} type="button" aria-pressed={active} onClick={() => onChange(s)}
+            className={`h-9 rounded-[5px] text-sm focus-visible:outline-2 focus-visible:outline-brand ${
+              active ? 'bg-canvas text-ink font-medium shadow-[0_0_0_1px_var(--color-line),0_1px_2px_rgba(0,0,0,0.06)]' : 'text-dim hover:text-ink'
+            }`}>
+            {s}<span className="ml-1 text-xs font-normal text-dim tabular-nums">{counts[i]}件</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 interface Placed { r: Reservation; lane: number; lanes: number }
 
-/** 時間が近くカードが重なる予約を横に並べる（list は時刻順） */
+/** 同じ担当で時間が重なる予約（手入力で二重に入れた場合）だけ横に並べる（list は時刻順） */
 export function placeInLanes(list: Reservation[]): Placed[] {
   const placed: Placed[] = [];
   let cluster: { r: Reservation; lane: number }[] = [];
@@ -120,12 +138,20 @@ export function placeInLanes(list: Reservation[]): Placed[] {
   return placed;
 }
 
-/** デスクトップ: 営業時間の時間軸に予約を並べる */
-function Timeline({ list }: { list: Reservation[] }) {
-  const startMin = OPEN_HOURS[0] * 60;
+/** デスクトップ: 営業時間の時間軸に、担当ごとの列で予約を並べる */
+function Timeline({ byStaff }: { byStaff: (s: Staff) => Reservation[] }) {
+  const cols = { gridTemplateColumns: `64px repeat(${STAFF.length}, minmax(0, 1fr))` };
   return (
     <div className="hidden md:block border border-line rounded-lg overflow-hidden">
-      <div className="grid grid-cols-[64px_1fr]">
+      <div className="grid border-b border-line bg-muted" style={cols}>
+        <div className="border-r border-line" />
+        {STAFF.map((s, i) => (
+          <p key={s} className={`px-3 py-2 text-sm font-medium text-ink ${i > 0 ? 'border-l border-line' : ''}`}>
+            {s}<span className="ml-1.5 text-xs font-normal text-dim tabular-nums">{byStaff(s).length}件</span>
+          </p>
+        ))}
+      </div>
+      <div className="grid" style={cols}>
         <div className="border-r border-line pt-1.5">
           {OPEN_HOURS.map(h => (
             <div key={h} className="pr-3 text-right text-xs text-dim tabular-nums" style={{ height: SLOT_H }}>
@@ -133,24 +159,32 @@ function Timeline({ list }: { list: Reservation[] }) {
             </div>
           ))}
         </div>
-        <div className="relative" style={{ height: SLOT_H * OPEN_HOURS.length }}>
-          {OPEN_HOURS.map((h, i) => (
-            <div key={h} className="absolute left-0 right-0 border-t border-line" style={{ top: i * SLOT_H + 3 }} />
-          ))}
-          {placeInLanes(list).map(({ r, lane, lanes }) => {
-            const top = Math.max(0, ((toMinutes(r.reservation_time) - startMin) / 60) * SLOT_H + 3);
-            const width = `calc((100% - 16px - ${(lanes - 1) * 6}px) / ${lanes})`;
-            const left = `calc(8px + (${width} + 6px) * ${lane})`;
-            // ブロックの高さ = 所要時間（区切りが見えるよう 4px 詰める）
-            const height = (durationMin(r) / 60) * SLOT_H - 4;
-            return (
-              <div key={r.id} className="absolute" style={{ top: top + 2, left, width, height }}>
-                <Block r={r} compact={height < COMPACT_H} />
-              </div>
-            );
-          })}
-        </div>
+        {STAFF.map((s, i) => (
+          <StaffColumn key={s} list={byStaff(s)} divider={i > 0} />
+        ))}
       </div>
+    </div>
+  );
+}
+
+function StaffColumn({ list, divider }: { list: Reservation[]; divider: boolean }) {
+  return (
+    <div className={`relative ${divider ? 'border-l border-line' : ''}`} style={{ height: SLOT_H * OPEN_HOURS.length }}>
+      {OPEN_HOURS.map((h, i) => (
+        <div key={h} className="absolute left-0 right-0 border-t border-line" style={{ top: i * SLOT_H + 3 }} />
+      ))}
+      {placeInLanes(list).map(({ r, lane, lanes }) => {
+        const top = Math.max(0, ((toMinutes(r.reservation_time) - OPEN_MIN) / 60) * SLOT_H + 3);
+        const width = `calc((100% - 16px - ${(lanes - 1) * 6}px) / ${lanes})`;
+        const left = `calc(8px + (${width} + 6px) * ${lane})`;
+        // ブロックの高さ = 所要時間（区切りが見えるよう 4px 詰める）
+        const height = (durationMin(r) / 60) * SLOT_H - 4;
+        return (
+          <div key={r.id} className="absolute" style={{ top: top + 2, left, width, height }}>
+            <Block r={r} compact={height < COMPACT_H} />
+          </div>
+        );
+      })}
     </div>
   );
 }

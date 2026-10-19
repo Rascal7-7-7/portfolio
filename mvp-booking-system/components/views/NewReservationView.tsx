@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
-import type { ReservationInput } from '@/lib/types';
+import { STAFF, type ReservationInput } from '@/lib/types';
 import LoadingState from '@/components/LoadingState';
 import ReservationForm from '@/components/ReservationForm';
 import { PageHeader, btn } from '@/components/ui';
@@ -25,7 +25,7 @@ export default function NewReservationView() {
   const defaults: ReservationInput = {
     customer_name: '', customer_email: '', customer_phone: '',
     reservation_date: today, reservation_time: '15:00',
-    service_name: '', note: '', channel: 'line',
+    service_name: '', note: '', channel: 'line', staff: STAFF[0],
   };
 
   const handleSubmit = (input: ReservationInput) => {

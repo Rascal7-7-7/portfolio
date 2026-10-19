@@ -1,6 +1,6 @@
 'use client';
 
-import { CHANNELS, CHANNEL_LABEL, MENUS, type Channel, type ReservationInput } from '@/lib/types';
+import { CHANNELS, CHANNEL_LABEL, MENUS, STAFF, isStaff, type Channel, type ReservationInput } from '@/lib/types';
 
 interface Props {
   id:        string;
@@ -22,7 +22,9 @@ function readForm(form: HTMLFormElement): ReservationInput {
   const fd = new FormData(form);
   const get = (k: string) => String(fd.get(k) ?? '').trim();
   const channel = get('channel');
+  const staff = get('staff');
   return {
+    staff:            isStaff(staff) ? staff : STAFF[0],
     customer_name:    get('customer_name'),
     customer_email:   get('customer_email'),
     customer_phone:   get('customer_phone'),
@@ -75,7 +77,7 @@ export default function ReservationForm({ id, defaults, minDate, onSubmit }: Pro
             <input id={`${id}-time`} type="time" name="reservation_time" required step={1800}
               defaultValue={defaults.reservation_time} className={inputCls} />
           </Field>
-          <Field id={`${id}-menu`} label="メニュー" required wide>
+          <Field id={`${id}-menu`} label="メニュー" required>
             <select id={`${id}-menu`} name="service_name" required defaultValue={defaults.service_name} className={inputCls}>
               <option value="">メニューを選択してください</option>
               {MENUS.map(m => (
@@ -83,6 +85,11 @@ export default function ReservationForm({ id, defaults, minDate, onSubmit }: Pro
                   {m.name}（{m.minutes}分・¥{m.price.toLocaleString()}）
                 </option>
               ))}
+            </select>
+          </Field>
+          <Field id={`${id}-staff`} label="担当" required>
+            <select id={`${id}-staff`} name="staff" required defaultValue={defaults.staff} className={inputCls}>
+              {STAFF.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </Field>
           <Field id={`${id}-note`} label="備考" wide>

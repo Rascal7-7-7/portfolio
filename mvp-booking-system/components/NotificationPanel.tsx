@@ -23,10 +23,20 @@ export default function NotificationPanel({ reservation: r, today, onSend }: Pro
       {/* 「LINEで手打ちしていた文面が自動で入る」ことを見せるための文面例 */}
       <figure className="px-5 pt-4 pb-5 border-t border-line">
         <figcaption className="text-xs text-dim mb-2">送られる文面（例）</figcaption>
-        <p className="bg-muted rounded-md px-3 py-2.5 text-sm text-body leading-relaxed">
-          {r.customer_name} 様、ご予約ありがとうございます。
-          {formatShortDate(r.reservation_date)} {r.reservation_time}〜「{r.service_name}」でお待ちしております。
-        </p>
+        {/* トーク画面風。お店から送る側なので右寄せ。緑は LINE のときだけ（SMS・メールは白地） */}
+        <div className="bg-muted rounded-lg px-3 py-4">
+          <p className="text-center text-[11px] text-dim mb-3">
+            {via === 'LINE' ? `${r.customer_name} 様とのトーク（LINE）` : `${r.customer_name} 様への${via}`}
+          </p>
+          <div className="flex items-end justify-end gap-1.5">
+            <span className="shrink-0 text-[11px] text-dim">{r.confirmation_sent ? '送信済み' : '未送信'}</span>
+            <p className={`max-w-[85%] rounded-[18px] rounded-tr-[4px] px-3.5 py-2.5 text-sm text-ink leading-relaxed ${
+              via === 'LINE' ? 'bg-chat' : 'bg-canvas border border-line'
+            }`}>
+              {r.customer_name} 様、ご予約ありがとうございます。
+              {formatShortDate(r.reservation_date)} {r.reservation_time}〜「{r.service_name}」でお待ちしております。            </p>
+          </div>
+        </div>
         <p className="text-xs text-dim mt-3 leading-relaxed">
           送信先：{via}（受付経路に合わせて自動選択）。デモ版のため実際には送信されません。
         </p>

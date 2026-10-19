@@ -11,7 +11,8 @@ import type { Reservation, ReservationInput } from './types';
  * ponytail: 日付が変わったらダミーデータを作り直す。実運用ならここが DB になる。
  */
 
-const STORAGE_KEY = 'booking-demo-v1';
+// v2: 担当（staff）を追加。古い形のデータは読み込まずダミーデータを作り直す
+const STORAGE_KEY = 'booking-demo-v2';
 
 interface Saved {
   seededOn:     string;
@@ -78,6 +79,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setToast(message);
     toastTimer.current = setTimeout(() => setToast(null), 3500);
   }, []);
+
+  // 予約ページを別タブで開いてデモしたとき、管理画面のタブにも新しい予約がすぐ入るようにする
+  const latest = useRef(reservations);
+  useEffect(() => { latest.current = reservations; }, [reservations]);
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== STORAGE_KEY || !today) return;
+      const next = load(today);
+      const known = new Set((latest.current ?? []).map(r => r.id));
+      const added = next.filter(r => !known.has(r.id));
+      setReservations(next);
+      if (added.length > 0) notify(`新しい予約が入りました：${added.map(r => `${r.customer_name} 様`).join('、')}`);
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [today, notify]);
 
   const create = useCallback((input: ReservationInput) => {
     const list = reservations ?? [];
