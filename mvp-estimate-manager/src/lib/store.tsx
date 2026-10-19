@@ -4,7 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { Estimate, EstimateInput, EstimateStatus } from "@/types";
 import { STATUSES } from "@/types";
 import { buildSeed } from "@/data/seed";
-import { calcTotals } from "@/lib/calc";
+import { calcTotals, summarize } from "@/lib/calc";
+import type { Summary } from "@/lib/calc";
 import { todayISO } from "@/lib/utils";
 
 // ponytail: localStorage のみ。複数端末・複数人で共有するならサーバー保存が必要
@@ -22,9 +23,9 @@ interface EstimatesContextValue {
   /** 未表示の受注通知（トースト用）。表示側が clearWonToast で消す */
   wonToast: WonToast | null;
   clearWonToast: () => void;
-  /** 一覧の受注金額 KPI にまだ見せていない増分（税込）。一覧側が takeWonDelta で受け取る */
-  wonDelta: number;
-  takeWonDelta: () => void;
+  /** 承認する直前の集計。一覧の KPI に差分（受注金額・受注率）を添えるのに使い、一覧側が takeKpiBase で受け取る */
+  kpiBase: Summary | null;
+  takeKpiBase: () => void;
 }
 
 export interface WonToast {
@@ -77,7 +78,7 @@ export function EstimatesProvider({ children }: { children: React.ReactNode }) {
   const [estimates, setEstimates] = useState<Estimate[] | null>(null);
   // 通知はページ遷移をまたいで残ればよいので保存しない（再読み込みで消える）
   const [wonToast, setWonToast] = useState<WonToast | null>(null);
-  const [wonDelta, setWonDelta] = useState(0);
+  const [kpiBase, setKpiBase] = useState<Summary | null>(null);
 
   // 相対日付のダミーデータはクライアントの「今日」で作る（SSR との日付ずれを避ける）
   useEffect(() => {
@@ -109,26 +110,27 @@ export function EstimatesProvider({ children }: { children: React.ReactNode }) {
   const reset = useCallback(() => {
     setEstimates(buildSeed(todayISO()));
     setWonToast(null);
-    setWonDelta(0);
+    setKpiBase(null);
   }, []);
 
   const approve = useCallback(
     (id: number) => {
       const target = estimates?.find((e) => e.id === id);
-      if (!target || target.status === "won") return;
+      if (!estimates || !target || target.status === "won") return;
       const amount = calcTotals(target.items).total;
       setStatus(id, "won");
       setWonToast({ id, subject: target.subject, amount });
-      setWonDelta((d) => d + amount);
+      // 一覧に戻る前に続けて承認しても、差分は最初の承認の直前から数える
+      setKpiBase((base) => base ?? summarize(estimates));
     },
     [estimates, setStatus],
   );
   const clearWonToast = useCallback(() => setWonToast(null), []);
-  const takeWonDelta = useCallback(() => setWonDelta(0), []);
+  const takeKpiBase = useCallback(() => setKpiBase(null), []);
 
   const value = useMemo(
-    () => ({ estimates, create, update, setStatus, reset, approve, wonToast, clearWonToast, wonDelta, takeWonDelta }),
-    [estimates, create, update, setStatus, reset, approve, wonToast, clearWonToast, wonDelta, takeWonDelta],
+    () => ({ estimates, create, update, setStatus, reset, approve, wonToast, clearWonToast, kpiBase, takeKpiBase }),
+    [estimates, create, update, setStatus, reset, approve, wonToast, clearWonToast, kpiBase, takeKpiBase],
   );
 
   return <EstimatesContext.Provider value={value}>{children}</EstimatesContext.Provider>;

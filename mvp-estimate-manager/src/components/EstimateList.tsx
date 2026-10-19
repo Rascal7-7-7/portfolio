@@ -6,6 +6,7 @@ import type { Estimate, EstimateStatus } from "@/types";
 import { STATUSES, STATUS_LABELS } from "@/types";
 import { useEstimates } from "@/lib/store";
 import { calcTotals, monthlyWon, summarize } from "@/lib/calc";
+import type { Summary } from "@/lib/calc";
 import { cn, daysBetween, estimateNumber, formatDate, formatYen, todayISO } from "@/lib/utils";
 import Icon from "@/components/Icon";
 import KpiCards from "@/components/KpiCards";
@@ -34,20 +35,20 @@ function DueNote({ estimate }: { estimate: Estimate }) {
 }
 
 export default function EstimateList() {
-  const { estimates, wonDelta, takeWonDelta } = useEstimates();
+  const { estimates, kpiBase, takeKpiBase } = useEstimates();
   const [filter, setFilter] = useState<Filter>("all");
-  // 承認で増えた受注額を受け取り、数秒だけ KPI に添える（受け取ったら store 側は 0 に戻す）
-  const [shownDelta, setShownDelta] = useState(0);
+  // 承認直前の集計を受け取り、数秒だけ KPI に差分を添える（受け取ったら store 側は null に戻す）
+  const [shownBase, setShownBase] = useState<Summary | null>(null);
   useEffect(() => {
-    if (wonDelta === 0) return;
-    setShownDelta(wonDelta);
-    takeWonDelta();
-  }, [wonDelta, takeWonDelta]);
+    if (!kpiBase) return;
+    setShownBase(kpiBase);
+    takeKpiBase();
+  }, [kpiBase, takeKpiBase]);
   useEffect(() => {
-    if (shownDelta === 0) return;
-    const timer = window.setTimeout(() => setShownDelta(0), DELTA_SHOW_MS);
+    if (!shownBase) return;
+    const timer = window.setTimeout(() => setShownBase(null), DELTA_SHOW_MS);
     return () => window.clearTimeout(timer);
-  }, [shownDelta]);
+  }, [shownBase]);
   const [keyword, setKeyword] = useState("");
 
   const sorted = useMemo(
@@ -74,7 +75,7 @@ export default function EstimateList() {
 
   return (
     <div className="space-y-8">
-      <KpiCards summary={summary} monthly={monthlyWon(estimates, todayISO(), SPARK_MONTHS)} wonDelta={shownDelta} />
+      <KpiCards summary={summary} monthly={monthlyWon(estimates, todayISO(), SPARK_MONTHS)} base={shownBase} />
 
       <section aria-label="見積一覧">
         <div className="flex flex-col gap-3 border-b border-line sm:flex-row sm:items-end sm:justify-between">
