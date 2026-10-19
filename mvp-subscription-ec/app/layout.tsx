@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, Noto_Sans_JP, Be_Vietnam_Pro } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/Header';
@@ -30,6 +30,9 @@ export const metadata: Metadata = {
   title: 'MORI ATELIER — 森の定期便',
   description: '森が育てた素材を、暮らしの定期便に。架空ブランドによる D2C 定期購入 EC のデモサイトです。',
 };
+
+// 固定バーで env(safe-area-inset-bottom) を効かせるため
+export const viewport: Viewport = { viewportFit: 'cover' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

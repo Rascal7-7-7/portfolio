@@ -1,6 +1,5 @@
 'use client';
 import Link from 'next/link';
-import { CheckCircle2 } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
 import { ProductVisual } from '@/components/ProductVisual';
 import { PlanBadge } from '@/components/PlanBadge';
@@ -34,8 +33,8 @@ export default function CompletePage() {
       <CheckoutSteps current={2} />
 
       <div className="text-center">
-        <CheckCircle2 className="mx-auto h-10 w-10 text-primary" strokeWidth={1.25} aria-hidden />
-        <h1 className="mt-4 font-headline text-3xl font-light text-on-background [word-break:auto-phrase]">ご注文ありがとうございます</h1>
+        <p className="text-xs tracking-[0.2em] text-on-surface-variant">ORDER CONFIRMED</p>
+        <h1 className="mt-3 font-headline text-3xl font-light text-on-background [word-break:auto-phrase]">ご注文ありがとうございます</h1>
         <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
           {DEMO_USER.name} 様のお申し込みを受け付けました。
           <br />
@@ -48,8 +47,10 @@ export default function CompletePage() {
           <p className="text-xs text-on-surface-variant">初回お届け予定</p>
           <p className="tnum mt-1 font-headline text-2xl font-light text-on-surface">{formatJaLong(order.firstDelivery)}</p>
           {subscriptionCount > 0 && (
-            <p className="mt-2 text-balance text-xs text-on-surface-variant">
-              定期便 {subscriptionCount} 件を開始しました。2回目以降はマイページで確認できます。
+            <p className="mt-2 text-xs leading-relaxed text-on-surface-variant">
+              定期便 {subscriptionCount} 件を開始しました。
+              <br />
+              2回目以降はマイページで確認できます。
             </p>
           )}
         </div>

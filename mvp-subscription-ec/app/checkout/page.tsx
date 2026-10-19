@@ -67,7 +67,15 @@ export default function CheckoutPage() {
             <div className="flex items-start justify-between gap-3">
               <div className="text-sm leading-relaxed">
                 <p className="font-medium text-on-surface">{DEMO_USER.name} 様</p>
-                <p className="text-on-surface-variant">{DEMO_USER.address}</p>
+                <p className="text-on-surface-variant">
+                  {/* 住所は空白の位置でだけ折り返す（「森の／ハイツ」のような語中改行を防ぐ） */}
+                  {DEMO_USER.address.split(' ').map((part, i) => (
+                    <span key={part}>
+                      {i > 0 && ' '}
+                      <span className="whitespace-nowrap">{part}</span>
+                    </span>
+                  ))}
+                </p>
                 <p className="text-on-surface-variant">{DEMO_USER.email}</p>
               </div>
               <span className="flex-shrink-0 text-xs text-on-surface-variant">デモユーザー</span>
