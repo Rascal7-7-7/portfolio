@@ -1,6 +1,26 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { calcTotals, lineAmount, summarize } from "./calc.ts";
+import { calcTotals, lineAmount, monthlyWon, summarize } from "./calc.ts";
+
+test("月別受注額は直近Nヶ月を古い順に、受注のみ・年またぎで集計", () => {
+  const item = [{ unitPrice: 1000, quantity: 1 }];
+  const result = monthlyWon(
+    [
+      { status: "won", issuedAt: "2026-01-10", items: item },
+      { status: "won", issuedAt: "2026-01-20", items: item },
+      { status: "won", issuedAt: "2025-12-31", items: item },
+      { status: "lost", issuedAt: "2026-01-05", items: item },
+      { status: "won", issuedAt: "2025-10-01", items: item }, // 範囲外
+    ],
+    "2026-01-15",
+    3,
+  );
+  assert.deepEqual(result, [
+    { month: "2025-11", amount: 0 },
+    { month: "2025-12", amount: 1100 },
+    { month: "2026-01", amount: 2200 },
+  ]);
+});
 
 test("明細金額は単価×数量", () => {
   assert.equal(lineAmount({ unitPrice: 45000, quantity: 3 }), 135000);

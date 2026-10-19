@@ -1,17 +1,29 @@
-import type { Summary } from "@/lib/calc";
+import type { MonthlyAmount, Summary } from "@/lib/calc";
 import { formatYen } from "@/lib/utils";
 
 interface Kpi {
   label: string;
   value: string;
   note: string;
+  extra?: React.ReactNode;
+}
+
+interface Props {
+  summary: Summary;
+  /** 月別受注額（古い順）。受注金額の欄にスパークラインで添える */
+  monthly: MonthlyAmount[];
 }
 
 /** Stripe Dashboard の概要欄にならい、カードではなく罫線で区切った1本の帯で並べる */
-export default function KpiCards({ summary }: { summary: Summary }) {
+export default function KpiCards({ summary, monthly }: Props) {
   const { count, pendingAmount, wonAmount, winRatePercent } = summary;
   const kpis: Kpi[] = [
-    { label: "受注金額（税込）", value: formatYen(wonAmount), note: `受注 ${count.won} 件` },
+    {
+      label: "受注金額（税込）",
+      value: formatYen(wonAmount),
+      note: `受注 ${count.won} 件`,
+      extra: <WonTrend monthly={monthly} />,
+    },
     { label: "回答待ち（税込）", value: formatYen(pendingAmount), note: `送付済み ${count.sent} 件` },
     {
       label: "受注率",
@@ -28,8 +40,52 @@ export default function KpiCards({ summary }: { summary: Summary }) {
           <dt className="text-xs text-muted">{kpi.label}</dt>
           <dd className="tnum mt-1 text-xl font-semibold text-navy sm:text-2xl">{kpi.value}</dd>
           <dd className="tnum mt-0.5 text-xs text-muted">{kpi.note}</dd>
+          {kpi.extra}
         </div>
       ))}
     </dl>
+  );
+}
+
+const SPARK_W = 64;
+const SPARK_H = 24;
+const SPARK_PAD = 3;
+
+/** 月別受注額の小さな折れ線。色はアクセント1色、今月の値を文字でも添える */
+function WonTrend({ monthly }: { monthly: MonthlyAmount[] }) {
+  if (monthly.length < 2) return null;
+  const max = Math.max(...monthly.map((m) => m.amount), 1);
+  const step = (SPARK_W - SPARK_PAD * 2) / (monthly.length - 1);
+  const points = monthly.map((m, i) => ({
+    x: SPARK_PAD + i * step,
+    y: SPARK_H - SPARK_PAD - (m.amount / max) * (SPARK_H - SPARK_PAD * 2),
+  }));
+  const last = points[points.length - 1];
+  const current = monthly[monthly.length - 1];
+  const monthLabel = (m: MonthlyAmount) => `${Number(m.month.slice(5))}月`;
+
+  return (
+    <dd className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+      <svg width={SPARK_W} height={SPARK_H} viewBox={`0 0 ${SPARK_W} ${SPARK_H}`} aria-hidden="true" className="shrink-0 text-primary">
+        <polyline
+          points={points.map((p) => `${p.x},${p.y}`).join(" ")}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+        <circle cx={last.x} cy={last.y} r="2.5" fill="currentColor" />
+      </svg>
+      <span className="tnum min-w-0 text-xs leading-tight">
+        <span className="block whitespace-nowrap font-semibold text-navy">今月 {formatYen(current.amount)}</span>
+        <span className="block whitespace-nowrap text-muted">
+          {monthLabel(monthly[0]).replace("月", "")}〜{monthLabel(current)}の推移
+        </span>
+      </span>
+      <span className="sr-only">
+        月別受注額：{monthly.map((m) => `${monthLabel(m)} ${formatYen(m.amount)}`).join("、")}
+      </span>
+    </dd>
   );
 }
