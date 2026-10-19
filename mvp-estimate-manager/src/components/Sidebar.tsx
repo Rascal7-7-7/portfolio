@@ -69,7 +69,8 @@ export default function Sidebar() {
       </nav>
       <div className="mt-auto space-y-3 border-t border-line px-2 pt-4">
         <p className="text-xs leading-relaxed text-muted">
-          デモ版：データはこのブラウザ内にだけ保存されます（送信・外部通信なし）。
+          デモ版：データはこのブラウザ内にだけ保存されます
+          <span className="inline-block">（送信・外部通信なし）。</span>
         </p>
         <ResetDemoButton />
       </div>

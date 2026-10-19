@@ -96,7 +96,7 @@ export default function BookingView() {
       <div className="px-4 py-6 md:py-12">
         {done ? (
           <Confirmed done={done} onAgain={() => { setDone(null); setTime(null); }}
-            onAdmin={() => notify(`Web予約が入りました：${done.name} 様（確定待ち）`)} />
+            onAdmin={() => notify(`${done.name} 様の Web 予約が入りました。確定してください`)} />
         ) : (
           <div className="mx-auto max-w-5xl bg-canvas border border-line rounded-xl md:grid md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)_minmax(0,14rem)]">
 
