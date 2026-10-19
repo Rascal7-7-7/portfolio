@@ -13,15 +13,14 @@ const config: Config = {
       colors: {
         // 白文字を載せても AA（4.5:1）になる青。Framer Blue #0099ff は 3:1 しかない
         accent: '#0a72e0',
-        'ed-bg': '#0a0a0a',
-        'ed-panel': '#141414',
-        'ed-muted': '#a6a6a6',
+        // エディタは明るい配色（Wix Studio Editor は明るい配色のみ提供、Squarespace / STUDIO も白基調）
+        'ed-bg': '#f4f4f2',
+        'ed-panel': '#ffffff',
+        'ed-line': '#e2e2de',
+        'ed-ink': '#18181b',
+        'ed-muted': '#5c5c57', // 白で約 6.6:1、ed-bg で約 6:1
       },
       fontFamily: { gothic, mincho },
-      keyframes: {
-        'fade-in': { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'none' } },
-      },
-      animation: { 'fade-in': 'fade-in 0.45s ease-out both' },
     },
   },
   plugins: [],

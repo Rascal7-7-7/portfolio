@@ -17,26 +17,15 @@ interface Props {
   onTemplate: (key: TemplateKey) => void
 }
 
+const SEGMENT = 'flex shrink-0 items-center gap-2 rounded px-3 py-1.5 text-[13px] font-medium transition-colors'
+const segmentState = (on: boolean) => (on ? 'bg-ed-ink text-white' : 'text-ed-muted hover:text-ed-ink')
+
 function TemplatePicker({ value, onChange }: { value: TemplateKey; onChange: (k: TemplateKey) => void }) {
   return (
-    <div role="group" aria-label="テンプレート" className="flex gap-1.5 overflow-x-auto">
+    <div role="group" aria-label="テンプレート" className="flex gap-0.5 overflow-x-auto rounded-md border border-ed-line bg-ed-panel p-0.5">
       {TEMPLATE_KEYS.map((k) => (
-        <button
-          key={k}
-          type="button"
-          aria-pressed={value === k}
-          title={THEMES[k].note}
-          onClick={() => onChange(k)}
-          className={cx(
-            'flex shrink-0 items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3.5 text-xs font-medium transition',
-            value === k ? 'border-accent bg-accent/15 text-white' : 'border-white/10 text-white/70 hover:border-white/30',
-          )}
-        >
-          <span aria-hidden className="flex -space-x-1">
-            {THEMES[k].swatch.map((c) => (
-              <span key={c} className="h-4 w-4 rounded-full border border-white/25" style={{ backgroundColor: c }} />
-            ))}
-          </span>
+        <button key={k} type="button" aria-pressed={value === k} title={THEMES[k].note} onClick={() => onChange(k)} className={cx(SEGMENT, segmentState(value === k))}>
+          <span aria-hidden className="h-3 w-3 rounded-sm border border-black/20" style={{ backgroundColor: THEMES[k].swatch }} />
           {THEMES[k].label}
         </button>
       ))}
@@ -50,16 +39,9 @@ function DeviceToggle({ value, onChange }: { value: Device; onChange: (d: Device
     { key: 'sp', icon: 'phone', label: 'スマホ表示' },
   ] as const
   return (
-    <div role="group" aria-label="表示サイズ" className="hidden rounded-full border border-white/10 p-0.5 sm:flex">
+    <div role="group" aria-label="表示サイズ" className="hidden gap-0.5 rounded-md border border-ed-line bg-ed-panel p-0.5 sm:flex">
       {opts.map((o) => (
-        <button
-          key={o.key}
-          type="button"
-          aria-label={o.label}
-          aria-pressed={value === o.key}
-          onClick={() => onChange(o.key)}
-          className={cx('rounded-full px-3 py-1.5 transition', value === o.key ? 'bg-white/15 text-white' : 'text-white/50 hover:text-white')}
-        >
+        <button key={o.key} type="button" aria-label={o.label} aria-pressed={value === o.key} onClick={() => onChange(o.key)} className={cx(SEGMENT, segmentState(value === o.key))}>
           <Icon name={o.icon} />
         </button>
       ))}
@@ -69,11 +51,7 @@ function DeviceToggle({ value, onChange }: { value: Device; onChange: (d: Device
 
 export default function PreviewPane({ doc, generating, onTemplate }: Props) {
   const [device, setDevice] = useState<Device>('pc')
-  const page = (
-    <div key={`${doc.id}-${doc.template}`} className="min-h-full animate-fade-in">
-      <LandingPage doc={doc} />
-    </div>
-  )
+  const page = <LandingPage key={`${doc.id}-${doc.template}`} doc={doc} />
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4 lg:p-6">
@@ -84,24 +62,15 @@ export default function PreviewPane({ doc, generating, onTemplate }: Props) {
 
       <div className="relative flex min-h-0 flex-1 justify-center">
         {device === 'pc' ? (
-          // 1024px 未満は偽のブラウザ枠を外し、LP を画面幅でそのまま見せる
-          <div className="flex w-full flex-col lg:overflow-hidden lg:rounded-2xl lg:border lg:border-white/10 lg:bg-ed-panel lg:shadow-2xl">
-            <div className="hidden items-center gap-3 border-b border-white/[0.08] px-4 py-2.5 lg:flex">
-              <span aria-hidden className="flex gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-              </span>
-              <span className="mx-auto truncate rounded-full bg-white/[0.06] px-4 py-1 text-[11px] text-ed-muted">{mockPublicUrl(doc.slug)}</span>
-            </div>
+          // 1024px 未満は枠を外し、LP を画面幅でそのまま見せる。枠の上端には公開後の URL だけを出す
+          <div className="flex w-full flex-col lg:overflow-hidden lg:rounded-lg lg:border lg:border-ed-line lg:bg-ed-panel lg:shadow-sm">
+            <p className="hidden truncate border-b border-ed-line px-4 py-2 text-center text-xs text-ed-muted lg:block">{mockPublicUrl(doc.slug)}</p>
             <div className="bg-white lg:min-h-0 lg:flex-1 lg:overflow-y-auto">{page}</div>
           </div>
         ) : (
-          // 枠はボーダーでなく padding で描く。スクロール領域の角の白抜けを防ぐため、画面側を mask で角丸クリップする
-          <div data-phone className="h-[78vh] w-[390px] max-w-full rounded-[2.75rem] bg-[#1d1d1f] p-[10px] shadow-2xl lg:h-full lg:max-h-[800px]">
-            <div className="h-full overflow-hidden rounded-[2.1rem] bg-white [-webkit-mask-image:linear-gradient(#000,#000)] [mask-image:linear-gradient(#000,#000)]">
-              <div className="h-full overflow-y-auto [scrollbar-width:none]">{page}</div>
-            </div>
+          // 端末の枠は描かず、390px 幅のキャンバスだけを見せる（Wix / Squarespace のモバイル表示と同じ考え方）
+          <div data-phone className="h-[78vh] w-[390px] max-w-full overflow-hidden rounded-lg border border-ed-line bg-white shadow-sm lg:h-full lg:max-h-[844px]">
+            <div className="h-full overflow-y-auto">{page}</div>
           </div>
         )}
         {generating && <GeneratingOverlay />}
