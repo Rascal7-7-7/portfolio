@@ -46,8 +46,9 @@ const ROWS: SeedRow[] = [
     client: "株式会社みなと不動産",
     contact: "佐藤 健一",
     subject: "コーポレートサイト リニューアル",
-    daysAgo: 2,
-    status: "draft",
+    daysAgo: 1,
+    // 一覧の先頭を送付済みにして、詳細→「お客様の画面を見る」→承認の流れにすぐ入れるようにする
+    status: "sent",
     items: [
       ["Webサイト設計・ディレクション", "式", 180000, 1],
       ["ページデザイン", "ページ", 45000, 8],
@@ -59,8 +60,8 @@ const ROWS: SeedRow[] = [
     client: "有限会社さくら工務店",
     contact: "田中 美咲",
     subject: "施工事例ページ追加",
-    daysAgo: 5,
-    status: "sent",
+    daysAgo: 4,
+    status: "draft",
     items: [
       ["ページデザイン", "ページ", 45000, 3],
       ["コーディング（レスポンシブ対応）", "ページ", 30000, 3],
