@@ -17,6 +17,7 @@ export const mvpSubscriptionEc: Project = {
     { label: "マイページで定期便のスキップ・お休み・解約", type: "data" },
   ],
   verification: "live-demo",
+  thumbnail: "/projects/mvp-subscription-ec.webp",
   links: {
     demo: "https://mvp-subscription-ec.vercel.app/products",
     github: "https://github.com/Rascal7-7-7/portfolio/tree/main/mvp-subscription-ec",

@@ -17,6 +17,7 @@ export const mvpLpGenerator: Project = {
     { label: "PC / スマホ表示を切替", type: "check" },
   ],
   verification: "live-demo",
+  thumbnail: "/projects/mvp-lp-generator.webp",
   links: {
     demo: "https://mvp-lp-generator.vercel.app/editor/1",
     github: "https://github.com/Rascal7-7-7/portfolio/tree/main/mvp-lp-generator",

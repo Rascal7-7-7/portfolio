@@ -17,6 +17,7 @@ export const mvpBookingSystem: Project = {
     { label: "ワンクリックのステータス更新と通知演出", type: "check" },
   ],
   verification: "live-demo",
+  thumbnail: "/projects/mvp-booking-system.webp",
   links: {
     demo: "https://mvp-booking-system.vercel.app/reservations",
     github: "https://github.com/Rascal7-7-7/portfolio/tree/main/mvp-booking-system",

@@ -44,7 +44,14 @@ export function Hero() {
 
         <p className="text-[17px] leading-[1.8] text-ink-muted mb-6">
           生成AIをアプリに組み込むなかで、Prompt Injection や Jailbreak といった
-          AI特有のセキュリティ問題に関心を持つようになりました。小さく作ったものは公開URLで触れる状態に、代表作はソースコードを公開しています。
+          AI特有のセキュリティ問題に
+          {/*
+            390px 幅で「関心を／持つように」と折り返さないよう文節をまとめる。
+            auto-phrase は nowrap の直後で改行しないため、wbr で切れ目を明示する。
+          */}
+          <span className="whitespace-nowrap">関心を持つように</span>
+          <wbr />
+          なりました。小さく作ったものは公開URLで触れる状態に、代表作はソースコードを公開しています。
         </p>
 
         {/* 導線。390px 幅でも最初の画面に収まるよう、説明文の直後に置く */}

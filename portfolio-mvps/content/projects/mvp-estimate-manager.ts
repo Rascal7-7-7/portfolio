@@ -17,6 +17,7 @@ export const mvpEstimateManager: Project = {
     { label: "受注・失注のステータス管理と受注率の集計", type: "data" },
   ],
   verification: "live-demo",
+  thumbnail: "/projects/mvp-estimate-manager.webp",
   links: {
     demo: "https://mvp-estimate-manager.vercel.app/estimates",
     github: "https://github.com/Rascal7-7-7/portfolio/tree/main/mvp-estimate-manager",

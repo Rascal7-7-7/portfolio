@@ -18,6 +18,22 @@ test.describe("トップページ", () => {
     await expect(page.locator("article")).toHaveCount(projects.length);
   });
 
+  test("サムネイルのある作品は画像が表示され、alt がある", async ({ page }) => {
+    await page.goto("/");
+    const withThumb = projects.filter((p) => p.thumbnail);
+    expect(withThumb.length).toBeGreaterThan(0);
+    for (const project of withThumb) {
+      // next/image は src を /_next/image?url=... に書き換えるが、slug は残る
+      const img = page.locator(`article img[src*="${project.slug}"]`);
+      await expect(img, `${project.slug} のサムネイル`).toHaveCount(1);
+      await img.scrollIntoViewIfNeeded();
+      await expect(img).toBeVisible();
+      await expect(img).toHaveAttribute("alt", /.+/);
+      // 画像が実際に読み込めている（404 で壊れた画像になっていない）
+      expect(await img.evaluate((el) => (el as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+    }
+  });
+
   test("各作品のデモとコードのリンクが、データどおりの先を向いている", async ({ page }) => {
     await page.goto("/");
     for (const project of projects) {
