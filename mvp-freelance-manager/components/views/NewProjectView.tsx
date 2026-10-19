@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { ArrowLeft } from "lucide-react";
 import { actions, useAppStore } from "@/lib/store";
 import { addDays } from "@/lib/dates";
+import { DateInput } from "@/components/DateInput";
 import { buttonStyles, Page, PageHeader, PageSkeleton } from "@/components/ui";
 import { PROJECT_STATUS_LABEL, PROJECT_STATUSES, type ProjectStatus } from "@/types";
 
@@ -15,6 +16,7 @@ export function NewProjectView() {
   const store = useAppStore();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [dueDate, setDueDate] = useState<string | null>(null);
   if (!store) return <PageSkeleton />;
   const { today } = store;
 
@@ -67,7 +69,7 @@ export function NewProjectView() {
         </label>
         <label className={field}>
           納期
-          <input name="dueDate" type="date" defaultValue={addDays(today, 30)} className={`${buttonStyles.input} num mt-1`} />
+          <DateInput name="dueDate" value={dueDate ?? addDays(today, 30)} onChange={setDueDate} className="mt-1" />
         </label>
         <label className={field}>
           ステータス

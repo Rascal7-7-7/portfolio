@@ -76,18 +76,18 @@ export function ProjectsView() {
                       <div className="mt-0.5 sm:hidden">
                         <ProjectStatusBadge status={p.status} />
                       </div>
-                      {/* 区切りごとに折り返し、語の途中で改行しない */}
-                      <p className="mt-0.5 flex flex-wrap gap-x-1 text-xs text-warm-500">
+                      {/* 区切りごとに折り返し、語の途中で改行しない。行頭に「・」が来ないよう記号ではなく余白で区切る */}
+                      <p className="mt-0.5 flex flex-wrap gap-x-2.5 text-xs text-warm-500">
                         <span className="min-w-0 break-words">{p.client}</span>
-                        <span className="num whitespace-nowrap">・ {dueLabel(p)} {formatDate(p.dueDate)}</span>
-                        <span className="num whitespace-nowrap">・ タスク {prog.done}/{prog.total}</span>
+                        <span className="num whitespace-nowrap">{dueLabel(p)} {formatDate(p.dueDate)}</span>
+                        <span className="num whitespace-nowrap">タスク {prog.done}/{prog.total}</span>
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
                       <p className="num text-sm font-medium text-ink">{formatYen(p.amount)}</p>
                       <p className="num text-xs text-warm-500">入金 {formatYen(prog.paid)}</p>
                     </div>
-                    <ChevronRight size={16} className="shrink-0 text-warm-300" aria-hidden />
+                    <ChevronRight size={16} className="hidden shrink-0 text-warm-300 sm:block" aria-hidden />
                   </Link>
                 </li>
               );

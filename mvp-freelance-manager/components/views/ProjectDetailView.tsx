@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CircleCheck, FileText, Landmark } from "lucide-react";
 import { actions, useAppStore } from "@/lib/store";
-import { formatDate, formatRelative } from "@/lib/dates";
-import { dueLabel, projectProgress, sortTasks, sortInvoices } from "@/lib/selectors";
+import { formatAgo, formatDate, formatRelative } from "@/lib/dates";
+import { dueLabel, projectActivity, projectProgress, sortTasks, sortInvoices, type ActivityItem } from "@/lib/selectors";
 import { formatYen } from "@/lib/utils";
 import { buttonStyles, Card, Page, PageSkeleton } from "@/components/ui";
 import { TaskRow } from "@/components/TaskRow";
@@ -13,6 +13,36 @@ import { TaskQuickAdd } from "@/components/TaskQuickAdd";
 import { InvoiceList } from "@/components/InvoiceList";
 import { InvoiceForm } from "@/components/InvoiceForm";
 import { PROJECT_STATUS_LABEL, PROJECT_STATUSES, type ProjectStatus } from "@/types";
+
+const ACTIVITY_ICON: Record<ActivityItem["kind"], typeof FileText> = {
+  issued: FileText,
+  paid: Landmark,
+  task: CircleCheck,
+};
+
+/** Linear の案件アクティビティに倣い、何をしたかを相対時刻つきで新しい順に並べる */
+function ActivityFeed({ items, today }: { items: readonly ActivityItem[]; today: string }) {
+  if (items.length === 0) {
+    return <p className="px-5 py-6 text-center text-sm text-warm-500">まだ記録はありません</p>;
+  }
+  return (
+    <ol className="px-4 py-3 sm:px-5">
+      {items.map((a, i) => {
+        const Icon = ACTIVITY_ICON[a.kind];
+        return (
+          <li key={a.key} className="relative flex gap-3 py-2">
+            {i < items.length - 1 && <span aria-hidden className="absolute top-[30px] -bottom-2 left-[9px] w-px bg-black/15" />}
+            <Icon size={19} aria-hidden className={a.kind === "paid" ? "shrink-0 text-blue" : "shrink-0 text-warm-500"} />
+            <p className="min-w-0 flex-1 text-sm break-words text-ink">{a.text}</p>
+            <time dateTime={a.date} title={formatDate(a.date)} className="num shrink-0 text-xs text-warm-500">
+              {formatAgo(today, a.date)}
+            </time>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
 
 export function ProjectDetailView({ id }: { id: string }) {
   const store = useAppStore();
@@ -131,6 +161,10 @@ export function ProjectDetailView({ id }: { id: string }) {
               未請求の残額 {formatYen(uninvoiced)}
             </p>
           )}
+        </Card>
+
+        <Card title="アクティビティ">
+          <ActivityFeed items={projectActivity(project.id, data)} today={today} />
         </Card>
       </div>
     </Page>

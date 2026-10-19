@@ -6,6 +6,7 @@ import { actions } from "@/lib/store";
 import { remainingBillable } from "@/lib/selectors";
 import { formatYen } from "@/lib/utils";
 import { buttonStyles } from "@/components/ui";
+import { DateInput } from "@/components/DateInput";
 import type { Invoice, ISODate, Project } from "@/types";
 
 interface InvoiceFormProps {
@@ -91,13 +92,7 @@ export function InvoiceForm({ projects, invoices, today, defaultProjectId, onCre
       </label>
       <label className="block text-xs font-medium text-warm-900">
         支払期日
-        <input
-          type="date"
-          min={today}
-          value={dueOn}
-          onChange={(e) => setDueOn(e.target.value)}
-          className={`${buttonStyles.input} num mt-1`}
-        />
+        <DateInput min={today} value={dueOn} onChange={setDueOn} className="mt-1" />
       </label>
       <button type="submit" disabled={fullyBilled} className={`${buttonStyles.primary} disabled:cursor-not-allowed disabled:opacity-50`}>
         請求書を作成
