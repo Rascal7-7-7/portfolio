@@ -1,0 +1,54 @@
+name: mvps
+
+# 5つの MVP がビルドできることを、マージ前に確認する。
+# lint は booking-system に script が無く、estimate-manager・lp-generator に
+# ESLint の設定が無いため、ビルドのみ。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mvp-*/**"
+      - ".github/workflows/mvps.yml"
+  pull_request:
+    paths:
+      - "mvp-*/**"
+      - ".github/workflows/mvps.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ビルド (${{ matrix.mvp }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # 意図的な簡略化: 1つの変更でも全 MVP をビルドする。
+      # 遅くなったら、変更のあった MVP だけをビルドするようにする
+      matrix:
+        mvp:
+          - mvp-booking-system
+          - mvp-estimate-manager
+          - mvp-freelance-manager
+          - mvp-lp-generator
+          - mvp-subscription-ec
+    defaults:
+      run:
+        working-directory: ${{ matrix.mvp }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: ${{ matrix.mvp }}/package-lock.json
+
+      - name: 依存関係のインストール
+        run: npm ci
+
+      - name: ビルド
+        # DB を使うページは動的レンダリングのため、ビルド時に DATABASE_URL は不要
+        run: npm run build
