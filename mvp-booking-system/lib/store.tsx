@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { todayStr } from './date';
 import { createSeed } from './seed';
 import { isChannel, isStaff, isStatus, type Reservation, type ReservationInput } from './types';
+import Icon from '@/components/Icon';
 
 /**
  * デモ用のクライアント側ストア。API・DB は使わない。
@@ -179,7 +180,7 @@ function Toast({ message }: { message: string | null }) {
     >
       {message && (
         <div className="flex items-start gap-2.5 bg-ink text-white rounded-md px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
-          <span className="material-symbols-outlined shrink-0 mt-px" aria-hidden="true">check</span>
+          <Icon name="check" className="shrink-0 mt-px" />
           <p className="text-sm leading-relaxed">{message}</p>
         </div>
       )}

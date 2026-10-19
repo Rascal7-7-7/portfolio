@@ -32,7 +32,7 @@
 
   --color-now: #c8312a;        /* 現在時刻の線。白地 5.3:1 */
 
-  /* 担当ごとのごく淡い色分け（スケジュールの列・予約ページのイニシャル） */
+  /* 担当ごとの色（スケジュールの列見出しの色見本・予約ページのイニシャル） */
   --color-staff1: #b9776d;
   --color-staff1-soft: #fbf6f5;
   --color-staff2: #7489a6;
@@ -40,27 +40,8 @@
 
   --color-chat: #8de055;       /* 送信文面の吹き出し（LINE のトーク画面の緑）。この用途以外には使わない */
 
-  --font-sans: 'Noto Sans JP', system-ui, sans-serif;
-}
-
-/* base レイヤーに置き、hidden / md:block などのユーティリティで上書きできるようにする */
-@layer base {
-  .material-symbols-outlined {
-    font-family: 'Material Symbols Outlined';
-    font-style: normal;
-    font-size: 18px;
-    display: inline-block;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
-    vertical-align: middle;
-  }
+  /* Web フォントは読み込まない（外部通信なし）。OS の日本語フォントを使う */
+  --font-sans: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic UI', Meiryo, system-ui, sans-serif;
 }
 
 body {

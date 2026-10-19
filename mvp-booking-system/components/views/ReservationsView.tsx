@@ -7,6 +7,7 @@ import { CHANNELS, CHANNEL_LABEL, type Reservation } from '@/lib/types';
 import LoadingState from '@/components/LoadingState';
 import ReservationRow, { ReservationTableHeader, needsAttention } from '@/components/ReservationRow';
 import { PageHeader, StatStrip, btn } from '@/components/ui';
+import Icon from '@/components/Icon';
 
 export default function ReservationsView() {
   const { reservations, today, reset, notify } = useStore();
@@ -35,7 +36,7 @@ export default function ReservationsView() {
         description="LINE・電話・Web予約・店頭の予約を1つに集め、確定・連絡・来店完了までこの画面で管理します。"
         action={
           <Link href="/reservations/new" className={btn('primary')}>
-            <span className="material-symbols-outlined" aria-hidden="true">add</span>
+            <Icon name="add" />
             新規予約
           </Link>
         }
@@ -54,7 +55,7 @@ export default function ReservationsView() {
           お客様がスマホから予約すると、<span className="font-medium text-ink">受付経路「Web」・確定待ち</span>でこの一覧に入ってきます。
         </p>
         <Link href="/book" className={`${btn('secondary', 'sm')} self-start sm:self-auto`}>
-          <span className="material-symbols-outlined" aria-hidden="true">storefront</span>
+          <Icon name="storefront" />
           お客様の予約ページを開く
         </Link>
       </div>

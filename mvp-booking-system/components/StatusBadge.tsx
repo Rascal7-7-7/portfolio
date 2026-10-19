@@ -1,4 +1,5 @@
 import { STATUS_LABEL, type ReservationStatus } from '@/lib/types';
+import Icon from '@/components/Icon';
 
 /**
  * Cal.com の予約一覧と同じく、色付きの札は「対応が必要な状態」（確定待ち）だけに付ける。
@@ -12,7 +13,7 @@ export default function StatusBadge({ status }: { status: ReservationStatus }) {
     case 'confirmed':
       return (
         <span className="inline-flex items-center gap-0.5 text-xs font-medium whitespace-nowrap text-ink">
-          <span className="material-symbols-outlined" style={{ fontSize: '14px' }} aria-hidden="true">check</span>
+          <Icon name="check" size={14} />
           {label}
         </span>
       );

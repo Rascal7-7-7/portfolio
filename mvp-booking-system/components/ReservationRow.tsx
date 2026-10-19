@@ -3,6 +3,7 @@ import { formatShortDate } from '@/lib/date';
 import type { Reservation } from '@/lib/types';
 import ChannelBadge from './ChannelBadge';
 import StatusBadge from './StatusBadge';
+import Icon from '@/components/Icon';
 
 export function needsAttention(r: Reservation): boolean {
   return !r.confirmation_sent && r.status === 'pending';
@@ -66,7 +67,7 @@ export default function ReservationRow({ r }: { r: Reservation }) {
         <NoticeLine label="前日" sent={r.reminder_sent} />
       </dl>
 
-      <span className="hidden md:block material-symbols-outlined text-dim" aria-hidden="true">chevron_right</span>
+      <Icon name="chevron_right" className="hidden md:block text-dim" />
     </Link>
   );
 }
