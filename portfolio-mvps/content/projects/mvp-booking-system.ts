@@ -5,16 +5,16 @@ export const mvpBookingSystem: Project = {
   name: "予約管理システム",
   headline: "紙やLINEの予約管理を画面に載せ替える管理ツール",
   summary:
-    "予約の登録・編集と、受付中／確定／完了のステータス管理を行います。本日・近日・過去の予約を分けて表示し、確認通知とリマインドの送信状況をフラグで管理します。",
+    "LINE・電話・Web・店頭で受けた予約を1画面にまとめるモックアップです。予約の登録・編集・削除、受付→確定→完了のワンクリック更新、日別スケジュール、確認通知の送信演出までを、API やデータベースを使わずブラウザ内のダミーデータで操作できます。",
   tier: "standard",
   categories: ["web"],
   team: { kind: "solo" },
   period: { start: "2026-03" },
-  stack: ["Next.js (App Router)", "Server Actions", "PostgreSQL"],
+  stack: ["Next.js (App Router)", "React", "TypeScript", "Tailwind CSS"],
   highlights: [
-    { label: "予約の登録・編集", type: "check" },
-    { label: "ステータス管理", type: "data" },
-    { label: "通知状況のフラグ管理", type: "data" },
+    { label: "予約の登録・編集・削除", type: "check" },
+    { label: "受付経路（LINE・電話・Web）の一元管理", type: "data" },
+    { label: "ワンクリックのステータス更新と通知演出", type: "check" },
   ],
   verification: "live-demo",
   links: {
