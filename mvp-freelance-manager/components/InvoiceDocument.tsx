@@ -83,10 +83,10 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
         </div>
 
         <address className="pt-8 text-xs leading-relaxed text-warm-500 not-italic">
-          {/* 角印は社名のすぐ右から住所の行へかかるように押す。社名には重ねず読めるようにする */}
+          {/* 角印は見積書と同じく社名の末尾に半分かかるように押す */}
           <p className="relative w-fit text-sm font-semibold text-ink">
             {ISSUER.name}
-            <CompanySeal className="absolute top-0 left-full ml-1 h-10 w-10 sm:h-12 sm:w-12" />
+            <CompanySeal className="absolute bottom-0 left-full -ml-3 h-10 w-10 sm:h-12 sm:w-12" />
           </p>
           {/* 住所は語の途中で折らず、空白の位置でだけ改行する */}
           <p>
