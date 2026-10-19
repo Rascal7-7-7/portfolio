@@ -33,8 +33,7 @@ export default function CompletePage() {
       <CheckoutSteps current={2} />
 
       <div className="text-center">
-        <p className="text-xs tracking-[0.2em] text-on-surface-variant">ORDER CONFIRMED</p>
-        <h1 className="mt-3 font-headline text-3xl font-light text-on-background [word-break:auto-phrase]">ご注文ありがとうございます</h1>
+        <h1 className="font-headline text-3xl font-light text-on-background [word-break:auto-phrase]">ご注文ありがとうございます</h1>
         <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
           {DEMO_USER.name} 様のお申し込みを受け付けました。
           <br />
