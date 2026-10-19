@@ -38,7 +38,8 @@ export default function LandingPage({ doc }: { doc: LPDoc }) {
   const wide = useIsWide(ref)
   const Page = PAGES[doc.template]
   return (
-    <div ref={ref} className="min-h-full font-gothic antialiased [container-type:inline-size]">
+    // 本文は text-wrap: pretty で最終行の1文字落ち（「す。」だけの行）を避ける。見出しは Phrases で文節単位に改行
+    <div ref={ref} className="min-h-full font-gothic antialiased [container-type:inline-size] [&_:is(p,blockquote,dd)]:[text-wrap:pretty]">
       <Page store={doc.store} sections={doc.sections} wide={wide} />
     </div>
   )

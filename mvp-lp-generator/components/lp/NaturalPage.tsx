@@ -89,9 +89,9 @@ function Features({ store, wide }: TemplateProps) {
       <H2 lead={`${storeName(store)}の`} text="こだわり" wide={wide} />
       <ol className={cx('mx-auto mt-14 grid max-w-5xl', wide ? 'grid-cols-3 divide-x' : 'divide-y', 'divide-[#2e2620]/15')}>
         {store.features.map((f, i) => (
-          <li key={f.title} className={wide ? 'px-10' : 'py-8 first:pt-0 last:pb-0'}>
+          <li key={f.title} className={wide ? 'px-8 first:pl-0 last:pr-0' : 'py-8 first:pt-0 last:pb-0'}>
             <p aria-hidden className={cx(ACCENT, 'font-mincho text-2xl')}>{KANJI_NUM[i] ?? i + 1}</p>
-            <h3 className="mt-4 font-mincho text-lg font-semibold tracking-[0.08em]">{f.title}</h3>
+            <h3 className="mt-4 font-mincho text-lg font-semibold tracking-[0.08em]"><Phrases text={f.title} /></h3>
             <p className={cx(MUTED, 'mt-3 text-sm leading-[2] tracking-[0.04em]')}>{f.text}</p>
           </li>
         ))}
@@ -110,7 +110,7 @@ function Menu({ store, wide }: TemplateProps) {
         {items.map((m) => (
           <li key={m.name} className={cx(LINE, 'border-b py-6')}>
             <div className="flex items-baseline gap-4">
-              <h3 className="font-mincho text-[17px] font-semibold tracking-[0.08em]">{m.name}</h3>
+              <h3 className="font-mincho text-[17px] font-semibold tracking-[0.08em]"><Phrases text={m.name} /></h3>
               <span aria-hidden className="flex-1 border-b border-dotted border-[#2e2620]/35" />
               <p className="shrink-0 font-mincho text-[17px] tabular-nums tracking-[0.04em]">{m.price}</p>
             </div>

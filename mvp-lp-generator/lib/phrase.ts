@@ -7,6 +7,7 @@
  */
 const HIRAGANA = /[ぁ-ゟ]/
 const KANJI = /[㐀-鿿々]/
+const KATAKANA = /[ァ-ヺ]/
 const CLOSING = /[、。，．！？!?）」』】〕…・ 　]/
 const PREFIX = /[おご]/
 const MAX_UNIT = 10
@@ -23,7 +24,9 @@ export function toPhrases(text: string): string[] {
     const isPrefix = PREFIX.test(ch) && next !== undefined && KANJI.test(next)
     const afterPrefix = prev !== undefined && PREFIX.test(prev) && KANJI.test(ch)
     const startsWord = !HIRAGANA.test(ch) && !CLOSING.test(ch) && !afterPrefix
-    const breakHere = cur !== '' && prevIsHiraOrClose && (startsWord || isPrefix || prev === ' ' || prev === '　')
+    // 漢字→カタカナの境目も語の切れ目（例: 髪質改善|トリートメント、姿勢|チェックつき）
+    const kanjiToKana = prev !== undefined && KANJI.test(prev) && KATAKANA.test(ch) && cur.length >= 2
+    const breakHere = cur !== '' && ((prevIsHiraOrClose && (startsWord || isPrefix || prev === ' ' || prev === '　')) || kanjiToKana)
     if (breakHere || cur.length >= MAX_UNIT) {
       units.push(cur)
       cur = ''

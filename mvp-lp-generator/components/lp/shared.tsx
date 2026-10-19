@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { toPhrases } from '@/lib/phrase'
 import type { LPDoc, SectionKey, StoreInfo } from '@/lib/types'
 
@@ -13,11 +14,16 @@ export function Phrases({ text, lead }: { text: string; lead?: string }) {
   const units = lead ? [lead, ...toPhrases(text)] : toPhrases(text)
   return (
     <>
-      {units.map((u, i) => (
-        <span key={i} className="inline-block">
-          {u}
-        </span>
-      ))}
+      {units.map((u, i) => {
+        // 末尾の空白は inline-block の中だと消えるので外に出す（「初回お試し 60分」の空白を残す）
+        const body = u.trimEnd()
+        return (
+          <Fragment key={i}>
+            <span className="inline-block">{body}</span>
+            {u.slice(body.length)}
+          </Fragment>
+        )
+      })}
     </>
   )
 }
