@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import type { EstimateStatus } from "@/types";
+import { useState, type ReactNode } from "react";
+import type { Estimate, EstimateStatus } from "@/types";
 import { useEstimates } from "@/lib/store";
 import { calcTotals } from "@/lib/calc";
-import { estimateNumber, formatYen } from "@/lib/utils";
+import { estimateNumber, formatShortDate, formatYen } from "@/lib/utils";
 import EstimateDocument from "@/components/EstimateDocument";
 import Icon, { type IconName } from "@/components/Icon";
 import LoadingState from "@/components/LoadingState";
@@ -17,24 +17,23 @@ interface Action {
   to: EstimateStatus;
   label: string;
   icon: IconName;
-  /** 1画面のアクセント色は1色だけ。次に進める操作だけ primary、ほかは中立 */
-  tone: "primary" | "neutral";
   message: string;
 }
 
 const ACTIONS: Record<EstimateStatus, Action[]> = {
   draft: [
-    { to: "sent", label: "送付済みにする", icon: "send", tone: "primary", message: "送付済みにしました（デモのため実際のメールは送信されません）。「お客様の画面を見る」で先方に届く画面を確認できます" },
+    { to: "sent", label: "送付済みにする", icon: "send", message: "送付済みにしました（デモのため実際のメールは送信されません）。「お客様の画面を見る」で先方に届く画面を確認できます" },
   ],
   sent: [
-    { to: "won", label: "受注にする", icon: "check", tone: "primary", message: "受注にしました。一覧の受注金額・受注率に反映されます" },
-    { to: "lost", label: "失注にする", icon: "x", tone: "neutral", message: "失注にしました" },
+    { to: "won", label: "受注にする", icon: "check", message: "受注にしました。一覧の受注金額・受注率に反映されます" },
+    { to: "lost", label: "失注にする", icon: "x", message: "失注にしました" },
   ],
-  won: [{ to: "sent", label: "送付済みに戻す", icon: "reset", tone: "neutral", message: "送付済みに戻しました" }],
-  lost: [{ to: "sent", label: "送付済みに戻す", icon: "reset", tone: "neutral", message: "送付済みに戻しました" }],
+  won: [{ to: "sent", label: "送付済みに戻す", icon: "reset", message: "送付済みに戻しました" }],
+  lost: [{ to: "sent", label: "送付済みに戻す", icon: "reset", message: "送付済みに戻しました" }],
 };
 
-const TONE_CLASS: Record<Action["tone"], string> = {
+/** 1画面のアクセント色は1色だけ。主ボタンだけ primary、ほかは中立 */
+const TONE_CLASS: Record<"primary" | "neutral", string> = {
   primary: "bg-primary text-white hover:bg-primary-hover",
   neutral: "border border-line bg-white text-navy hover:bg-canvas",
 };
@@ -54,6 +53,11 @@ export default function EstimateDetail({ id, justSaved }: Props) {
   if (!estimates) return <LoadingState />;
   const estimate = estimates.find((e) => e.id === id);
   if (!estimate) return <NotFoundState />;
+
+  // 主ボタンは1つだけ。下書きは「送付済みにする」、送付後は承認の流れを見せる「お客様の画面」
+  const actions = ACTIONS[estimate.status];
+  const primary = estimate.status === "draft" ? actions[0] : null;
+  const others = primary ? actions.slice(1) : actions;
 
   const handleAction = (action: Action) => {
     setStatus(estimate.id, action.to);
@@ -88,28 +92,40 @@ export default function EstimateDetail({ id, justSaved }: Props) {
 
           <StatusStepper status={estimate.status} />
 
-          <div className="flex flex-wrap gap-2">
-            {ACTIONS[estimate.status].map((action) => (
-              <button key={action.to} type="button" onClick={() => handleAction(action)} className={`${BUTTON} ${TONE_CLASS[action.tone]}`}>
-                <Icon name={action.icon} />
-                {action.label}
+          <History estimate={estimate} />
+
+          <div className="flex flex-wrap items-start gap-2">
+            {primary ? (
+              <button type="button" onClick={() => handleAction(primary)} className={`${BUTTON} ${TONE_CLASS.primary}`}>
+                <Icon name={primary.icon} />
+                {primary.label}
               </button>
-            ))}
-            {estimate.status !== "draft" && (
-              <Link href={`/estimates/${estimate.id}/customer`} className={`${BUTTON} ${TONE_CLASS.neutral}`}>
+            ) : (
+              <Link href={`/estimates/${estimate.id}/customer`} className={`${BUTTON} ${TONE_CLASS.primary}`}>
                 <Icon name="eye" />
                 お客様の画面を見る（デモ）
               </Link>
             )}
-            <span className="hidden flex-1 sm:block" />
-            <Link href={`/estimates/${estimate.id}/edit`} className={`${BUTTON} ${TONE_CLASS.neutral}`}>
-              <Icon name="edit" />
-              編集
-            </Link>
-            <button type="button" onClick={() => window.print()} className={`${BUTTON} ${TONE_CLASS.neutral}`}>
-              <Icon name="print" />
-              印刷
-            </button>
+            <MoreMenu>
+              {(close) => (
+                <>
+                  {others.map((action) => (
+                    <button key={action.to} type="button" onClick={() => { close(); handleAction(action); }} className={MENU_ITEM}>
+                      <Icon name={action.icon} />
+                      {action.label}
+                    </button>
+                  ))}
+                  <Link href={`/estimates/${estimate.id}/edit`} className={MENU_ITEM}>
+                    <Icon name="edit" />
+                    編集
+                  </Link>
+                  <button type="button" onClick={() => { close(); window.print(); }} className={MENU_ITEM}>
+                    <Icon name="print" />
+                    印刷
+                  </button>
+                </>
+              )}
+            </MoreMenu>
           </div>
 
           <p
@@ -128,5 +144,63 @@ export default function EstimateDetail({ id, justSaved }: Props) {
       </div>
       </div>
     </div>
+  );
+}
+
+const MENU_ITEM =
+  "flex w-full items-center gap-2 whitespace-nowrap px-3 py-2 text-left text-sm text-navy hover:bg-canvas focus-visible:bg-canvas focus-visible:outline-none";
+
+/** ネイティブの details で作る「その他」メニュー。Esc・外側へのフォーカス移動で閉じる */
+function MoreMenu({ children }: { children: (close: () => void) => ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
+  return (
+    <details
+      open={open}
+      onToggle={(e) => setOpen(e.currentTarget.open)}
+      onKeyDown={(e) => {
+        if (e.key === "Escape" && open) {
+          close();
+          e.currentTarget.querySelector("summary")?.focus();
+        }
+      }}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) close();
+      }}
+      className="relative"
+    >
+      <summary
+        aria-expanded={open}
+        aria-haspopup="true"
+        className={`${BUTTON} ${TONE_CLASS.neutral} cursor-pointer list-none [&::-webkit-details-marker]:hidden`}
+      >
+        その他
+        <Icon name="chevron" className={open ? "h-4 w-4 rotate-180" : "h-4 w-4"} />
+      </summary>
+      <div className="absolute right-0 top-full z-20 mt-1 min-w-[12rem] overflow-hidden rounded border border-line bg-white py-1 shadow-lg">
+        {children(close)}
+      </div>
+    </details>
+  );
+}
+
+/** 作成 9/20 → 送付 9/24 → 受注 10/19 のように、状態が進んだ日を1行で見せる */
+function History({ estimate }: { estimate: Estimate }) {
+  const steps = [
+    { label: "作成", date: estimate.issuedAt },
+    estimate.sentAt && { label: "送付", date: estimate.sentAt },
+    estimate.decidedAt && { label: estimate.status === "lost" ? "失注" : "受注", date: estimate.decidedAt },
+  ].filter((s): s is { label: string; date: string } => Boolean(s));
+  return (
+    <p aria-label="履歴" className="tnum flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-body">
+      {steps.map((s, i) => (
+        <span key={s.label} className="inline-flex items-center gap-2 whitespace-nowrap">
+          {i > 0 && <span aria-hidden="true" className="text-muted">→</span>}
+          <span>
+            <span className="text-muted">{s.label}</span> {formatShortDate(s.date)}
+          </span>
+        </span>
+      ))}
+    </p>
   );
 }

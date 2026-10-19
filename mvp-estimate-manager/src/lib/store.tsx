@@ -8,7 +8,7 @@ import { calcTotals } from "@/lib/calc";
 import { todayISO } from "@/lib/utils";
 
 // ponytail: localStorage のみ。複数端末・複数人で共有するならサーバー保存が必要
-const STORAGE_KEY = "mvp-estimate-manager:v4";
+const STORAGE_KEY = "mvp-estimate-manager:v5";
 
 interface EstimatesContextValue {
   /** マウント前（localStorage 読み込み前）は null */
@@ -66,6 +66,13 @@ function saveStored(estimates: Estimate[]): void {
   }
 }
 
+/** 状態遷移の日付を記録する。送付済みに戻したときは送付日を残し、決定日だけ消す */
+function withStatus(e: Estimate, status: EstimateStatus, today: string): Estimate {
+  if (status === "draft") return { ...e, status, sentAt: undefined, decidedAt: undefined };
+  if (status === "sent") return { ...e, status, sentAt: e.sentAt ?? today, decidedAt: undefined };
+  return { ...e, status, sentAt: e.sentAt ?? today, decidedAt: today };
+}
+
 export function EstimatesProvider({ children }: { children: React.ReactNode }) {
   const [estimates, setEstimates] = useState<Estimate[] | null>(null);
   // 通知はページ遷移をまたいで残ればよいので保存しない（再読み込みで消える）
@@ -96,7 +103,7 @@ export function EstimatesProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setStatus = useCallback((id: number, status: EstimateStatus) => {
-    setEstimates((prev) => prev?.map((e) => (e.id === id ? { ...e, status } : e)) ?? prev);
+    setEstimates((prev) => prev?.map((e) => (e.id === id ? withStatus(e, status, todayISO()) : e)) ?? prev);
   }, []);
 
   const reset = useCallback(() => {

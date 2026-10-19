@@ -28,6 +28,10 @@ export interface Estimate {
   note: string;
   items: LineItem[];
   status: EstimateStatus;
+  /** 送付済みにした日。ステータス変更時に記録する */
+  sentAt?: string;
+  /** 受注・失注が決まった日 */
+  decidedAt?: string;
 }
 
-export type EstimateInput = Omit<Estimate, "id" | "status">;
+export type EstimateInput = Omit<Estimate, "id" | "status" | "sentAt" | "decidedAt">;

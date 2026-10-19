@@ -205,6 +205,14 @@ const ROWS: SeedRow[] = [
   },
 ];
 
+/** 送付は発行の数日後、受注・失注はその1〜2週間後（いずれも今日を越えない） */
+function seedHistory(issuedAt: string, row: SeedRow, id: number): Pick<Estimate, "sentAt" | "decidedAt"> {
+  if (row.status === "draft") return {};
+  const sentAt = addDays(issuedAt, Math.min(2 + (id % 3), row.daysAgo));
+  if (row.status === "sent") return { sentAt };
+  return { sentAt, decidedAt: addDays(issuedAt, Math.min(10 + (id % 6), row.daysAgo)) };
+}
+
 /** 今日を基準にした相対日付でダミー見積を作る。ROWS は新しい順（daysAgo 昇順）に並べ、番号順＝発行日順にする */
 export function buildSeed(today: string): Estimate[] {
   return ROWS.map((row, index) => {
@@ -219,6 +227,7 @@ export function buildSeed(today: string): Estimate[] {
       validUntil: addDays(issuedAt, VALID_DAYS),
       note: "お支払い条件：納品月末締め翌月末払い",
       status: row.status,
+      ...seedHistory(issuedAt, row, id),
       items: row.items.map(([name, unit, unitPrice, quantity], i) => ({
         id: `${id}-${i}`,
         name,
