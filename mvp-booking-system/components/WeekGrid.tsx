@@ -108,7 +108,7 @@ function DayColumn({ list, nowMin, past }: { list: Reservation[]; nowMin: number
   );
 }
 
-/** 横に並ぶ（narrow）ときは名前を2行目に回し、担当は時刻の横に出す。低い（short）ときは1行に姓まで */
+/** 横に並ぶ（narrow）ときは姓を2行目に回し、担当の行は高いブロックだけに出す（45分枠で3行目が欠けるため）。低い（short）ときは1行に姓まで */
 function WeekBlock({ r, tall, short, narrow }: { r: Reservation; tall: boolean; short: boolean; narrow: boolean }) {
   const canceled = r.status === 'canceled';
   const kind = KIND[menuKind(r.service_name)];
@@ -126,7 +126,7 @@ function WeekBlock({ r, tall, short, narrow }: { r: Reservation; tall: boolean; 
   const freshMark = <span className="shrink-0 font-medium text-accent-hover">新着</span>;
   return (
     <Link href={`/reservations/${r.id}`}
-      aria-label={`${r.reservation_time}–${endTime(r)} ${r.customer_name}様 ${r.service_name} 担当${r.staff} ${STATUS_LABEL[r.status]}${needsAttention(r) ? ' 確認通知未送信' : ''}${isNew(r) ? ' 新着' : ''}`}
+      aria-label={`${r.reservation_time}–${endTime(r)} ${r.customer_name}様 ${r.service_name} 担当${r.staff} ${STATUS_LABEL[r.status]}${needsAttention(r) ? ' 確認通知未送信' : ''}${fresh ? ' 新着' : ''}`}
       className={`block h-full overflow-hidden rounded-[5px] px-1.5 py-1 text-[11px] leading-[15px] hover:brightness-[0.97] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${look} ${fresh ? 'ring-1 ring-accent' : ''}`}>
       <p className="flex items-center gap-1 min-w-0">
         {!(short && narrow) && <span className="tabular-nums text-body shrink-0">{r.reservation_time}</span>}
@@ -134,8 +134,8 @@ function WeekBlock({ r, tall, short, narrow }: { r: Reservation; tall: boolean; 
         {short && fresh && freshMark}
         {r.status === 'pending' && <span aria-hidden="true" className="ml-auto size-2 shrink-0 rounded-full bg-attn" />}
       </p>
-      {!short && narrow && <p className="flex min-w-0">{name}</p>}
-      {!short && <p className="text-dim truncate">{fresh && <span className="mr-1 font-medium text-accent-hover">新着</span>}{r.staff}{tall && !narrow && <><span aria-hidden="true"> · </span>{r.service_name}</>}</p>}
+      {!short && narrow && <p className="flex items-center gap-1 min-w-0">{name}{!tall && fresh && freshMark}</p>}
+      {!short && (!narrow || tall) && <p className="text-dim truncate">{fresh && <span className="mr-1 font-medium text-accent-hover">新着</span>}{r.staff}{tall && !narrow && <><span aria-hidden="true"> · </span>{r.service_name}</>}</p>}
     </Link>
   );
 }

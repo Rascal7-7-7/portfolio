@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useLayoutEffect, useRef, useState, type RefObject } from 'react'
 import type { LPDoc, TemplateKey } from '@/lib/types'
 import ModernPage from './ModernPage'
 import NaturalPage from './NaturalPage'
@@ -23,7 +23,8 @@ const PAGES: Record<TemplateKey, (p: TemplateProps) => React.ReactNode> = {
  */
 function useIsWide(ref: RefObject<HTMLDivElement | null>) {
   const [size, setSize] = useState({ wide: true, roomy: true })
-  useEffect(() => {
+  // 描画前に幅を測り、広いレイアウトが一瞬出てから切り替わるのを防ぐ
+  useLayoutEffect(() => {
     const el = ref.current
     if (!el) return
     const update = () => {

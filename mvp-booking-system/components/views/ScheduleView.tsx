@@ -61,8 +61,9 @@ export default function ScheduleView() {
     const s = STAFF.find(x => x === params.get('staff'));
     if (s) setStaff(s);
     const d = params.get('date');
-    setFocusId(params.get('id'));
-    if (params.has('date') || params.has('staff')) window.history.replaceState(null, '', window.location.pathname);
+    const id = params.get('id');
+    setFocusId(id && /^\d+$/.test(id) ? id : null);
+    if (params.has('date') || params.has('staff') || params.has('id')) window.history.replaceState(null, '', window.location.pathname);
     if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
     const days = diffDays(today, d);
     if (!Number.isFinite(days)) return;
