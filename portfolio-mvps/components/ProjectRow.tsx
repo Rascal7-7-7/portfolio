@@ -29,10 +29,10 @@ export function ProjectRow({ project }: { project: Project }) {
         <Image
           src={thumbnail}
           alt={`${name}のデモ画面`}
-          width={640}
-          height={400}
-          sizes="(min-width: 640px) 176px, 160px"
-          className="w-40 sm:w-44 sm:mt-1 h-auto shrink-0 rounded-[4px] border border-rule"
+          width={800}
+          height={500}
+          sizes="(min-width: 640px) 224px, 320px"
+          className="w-full max-w-[320px] sm:w-56 sm:mt-1 h-auto shrink-0 rounded-[4px] border border-rule"
         />
       )}
     </article>

@@ -61,7 +61,7 @@ function Hero({ store, wide }: TemplateProps) {
           )}
           <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-4">
             <a href="#reserve" className={BTN}>{ctaLabel(store)}</a>
-            <a href="#menu" className="border-b border-white/40 pb-0.5 text-sm hover:border-white">メニュー・料金</a>
+            <a href="#menu" className="border-b border-white/40 pb-0.5 text-sm hover:border-white">{menuTitle(store)}</a>
           </div>
         </div>
       </div>

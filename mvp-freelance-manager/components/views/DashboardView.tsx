@@ -153,6 +153,10 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
       </div>
 
       <div className="mb-4 grid gap-4 lg:grid-cols-5">
+        {/* 「入金済にする」がデモの山場なので、見た目もフォーカス順も今日やることより先に置く */}
+        <Card title="未入金の請求" className="lg:col-span-3" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
+          <InvoiceList invoices={unpaid} data={data} today={today} empty="未入金の請求はありません" />
+        </Card>
         <Card title="今日やること" className="lg:col-span-2" action={<MoreLink href="/tasks">すべて見る</MoreLink>}>
           {focusTasks.length === 0 ? (
             <p className="px-5 py-8 text-center text-sm text-warm-500">今日のタスクはすべて完了です</p>
@@ -168,10 +172,6 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
               ))}
             </ul>
           )}
-        </Card>
-        {/* スマホでは「入金済にする」まで早く届くよう、今日やることより先に出す */}
-        <Card title="未入金の請求" className="order-first lg:order-none lg:col-span-3" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
-          <InvoiceList invoices={unpaid} data={data} today={today} empty="未入金の請求はありません" />
         </Card>
       </div>
 
