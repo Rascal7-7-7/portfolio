@@ -58,6 +58,28 @@ export type Challenge = {
   readonly solution: string;
 };
 
+/** 構成図の1段。boundary は決定的な信頼境界であることを示す。 */
+export type FlowStep = {
+  readonly label: string;
+  readonly note: string;
+  readonly boundary?: boolean;
+};
+
+/**
+ * Case Study の構成図。本流を縦に並べ、読み取り専用の脇道を下に添える。
+ * 図にできる事実がある作品にだけ持たせる。
+ */
+export type FlowDiagram = {
+  /** 図全体の説明。支援技術向けの代替テキストになる。 */
+  readonly description: string;
+  readonly steps: readonly FlowStep[];
+  /** 本流から一方向にだけ読む経路（左から右へ）。 */
+  readonly sidePath?: {
+    readonly steps: readonly Omit<FlowStep, "boundary">[];
+    readonly note: string;
+  };
+};
+
 export type Project = {
   // ---- 一覧に必要なもの ----
   readonly slug: string;
@@ -93,6 +115,7 @@ export type Project = {
   readonly problem?: string;
   readonly goal?: string;
   readonly architecture?: string;
+  readonly diagram?: FlowDiagram;
   readonly features?: readonly string[];
   readonly decisions?: readonly Decision[];
   readonly challenges?: readonly Challenge[];

@@ -14,7 +14,7 @@ export const jarvisVoiceAgent: Project = {
   highlights: [
     { label: "LLMを信頼境界にしない設計", type: "check" },
     { label: "日本語音声特有の脆弱性3件を修正", type: "check" },
-    { label: "テスト34ファイル・CI稼働", type: "data" },
+    { label: "テスト34ファイル・CIで297件成功", type: "data" },
   ],
   verification: "code-only",
   evidence: [
@@ -32,6 +32,25 @@ export const jarvisVoiceAgent: Project = {
   problem:
     "音声からコマンドを実行させると、聞き間違いや曖昧な指示がそのまま破壊的な操作につながります。どこまでをLLMに任せてよいかを、感覚ではなく根拠で決める必要がありました。",
   goal: "発話と危険な操作の間に、LLMの判断に依存しない境界を置くこと。",
+  diagram: {
+    description:
+      "JARVIS の構成図。発話は、決定的なポリシー層、LLM ルーター、もう一度決定的なポリシー層の順に通ってから実行される。信頼境界はポリシー層で、LLM ルーターは信頼境界にしない。HUD は runtime が書く JSON 1ファイルを読むだけで、runtime へ戻る経路を持たない。",
+    steps: [
+      { label: "発話", note: "音声で開発作業を指示する" },
+      { label: "ポリシー層（決定的）", note: "LLM の前で判定する", boundary: true },
+      { label: "LLM ルーター", note: "ローカルLLMが分類する。信頼境界にしない" },
+      { label: "ポリシー層（決定的）", note: "LLM の後で判定する", boundary: true },
+      { label: "実行", note: "開発作業を実行する" },
+    ],
+    sidePath: {
+      steps: [
+        { label: "runtime", note: "状態を書く" },
+        { label: "JSON", note: "1ファイル" },
+        { label: "HUD", note: "読むだけ" },
+      ],
+      note: "HUD から runtime へ戻る経路は持たない",
+    },
+  },
   decisions: [
     {
       question: "なぜ LLM のルーターを信頼境界にしなかったのか",
@@ -61,7 +80,8 @@ export const jarvisVoiceAgent: Project = {
     "呼び出しのたびに設定の解決経路を検証し、想定と異なれば停止する（fail-closed）",
     "状態ファイルの権限を絞り、同一マシンの他アカウントから読めないようにした",
   ],
-  testing: "34ファイル。マイクを必要としないスイートを GitHub Actions で実行しています。",
+  testing:
+    "34ファイル。うちマイクを必要としない10スイートを push / PR ごとに GitHub Actions で実行し、main の最新コミット（2026-09-12）では297件成功・2件スキップでした。",
   learned: [
     "正規表現の単語境界は、言語をまたぐと前提が崩れる",
     "「設定してある」と「実際に効いている」は別物で、後者は毎回確かめる必要がある",

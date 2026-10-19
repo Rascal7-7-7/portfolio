@@ -24,9 +24,13 @@ export function MVPGrid() {
           ))}
         </div>
 
-        <h3 className="font-mono text-xs uppercase tracking-widest text-surface-400 mb-2">
-          そのほかに作ったもの
-        </h3>
+        {/* 代表作との間に区切りを置き、ここからは一覧として流し読みできる密度にする */}
+        <div className="flex items-center gap-4 mb-2">
+          <h3 className="shrink-0 font-mono text-xs uppercase tracking-widest text-surface-400">
+            そのほかに作ったもの
+          </h3>
+          <span className="h-px flex-1 bg-white/10" aria-hidden="true" />
+        </div>
         <ul className="divide-y divide-white/5">
           {standard.map((project) => (
             <li key={project.slug}>

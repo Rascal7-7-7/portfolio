@@ -10,6 +10,8 @@ import {
 } from "@/content/projects";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { EvidenceLog } from "@/components/EvidenceLog";
+import { FlowDiagram } from "@/components/FlowDiagram";
 import { Badge } from "@/components/ui/Badge";
 import { TextLink } from "@/components/ui/TextLink";
 
@@ -134,12 +136,7 @@ export default function ProjectDetail({ params }: { params: Params }) {
 
           {/* 一覧の代表作と同じ根拠を、ここでも最初に見せる（画像の代わり） */}
           {project.evidence?.length ? (
-            <figure className="rounded-xl bg-surface-900 ring-1 ring-white/5 p-5 mb-6">
-              <figcaption className="font-mono text-xs text-brand-400 mb-3">根拠</figcaption>
-              <pre className="font-mono text-xs sm:text-[13px] leading-relaxed text-surface-300 whitespace-pre-wrap">
-                {project.evidence.join("\n")}
-              </pre>
-            </figure>
+            <EvidenceLog lines={project.evidence} className="bg-surface-900 mb-6" />
           ) : null}
 
           <div className="flex flex-wrap items-center gap-3 text-sm text-surface-400 mb-6">
@@ -222,6 +219,7 @@ export default function ProjectDetail({ params }: { params: Params }) {
 
           {/* 体制と構成 */}
           <Section id="role" title="体制と構成">
+            {project.diagram && <FlowDiagram diagram={project.diagram} />}
             <dl className="space-y-3">
               <div className="flex flex-col sm:flex-row sm:gap-4">
                 <dt className="text-surface-400 text-sm sm:w-32 shrink-0">体制</dt>
