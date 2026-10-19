@@ -112,12 +112,22 @@ function Features({ store, wide }: TemplateProps) {
   return (
     <section className={pad(wide)}>
       <H2 lead={`${storeName(store)}が`} text="選ばれる理由" wide={wide} />
-      {/* 大きな 01/02/03 は置かず、見出しを珊瑚色の文字にして本文で読ませる */}
-      <ul className={cx('mx-auto mt-12 grid max-w-6xl', LINE, wide ? 'grid-cols-3' : 'border-b')}>
-        {store.features.map((f) => (
-          <li key={f.title} className={cx(LINE, wide ? 'border-l px-8 py-2 first:border-l-0 first:pl-0 last:pr-0' : 'border-t py-7')}>
-            <h3 className={cx(ACCENT, 'text-xl font-extrabold leading-snug')}><Phrases text={f.title} /></h3>
-            <p className={cx(MUTED, 'mt-2 text-sm leading-[1.9]')}>{f.text}</p>
+      {/*
+        「3列の特長カード」はテンプレートの型に見えるので使わない。PC では見出しと本文を横に組んだ段を
+        左右交互にずらして置き、読む順に視線が蛇行するようにする（手本の整骨院サイトの「理由」の組み方）
+      */}
+      <ul className={cx('mx-auto mt-12 max-w-5xl', wide ? 'space-y-12' : 'border-b', LINE)}>
+        {store.features.map((f, i) => (
+          <li
+            key={f.title}
+            className={cx(
+              wide
+                ? cx('grid w-[78%] grid-cols-[minmax(0,15em)_minmax(0,1fr)] items-baseline gap-10 border-t-2 pt-6', RULE, i % 2 === 1 && 'ml-auto')
+                : cx('border-t py-7', LINE),
+            )}
+          >
+            <h3 className={cx(ACCENT, 'font-extrabold leading-snug', wide ? 'text-2xl' : 'text-xl')}><Phrases text={f.title} /></h3>
+            <p className={cx(MUTED, 'text-[15px] leading-[1.9]', !wide && 'mt-2')}>{f.text}</p>
           </li>
         ))}
       </ul>
