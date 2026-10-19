@@ -7,11 +7,13 @@ import { DEMO_USER } from '@/lib/catalog';
 import { formatJa, nextAfter, todayIso } from '@/lib/date';
 import { monthlyEquivalent, yen } from '@/lib/pricing';
 import type { Subscription } from '@/lib/types';
+import { Phrases } from '@/components/Phrases';
 import { SubscriptionCard, type SubscriptionCommand } from './_components/SubscriptionCard';
 
 export default function MyPage() {
   const { state, loaded, dispatch } = useStore();
-  const [message, setMessage] = useState('');
+  // 文節の配列で持ち、Phrases で日付の途中では改行させない
+  const [message, setMessage] = useState<ReadonlyArray<string>>([]);
   if (!loaded) return <main className="min-h-[60vh]" aria-busy="true" />;
 
   // 並べ替えない：操作したカードが動くと、デモ中に目で追えなくなる
@@ -24,12 +26,12 @@ export default function MyPage() {
     const today = todayIso();
     const after =
       command === 'skip' && sub.nextDelivery
-        ? `次回のお届けを${formatJa(nextAfter(sub.nextDelivery, sub.interval))}に変更しました`
+        ? ['次回のお届けを', '変更しました：', `${formatJa(sub.nextDelivery)} → ${formatJa(nextAfter(sub.nextDelivery, sub.interval))}`]
         : command === 'pause'
-          ? `${name}の定期便をお休みにしました`
+          ? [`${name}の定期便を`, 'お休みにしました']
           : command === 'resume'
-            ? `${name}の定期便を再開しました`
-            : `${name}の定期便を解約しました`;
+            ? [`${name}の定期便を`, '再開しました']
+            : [`${name}の定期便を`, '解約しました'];
     dispatch(command === 'resume' ? { type: 'resume', id: sub.id, today } : { type: command, id: sub.id });
     setMessage(after);
   };
@@ -48,10 +50,10 @@ export default function MyPage() {
       </dl>
 
       <p role="status" aria-live="polite" className="mt-4 min-h-[1.25rem] text-sm font-medium text-primary">
-        {message}
+        <Phrases parts={message} />
       </p>
 
-      <div className="mb-3 mt-2 flex flex-wrap items-baseline justify-between gap-x-4">
+      <div className="mb-3 mt-6 flex flex-wrap items-baseline justify-between gap-x-4">
         <h2 className="text-sm font-semibold text-on-surface">定期便の管理</h2>
         <p className="text-xs text-on-surface-variant">金額は税込・送料無料</p>
       </div>
@@ -77,7 +79,7 @@ export default function MyPage() {
           type="button"
           onClick={() => {
             dispatch({ type: 'reset', today: todayIso() });
-            setMessage('デモデータを初期状態に戻しました');
+            setMessage(['デモデータを', '初期状態に', '戻しました']);
           }}
           className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-on-surface"
         >

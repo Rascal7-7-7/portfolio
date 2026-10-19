@@ -89,19 +89,14 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
             <div className="grid grid-cols-3 gap-2 sm:flex">
               {sub.status === 'active' ? (
                 <>
-                  {firstPending ? (
-                    // 押せないものはボタンの形にせず、状態と理由を文字で示す
-                    <p className="flex flex-col justify-center text-xs leading-snug text-on-surface-variant sm:pr-2">
-                      <span className="font-medium text-on-surface">初回発送準備中</span>
-                      <span>届いた後からスキップできます</span>
-                    </p>
-                  ) : (
+                  {!firstPending && (
                     <ActionButton onClick={() => run('skip')} tone="primary">
                       <SkipForward className="h-4 w-4" aria-hidden />
                       次回をスキップ
                     </ActionButton>
                   )}
-                  <ActionButton onClick={() => run('pause')}>
+                  {/* スキップ枠が空いても、スマホの3列では他のカードと同じ列に置く */}
+                  <ActionButton onClick={() => run('pause')} className={cn(firstPending && 'col-start-2')}>
                     <Pause className="h-4 w-4" aria-hidden />
                     お休みする
                   </ActionButton>
@@ -117,6 +112,13 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
                 解約
               </ActionButton>
             </div>
+          )}
+          {firstPending && !confirming && (
+            // 押せないものはボタンの形にせず、ボタン列の下に状態と理由を文字で示す
+            <p className="mt-2 text-xs text-on-surface-variant">
+              <span className="inline-block font-medium text-on-surface">初回発送準備中</span>
+              <span className="inline-block">：届いた後からスキップできます</span>
+            </p>
           )}
         </div>
       )}
