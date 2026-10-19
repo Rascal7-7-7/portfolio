@@ -1,20 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { addDays, formatFullDate, toMinutes } from '@/lib/date';
-import { CLOSE_MIN, OPEN_MIN, durationMin, endTime } from '@/lib/slots';
+import { CLOSE_MIN, OPEN_MIN, availableSlots, durationMin, endTime, toTime } from '@/lib/slots';
 import { sortByDateTime, useStore } from '@/lib/store';
-import { STAFF, type Reservation, type Staff } from '@/lib/types';
+import { MENUS, STAFF, type Reservation, type Staff } from '@/lib/types';
 import ChannelBadge from '@/components/ChannelBadge';
 import LoadingState from '@/components/LoadingState';
 import { needsAttention } from '@/components/ReservationRow';
 import StatusBadge from '@/components/StatusBadge';
-import { PageHeader, StatStrip, btn } from '@/components/ui';
+import { PageHeader, STAFF_TONE, StatStrip, btn } from '@/components/ui';
 
 const SLOT_H = 112;
 /** これより低いカードは1行目に名前まで詰める */
 const COMPACT_H = 100;
+/** 空き枠を数えるときの基準（いちばん短いメニュー） */
+const SHORTEST = MENUS.reduce((a, b) => (b.minutes < a.minutes ? b : a));
 const OPEN_HOURS = Array.from({ length: (CLOSE_MIN - OPEN_MIN) / 60 }, (_, i) => OPEN_MIN / 60 + i);
 
 /** 予定ブロックの見た目。色は「要対応」だけに使い、ほかは地の色と枠の形（キャンセル=破線）で区別する */
@@ -25,15 +27,33 @@ function blockCls(r: Reservation): string {
   return 'bg-subtle border border-line';
 }
 
+function minutesNow(): number {
+  const d = new Date();
+  return d.getHours() * 60 + d.getMinutes();
+}
+
+/** 現在時刻（分）。1分ごとに更新して、スケジュールの赤線を動かす */
+function useNowMinutes(): number {
+  const [now, setNow] = useState(minutesNow);
+  useEffect(() => {
+    const t = setInterval(() => setNow(minutesNow()), 60_000);
+    return () => clearInterval(t);
+  }, []);
+  return now;
+}
+
 export default function ScheduleView() {
   const { reservations, today } = useStore();
   const [offset, setOffset] = useState(0);
   const [staff, setStaff] = useState<Staff>(STAFF[0]);
+  const now = useNowMinutes();
   if (!reservations) return <LoadingState />;
 
   const date = addDays(today, offset);
   const list = sortByDateTime(reservations.filter(r => r.reservation_date === date));
-  const active = list.filter(r => r.status === 'pending' || r.status === 'confirmed');
+  // 「予約件数」と重ならない指標として、まだ予約を受けられる枠を出す（本日は過ぎた時刻を除く）
+  const open = date < today ? 0 : availableSlots(reservations, date, SHORTEST.minutes, date === today ? now : 0).length;
+  const nowMin = offset === 0 && now >= OPEN_MIN && now < CLOSE_MIN ? now : null;
   const unnotified = list.filter(needsAttention);
   const byStaff = (s: Staff) => list.filter(r => r.staff === s);
 
@@ -59,7 +79,7 @@ export default function ScheduleView() {
 
       <StatStrip items={[
         { label: '予約件数', value: list.length },
-        { label: '対応予定', value: active.length },
+        { label: '空き枠', value: open, unit: '枠', note: `${SHORTEST.minutes}分メニューで予約できる開始時刻` },
         { label: '未通知', value: unnotified.length, alert: unnotified.length > 0 },
       ]} />
 
@@ -67,7 +87,7 @@ export default function ScheduleView() {
         <p className="border border-line rounded-lg px-6 py-14 text-center text-sm text-dim">この日の予約はありません</p>
       ) : (
         <>
-          <Timeline byStaff={byStaff} />
+          <Timeline byStaff={byStaff} nowMin={nowMin} />
           <div className="md:hidden">
             <StaffSwitcher current={staff} counts={STAFF.map(s => byStaff(s).length)} onChange={setStaff} />
             {byStaff(staff).length === 0 ? (
@@ -104,6 +124,7 @@ function StaffSwitcher({ current, counts, onChange }: { current: Staff; counts: 
             className={`h-9 rounded-[5px] text-sm focus-visible:outline-2 focus-visible:outline-brand ${
               active ? 'bg-canvas text-ink font-medium shadow-[0_0_0_1px_var(--color-line),0_1px_2px_rgba(0,0,0,0.06)]' : 'text-dim hover:text-ink'
             }`}>
+            <span className={`inline-block size-2 rounded-full mr-1.5 align-[1px] ${STAFF_TONE[s].dot}`} aria-hidden="true" />
             {s}<span className="ml-1 text-xs font-normal text-dim tabular-nums">{counts[i]}件</span>
           </button>
         );
@@ -139,20 +160,26 @@ export function placeInLanes(list: Reservation[]): Placed[] {
 }
 
 /** デスクトップ: 営業時間の時間軸に、担当ごとの列で予約を並べる */
-function Timeline({ byStaff }: { byStaff: (s: Staff) => Reservation[] }) {
+function Timeline({ byStaff, nowMin }: { byStaff: (s: Staff) => Reservation[]; nowMin: number | null }) {
+  const nowTop = nowMin === null ? null : ((nowMin - OPEN_MIN) / 60) * SLOT_H + 3;
   const cols = { gridTemplateColumns: `64px repeat(${STAFF.length}, minmax(0, 1fr))` };
   return (
     <div className="hidden md:block border border-line rounded-lg overflow-hidden">
       <div className="grid border-b border-line bg-muted" style={cols}>
         <div className="border-r border-line" />
         {STAFF.map((s, i) => (
-          <p key={s} className={`px-3 py-2 text-sm font-medium text-ink ${i > 0 ? 'border-l border-line' : ''}`}>
-            {s}<span className="ml-1.5 text-xs font-normal text-dim tabular-nums">{byStaff(s).length}件</span>
+          <p key={s} className={`flex items-center gap-2 px-3 py-2 text-sm font-medium text-ink ${i > 0 ? 'border-l border-line' : ''}`}>
+            <span className={`size-2 rounded-full ${STAFF_TONE[s].dot}`} aria-hidden="true" />{s}<span className="ml-1.5 text-xs font-normal text-dim tabular-nums">{byStaff(s).length}件</span>
           </p>
         ))}
       </div>
       <div className="grid" style={cols}>
-        <div className="border-r border-line pt-1.5">
+        <div className="relative border-r border-line pt-1.5">
+          {nowTop !== null && (
+            <p className="absolute right-1 -translate-y-1/2 z-10 bg-canvas px-0.5 text-[11px] font-medium text-now tabular-nums" style={{ top: nowTop }}>
+              <span className="sr-only">現在時刻 </span>{toTime(nowMin ?? 0)}
+            </p>
+          )}
           {OPEN_HOURS.map(h => (
             <div key={h} className="pr-3 text-right text-xs text-dim tabular-nums" style={{ height: SLOT_H }}>
               {String(h).padStart(2, '0')}:00
@@ -160,16 +187,16 @@ function Timeline({ byStaff }: { byStaff: (s: Staff) => Reservation[] }) {
           ))}
         </div>
         {STAFF.map((s, i) => (
-          <StaffColumn key={s} list={byStaff(s)} divider={i > 0} />
+          <StaffColumn key={s} list={byStaff(s)} divider={i > 0} tone={STAFF_TONE[s].soft} nowTop={nowTop} />
         ))}
       </div>
     </div>
   );
 }
 
-function StaffColumn({ list, divider }: { list: Reservation[]; divider: boolean }) {
+function StaffColumn({ list, divider, tone, nowTop }: { list: Reservation[]; divider: boolean; tone: string; nowTop: number | null }) {
   return (
-    <div className={`relative ${divider ? 'border-l border-line' : ''}`} style={{ height: SLOT_H * OPEN_HOURS.length }}>
+    <div className={`relative ${tone} ${divider ? 'border-l border-line' : ''}`} style={{ height: SLOT_H * OPEN_HOURS.length }}>
       {OPEN_HOURS.map((h, i) => (
         <div key={h} className="absolute left-0 right-0 border-t border-line" style={{ top: i * SLOT_H + 3 }} />
       ))}
@@ -185,6 +212,7 @@ function StaffColumn({ list, divider }: { list: Reservation[]; divider: boolean 
           </div>
         );
       })}
+      {nowTop !== null && <div aria-hidden="true" className="absolute left-0 right-0 z-10 h-0.5 bg-now pointer-events-none" style={{ top: nowTop - 1 }} />}
     </div>
   );
 }

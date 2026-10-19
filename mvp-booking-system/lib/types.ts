@@ -13,8 +13,8 @@ export const STATUS_LABEL: Record<ReservationStatus, string> = {
 export const STAFF = ['山本', '石井'] as const;
 export type Staff = (typeof STAFF)[number];
 
-export function isStaff(v: string): v is Staff {
-  return (STAFF as readonly string[]).includes(v);
+export function isStaff(v: unknown): v is Staff {
+  return (STAFF as readonly unknown[]).includes(v);
 }
 
 /** どこから受けた予約か。「紙・LINE・電話がバラバラ」を一元化した感を出すための項目 */
@@ -27,14 +27,6 @@ export const CHANNEL_LABEL: Record<Channel, string> = {
   phone:   '電話',
   web:     'Web',
   walk_in: '店頭',
-};
-
-/** 確認通知をどの手段で送る想定か（モック表示用） */
-export const CHANNEL_NOTIFY_VIA: Record<Channel, string> = {
-  line:    'LINE',
-  phone:   'SMS',
-  web:     'メール',
-  walk_in: 'SMS',
 };
 
 export interface Menu {
@@ -77,6 +69,27 @@ export type ReservationInput = Pick<
   | 'customer_name' | 'customer_email' | 'customer_phone'
   | 'reservation_date' | 'reservation_time' | 'service_name' | 'note' | 'channel' | 'staff'
 >;
+
+export type NotifyVia = 'LINE' | 'メール' | 'SMS';
+
+/**
+ * 確認通知をどの手段で送る想定か（モック表示用）。
+ * LINE で受けた予約は LINE、それ以外はメールがあればメール、無ければ電話番号宛ての SMS。連絡先が無ければ null。
+ */
+export function notifyVia(r: Pick<Reservation, 'channel' | 'customer_email' | 'customer_phone'>): NotifyVia | null {
+  if (r.channel === 'line') return 'LINE';
+  if (r.customer_email) return 'メール';
+  if (r.customer_phone) return 'SMS';
+  return null;
+}
+
+export function isChannel(v: unknown): v is Channel {
+  return (CHANNELS as unknown[]).includes(v);
+}
+
+export function isStatus(v: unknown): v is ReservationStatus {
+  return (STATUSES as unknown[]).includes(v);
+}
 
 export function findMenu(name: string): Menu | undefined {
   return MENUS.find(m => m.name === name);

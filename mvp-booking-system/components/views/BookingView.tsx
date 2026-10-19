@@ -6,11 +6,11 @@ import { addDays, formatFullDate, formatShortDate, toMinutes } from '@/lib/date'
 import { SHOP } from '@/lib/seed';
 import { availableSlots, toTime } from '@/lib/slots';
 import { useStore } from '@/lib/store';
-import { MENUS, type Menu } from '@/lib/types';
+import { MENUS, STAFF, type Menu } from '@/lib/types';
 import LoadingState from '@/components/LoadingState';
 import MonthCalendar from '@/components/MonthCalendar';
 import { inputCls } from '@/components/ReservationForm';
-import { btn } from '@/components/ui';
+import { STAFF_TONE, btn } from '@/components/ui';
 
 /** 予約を受け付ける期間（今日から何日先まで） */
 const BOOK_DAYS = 30;
@@ -63,7 +63,8 @@ export default function BookingView() {
   const shownMonth = month ?? monthOf(selectedDate);
   const slots = slotsOf(selectedDate);
 
-  const chooseMenu = (m: Menu) => { setMenu(m); setTime(null); setError(null); };
+  // メニューを変えると空きのある日も変わるので、表示する月も選択中の日の月へ戻す
+  const chooseMenu = (m: Menu) => { setMenu(m); setTime(null); setMonth(null); setError(null); };
   const chooseDate = (d: string) => { setDate(d); setTime(null); setError(null); };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -101,8 +102,20 @@ export default function BookingView() {
 
             {/* 左: お店・メニュー・選んだ内容 */}
             <section aria-labelledby="book-title" className="p-5 md:p-6 border-b md:border-b-0 md:border-r border-line">
-              <p className="text-sm text-dim">{SHOP.name} {SHOP.branch}</p>
-              <h1 id="book-title" className="text-xl font-bold text-ink mt-1">ご予約</h1>
+              {/* 写真の代わりに、店名のワードマークと担当スタイリストで店の雰囲気を出す */}
+              <p className="font-serif text-2xl leading-none text-accent tracking-tight">{SHOP.name}</p>
+              <p className="text-xs text-dim mt-1.5">{SHOP.branch}</p>
+              <h1 id="book-title" className="text-xl font-bold text-ink mt-5">ご予約</h1>
+              <div className="mt-3 flex items-center gap-3">
+                <ul className="flex -space-x-1.5" aria-hidden="true">
+                  {STAFF.map(s => (
+                    <li key={s} className={`size-8 rounded-full ring-2 ring-canvas flex items-center justify-center text-xs font-medium text-ink ${STAFF_TONE[s].soft} border border-line`}>
+                      {s.slice(0, 1)}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-dim">スタイリスト {STAFF.join('・')}</p>
+              </div>
 
               <fieldset className="mt-5">
                 <legend className="text-sm font-medium text-ink mb-2">メニュー</legend>
@@ -110,15 +123,21 @@ export default function BookingView() {
                   {MENUS.map(m => (
                     <label key={m.name}
                       className={`flex items-center gap-3 rounded-md border px-3 py-2 cursor-pointer has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand ${
-                        m.name === menu.name ? 'border-brand bg-muted' : 'border-line hover:bg-muted'
+                        m.name === menu.name ? 'border-accent bg-accent-soft' : 'border-line hover:bg-muted'
                       }`}>
                       <input type="radio" name="menu" value={m.name} checked={m.name === menu.name}
                         onChange={() => chooseMenu(m)} className="sr-only" />
                       <span className="flex-1 min-w-0">
-                        <span className="block text-sm text-ink">{m.name}</span>
+                        {/* 狭い幅では「＆」の後ろでだけ改行する（語の途中で折り返さない） */}
+                        <span className="block text-sm text-ink break-keep">
+                          {m.name.split('＆').map((part, i) => <span key={part}>{i > 0 && <>＆<wbr /></>}{part}</span>)}
+                        </span>
                         <span className="block text-xs text-dim tabular-nums">{m.minutes}分 · ¥{m.price.toLocaleString()}</span>
                       </span>
-                      {m.name === menu.name && <span className="material-symbols-outlined text-ink" aria-hidden="true">check</span>}
+                      {/* Material Symbols の CSS が display を上書きするため、表示切り替えは外側の span で行う */}
+                      {m.name === menu.name && (
+                        <span className="hidden md:inline"><span className="material-symbols-outlined text-accent" aria-hidden="true">check</span></span>
+                      )}
                     </label>
                   ))}
                 </div>
@@ -126,7 +145,7 @@ export default function BookingView() {
 
               {/* スマホでは入力欄の見出しに日時が出るので省く */}
               <ul className="hidden md:block mt-5 pt-5 border-t border-line space-y-2 text-sm text-body">
-                <Meta icon="schedule">{menu.minutes}分</Meta>
+                <li><DurationChip minutes={menu.minutes} /></li>
                 <Meta icon="calendar_today">
                   {time ? <span className="text-ink font-medium tabular-nums">{formatShortDate(selectedDate)} {time}–{end}</span> : '日時を選んでください'}
                 </Meta>
@@ -140,7 +159,8 @@ export default function BookingView() {
                 <h2 id="form-title" ref={formHeading} tabIndex={-1} className="text-base font-bold text-ink outline-none">
                   お客様情報の入力
                 </h2>
-                <p className="text-sm text-dim mt-1 tabular-nums">{formatFullDate(selectedDate)} {time}–{end} · {menu.name}</p>
+                <p className="text-sm text-dim mt-1 tabular-nums">{formatFullDate(selectedDate)} {time}–{end} · <span className="whitespace-nowrap">{menu.name}</span></p>
+                <p className="mt-2 md:hidden"><DurationChip minutes={menu.minutes} /></p>
                 <form onSubmit={handleSubmit} className="mt-5 space-y-4 max-w-md">
                   <TextField id="book-name" name="name" label="お名前" required autoComplete="name" placeholder="山田 花子" />
                   <TextField id="book-phone" name="phone" label="電話番号" type="tel" required autoComplete="tel" placeholder="090-0000-0000" />
@@ -157,7 +177,7 @@ export default function BookingView() {
                   </p>
                   <div className="flex flex-col-reverse sm:flex-row gap-2 pt-1">
                     <button type="button" onClick={() => setTime(null)} className={btn('ghost', 'lg')}>戻る</button>
-                    <button type="submit" className={`${btn('primary', 'lg')} sm:min-w-40`}>予約を申し込む</button>
+                    <button type="submit" className={`${btn('accent', 'lg')} sm:min-w-40`}>予約を申し込む</button>
                   </div>
                 </form>
               </section>
@@ -191,7 +211,7 @@ export default function BookingView() {
                         <li key={s.time}>
                           <button type="button" onClick={() => { setTime(s.time); setError(null); }}
                             aria-label={`${s.time}から予約する`}
-                            className="w-full h-10 rounded-md border border-line-strong text-sm font-medium text-ink tabular-nums hover:border-brand hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand">
+                            className="w-full h-10 rounded-md border border-line-strong text-sm font-medium text-ink tabular-nums hover:border-accent hover:bg-accent-soft focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand">
                             {s.time}
                           </button>
                         </li>
@@ -232,6 +252,16 @@ function Meta({ icon, children }: { icon: string; children: React.ReactNode }) {
   );
 }
 
+/** Cal.com の予約ページと同じ、所要時間のチップ */
+function DurationChip({ minutes }: { minutes: number }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-md bg-accent-soft px-2 py-1 text-xs font-medium text-accent tabular-nums">
+      <span className="material-symbols-outlined" style={{ fontSize: '14px' }} aria-hidden="true">schedule</span>
+      {minutes}分
+    </span>
+  );
+}
+
 function TextField({ id, label, required = false, ...input }: {
   id: string; name: string; label: string; required?: boolean; type?: string; autoComplete?: string; placeholder?: string;
 }) {
@@ -250,17 +280,17 @@ function Confirmed({ done, onAgain, onAdmin }: { done: Done; onAgain: () => void
   const end = toTime(toMinutes(done.time) + done.menu.minutes);
   return (
     <section aria-labelledby="done-title" className="mx-auto max-w-lg bg-canvas border border-line rounded-xl p-6 md:p-8 text-center">
-      <span className="material-symbols-outlined text-ink" style={{ fontSize: '32px' }} aria-hidden="true">check_circle</span>
+      <span className="material-symbols-outlined text-accent" style={{ fontSize: '32px' }} aria-hidden="true">check_circle</span>
       <h1 id="done-title" className="text-xl font-bold text-ink mt-2">ご予約を受け付けました</h1>
-      <p className="text-sm text-dim mt-1">お店で確認したあと、確定のご連絡をお送りします。</p>
+      <p className="text-sm text-dim mt-1 text-balance">お店で確認したあと、確定のご連絡をお送りします。</p>
       <dl className="mt-6 text-left text-sm border-y border-line divide-y divide-line">
         <Row label="お名前">{done.name} 様</Row>
-        <Row label="日時"><span className="tabular-nums">{formatFullDate(done.date)} {done.time}–{end}</span></Row>
-        <Row label="メニュー">{done.menu.name}（¥{done.menu.price.toLocaleString()}）</Row>
+        <Row label="日時"><span className="tabular-nums">{formatFullDate(done.date)} <span className="whitespace-nowrap">{done.time}–{end}</span></span></Row>
+        <Row label="メニュー"><span className="whitespace-nowrap">{done.menu.name}</span><span className="whitespace-nowrap">（¥{done.menu.price.toLocaleString()}）</span></Row>
         <Row label="受付番号"><span className="tabular-nums">#{String(done.id).padStart(4, '0')}</span></Row>
       </dl>
       <div className="mt-6 flex flex-col gap-2">
-        <Link href="/reservations" onClick={onAdmin} className={btn('primary', 'lg')}>
+        <Link href={`/reservations?new=${done.id}`} onClick={onAdmin} className={btn('accent', 'lg')}>
           管理画面で確認する<span className="font-normal opacity-80">（お店側の画面）</span>
         </Link>
         <button type="button" onClick={onAgain} className={btn('secondary', 'lg')}>別の予約をする</button>

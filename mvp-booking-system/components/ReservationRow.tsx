@@ -47,7 +47,7 @@ export default function ReservationRow({ r }: { r: Reservation }) {
         <p className={`text-sm font-medium text-ink truncate ${canceled ? 'line-through' : ''}`}>
           {r.customer_name}<span className="font-normal text-xs text-dim ml-0.5">様</span>
           {isNew(r) && (
-            <span className="ml-2 inline-block rounded-[4px] border border-line-strong px-1 py-px text-[11px] leading-none font-medium text-ink no-underline align-[1px]">新着</span>
+            <span className="ml-2 inline-block rounded-[4px] bg-accent-soft px-1 py-0.5 text-[11px] leading-none font-medium text-accent no-underline align-[1px]">新着</span>
           )}
         </p>
         <p className="text-xs text-dim truncate mt-0.5">

@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { formatDateTime, formatFullDate } from '@/lib/date';
+import { findConflict } from '@/lib/slots';
 import { useStore } from '@/lib/store';
 import {
-  CHANNEL_LABEL, CHANNEL_NOTIFY_VIA, STATUSES, STATUS_LABEL, findMenu,
+  CHANNEL_LABEL, STATUSES, STATUS_LABEL, findMenu, notifyVia,
   type Reservation, type ReservationInput, type ReservationStatus,
 } from '@/lib/types';
 import LoadingState from '@/components/LoadingState';
@@ -37,7 +38,8 @@ export default function ReservationDetailView({ id }: { id: number }) {
   };
 
   const sendNotice = (kind: 'confirmation' | 'reminder') => {
-    const via = CHANNEL_NOTIFY_VIA[r.channel];
+    const via = notifyVia(r);
+    if (!via) return;
     update(r.id, kind === 'confirmation' ? { confirmation_sent: true } : { reminder_sent: true });
     const what = kind === 'confirmation' ? '予約確認' : '前日連絡';
     notify(`${r.customer_name} 様へ${what}を${via}で送信しました（デモのため実際には送信されません）`);
@@ -76,8 +78,8 @@ export default function ReservationDetailView({ id }: { id: number }) {
               <StatusBadge status={r.status} />
             </div>
             <p className="text-sm text-body mt-1.5 tabular-nums">
-              {formatFullDate(r.reservation_date)} {r.reservation_time}〜<span className="text-dim mx-1.5" aria-hidden="true">·</span>{r.service_name}
-              {menu && <span className="text-dim">（{menu.minutes}分・¥{menu.price.toLocaleString()}）</span>}
+              {formatFullDate(r.reservation_date)} {r.reservation_time}〜<span className="text-dim mx-1.5" aria-hidden="true">·</span><span className="whitespace-nowrap">{r.service_name}</span>
+              {menu && <span className="text-dim whitespace-nowrap">（{menu.minutes}分・¥{menu.price.toLocaleString()}）</span>}
             </p>
             <p className="text-xs text-dim mt-1">担当：{r.staff}<span className="mx-1.5" aria-hidden="true">·</span>受付：{CHANNEL_LABEL[r.channel]}</p>
           </div>
@@ -93,7 +95,8 @@ export default function ReservationDetailView({ id }: { id: number }) {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
         <div className="md:col-span-7 lg:col-span-8">
           {/* key を付けて、別の予約に移ったときにフォームの初期値を入れ直す */}
-          <ReservationForm key={r.id} id={FORM_ID} defaults={toInput(r)} onSubmit={save} />
+          <ReservationForm key={r.id} id={FORM_ID} defaults={toInput(r)} onSubmit={save}
+            findConflict={input => (r.status === 'canceled' ? undefined : findConflict(reservations, input, r.id))} />
           <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 mt-5">
             <button type="button" onClick={handleDelete} className={btn('ghost')}>
               この予約を削除

@@ -2,7 +2,10 @@
 
 /*
  * 配色は Cal.com のプロダクト UI（packages/config/theme/tokens.css のライトテーマ）に合わせた。
- * ほぼ無彩色で、色が付くのは「対応が必要なもの」を示す attention だけ（1画面1アクセント）。
+ * 色の役割は最小限に分ける:
+ *   accent … サロンらしさ（ローズブラウン）。お客様の予約ページの主操作・選択と、管理画面の「新着」だけに使う
+ *   attn   … 状態色「要対応」（確定待ち・未送信）。accent と取り違えないよう黄土系にしている
+ *   now    … スケジュールの現在時刻の線だけ
  */
 @theme {
   --color-canvas: #ffffff;
@@ -19,9 +22,21 @@
   --color-brand: #1c2836;      /* 主ボタン */
   --color-brand-hover: #3c3f44;
 
-  --color-attn: #9a3412;       /* 要対応（確定待ち・未送信）の文字 */
-  --color-attn-bg: #ffedd5;
-  --color-attn-soft: #fff7ed;
+  --color-accent: #9b4f45;     /* ローズブラウン。白地 5.8:1 */
+  --color-accent-hover: #823f37;
+  --color-accent-soft: #f8eeec;/* 選べる日・新着行のハイライト。accent の文字も 5.1:1 */
+
+  --color-attn: #854d0e;       /* 要対応（確定待ち・未送信）の文字 */
+  --color-attn-bg: #fef3c7;
+  --color-attn-soft: #fffbeb;
+
+  --color-now: #c8312a;        /* 現在時刻の線。白地 5.3:1 */
+
+  /* 担当ごとのごく淡い色分け（スケジュールの列・予約ページのイニシャル） */
+  --color-staff1: #b9776d;
+  --color-staff1-soft: #fbf6f5;
+  --color-staff2: #7489a6;
+  --color-staff2-soft: #f5f7fb;
 
   --color-chat: #8de055;       /* 送信文面の吹き出し（LINE のトーク画面の緑）。この用途以外には使わない */
 
@@ -52,4 +67,15 @@ body {
   background-color: var(--color-canvas);
   color: var(--color-body);
   -webkit-font-smoothing: antialiased;
+}
+
+/* 予約ページから戻ったときの新着行。淡いアクセント色から元の地へ戻す（行のリンクに掛け、ホバー色より優先させる） */
+@keyframes arrive {
+  0%, 45% { background-color: var(--color-accent-soft); }
+  100%    { background-color: transparent; }
+}
+.arrive > a { animation: arrive 3.2s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  /* 動かさず、色だけで新着を示す */
+  .arrive > a { animation: none; background-color: var(--color-accent-soft); }
 }

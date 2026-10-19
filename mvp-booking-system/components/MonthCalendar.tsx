@@ -47,8 +47,8 @@ export default function MonthCalendar({ month, today, selected, isAvailable, can
               aria-label={`${m}月${day}日${available ? '' : '（空きなし）'}`}
               onClick={() => onSelect(d)}
               className={`relative aspect-square max-h-12 w-full rounded-md text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${
-                isSelected ? 'bg-brand text-white font-bold'
-                  : available ? 'bg-subtle text-ink font-medium hover:bg-emphasis'
+                isSelected ? 'bg-accent text-white font-bold'
+                  : available ? 'bg-accent-soft text-ink font-medium hover:bg-[#f1e0dc]'
                   : 'text-dim cursor-not-allowed'
               }`}>
               {day}
