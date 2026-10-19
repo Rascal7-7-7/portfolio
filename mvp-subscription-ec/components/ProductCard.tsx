@@ -15,7 +15,7 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="flex flex-1 flex-col pt-3 sm:pt-4">
         <p className="text-xs text-on-surface-variant">
           {product.category}
-          {product.badge && <span> ・ {product.badge}</span>}
+          {product.badge && <span>・{product.badge}</span>}
         </p>
         <h3 className="mt-1 font-headline text-[15px] font-semibold leading-snug text-on-surface underline-offset-4 group-hover:underline sm:text-base">
           <Phrases parts={product.nameParts} />

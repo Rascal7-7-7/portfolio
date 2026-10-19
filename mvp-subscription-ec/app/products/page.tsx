@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { PRODUCTS } from '@/lib/catalog';
 import { ProductCard } from '@/components/ProductCard';
-import { ProductVisual } from '@/components/ProductVisual';
 import { Phrases } from '@/components/Phrases';
+import { perServing, unitPrice, yen } from '@/lib/pricing';
 
 const PERKS = [
   { title: ['定期便は', 'ずっと10%OFF'], body: '2回目以降も、すべての商品が10%OFF。' },
@@ -32,7 +32,10 @@ const STEPS = [
 ];
 
 export default function ProductsPage() {
-  const heroItems = [PRODUCTS[1], PRODUCTS[0], PRODUCTS[4]];
+  const hero = PRODUCTS[0];
+  const heroPrice = unitPrice(hero.price, 'monthly');
+  const heroServing = perServing(heroPrice, hero.specs);
+  const heroSize = hero.specs.find((s) => s.label === '内容量')?.value.replace(/（.*）/, '');
 
   return (
     <main>
@@ -62,11 +65,29 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* スマホでも最初の画面で商品が見えるよう、低い横並びで出す */}
-        <div className="grid grid-cols-3 gap-2" aria-hidden>
-          {heroItems.map((p) => (
-            <ProductVisual key={p.id} product={p} decorative className="aspect-[4/3] sm:aspect-[3/4]" />
-          ))}
+        {/* 商品は下の一覧で見せるので、ここは「毎月届く」体験と1杯の値段だけを置く */}
+        <div className="flex items-center gap-5 border-t border-outline-variant/60 pt-6 sm:gap-10 sm:pt-10 lg:border-t-0 lg:pt-0">
+          <ParcelIcon className="w-24 flex-shrink-0 text-primary sm:w-44 lg:w-56" />
+          <div className="min-w-0">
+            <p className="text-xs text-on-surface-variant sm:text-sm">
+              <Phrases parts={[...hero.nameParts, heroSize ? `（${heroSize}）の定期便` : 'の定期便']} />
+            </p>
+            <p className="tnum mt-1 font-headline text-3xl font-light tracking-[-0.02em] text-on-background sm:mt-2 sm:text-5xl">
+              <span className="mr-2 text-base text-on-surface-variant sm:text-xl">毎月</span>
+              {yen(heroPrice)}
+            </p>
+            {heroServing && (
+              <p className="tnum mt-1 text-sm text-on-surface sm:mt-2 sm:text-lg">
+                <span aria-hidden className="mr-1.5 text-primary">→</span>
+                <span className="whitespace-nowrap">
+                  1{heroServing.unit}あたり約<span className="ml-0.5 font-semibold">{yen(heroServing.amount)}</span>
+                </span>
+              </p>
+            )}
+            <p className="mt-2 text-xs text-on-surface-variant sm:mt-3">
+              <Phrases parts={['ポストに届く薄い箱で、', '送料無料。']} />
+            </p>
+          </div>
         </div>
       </section>
 
@@ -136,5 +157,20 @@ export default function ProductsPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+/** ポスト投函サイズの薄い箱。線は currentColor の1色だけ */
+function ParcelIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 200 140" fill="none" stroke="currentColor" strokeWidth={2} strokeLinejoin="round" aria-hidden className={className}>
+      <path d="M20 58 L110 28 L180 53 L90 83 Z" fill="currentColor" fillOpacity={0.08} />
+      <path d="M20 58 L90 83 L90 105 L20 80 Z" />
+      <path d="M90 83 L180 53 L180 75 L90 105 Z" />
+      {/* テープと宛名ラベル */}
+      <path d="M65 43 L135 68" strokeWidth={6} strokeOpacity={0.35} />
+      <path d="M135 68 L135 90" strokeWidth={6} strokeOpacity={0.35} />
+      <path d="M32 70 L58 79 L58 88 L32 79 Z" />
+    </svg>
   );
 }

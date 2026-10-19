@@ -7,6 +7,8 @@ import { ProductVisual } from '@/components/ProductVisual';
 import { Phrases } from '@/components/Phrases';
 import { PlanPicker } from './_components/PlanPicker';
 import { unitPrice, yen } from '@/lib/pricing';
+import { cn } from '@/lib/cn';
+import type { TasteAxis } from '@/lib/types';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -27,6 +29,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function ProductDetailPage({ params }: Params) {
   const product = findProduct((await params).id);
   if (!product) notFound();
+  const endWidth = Math.max(...product.taste.flatMap((t) => [t.low.length, t.high.length]));
 
   return (
     <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 sm:pt-10 lg:pb-10 lg:pt-6">
@@ -46,7 +49,7 @@ export default async function ProductDetailPage({ params }: Params) {
         <div>
           <p className="text-xs text-on-surface-variant">
             {product.category}
-            {product.badge && <span> ・ {product.badge}</span>}
+            {product.badge && <span>・{product.badge}</span>}
           </p>
           <h1 className="mt-2 font-headline text-3xl font-light leading-snug tracking-[-0.01em] text-on-background sm:text-4xl">
             <Phrases parts={product.nameParts} />
@@ -62,7 +65,36 @@ export default async function ProductDetailPage({ params }: Params) {
             <PlanPicker product={product} />
           </div>
 
-          <dl className="mt-10 divide-y divide-outline-variant/50 border-y border-outline-variant/50 text-sm">
+          {/* 軽減税率 8% の商品＝飲食料品なので「味わい」、それ以外は「使い心地」 */}
+          <h2 className="mt-10 text-sm font-semibold text-on-surface">
+            {product.taxRate === 8 ? '味わいの目安' : '使い心地の目安'}
+          </h2>
+          <dl className="mt-3 space-y-2.5 text-sm">
+            {product.taste.map((t) => (
+              <div key={t.label} className="flex items-center gap-4">
+                <dt className="w-24 flex-shrink-0 text-on-surface-variant">{t.label}</dt>
+                <dd className="flex flex-1 items-center gap-2 text-xs text-on-surface-variant">
+                  <span className="sr-only">
+                    {t.value}/5（{tasteWord(t)}）
+                  </span>
+                  {/* 両端の言葉は商品内でいちばん長い語の幅に揃え、目盛りの位置を全行で合わせる */}
+                  <span aria-hidden className="flex-shrink-0 text-right" style={{ width: `${endWidth}em` }}>
+                    {t.low}
+                  </span>
+                  <span aria-hidden className="grid max-w-48 flex-1 grid-cols-5 gap-1">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <span key={n} className={cn('h-1.5', n <= t.value ? 'bg-on-surface' : 'bg-outline-variant/70')} />
+                    ))}
+                  </span>
+                  <span aria-hidden className="flex-shrink-0" style={{ width: `${endWidth}em` }}>
+                    {t.high}
+                  </span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          <dl className="mt-8 divide-y divide-outline-variant/50 border-y border-outline-variant/50 text-sm">
             {product.specs.map((s) => (
               <div key={s.label} className="flex gap-4 py-3">
                 <dt className="w-24 flex-shrink-0 text-on-surface-variant">{s.label}</dt>
@@ -78,4 +110,10 @@ export default async function ProductDetailPage({ params }: Params) {
       </div>
     </main>
   );
+}
+
+/** 読み上げ用の言葉。例: 焙煎度 4 → 深め、3 → 中間 */
+function tasteWord({ low, high, value }: TasteAxis): string {
+  if (value === 3) return '中間';
+  return `${value < 3 ? low : high}め`;
 }
