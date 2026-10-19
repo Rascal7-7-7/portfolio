@@ -16,12 +16,16 @@ type Filter = EstimateStatus | "all";
 
 const DUE_SOON_DAYS = 7;
 
+/** 一覧の列。見出し行と各行で同じ grid を使い、列をそろえる */
+const ROW_GRID = "sm:grid-cols-[88px_minmax(0,1fr)_96px_120px_128px]";
+
+/** 期限が近い送付済みの見積に、バッジではなく注記の文字で知らせる */
 function DueNote({ estimate }: { estimate: Estimate }) {
   if (estimate.status !== "sent") return null;
   const left = daysBetween(todayISO(), estimate.validUntil);
   if (left > DUE_SOON_DAYS) return null;
   return (
-    <span className="ml-2 whitespace-nowrap rounded bg-amber-50 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800">
+    <span className="block whitespace-nowrap text-xs font-medium text-amber-800">
       {left < 0 ? "期限切れ" : `期限まで${left}日`}
     </span>
   );
@@ -55,12 +59,12 @@ export default function EstimateList() {
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       <KpiCards summary={summary} />
 
-      <section aria-label="見積一覧" className="overflow-hidden rounded-md bg-white shadow-card">
-        <div className="flex flex-col gap-3 border-b border-line p-3 sm:flex-row sm:items-center sm:justify-between">
-          <div role="group" aria-label="ステータスで絞り込み" className="-mx-3 flex gap-1 overflow-x-auto px-3 pb-1 sm:mx-0 sm:px-0 sm:pb-0">
+      <section aria-label="見積一覧">
+        <div className="flex flex-col gap-3 border-b border-line sm:flex-row sm:items-end sm:justify-between">
+          <div role="group" aria-label="ステータスで絞り込み" className="-mx-4 flex overflow-x-auto px-4 sm:mx-0 sm:px-0">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -68,24 +72,21 @@ export default function EstimateList() {
                 aria-pressed={filter === tab.key}
                 onClick={() => setFilter(tab.key)}
                 className={cn(
-                  "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded px-2.5 py-1.5 text-sm font-medium sm:px-3",
-                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
-                  filter === tab.key ? "bg-primary-soft text-primary" : "text-body hover:bg-canvas",
+                  "-mb-px inline-flex shrink-0 items-baseline gap-1.5 whitespace-nowrap border-b-2 px-3 py-2.5 text-sm first:pl-0",
+                  "focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary",
+                  filter === tab.key
+                    ? "border-primary font-semibold text-primary"
+                    : "border-transparent text-body hover:text-navy",
                 )}
               >
                 {tab.label}
-                <span
-                  className={cn(
-                    "tnum min-w-[1.25rem] rounded-full px-1.5 text-center text-xs leading-5",
-                    filter === tab.key ? "bg-white text-primary" : "bg-canvas text-muted",
-                  )}
-                >
+                <span className={cn("tnum text-xs", filter === tab.key ? "text-primary" : "text-muted")}>
                   {tab.count}
                 </span>
               </button>
             ))}
           </div>
-          <label className="relative block sm:w-64">
+          <label className="relative mb-3 block sm:mb-2 sm:w-64">
             <span className="sr-only">取引先・件名で検索</span>
             <Icon name="search" className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
             <input
@@ -98,36 +99,43 @@ export default function EstimateList() {
           </label>
         </div>
 
+        <div aria-hidden="true" className={cn("hidden gap-x-4 border-b border-line py-2 text-xs text-muted sm:grid", ROW_GRID)}>
+          <span>番号</span>
+          <span>取引先 / 件名</span>
+          <span>ステータス</span>
+          <span>発行日</span>
+          <span className="text-right">合計（税込）</span>
+        </div>
+
         {visible.length === 0 ? (
-          <p className="p-10 text-center text-sm text-muted">該当する見積がありません</p>
+          <p className="py-10 text-center text-sm text-muted">該当する見積がありません</p>
         ) : (
-          <ul className="divide-y divide-line">
+          <ul className="divide-y divide-line border-b border-line">
             {visible.map((e) => (
               <li key={e.id}>
                 <Link
                   href={`/estimates/${e.id}`}
-                  className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 px-4 py-3 hover:bg-canvas focus-visible:bg-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:grid-cols-[120px_1fr_100px_140px]"
+                  className={cn(
+                    "-mx-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-4 py-3 hover:bg-canvas sm:mx-0 sm:px-0",
+                    "focus-visible:bg-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary",
+                    ROW_GRID,
+                  )}
                 >
-                  <span className="order-3 col-span-2 text-xs text-muted sm:order-none sm:col-span-1">
-                    <span className="tnum">{estimateNumber(e.id)}</span>
-                    <span className="sm:block">
-                      <span className="sm:hidden"> ・ </span>
-                      {formatDate(e.issuedAt)}
-                    </span>
+                  <span className="tnum order-3 text-xs text-muted sm:order-none sm:text-sm">
+                    {estimateNumber(e.id)}
+                    <span className="sm:hidden"> ・ {formatDate(e.issuedAt)}</span>
                   </span>
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-semibold text-navy">{e.clientName}</span>
                     <span className="block truncate text-xs text-body">{e.subject}</span>
                   </span>
-                  <span className="hidden sm:block">
+                  <span className="order-4 justify-self-end sm:order-none sm:justify-self-start">
                     <StatusBadge status={e.status} />
                   </span>
+                  <span className="tnum hidden text-sm text-body sm:block">{formatDate(e.issuedAt)}</span>
                   <span className="text-right">
                     <span className="tnum block text-sm font-semibold text-navy">
                       {formatYen(calcTotals(e.items).total)}
-                    </span>
-                    <span className="mt-0.5 flex items-center justify-end sm:hidden">
-                      <StatusBadge status={e.status} />
                     </span>
                     <DueNote estimate={e} />
                   </span>

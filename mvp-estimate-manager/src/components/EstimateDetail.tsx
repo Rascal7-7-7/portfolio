@@ -17,7 +17,8 @@ interface Action {
   to: EstimateStatus;
   label: string;
   icon: IconName;
-  tone: "primary" | "success" | "danger" | "neutral";
+  /** 1画面のアクセント色は1色だけ。次に進める操作だけ primary、ほかは中立 */
+  tone: "primary" | "neutral";
   message: string;
 }
 
@@ -26,21 +27,20 @@ const ACTIONS: Record<EstimateStatus, Action[]> = {
     { to: "sent", label: "送付済みにする", icon: "send", tone: "primary", message: "送付済みにしました（デモのため実際のメールは送信されません）" },
   ],
   sent: [
-    { to: "won", label: "受注にする", icon: "check", tone: "success", message: "受注にしました。一覧の受注金額・受注率に反映されます" },
-    { to: "lost", label: "失注にする", icon: "x", tone: "danger", message: "失注にしました" },
+    { to: "won", label: "受注にする", icon: "check", tone: "primary", message: "受注にしました。一覧の受注金額・受注率に反映されます" },
+    { to: "lost", label: "失注にする", icon: "x", tone: "neutral", message: "失注にしました" },
   ],
   won: [{ to: "sent", label: "送付済みに戻す", icon: "reset", tone: "neutral", message: "送付済みに戻しました" }],
   lost: [{ to: "sent", label: "送付済みに戻す", icon: "reset", tone: "neutral", message: "送付済みに戻しました" }],
 };
 
 const TONE_CLASS: Record<Action["tone"], string> = {
-  primary: "bg-primary text-white hover:bg-primary-hover shadow-card",
-  success: "bg-emerald-600 text-white hover:bg-emerald-700 shadow-card",
-  danger: "border border-rose-200 bg-white text-rose-700 hover:bg-rose-50",
-  neutral: "border border-line bg-white text-body hover:bg-canvas",
+  primary: "bg-primary text-white hover:bg-primary-hover",
+  neutral: "border border-line bg-white text-navy hover:bg-canvas",
 };
 
-const BUTTON = "inline-flex items-center justify-center gap-1.5 rounded-md px-3.5 py-2 text-sm font-semibold";
+const BUTTON =
+  "inline-flex items-center justify-center gap-1.5 rounded px-3.5 py-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
 
 interface Props {
   id: number;
@@ -61,22 +61,22 @@ export default function EstimateDetail({ id, justSaved }: Props) {
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-5 p-4 sm:p-8 print:max-w-none print:p-0">
-      <div className="space-y-4 print:hidden">
+    <div className="mx-auto max-w-4xl p-4 sm:p-8 print:max-w-none print:p-0">
+      <div className="print:hidden">
         <Link href="/estimates" className="inline-flex items-center gap-1 text-sm text-body hover:text-navy">
           <Icon name="back" />
           見積一覧
         </Link>
 
-        <section aria-label="ステータス" className="space-y-4 rounded-md bg-white p-4 shadow-card sm:p-5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="tnum flex items-center gap-2 text-xs text-muted">
+        <section aria-label="ステータス" className="mt-4 space-y-5 border-b border-line pb-6">
+          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+            <div className="min-w-0">
+              <p className="tnum flex items-center gap-2 text-sm text-muted">
                 {estimateNumber(estimate.id)}
                 <StatusBadge status={estimate.status} />
               </p>
-              <h1 className="mt-1 text-xl font-semibold tracking-tight text-navy">{estimate.subject}</h1>
-              <p className="text-sm text-body">{estimate.clientName}</p>
+              <h1 className="mt-1 text-2xl font-semibold text-navy">{estimate.subject}</h1>
+              <p className="mt-0.5 text-sm text-body">{estimate.clientName}</p>
             </div>
             <p className="sm:text-right">
               <span className="block text-xs text-muted">合計（税込）</span>
@@ -86,7 +86,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
 
           <StatusStepper status={estimate.status} />
 
-          <div className="flex flex-wrap gap-2 border-t border-line pt-4">
+          <div className="flex flex-wrap gap-2">
             {ACTIONS[estimate.status].map((action) => (
               <button key={action.to} type="button" onClick={() => handleAction(action)} className={`${BUTTON} ${TONE_CLASS[action.tone]}`}>
                 <Icon name={action.icon} />
@@ -104,13 +104,20 @@ export default function EstimateDetail({ id, justSaved }: Props) {
             </button>
           </div>
 
-          <p role="status" aria-live="polite" className={notice ? "rounded bg-primary-soft px-3 py-2 text-sm text-primary" : "sr-only"}>
+          <p
+            role="status"
+            aria-live="polite"
+            className={notice ? "flex items-start gap-2 rounded border border-line bg-canvas px-3 py-2 text-sm text-navy" : "sr-only"}
+          >
+            {notice && <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-primary" />}
             {notice}
           </p>
         </section>
       </div>
 
-      <EstimateDocument estimate={estimate} id={estimate.id} />
+      <div className="mt-6 rounded bg-canvas p-3 sm:p-6 print:mt-0 print:bg-white print:p-0">
+        <EstimateDocument estimate={estimate} id={estimate.id} />
+      </div>
     </div>
   );
 }

@@ -7,6 +7,7 @@ interface Kpi {
   note: string;
 }
 
+/** Stripe Dashboard の概要欄にならい、カードではなく罫線で区切った1本の帯で並べる */
 export default function KpiCards({ summary }: { summary: Summary }) {
   const { count, pendingAmount, wonAmount, winRatePercent } = summary;
   const kpis: Kpi[] = [
@@ -21,16 +22,14 @@ export default function KpiCards({ summary }: { summary: Summary }) {
   ];
 
   return (
-    <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <dl className="grid grid-cols-2 gap-px border-y border-line bg-line lg:grid-cols-4">
       {kpis.map((kpi) => (
-        <li key={kpi.label} className="rounded-md bg-white p-4 shadow-card">
-          <p className="text-xs font-medium text-muted">{kpi.label}</p>
-          <p className="tnum mt-1 text-xl font-semibold tracking-tight text-navy sm:text-2xl">
-            {kpi.value}
-          </p>
-          <p className="mt-1 text-xs text-muted">{kpi.note}</p>
-        </li>
+        <div key={kpi.label} className="bg-white px-4 py-4">
+          <dt className="text-xs text-muted">{kpi.label}</dt>
+          <dd className="tnum mt-1 text-xl font-semibold text-navy sm:text-2xl">{kpi.value}</dd>
+          <dd className="tnum mt-0.5 text-xs text-muted">{kpi.note}</dd>
+        </div>
       ))}
-    </ul>
+    </dl>
   );
 }
