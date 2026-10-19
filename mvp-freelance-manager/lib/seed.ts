@@ -85,11 +85,12 @@ function splitItems(projectId: string, amount: number): InvoiceItem[] | undefine
   return rows.map((r, i) => (i === rows.length - 1 ? { ...r, amount: r.amount + rest } : r));
 }
 
+// 見積マネージャーの EST-0014 と同じ明細（税抜。合計 1,130,000 円＋消費税 113,000 円）
 const ESTIMATE_ITEMS: readonly InvoiceItem[] = [
-  { name: "要件定義・サイト設計", qty: "1 式", amount: 180_000 },
-  { name: "デザイン（トップ＋下層8ページ）", qty: "1 式", amount: 420_000 },
-  { name: "コーディング・CMS組込", qty: "1 式", amount: 450_000 },
-  { name: "公開作業・初期設定", qty: "1 式", amount: 80_000 },
+  { name: "Webサイト設計・ディレクション", qty: "1 式", amount: 180_000 },
+  { name: "ページデザイン", qty: "8 ページ", amount: 360_000 },
+  { name: "コーディング（レスポンシブ対応）", qty: "8 ページ", amount: 240_000 },
+  { name: "物件検索機能 開発", qty: "1 式", amount: 350_000 },
 ];
 
 function invoices(today: ISODate): Invoice[] {
