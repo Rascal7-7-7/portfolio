@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Estimate, EstimateStatus } from "@/types";
 import { useEstimates } from "@/lib/store";
 import { calcTotals } from "@/lib/calc";
@@ -153,9 +153,20 @@ const MENU_ITEM =
 /** ネイティブの details で作る「その他」メニュー。Esc・外側へのフォーカス移動で閉じる */
 function MoreMenu({ children }: { children: (close: () => void) => ReactNode }) {
   const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDetailsElement>(null);
   const close = () => setOpen(false);
+  // 外側のクリックで閉じる。Safari はクリックしたボタンにフォーカスを移さず relatedTarget が null になるため、blur だけに頼らない
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
   return (
     <details
+      ref={ref}
       open={open}
       onToggle={(e) => setOpen(e.currentTarget.open)}
       onKeyDown={(e) => {
@@ -165,7 +176,9 @@ function MoreMenu({ children }: { children: (close: () => void) => ReactNode }) 
         }
       }}
       onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) close();
+        // キーボードで外へ移ったときだけ閉じる（クリックは上の pointerdown で扱う）
+        const next = e.relatedTarget as Node | null;
+        if (next && !e.currentTarget.contains(next)) close();
       }}
       className="relative"
     >

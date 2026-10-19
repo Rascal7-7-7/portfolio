@@ -33,6 +33,8 @@ export function InvoiceForm({ projects, invoices, today, defaultProjectId, onCre
   const [amount, setAmount] = useState(() => initialAmount(projectId));
   const [dueOn, setDueOn] = useState(addDays(today, 30));
   const [error, setError] = useState<string | null>(null);
+  // 入力中にカンマを付け直すとカーソルが末尾へ飛び、日本語入力の変換も崩れるため、整形はフォーカスが外れている間だけ
+  const [editingAmount, setEditingAmount] = useState(false);
   const remaining = remainingOf(projectId);
   const fullyBilled = remaining !== null && remaining <= 0;
 
@@ -84,7 +86,9 @@ export function InvoiceForm({ projects, invoices, today, defaultProjectId, onCre
           type="text"
           inputMode="numeric"
           autoComplete="off"
-          value={amount ? Number(amount).toLocaleString("ja-JP") : ""}
+          value={editingAmount || !amount ? amount : Number(amount).toLocaleString("ja-JP")}
+          onFocus={() => setEditingAmount(true)}
+          onBlur={() => setEditingAmount(false)}
           onChange={(e) => setAmount(toDigits(e.target.value))}
           aria-describedby="invoice-remaining"
           className={`${buttonStyles.input} num mt-1`}

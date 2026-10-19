@@ -121,7 +121,7 @@ function WeekSection({ date, today, reservations, nowMin, onMove, onPickDay }: {
         </div>
       </div>
       <StatStrip items={[
-        { label: '今週の予約', value: active.length, note: `キャンセル除く・全${list.length}件` },
+        { label: 'この週の予約', value: active.length, note: `キャンセル除く・全${list.length}件` },
         { label: '確定待ち', value: pending.length },
         { label: '未通知', value: unnotified.length, alert: unnotified.length > 0 },
       ]} />
