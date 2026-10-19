@@ -8,10 +8,13 @@ const W = 360;
 const PAD = 8;
 const SIDE_GAP = 14;
 
-/** compact はトップの狭い画面用。説明（note）を省き、箱を詰める。 */
+/**
+ * compact はトップの狭い画面用。本流の説明（note）を省き、箱を詰める。
+ * 下段の補足は上段との関係を示すため compact でも残す。
+ */
 const SIZE = {
   full: { boxH: 56, gap: 28, sideBoxH: 52 },
-  compact: { boxH: 40, gap: 18, sideBoxH: 34 },
+  compact: { boxH: 40, gap: 18, sideBoxH: 48 },
 };
 
 export const COLOR = {
@@ -90,7 +93,8 @@ export function FlowDiagram({
   const height = sidePath ? sideY + SIDE_BOX_H + 30 : mainH + PAD * 2;
   // compact は説明を出さないため、作品名の1行を箱の上下中央に置く
   const labelY = compact ? BOX_H / 2 + 5 : 24;
-  const sideLabelY = compact ? SIDE_BOX_H / 2 + 5 : 22;
+  const sideLabelY = compact ? 20 : 22;
+  const sideNoteY = compact ? 37 : 40;
 
   return (
     <figure className={className}>
@@ -185,17 +189,15 @@ export function FlowDiagram({
                   >
                     {label}
                   </text>
-                  {!compact && (
-                    <text
-                      x={x + sideW / 2}
-                      y={y + 40}
-                      fill={COLOR.note}
-                      fontSize={11}
-                      textAnchor="middle"
-                    >
-                      {note}
-                    </text>
-                  )}
+                  <text
+                    x={x + sideW / 2}
+                    y={y + sideNoteY}
+                    fill={COLOR.note}
+                    fontSize={11}
+                    textAnchor="middle"
+                  >
+                    {note}
+                  </text>
                   {i < sideCount - 1 && (
                     <Arrow
                       x1={x + sideW + 1}

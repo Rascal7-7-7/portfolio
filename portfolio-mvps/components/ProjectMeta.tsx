@@ -1,41 +1,33 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { hasCaseStudy, type Project, type Verification } from "@/content/projects";
+import { hasCaseStudy, type Project } from "@/content/projects";
 import { cn } from "@/lib/cn";
+import { metaItems, periodLabel } from "@/lib/projectText";
 import { TextLink, textLink } from "./ui/TextLink";
 
-/** 閲覧者がどこまで確かめられるか。一覧の時点で分かるようにする。 */
-const verificationLabels = {
-  "live-demo": "デモで操作できる",
-  "demo-video": "動画で確認できる",
-  "code-only": "コードで確認できる",
-} satisfies Record<Verification, string>;
-
-export function periodLabel({ period }: Project): string {
-  const start = period.start.replace("-", "/");
-  return period.end ? `${start}〜${period.end.replace("-", "/")}` : `${start}〜`;
-}
-
-export function teamLabel({ team }: Project): string {
-  return team.kind === "team" ? `チーム開発（${team.members}人）` : "個人開発";
-}
+export { periodLabel, teamLabel } from "@/lib/projectText";
 
 /** 作品名と制作時期の行。日付は右寄せの等幅にする。 */
 export function ProjectTitle({
   project,
   as: Heading,
   className,
+  showPeriod = true,
 }: {
   project: Project;
   as: "h3" | "h4";
   className: string;
+  /** 連作の行では、共通の制作時期を説明側に1回だけ書くため出さない */
+  showPeriod?: boolean;
 }) {
   return (
     <div className="flex items-baseline justify-between gap-4">
       <Heading className={cn("font-semibold tracking-tight text-ink", className)}>
         {project.name}
       </Heading>
-      <p className="shrink-0 font-mono text-[13px] text-ink-subtle">{periodLabel(project)}</p>
+      {showPeriod && (
+        <p className="shrink-0 font-mono text-[13px] text-ink-subtle">{periodLabel(project)}</p>
+      )}
     </div>
   );
 }
@@ -45,7 +37,10 @@ export function ProjectTitle({
  * 「コードで確認できる」が語の途中で折り返さないよう、項目ごとに inline-block で区切る。
  */
 export function MetaLine({ project, className }: { project: Project; className?: string }) {
-  const items = [teamLabel(project), verificationLabels[project.verification], ...project.stack];
+  return <MetaItems items={metaItems(project)} className={className} />;
+}
+
+export function MetaItems({ items, className }: { items: readonly string[]; className?: string }) {
   return (
     <p className={cn("text-sm leading-relaxed text-ink-subtle", className)}>
       {items.map((item, i) => (
