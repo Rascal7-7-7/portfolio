@@ -126,7 +126,7 @@ export function ProjectDetailView({ id }: { id: string }) {
               />
             </div>
           )}
-          <InvoiceList invoices={invoices} data={data} today={today} empty="この案件の請求はまだありません" />
+          <InvoiceList invoices={invoices} data={data} today={today} empty="この案件の請求はまだありません" withProject={false} />
           {uninvoiced > 0 && (
             <p className="num border-t border-line px-5 py-3 text-xs text-warm-500">
               未請求の残額 {formatYen(uninvoiced)}

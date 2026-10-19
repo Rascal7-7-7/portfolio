@@ -7,7 +7,8 @@
   --color-warm-50: #fbfaf9;
   --color-warm-100: #f6f5f4;
   --color-warm-200: #ebe9e7;
-  --color-warm-300: #a39e98;
+  /* Notion の #a39e98 は白地で 2.7:1 のため、本文に使える AA（4.5:1）まで濃くしている */
+  --color-warm-300: #74706b;
   --color-warm-500: #615d59;
   --color-warm-900: #31302e;
   --color-line: rgba(0, 0, 0, 0.1);
@@ -16,11 +17,11 @@
   --color-blue-active: #005bab;
   --color-blue-tint: #cfe5fa;
   --color-badge-blue: #f2f9ff;
-  --color-badge-blue-text: #097fe8;
+  --color-badge-blue-text: #0a6fcc; /* #097fe8 は淡青地で 3.8:1 → AA へ */
 
   --color-green: #1a7f37;
   --color-green-soft: #e9f7ec;
-  --color-orange: #c24e00;
+  --color-orange: #b34a00; /* 淡橙地でも 4.5:1 以上 */
   --color-orange-soft: #fff1e6;
 
   --shadow-card: rgba(0, 0, 0, 0.04) 0px 4px 18px, rgba(0, 0, 0, 0.027) 0px 2px 8px,

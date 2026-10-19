@@ -37,7 +37,9 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line bg-warm-100 md:flex">
+      {/* 背景と罫線は外側（ページ全高に伸びる）、中身だけ sticky にして長いページでも背景が途切れない */}
+      <aside className="hidden w-60 shrink-0 border-r border-line bg-warm-100 md:block">
+        <div className="sticky top-0 flex h-screen flex-col">
         <div className="px-5 py-5">
           <Logo />
           <p className="mt-1.5 text-xs text-warm-500">個人事業のバックオフィス</p>
@@ -77,6 +79,7 @@ export function Sidebar() {
             初期状態に戻す
           </button>
         </div>
+        </div>
       </aside>
 
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-canvas/90 px-4 py-3 backdrop-blur md:hidden">
@@ -93,7 +96,7 @@ export function Sidebar() {
 
       <nav
         aria-label="メイン"
-        className="fixed inset-x-0 bottom-0 z-50 flex justify-around border-t border-line bg-canvas/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-line bg-canvas px-2 pt-1.5 pb-[max(6px,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(0,0,0,0.05)] md:hidden"
       >
         {NAV_ITEMS.map(({ href, short, icon: Icon }) => {
           const active = isActive(href, pathname);
@@ -103,11 +106,18 @@ export function Sidebar() {
               href={href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex min-w-16 flex-col items-center gap-0.5 py-2 text-[11px] font-medium",
-                active ? "text-blue" : "text-warm-500",
+                "flex flex-col items-center gap-0.5 rounded-lg py-1 text-[11px]",
+                active ? "font-bold text-blue" : "font-medium text-warm-500",
               )}
             >
-              <Icon size={20} aria-hidden />
+              <span
+                className={cn(
+                  "flex h-7 w-12 items-center justify-center rounded-full transition-colors",
+                  active && "bg-badge-blue",
+                )}
+              >
+                <Icon size={20} strokeWidth={active ? 2.25 : 1.75} aria-hidden />
+              </span>
               {short}
             </Link>
           );

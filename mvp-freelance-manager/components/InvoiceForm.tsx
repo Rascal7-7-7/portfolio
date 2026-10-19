@@ -39,16 +39,24 @@ export function InvoiceForm({ projects, today, defaultProjectId, onCreated }: In
 
   return (
     <form onSubmit={submit} className="grid gap-3 p-4 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end sm:p-5" noValidate>
-      <label className="block text-xs font-semibold text-warm-500">
-        案件
-        <select value={projectId} onChange={(e) => selectProject(e.target.value)} className={`${buttonStyles.input} mt-1`}>
-          {selectable.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.client} ／ {p.name}
-            </option>
-          ))}
-        </select>
-      </label>
+      {selectable.length === 1 ? (
+        // 案件詳細から開いたときは案件が決まっているので、選択欄ではなく表示だけにする
+        <div className="min-w-0 text-xs font-semibold text-warm-500">
+          請求先
+          <p className="mt-1 py-2 text-sm font-medium break-words text-ink">{selectable[0].client}</p>
+        </div>
+      ) : (
+        <label className="block text-xs font-semibold text-warm-500">
+          案件
+          <select value={projectId} onChange={(e) => selectProject(e.target.value)} className={`${buttonStyles.input} mt-1`}>
+            {selectable.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.client} ／ {p.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <label className="block text-xs font-semibold text-warm-500">
         請求金額（円）
         <input

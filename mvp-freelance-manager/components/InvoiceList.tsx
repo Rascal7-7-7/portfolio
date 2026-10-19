@@ -12,6 +12,8 @@ interface InvoiceListProps {
   data: AppData;
   today: ISODate;
   empty: string;
+  /** 案件詳細の中では取引先・案件名を繰り返さず、請求番号を見出しにする */
+  withProject?: boolean;
 }
 
 function dueText(invoice: Invoice, today: ISODate): string {
@@ -19,7 +21,7 @@ function dueText(invoice: Invoice, today: ISODate): string {
   return `期日 ${formatDate(invoice.dueOn)}（${formatRelative(today, invoice.dueOn)}）`;
 }
 
-export function InvoiceList({ invoices, data, today, empty }: InvoiceListProps) {
+export function InvoiceList({ invoices, data, today, empty, withProject = true }: InvoiceListProps) {
   if (invoices.length === 0) {
     return <p className="px-5 py-8 text-center text-sm text-warm-500">{empty}</p>;
   }
@@ -32,18 +34,27 @@ export function InvoiceList({ invoices, data, today, empty }: InvoiceListProps) 
         return (
           <li key={inv.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 sm:flex-nowrap sm:px-5">
             <div className="min-w-0 flex-1 basis-full sm:basis-auto">
-              <p className="truncate text-sm font-medium text-ink">
-                {project?.client ?? "—"}
-                <span className="ml-2 text-xs font-normal text-warm-500">{project?.name}</span>
-              </p>
-              <p className="num mt-0.5 text-xs text-warm-500">
-                {inv.number} ・ {dueText(inv, today)}
+              {withProject ? (
+                <>
+                  <p className="text-sm font-medium break-words text-ink">{project?.client ?? "—"}</p>
+                  <p className="text-xs break-words text-warm-500">{project?.name}</p>
+                  <p className="num mt-0.5 text-xs text-warm-500">
+                    {inv.number} ・ <span className="whitespace-nowrap">{dueText(inv, today)}</span>
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="num text-sm font-medium text-ink">{inv.number}</p>
+                  <p className="num mt-0.5 text-xs text-warm-500">{dueText(inv, today)}</p>
+                </>
+              )}
+            </div>
+            <div className="flex flex-1 items-center gap-3 sm:flex-none sm:flex-col sm:items-end sm:gap-1">
+              <InvoiceStatusBadge status={status} />
+              <p className="num ml-auto text-sm font-semibold whitespace-nowrap text-ink sm:order-first sm:ml-0">
+                {formatYen(inv.amount)}
               </p>
             </div>
-            <InvoiceStatusBadge status={status} />
-            <p className="num ml-auto w-28 text-right text-sm font-semibold text-ink sm:ml-0">
-              {formatYen(inv.amount)}
-            </p>
             <button
               type="button"
               onClick={() => actions.setInvoicePaid(inv.id, !inv.paidOn)}
