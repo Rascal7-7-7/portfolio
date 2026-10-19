@@ -32,11 +32,9 @@
 
   --color-now: #c8312a;        /* 現在時刻の線。白地 5.3:1 */
 
-  /* 担当ごとの色（スケジュールの列見出しの色見本・予約ページのイニシャル） */
+  /* 担当ごとの色（スケジュールの担当タブと列見出しの色見本） */
   --color-staff1: #b9776d;
-  --color-staff1-soft: #fbf6f5;
   --color-staff2: #7489a6;
-  --color-staff2-soft: #f5f7fb;
 
   /* 週表示のメニュー種別。状態色（attn）・accent・担当色と取り違えないよう、彩度は低いまま。
      色相だけだと見分けにくいので、カット→カラー→パーマ→ケアの順に地の明度を一段ずつ下げている。
@@ -63,15 +61,4 @@ body {
   /* 日本語を文節で折り返し、語の途中での改行と行末1文字だけの行を避ける（lang="ja" 前提、非対応ブラウザは通常の折り返し） */
   word-break: auto-phrase;
   text-wrap: pretty;
-}
-
-/* 予約ページから戻ったときの新着行。淡いアクセント色から元の地へ戻す（行のリンクに掛け、ホバー色より優先させる） */
-@keyframes arrive {
-  0%, 45% { background-color: var(--color-accent-soft); }
-  100%    { background-color: transparent; }
-}
-.arrive > a { animation: arrive 3.2s ease-out both; }
-@media (prefers-reduced-motion: reduce) {
-  /* 動かさず、色だけで新着を示す */
-  .arrive > a { animation: none; background-color: var(--color-accent-soft); }
 }

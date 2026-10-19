@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatFullDate } from '@/lib/date';
 import { sortByDateTime, useStore } from '@/lib/store';
@@ -12,7 +11,6 @@ import Icon from '@/components/Icon';
 
 export default function ReservationsView() {
   const { reservations, today, reset, notify } = useStore();
-  const arrived = useArrived(reservations !== null);
   if (!reservations) return <LoadingState />;
 
   const sorted       = sortByDateTime(reservations);
@@ -63,9 +61,9 @@ export default function ReservationsView() {
 
       <div className="border border-line rounded-lg overflow-hidden [&>section:last-child>:last-child]:border-b-0">
         <ReservationTableHeader />
-        <Group label="本日" rows={todayList} arrived={arrived} empty="本日の予約はまだありません。お客様の予約ページから予約すると、ここに表示されます" />
-        <Group label="近日" rows={upcomingList} arrived={arrived} />
-        <Group label="過去" rows={pastList} arrived={arrived} />
+        <Group label="本日" rows={todayList} empty="本日の予約はまだありません。お客様の予約ページから予約すると、ここに表示されます" />
+        <Group label="近日" rows={upcomingList} />
+        <Group label="過去" rows={pastList} />
       </div>
 
       <ChannelSummary reservations={reservations} />
@@ -85,8 +83,8 @@ export default function ReservationsView() {
 }
 
 /** Cal.com の予約一覧と同じく、1枚の表の中を区切り行（本日 / 近日 / 過去）で分ける */
-function Group({ label, rows, arrived, empty = '該当する予約はありません' }: {
-  label: string; rows: Reservation[]; arrived: number | null; empty?: string;
+function Group({ label, rows, empty = '該当する予約はありません' }: {
+  label: string; rows: Reservation[]; empty?: string;
 }) {
   return (
     <section aria-label={`${label}の予約`}>
@@ -98,7 +96,7 @@ function Group({ label, rows, arrived, empty = '該当する予約はありま�
       ) : (
         <ul className="divide-y divide-line border-b border-line">
           {rows.map(r => (
-            <li key={r.id} id={`reservation-${r.id}`} className={`scroll-mt-16 ${r.id === arrived ? 'arrive' : ''}`}>
+            <li key={r.id} id={`reservation-${r.id}`} className="scroll-mt-16">
               <ReservationRow r={r} />
             </li>
           ))}
@@ -106,24 +104,6 @@ function Group({ label, rows, arrived, empty = '該当する予約はありま�
       )}
     </section>
   );
-}
-
-/**
- * 予約ページの「お店側の画面で確認する」から ?new=ID で来たとき、その行まで送ってハイライトする（デモの山場）。
- * 再読み込みで繰り返さないよう、URL からはすぐ消す。
- */
-function useArrived(loaded: boolean): number | null {
-  const [arrived, setArrived] = useState<number | null>(null);
-  useEffect(() => {
-    if (!loaded) return;
-    const id = Number(new URLSearchParams(window.location.search).get('new'));
-    if (!Number.isInteger(id) || id <= 0) return;
-    window.history.replaceState(null, '', window.location.pathname);
-    setArrived(id);
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    document.getElementById(`reservation-${id}`)?.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
-  }, [loaded]);
-  return arrived;
 }
 
 /** 「電話もLINEも1か所に集まった」ことを数字で見せる */

@@ -1,4 +1,6 @@
+import type { ReactNode } from 'react'
 import { CATEGORIES } from '@/lib/categories'
+import type { CategoryKey } from '@/lib/types'
 import { cx } from '@/lib/cx'
 import MobileBar, { HERO_CTA } from './MobileBar'
 import { catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, ownerOf, Phrases, storeName, type TemplateProps } from './shared'
@@ -26,6 +28,42 @@ const toLines = (text: string) => text.split(/(?<=[、。！？])/).filter(Boole
 const splitDescription = (text: string) => {
   const sentences = text.trim().split(/(?<=。)/).filter((s) => s.trim())
   return { concept: (sentences[sentences.length - 1] ?? '').trim(), rest: sentences.slice(0, -1).join('').trim() }
+}
+
+const LEAF = (
+  <>
+    <path d="M60 30 C18 56 18 112 60 132 C102 112 102 56 60 30 Z" />
+    <path d="M60 46 V152" />
+    <path d="M60 74 L44 62 M60 74 L76 62 M60 100 L40 86 M60 100 L80 86" />
+  </>
+)
+
+/** 写真の代わりに置く業種ごとの線画（1本の細い線だけ。塗り・影は使わない） */
+const LINE_ART: Record<CategoryKey, ReactNode> = {
+  // ドリッパーとカップ
+  cafe: (
+    <>
+      <path d="M28 36 H92 L72 78 H48 Z" />
+      <path d="M22 36 H98" />
+      <path d="M60 84 V92" />
+      <path d="M34 98 H86 V118 Q86 138 66 138 H54 Q34 138 34 118 Z" />
+      <path d="M86 104 Q100 104 100 114 Q100 124 86 124" />
+      <path d="M22 150 H98" />
+    </>
+  ),
+  // はさみ
+  salon: (
+    <>
+      <circle cx="40" cy="128" r="14" />
+      <circle cx="80" cy="128" r="14" />
+      <path d="M47 116 L88 18" />
+      <path d="M73 116 L32 18" />
+      <circle cx="60" cy="85" r="2" />
+    </>
+  ),
+  // 葉（整体・その他）
+  seitai: LEAF,
+  other: LEAF,
 }
 
 const pad = (wide: boolean) => (wide ? 'px-16 py-24' : 'px-6 py-16')
@@ -62,11 +100,11 @@ function Hero({ store, wide }: TemplateProps) {
   const rows = [store.hours && `${hoursWord(store)} ${store.hours}`, store.closed && `定休 ${store.closed}`, store.address].filter(Boolean)
   const { concept, rest } = splitDescription(store.description)
   return (
-    <section className={cx('grid', wide ? 'min-h-[600px] grid-cols-[minmax(0,1fr)_auto] gap-16 px-16 pb-24 pt-16' : 'gap-12 px-6 pb-16 pt-10')}>
+    <section className={cx('grid', wide ? 'min-h-[600px] grid-cols-[minmax(0,26em)_minmax(0,1fr)] gap-16 px-16 pb-24 pt-16' : 'gap-12 px-6 pb-16 pt-10')}>
       {/* 左上にお店の考えを一文、下に案内。縦書きの見出しと上端・下端をそろえる（GLITCH COFFEE の組み方） */}
       <div className={cx('flex flex-col justify-between gap-12', wide ? 'max-w-[30em] pt-3' : 'order-2')}>
         {concept && (
-          <p className={cx('font-mincho font-semibold leading-[2] tracking-[0.1em]', wide ? 'max-w-[18em] text-[22px]' : 'text-[18px]')}>
+          <p className={cx('font-mincho leading-[2.1] tracking-[0.1em]', wide ? 'max-w-[20em] text-[17px]' : 'text-base')}>
             <Phrases text={concept} />
           </p>
         )}
@@ -74,7 +112,7 @@ function Hero({ store, wide }: TemplateProps) {
           <p className={cx(ACCENT, 'text-xs tracking-[0.2em]')}>{CATEGORIES[store.category].label}</p>
           {rest && <p className={cx(MUTED, 'mt-6 text-[15px] leading-[2.1] tracking-[0.06em]')}>{rest}</p>}
           {rows.length > 0 && (
-            <ul className={cx(LINE, 'mt-8 space-y-1 border-l pl-4 text-[13px] leading-relaxed tracking-[0.06em]')}>
+            <ul className={cx(LINE, 'mt-8 space-y-1 border-y py-4 text-[13px] leading-relaxed tracking-[0.06em]')}>
               {rows.map((r) => (
                 <li key={r}>{r}</li>
               ))}
@@ -86,19 +124,26 @@ function Hero({ store, wide }: TemplateProps) {
           </div>
         </div>
       </div>
-      {/* 縦書きのキャッチコピー。句読点で列を改め、長すぎる列は max-height で文節単位に折り返す */}
-      <h1
-        className={cx(
-          'font-mincho font-semibold leading-[1.7] tracking-[0.2em] [writing-mode:vertical-rl]',
-          wide ? 'max-h-[11em] justify-self-end text-[46px]' : 'order-1 max-h-[10em] justify-self-center text-[32px]',
+      {/* 縦書きのキャッチコピー。句読点で列を改め、長すぎる列は max-height で文節単位に折り返す。PC では右側の中央に線画と並べる */}
+      <div className={cx(wide ? 'flex items-center justify-center gap-20' : 'order-1 flex justify-center')}>
+        {wide && (
+          <svg aria-hidden viewBox="0 0 120 160" className="w-[150px] shrink-0 self-end" fill="none" stroke="#8a5526" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+            {LINE_ART[store.category]}
+          </svg>
         )}
-      >
-        {toLines(catchCopy(store)).map((line, i) => (
-          <span key={i} className="block">
-            <Phrases text={line} />
-          </span>
-        ))}
-      </h1>
+        <h1
+          className={cx(
+            'font-mincho font-semibold leading-[1.7] tracking-[0.2em] [writing-mode:vertical-rl]',
+            wide ? 'max-h-[10em] text-[56px]' : 'max-h-[10em] text-[32px]',
+          )}
+        >
+          {toLines(catchCopy(store)).map((line, i) => (
+            <span key={i} className="block">
+              <Phrases text={line} />
+            </span>
+          ))}
+        </h1>
+      </div>
     </section>
   )
 }

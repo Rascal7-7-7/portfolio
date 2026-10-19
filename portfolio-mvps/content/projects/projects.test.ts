@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { projects } from "./index";
+import { getNextProjectWithCaseStudy, getProjectsWithCaseStudy, projects } from "./index";
 import type { Project } from "./types";
 
 /**
@@ -170,5 +170,18 @@ describe("リンク", () => {
         ).toBeTruthy();
       }
     }
+  });
+});
+
+describe("次の制作の記録", () => {
+  it("Case Study のある作品を掲載順に巡回する", () => {
+    const slugs = getProjectsWithCaseStudy().map((p) => p.slug);
+    slugs.forEach((slug, i) => {
+      expect(getNextProjectWithCaseStudy(slug)?.slug).toBe(slugs[(i + 1) % slugs.length]);
+    });
+  });
+
+  it("Case Study の無い作品には次を返さない", () => {
+    expect(getNextProjectWithCaseStudy("no-such-project")).toBeUndefined();
   });
 });

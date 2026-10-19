@@ -1,19 +1,23 @@
+import { Fragment } from "react";
 import { formatFullDate } from "@/lib/dates";
 import { formatYen, TAX_RATE, taxIncluded } from "@/lib/utils";
 import type { Invoice, Project } from "@/types";
 
-/** 発行者・振込先はデモ用の架空の値。実在の口座と取り違えないよう名前でデモと分かるようにする */
+/**
+ * 発行者・振込先はデモ用の架空の値。実在の口座と取り違えないよう名前でデモと分かるようにする。
+ * 発行者は見積管理の見積書（EST-0014）と同じ値にそろえる
+ */
 const ISSUER = {
-  name: "デモ 花子",
-  trade: "デモワークス",
-  email: "hello@example.com",
-  registration: "T0000000000000",
+  name: "デモワークス",
+  address: "東京都千代田区架空町 1-2-3 デモワークスビル 5F",
+  tel: "03-0000-0000",
+  registration: "T1234567890123（デモ）",
 } as const;
 
 const BANK = [
   ["銀行", "デモ銀行 サンプル支店（000）"],
   ["口座", "普通 0000000"],
-  ["名義", "デモワークス デモ ハナコ"],
+  ["名義", "デモワークス"],
 ] as const;
 
 const CELL = "px-2 py-2";
@@ -79,13 +83,21 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
         </div>
 
         <address className="pt-8 text-xs leading-relaxed text-warm-500 not-italic">
-          <p className="text-sm font-semibold text-ink">{ISSUER.trade}</p>
-          <p className="text-ink">{ISSUER.name}</p>
-          <p>
-            <span className="inline-block">東京都デモ区</span>
-            <span className="inline-block">サンプル町 1-2-3</span>
+          {/* 角印は見積書と同じく社名の末尾に半分かかるように押す */}
+          <p className="relative w-fit text-sm font-semibold text-ink">
+            {ISSUER.name}
+            <CompanySeal className="absolute bottom-0 left-full -ml-3 h-10 w-10 sm:h-12 sm:w-12" />
           </p>
-          <p>{ISSUER.email}</p>
+          {/* 住所は語の途中で折らず、空白の位置でだけ改行する */}
+          <p>
+            {ISSUER.address.split(" ").map((part, i) => (
+              <Fragment key={i}>
+                {i > 0 && " "}
+                <span className="inline-block">{part}</span>
+              </Fragment>
+            ))}
+          </p>
+          <p className="num">TEL {ISSUER.tel}</p>
           <p className="num">登録番号 {ISSUER.registration}</p>
         </address>
       </div>
@@ -160,5 +172,43 @@ function PaidStamp({ paidOn }: { paidOn: string }) {
         {m}/{d}
       </span>
     </span>
+  );
+}
+
+/** 架空の屋号「デモワークス之印」の角印。見積書と同じ印影（朱色1色・右の列から縦に読む 2列×4字） */
+const SEAL_COLUMNS = ["デモワー", "クス之印"];
+
+function CompanySeal({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 64 64"
+      aria-hidden="true"
+      className={`pointer-events-none z-10 opacity-[0.82] [print-color-adjust:exact] ${className ?? ""}`}
+      style={{ color: "#c8322b" }}
+    >
+      <rect x="2" y="2" width="60" height="60" rx="2" fill="none" stroke="currentColor" strokeWidth="3" />
+      <g
+        fill="currentColor"
+        fontSize="13"
+        fontWeight="700"
+        textAnchor="middle"
+        fontFamily='"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif'
+      >
+        {SEAL_COLUMNS.map((column, c) =>
+          Array.from(column).map((char, r) => (
+            <text
+              key={`${c}-${r}`}
+              x={43 - c * 22}
+              y={12 + r * 13.3}
+              dominantBaseline="central"
+              // 縦組みなので長音符は90度回して縦棒にする
+              transform={char === "ー" ? `rotate(90 ${43 - c * 22} ${12 + r * 13.3})` : undefined}
+            >
+              {char}
+            </text>
+          )),
+        )}
+      </g>
+    </svg>
   );
 }

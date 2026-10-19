@@ -85,7 +85,10 @@ assert.ok(fromEstimate, "est-0014 の請求がある");
 assert.equal(fromEstimate.amount, 1_243_000);
 assert.equal(fromEstimate.paidOn, null);
 assert.equal(fromEstimate.estimateNo, "EST-0014");
-assert.equal(diffDays(today, fromEstimate.dueOn), 30);
+assert.equal(fromEstimate.number, "INV-0017", "見積管理 src/lib/utils.ts の HIKAE_INVOICE_NUMBERS と一致");
+assert.equal(fromEstimate.issuedOn, today);
+assert.equal(createSeed("2026-10-20").invoices.find((i) => i.id === ESTIMATE_INVOICE_ID)?.dueOn, "2026-11-30", "納品月末締め翌月末払い");
+assert.equal(createSeed("2026-12-15").invoices.find((i) => i.id === ESTIMATE_INVOICE_ID)?.dueOn, "2027-01-31", "年をまたいでも翌月末");
 const minato = data.projects.find((p) => p.id === fromEstimate.projectId);
 assert.equal(minato?.client, "株式会社みなと不動産");
 assert.equal(minato?.name, "コーポレートサイト リニューアル");
@@ -106,6 +109,6 @@ for (const i of data.invoices) {
 const charted = data.invoices.filter((i) => !i.paidOn && i.dueOn.slice(0, 7) <= revenue[5].month).reduce((sum, i) => sum + i.amount, 0);
 assert.equal(charted + summary.laterDueTotal, summary.outstandingTotal);
 const later = dashboardSummary(createSeed("2026-10-19"), "2026-10-19").laterDueTotal;
-assert.ok(later >= 1_243_000, "10/19 なら est-0014（11/18 期日）は来月以降の分に入る");
+assert.ok(later >= 1_243_000, "10/19 なら est-0014（11/30 期日）は来月以降の分に入る");
 
 console.log("selectors.check: ok");

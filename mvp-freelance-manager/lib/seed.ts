@@ -1,5 +1,5 @@
 import type { AppData, Invoice, InvoiceItem, ISODate, Project, Task } from "@/types";
-import { addDays, parseISODate, shiftMonth } from "./dates.ts";
+import { addDays, parseISODate, shiftMonth, toISODate } from "./dates.ts";
 import { taxIncluded } from "./utils.ts";
 
 /** 見積マネージャーの EST-0014（みなと不動産）から作った請求。シリーズ間で id・金額を固定する */
@@ -11,6 +11,12 @@ function dayInMonth(today: ISODate, offset: number, day: number): ISODate {
   const key = shiftMonth(today, offset);
   const safeDay = offset === 0 ? Math.min(day, parseISODate(today).getDate()) : day;
   return `${key}-${String(safeDay).padStart(2, "0")}`;
+}
+
+/** 翌月の末日 */
+function endOfNextMonth(today: ISODate): ISODate {
+  const date = parseISODate(today);
+  return toISODate(new Date(date.getFullYear(), date.getMonth() + 2, 0));
 }
 
 function projects(today: ISODate): Project[] {
@@ -134,7 +140,8 @@ function invoices(today: ISODate): Invoice[] {
     projectId: "p11",
     amount: 1_243_000,
     issuedOn: today,
-    dueOn: addDays(today, 30),
+    // 見積の支払条件「納品月末締め翌月末払い」に合わせ、今月発行分は翌月末が期日
+    dueOn: endOfNextMonth(today),
     paidOn: null,
     estimateNo: ESTIMATE_NO,
     items: ESTIMATE_ITEMS,

@@ -1,10 +1,10 @@
-import { profile } from "@/content/profile";
 import { SectionHeader } from "./ui/SectionHeader";
 import { container } from "./ui/container";
 
 /*
  * 小見出し＋説明文を4つ並べる型をやめ、文章として段落に組む。
  * 本文の文言は変えていない（学んでいること→興味の方向は1つの流れとして同じ段落に置く）。
+ * 学校・卒業予定・活動と「公開URL／ソースコード公開」の一文は Hero に書いてあるため、ここでは繰り返さない。
  */
 const paragraphs = [
   [
@@ -12,7 +12,7 @@ const paragraphs = [
     "AI特有のセキュリティ問題（Prompt Injection や Jailbreak）に関心があります。あわせて、OSSの脆弱性調査やCVE、通信解析など、システムが内部でどう動いていて、どこに問題が起きうるのかを考えることに面白さを感じています。",
   ],
   [
-    "ローカルで動かして終わりにせず、サーバー・Docker・データベース・ネットワークを組み合わせて動かしています。小さく作ったものは公開URLで触れる状態に、代表作はソースコードを公開しています。",
+    "ローカルで動かして終わりにせず、サーバー・Docker・データベース・ネットワークを組み合わせて動かしています。",
   ],
 ];
 
@@ -24,11 +24,7 @@ export function About() {
   return (
     <section id="about" className="py-8 sm:py-10" aria-labelledby="about-heading">
       <div className={container}>
-        <SectionHeader
-          id="about-heading"
-          title="自己紹介"
-          description={`${profile.school} ${profile.department}。${profile.activity}。`}
-        />
+        <SectionHeader id="about-heading" title="自己紹介" />
 
         <div className="space-y-4 leading-[1.8] text-ink-muted">
           {paragraphs.map((sentences) => (

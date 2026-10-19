@@ -26,7 +26,7 @@ export function ReservationTableHeader() {
 
 /** 30分以内に入った予約。お客様の予約ページから来た予約を一覧で見つけやすくする */
 const NEW_WITHIN_MS = 30 * 60_000;
-function isNew(r: Reservation): boolean {
+export function isNew(r: Reservation): boolean {
   return Date.now() - new Date(r.created_at).getTime() < NEW_WITHIN_MS;
 }
 

@@ -1,7 +1,7 @@
 /*
  * Case Study の本文用。2つのことだけをする。
- * 1. 図の信頼境界の枠と同じ語（「ポリシー層」「信頼境界」）を、枠と同じ accent 色で示す
- *    （paper に対し 7.1:1）。リンクは常に下線を引くので、下線の無いこの色とは区別できる。
+ * 1. 図の信頼境界の枠と同じ語（「ポリシー層」「信頼境界」）を字の太さと濃さで示す。
+ *    accent 色はリンクに見えるため使わない。
  * 2. 語の途中で折り返さないよう、日付（2026-09-12）と「カタカナ＋漢字1〜2字」の複合語
  *    （トークン方式・カタカナ表記など）をまとめる。
  */
@@ -22,7 +22,7 @@ export function RichText({ text, terms }: { text: string; terms: readonly string
         return (
           <span
             key={i}
-            className={isTerm ? "whitespace-nowrap font-medium text-accent" : "whitespace-nowrap"}
+            className={isTerm ? "whitespace-nowrap font-medium text-ink" : "whitespace-nowrap"}
           >
             {part}
           </span>
