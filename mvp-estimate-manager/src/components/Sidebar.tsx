@@ -19,16 +19,29 @@ function useIsActive() {
       : pathname.startsWith(href);
 }
 
-export default function Sidebar() {
-  const isActive = useIsActive();
+/** デスクトップはサイドバー下部、スマホはヘッダー右に置く */
+export function ResetDemoButton({ className }: { className?: string }) {
   const { reset } = useEstimates();
-
   const handleReset = () => {
     if (window.confirm("デモデータを初期状態に戻しますか？作成・変更した見積は消えます。")) reset();
   };
+  return (
+    <button
+      type="button"
+      onClick={handleReset}
+      className={cn("inline-flex items-center gap-1.5 rounded text-xs font-medium text-muted hover:text-navy", className)}
+    >
+      <Icon name="reset" className="h-3.5 w-3.5" />
+      デモデータに戻す
+    </button>
+  );
+}
+
+export default function Sidebar() {
+  const isActive = useIsActive();
 
   return (
-    <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-white px-4 py-6 md:flex print:hidden">
+    <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line bg-white px-4 py-6 md:flex print:hidden">
       <Link href="/estimates" className="mb-8 px-2">
         <p className="text-lg font-bold tracking-tight text-navy">見積マネージャー</p>
         <p className="text-xs text-muted">明細から自動計算・ステータス管理</p>
@@ -55,14 +68,7 @@ export default function Sidebar() {
         <p className="text-xs leading-relaxed text-muted">
           デモ版：データはこのブラウザ内にだけ保存されます（送信・外部通信なし）。
         </p>
-        <button
-          type="button"
-          onClick={handleReset}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted hover:text-navy"
-        >
-          <Icon name="reset" className="h-3.5 w-3.5" />
-          デモデータに戻す
-        </button>
+        <ResetDemoButton />
       </div>
     </aside>
   );

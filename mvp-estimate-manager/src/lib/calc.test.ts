@@ -6,6 +6,13 @@ test("明細金額は単価×数量", () => {
   assert.equal(lineAmount({ unitPrice: 45000, quantity: 3 }), 135000);
 });
 
+test("小数の数量（㎡・m など）は明細ごとに1円未満を四捨五入", () => {
+  assert.equal(lineAmount({ unitPrice: 3800, quantity: 12.5 }), 47500);
+  assert.equal(lineAmount({ unitPrice: 333, quantity: 1.5 }), 500); // 499.5 → 500
+  assert.equal(lineAmount({ unitPrice: 1999, quantity: 1.15 }), 2299); // 2298.85 → 2299
+  assert.equal(lineAmount({ unitPrice: 100, quantity: 0.35 }), 35); // 浮動小数の誤差を出さない
+});
+
 test("小計・消費税10%・合計", () => {
   const totals = calcTotals([
     { unitPrice: 300000, quantity: 1 },

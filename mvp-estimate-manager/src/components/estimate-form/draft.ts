@@ -16,6 +16,8 @@ export interface Draft extends Omit<EstimateInput, "items"> {
 }
 
 const MAX_AMOUNT = 1_000_000_000;
+/** 数量は小数2桁まで（例：12.5 ㎡）。金額計算 lineAmount の精度と揃える */
+const QUANTITY_PATTERN = /^\d{1,6}(\.\d{1,2})?$/;
 
 export function newItemId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -108,7 +110,9 @@ export function validateDraft(draft: Draft): ValidationResult {
     const unitPrice = parseAmount(item.unitPrice);
     const quantity = parseAmount(item.quantity);
     const label = `明細${i + 1}「${item.name.trim()}」`;
-    if (!Number.isInteger(quantity) || quantity < 1) errors.push(`${label}の数量は1以上の整数にしてください`);
+    if (!QUANTITY_PATTERN.test(item.quantity.replace(/,/g, "").trim()) || quantity <= 0) {
+      errors.push(`${label}の数量は0より大きい数（小数は2桁まで）にしてください`);
+    }
     if (!Number.isInteger(unitPrice) || unitPrice < 0 || unitPrice > MAX_AMOUNT) {
       errors.push(`${label}の単価は0〜10億円の整数（円）で入力してください`);
     }

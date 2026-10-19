@@ -14,8 +14,9 @@ export interface Totals {
   total: number;
 }
 
+/** 数量は小数2桁まで（㎡・m など）。数量を100倍の整数にしてから掛け、1円未満は明細ごとに四捨五入する */
 export function lineAmount(item: Priced): number {
-  return item.unitPrice * item.quantity;
+  return Math.round((item.unitPrice * Math.round(item.quantity * 100)) / 100);
 }
 
 /** 消費税は請求書単位で1回計算し、1円未満は切り捨てる */

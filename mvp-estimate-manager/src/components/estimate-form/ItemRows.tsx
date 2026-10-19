@@ -47,7 +47,7 @@ export default function ItemRows({ items, amounts, onChange, onRemove }: Props) 
               <label>
                 <span className={LABEL_CLASS}>数量</span>
                 <input
-                  inputMode="numeric"
+                  inputMode="decimal"
                   value={item.quantity}
                   onChange={(e) => onChange(item.id, { quantity: e.target.value })}
                   aria-label={`明細${n} 数量`}

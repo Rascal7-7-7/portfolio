@@ -10,6 +10,7 @@ const PATHS = {
   search: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3",
   reset: "M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5",
   trash: "M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6",
+  calendar: "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
   bolt: "M13 2 3 14h9l-1 8 10-12h-9z",
 } as const;
 
