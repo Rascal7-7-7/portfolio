@@ -8,6 +8,8 @@ export interface TemplateProps {
   sections: LPDoc['sections']
   /** LP 自身の幅が PC レイアウト相当か（ビューポートではなくコンテナ基準） */
   wide: boolean
+  /** PC レイアウトの中でも横幅に余裕があるか（1100px 以上）。エディタのプレビュー枠では false */
+  roomy: boolean
 }
 
 /** 見出し用。文節単位で包んで語の途中の改行を防ぐ（Safari でも有効）。lead は分割しない先頭部分（店名など） */

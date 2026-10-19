@@ -96,11 +96,13 @@ function Nav({ store, wide }: TemplateProps) {
   )
 }
 
-function Hero({ store, wide }: TemplateProps) {
+function Hero({ store, wide, roomy }: TemplateProps) {
   const rows = [store.hours && `${hoursWord(store)} ${store.hours}`, store.closed && `定休 ${store.closed}`, store.address].filter(Boolean)
   const { concept, rest } = splitDescription(store.description)
   return (
-    <section className={cx('grid', wide ? 'min-h-[600px] grid-cols-[minmax(0,26em)_minmax(0,1fr)] gap-16 px-16 pb-24 pt-16' : 'gap-12 px-6 pb-16 pt-10')}>
+    <section className={cx('grid', wide
+          ? cx('min-h-[600px] px-16 pb-24 pt-16', roomy ? 'grid-cols-[minmax(0,26em)_minmax(0,1fr)] gap-16' : 'grid-cols-[minmax(0,22em)_minmax(0,1fr)] gap-12')
+           : 'gap-12 px-6 pb-16 pt-10')}>
       {/* 左上にお店の考えを一文、下に案内。縦書きの見出しと上端・下端をそろえる（GLITCH COFFEE の組み方） */}
       <div className={cx('flex flex-col justify-between gap-12', wide ? 'max-w-[30em] pt-3' : 'order-2')}>
         {concept && (
@@ -124,9 +126,9 @@ function Hero({ store, wide }: TemplateProps) {
           </div>
         </div>
       </div>
-      {/* 縦書きのキャッチコピー。句読点で列を改め、長すぎる列は max-height で文節単位に折り返す。PC では右側の中央に線画と並べる */}
-      <div className={cx(wide ? 'flex items-center justify-center gap-20' : 'order-1 flex justify-center')}>
-        {wide && (
+      {/* 縦書きのキャッチコピー。句読点で列を改め、長すぎる列は max-height で文節単位に折り返す。PC では右側の中央に線画と並べる（線画は幅に余裕があるときだけ） */}
+      <div className={cx(wide ? cx('flex items-center justify-center', roomy && 'gap-20') : 'order-1 flex justify-center')}>
+        {roomy && (
           <svg aria-hidden viewBox="0 0 120 160" className="w-[150px] shrink-0 self-end" fill="none" stroke="#8a5526" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
             {LINE_ART[store.category]}
           </svg>
