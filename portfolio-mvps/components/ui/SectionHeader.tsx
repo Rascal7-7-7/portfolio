@@ -20,7 +20,7 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   return (
     <div className={cn("mb-12", className)}>
-      <p className="text-brand-500 text-sm font-semibold mb-3">{label}</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-brand-400 mb-3">{label}</p>
       <h2
         id={id}
         className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4"

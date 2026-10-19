@@ -77,6 +77,11 @@ export type Project = {
   readonly verification: Verification;
   readonly links: ProjectLinks;
   readonly thumbnail?: string;
+  /**
+   * 代表作の右側に、画像の代わりに等幅で出す根拠の行。
+   * Case Study に書いた実測値・事実だけを書く。
+   */
+  readonly evidence?: readonly string[];
 
   // ---- 旧レイアウト互換（Phase 6 で見直す） ----
   /** 制作にかけた期間の表示。 */

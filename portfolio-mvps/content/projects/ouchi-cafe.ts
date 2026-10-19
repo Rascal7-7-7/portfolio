@@ -22,6 +22,12 @@ export const ouchiCafe: Project = {
     { label: "商品692件・101テーブル", type: "data" },
   ],
   verification: "code-only",
+  evidence: [
+    "taste_vector   12 次元",
+    "products       692 件",
+    "tables         101",
+    "commits        560 / 608（本人）",
+  ],
   links: {
     github: "https://github.com/Rascal7-7-7/ouchi-cafe",
   },
