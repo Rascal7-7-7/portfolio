@@ -29,7 +29,11 @@ export function PaidToast() {
     actions.clearPaidToast();
   }, [pathname]);
 
-  const href = toast ? `/invoices/${toast.invoiceId}` : "";
+  const invoiceHref = toast ? `/invoices/${toast.invoiceId}` : "";
+  // 請求書画面で記録したときは、今月のグラフが伸びるところを見せに行けるようダッシュボードへ誘う
+  const link = pathname === invoiceHref
+    ? { href: "/", label: "ダッシュボードで見る" }
+    : { href: invoiceHref, label: "請求書を見る" };
 
   return (
     <div
@@ -51,14 +55,12 @@ export function PaidToast() {
               <span className="num">{toast.number}</span>
               {toast.client && <span className="ml-1.5 inline-block">{toast.client}</span>}
             </p>
-            {pathname !== href && (
-              <Link
-                href={href}
-                className="mt-1 inline-block rounded text-xs font-semibold underline underline-offset-2 focus-visible:outline-white"
-              >
-                請求書を見る
-              </Link>
-            )}
+            <Link
+              href={link.href}
+              className="mt-1 inline-block rounded text-xs font-semibold underline underline-offset-2 focus-visible:outline-white"
+            >
+              {link.label}
+            </Link>
           </div>
           <button
             type="button"
