@@ -27,7 +27,7 @@ export function About() {
         <SectionHeader
           id="about-heading"
           title="自己紹介"
-          description={`${profile.school} ${profile.department}。${profile.activity}。`}
+          description={`${profile.school} ${profile.department}（${profile.graduation}）。${profile.activity}。`}
         />
 
         <div className="space-y-4 leading-[1.8] text-ink-muted">

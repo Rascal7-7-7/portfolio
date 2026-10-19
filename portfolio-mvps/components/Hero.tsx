@@ -29,7 +29,8 @@ export function Hero() {
           <span className="ml-2 text-ink-subtle">{profile.nameReading}</span>
           <br />
           <span className="inline-block">{profile.school}</span>{" "}
-          <span className="inline-block">{profile.department}</span>
+          <span className="inline-block">{profile.department}</span>{" "}
+          <span className="inline-block">{profile.graduation}</span>
         </p>
 
         {/* 何をする人か。語の途中で折り返さないよう、意味の切れ目ごとに inline-block で区切る */}
