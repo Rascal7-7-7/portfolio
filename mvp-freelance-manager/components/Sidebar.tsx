@@ -26,10 +26,10 @@ function resetDemo(): void {
 function Logo() {
   return (
     <Link href="/dashboard" className="flex items-center gap-2">
-      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-xs font-bold text-white">
+      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-xs font-semibold text-white">
         F
       </span>
-      <span className="text-[15px] font-bold tracking-tight text-ink">FreelanceHub</span>
+      <span className="text-[15px] font-semibold tracking-tight text-ink">FreelanceHub</span>
     </Link>
   );
 }
@@ -67,12 +67,12 @@ export function Sidebar() {
             );
           })}
         </nav>
-        <div className="m-3 rounded-lg border border-line bg-canvas p-3">
+        <div className="border-t border-line px-5 py-4">
           <p className="text-xs leading-relaxed text-warm-500">{DEMO_NOTE}</p>
           <button
             type="button"
             onClick={resetDemo}
-            className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-blue hover:underline"
+            className="mt-1.5 -ml-1 inline-flex items-center gap-1 rounded px-1 py-0.5 text-xs font-medium text-ink hover:bg-black/[0.05]"
           >
             <RotateCcw size={12} aria-hidden />
             デモデータに戻す
@@ -81,7 +81,7 @@ export function Sidebar() {
         </div>
       </aside>
 
-      <header className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-y-1 border-b border-line bg-canvas/90 px-4 py-2.5 backdrop-blur md:hidden">
+      <header className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-y-1 border-b border-line bg-canvas px-4 py-2.5 md:hidden">
         <Logo />
         <button
           type="button"
@@ -96,7 +96,7 @@ export function Sidebar() {
 
       <nav
         aria-label="メイン"
-        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-line bg-canvas px-2 pt-1.5 pb-[max(6px,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(0,0,0,0.05)] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-line bg-canvas px-2 pt-1.5 pb-[max(6px,env(safe-area-inset-bottom))] md:hidden"
       >
         {NAV_ITEMS.map(({ href, short, icon: Icon }) => {
           const active = isActive(href, pathname);
@@ -106,18 +106,11 @@ export function Sidebar() {
               href={href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex flex-col items-center gap-0.5 rounded-lg py-1 text-[11px]",
-                active ? "font-bold text-blue" : "font-medium text-warm-500",
+                "flex flex-col items-center gap-0.5 rounded-md py-1 text-[11px]",
+                active ? "font-semibold text-ink" : "text-warm-500",
               )}
             >
-              <span
-                className={cn(
-                  "flex h-7 w-12 items-center justify-center rounded-full transition-colors",
-                  active && "bg-badge-blue",
-                )}
-              >
-                <Icon size={20} strokeWidth={active ? 2.25 : 1.75} aria-hidden />
-              </span>
+              <Icon size={20} strokeWidth={active ? 2.25 : 1.75} className="my-0.5" aria-hidden />
               {short}
             </Link>
           );

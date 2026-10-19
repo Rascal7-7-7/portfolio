@@ -18,8 +18,8 @@ interface TaskRowProps {
 }
 
 const DUE_STYLE = {
-  overdue: "font-semibold text-orange",
-  today: "font-semibold text-blue",
+  overdue: "font-semibold text-ink",
+  today: "font-medium text-ink",
   week: "text-warm-500",
   later: "text-warm-300",
   done: "text-warm-300",
@@ -56,7 +56,7 @@ export function TaskRow({ task, today, project, deletable }: TaskRowProps) {
         checked={done}
         onChange={toggle}
         aria-label={`${task.title}（完了にする）`}
-        className="h-[18px] w-[18px] shrink-0 cursor-pointer accent-[#0075de]"
+        className="h-[18px] w-[18px] shrink-0 cursor-pointer accent-[#31302e]"
       />
       <div className="min-w-0 flex-1">
         <p className={cn("line-clamp-2 text-sm break-words", done ? "text-warm-300 line-through" : "text-ink")}>
@@ -76,7 +76,7 @@ export function TaskRow({ task, today, project, deletable }: TaskRowProps) {
           type="button"
           onClick={() => actions.deleteTask(task.id)}
           aria-label={`${task.title}を削除`}
-          className="shrink-0 rounded p-1 text-warm-300 hover:bg-black/5 hover:text-orange"
+          className="shrink-0 rounded p-1 text-warm-300 hover:bg-black/5 hover:text-ink"
         >
           <Trash2 size={14} aria-hidden />
         </button>

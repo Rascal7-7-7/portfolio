@@ -52,21 +52,9 @@ export const PROJECT_STATUS_LABEL: Record<ProjectStatus, string> = {
   lost: "失注",
 };
 
-export const PROJECT_STATUS_STYLE: Record<ProjectStatus, string> = {
-  estimate: "bg-warm-100 text-warm-500",
-  in_progress: "bg-badge-blue text-badge-blue-text",
-  completed: "bg-green-soft text-green",
-  lost: "bg-warm-100 text-warm-300 line-through",
-};
-
 export const INVOICE_STATUS_LABEL: Record<InvoiceStatus, string> = {
   paid: "入金済",
   unpaid: "未入金",
   overdue: "期限超過",
 };
 
-export const INVOICE_STATUS_STYLE: Record<InvoiceStatus, string> = {
-  paid: "bg-green-soft text-green",
-  unpaid: "bg-badge-blue text-badge-blue-text",
-  overdue: "bg-orange-soft text-orange",
-};

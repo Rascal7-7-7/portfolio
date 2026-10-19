@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ── Notion 系デザイントークン（warm neutral + 単一アクセント） ── */
+/* ── warm neutral + 単一アクセント（青）。橙は「期限超過」の警告専用 ── */
 @theme {
   --color-canvas: #ffffff;
   --color-ink: rgba(0, 0, 0, 0.95);
@@ -16,16 +16,9 @@
   --color-blue: #0075de;
   --color-blue-active: #005bab;
   --color-blue-tint: #cfe5fa;
-  --color-badge-blue: #f2f9ff;
-  --color-badge-blue-text: #0a6fcc; /* #097fe8 は淡青地で 3.8:1 → AA へ */
 
-  --color-green: #1a7f37;
-  --color-green-soft: #e9f7ec;
-  --color-orange: #b34a00; /* 淡橙地でも 4.5:1 以上 */
-  --color-orange-soft: #fff1e6;
+  --color-orange: #b34a00; /* 白・warm-100 地で 4.5:1 以上 */
 
-  --shadow-card: rgba(0, 0, 0, 0.04) 0px 4px 18px, rgba(0, 0, 0, 0.027) 0px 2px 8px,
-    rgba(0, 0, 0, 0.02) 0px 0.8px 3px;
   --font-sans: var(--font-noto-jp), Inter, -apple-system, system-ui, sans-serif;
 }
 
@@ -37,7 +30,6 @@ body {
 
 .num {
   font-variant-numeric: tabular-nums lining-nums;
-  letter-spacing: -0.02em;
 }
 
 :focus-visible {
