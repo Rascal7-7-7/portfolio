@@ -48,7 +48,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja" className={`${inter.variable} ${notoSansJP.variable}`}>
-      <body className="bg-surface-950 text-surface-50 antialiased">
+      <body className="bg-paper text-ink antialiased">
         {children}
       </body>
     </html>

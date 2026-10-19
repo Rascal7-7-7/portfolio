@@ -1,50 +1,32 @@
-import { Check } from "lucide-react";
 import type { Project } from "@/content/projects";
 import { EvidenceLog } from "./EvidenceLog";
-import { Badge } from "./ui/Badge";
-import { ProjectLinks, metaLabel, periodLabel } from "./ProjectMeta";
+import { MetaLine, ProjectLinks, ProjectTitle } from "./ProjectMeta";
 
 /**
- * 代表作。全幅で、左に説明、右に根拠を置く。
- * スクリーンショットが揃うまでは、右側を等幅の「根拠ログ」で代える。
+ * 代表作。一覧の1行を少し大きくしたもの。カードにはせず、上の罫線で区切る。
+ * スクリーンショットが揃うまでは、根拠を <pre> 1枚で添える。
  */
 export function FeaturedProject({ project }: { project: Project }) {
-  const { name, headline, summary, stack, highlights, evidence } = project;
+  const { headline, summary, highlights, evidence } = project;
 
   return (
-    <article className="grid grid-cols-1 md:grid-cols-5 gap-8 rounded-2xl bg-surface-900 ring-1 ring-white/5 p-6 sm:p-8">
-      <div className="md:col-span-3 flex flex-col">
-        <p className="font-mono text-xs text-surface-400 mb-4">
-          {periodLabel(project)} · {metaLabel(project)}
-        </p>
-        <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-surface-50 mb-3">
-          {name}
-        </h3>
-        <p className="text-base text-surface-200 font-medium mb-4">{headline}</p>
-        <p className="text-sm text-surface-300 leading-relaxed mb-5">{summary}</p>
-        <ul className="space-y-1.5 mb-6">
-          {highlights.map(({ label }) => (
-            <li key={label} className="flex items-center gap-2 text-sm text-surface-200">
-              <Check className="w-4 h-4 text-brand-400 flex-shrink-0" aria-hidden="true" />
-              {label}
-            </li>
-          ))}
-        </ul>
-        <div className="flex flex-wrap gap-1.5 mb-6">
-          {stack.map((tech) => (
-            <Badge key={tech} variant="tech">
-              {tech}
-            </Badge>
-          ))}
-        </div>
-        <div className="mt-auto">
-          <ProjectLinks project={project} />
-        </div>
-      </div>
+    <article className="py-8 border-t border-rule">
+      <ProjectTitle project={project} as="h3" className="text-xl sm:text-2xl" />
+      <p className="mt-1 text-[17px] font-medium leading-relaxed text-ink">{headline}</p>
+      <p className="mt-3 leading-[1.8] text-ink-muted">{summary}</p>
 
-      {evidence && (
-        <EvidenceLog lines={evidence} className="md:col-span-2 self-start bg-surface-950" />
-      )}
+      <ul className="mt-4 list-disc pl-5 space-y-1 leading-relaxed text-ink-muted marker:text-ink-subtle">
+        {highlights.map(({ label }) => (
+          <li key={label}>{label}</li>
+        ))}
+      </ul>
+
+      {evidence && <EvidenceLog lines={evidence} className="mt-6" />}
+
+      <MetaLine project={project} className="mt-5" />
+      <div className="mt-1">
+        <ProjectLinks project={project} />
+      </div>
     </article>
   );
 }

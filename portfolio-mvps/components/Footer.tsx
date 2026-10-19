@@ -1,25 +1,24 @@
 import { profile } from "@/content/profile";
 import { TextLink } from "./ui/TextLink";
+import { container } from "./ui/container";
 
 export function Footer() {
   return (
-    <footer className="py-12 px-6 border-t border-surface-800/60 bg-surface-950">
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-        <div>
-          <p className="font-bold text-surface-200 text-sm mb-1">{profile.name}</p>
-          <p className="text-surface-400 text-xs">
-            {profile.school} {profile.department}
+    <footer className="pb-12">
+      <div className={container}>
+        <div className="border-t border-rule pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <p className="text-sm text-ink-subtle">
+            © {new Date().getFullYear()} {profile.name}
+            <span className="mx-1.5" aria-hidden="true">
+              ·
+            </span>
+            <span className="inline-block">{profile.school}</span>
           </p>
+          <TextLink href="#top" className="text-sm" aria-label="ページ先頭へ戻る">
+            ページ先頭へ戻る
+          </TextLink>
         </div>
-
-        <TextLink href="#top" tone="subtle" aria-label="ページ先頭へ戻る">
-          ページ先頭へ戻る
-        </TextLink>
       </div>
-
-      <p className="max-w-6xl mx-auto text-surface-400 text-xs mt-8">
-        © {new Date().getFullYear()} {profile.name}
-      </p>
     </footer>
   );
 }

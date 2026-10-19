@@ -1,8 +1,6 @@
 import { cn } from "@/lib/cn";
 
 type SectionHeaderProps = {
-  /** セクションの英字ラベル（MVP CASES など） */
-  label: string;
   /** 見出し本文 */
   title: string;
   /** section の aria-labelledby から参照される id */
@@ -11,23 +9,14 @@ type SectionHeaderProps = {
   className?: string;
 };
 
-export function SectionHeader({
-  label,
-  title,
-  id,
-  description,
-  className,
-}: SectionHeaderProps) {
+/** 節の見出し。飾りのラベルは付けず、見出しと一文の説明だけにする。 */
+export function SectionHeader({ title, id, description, className }: SectionHeaderProps) {
   return (
-    <div className={cn("mb-12", className)}>
-      <p className="font-mono text-xs uppercase tracking-widest text-brand-400 mb-3">{label}</p>
-      <h2
-        id={id}
-        className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4"
-      >
+    <div className={cn("mb-8", className)}>
+      <h2 id={id} className="text-xl font-semibold tracking-tight text-ink">
         {title}
       </h2>
-      {description && <p className="text-surface-400 max-w-xl">{description}</p>}
+      {description && <p className="mt-2 text-ink-muted">{description}</p>}
     </div>
   );
 }

@@ -2,7 +2,7 @@ import type { FlowDiagram as FlowDiagramData } from "@/content/projects";
 
 /*
  * 座標は viewBox 上の値。幅を 360 に抑え、390px 幅の画面でも文字が縮みすぎないようにする。
- * 色は暗い背景（surface-900/950）で AA を満たすものだけを使う。
+ * 色は tailwind.config.ts のトークンと同じ値。明るい地（paper）で AA を満たすものだけを文字に使う。
  */
 const W = 360;
 const PAD = 8;
@@ -12,11 +12,11 @@ const SIDE_GAP = 14;
 const SIDE_BOX_H = 52;
 
 const COLOR = {
-  box: "#09090b", // surface-950
-  line: "#52525b", // surface-600（枠線のみ。文字には使わない）
-  boundary: "#38bdf8", // brand-400
-  label: "#fafafa", // surface-50
-  note: "#a1a1aa", // surface-400
+  box: "#fcfbf8", // paper
+  line: "#8f8b82", // 枠線のみ（paper に対し 3.3:1。非テキストの 3:1 を満たす）。文字には使わない
+  boundary: "#035a8c", // accent（7.1:1）
+  label: "#1c1b19", // ink（16.6:1）
+  note: "#52504b", // ink.muted（7.8:1）
 };
 
 function Arrow({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) {
@@ -42,7 +42,7 @@ export function FlowDiagram({ diagram }: { diagram: FlowDiagramData }) {
   const height = sidePath ? sideTop + 24 + SIDE_BOX_H + 30 : mainH + PAD * 2;
 
   return (
-    <figure className="rounded-xl bg-surface-900 ring-1 ring-white/5 p-4 sm:p-6 mb-8">
+    <figure className="mb-8">
       <svg
         viewBox={`0 0 ${W} ${height}`}
         role="img"

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Github } from "lucide-react";
+import { cn } from "@/lib/cn";
 import {
   getProjectBySlug,
   getProjectsWithCaseStudy,
@@ -12,8 +13,9 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { EvidenceLog } from "@/components/EvidenceLog";
 import { FlowDiagram } from "@/components/FlowDiagram";
-import { Badge } from "@/components/ui/Badge";
-import { TextLink } from "@/components/ui/TextLink";
+import { MetaLine, periodLabel, teamLabel } from "@/components/ProjectMeta";
+import { TextLink, textLink } from "@/components/ui/TextLink";
+import { container } from "@/components/ui/container";
 
 type Params = { slug: string };
 
@@ -45,7 +47,7 @@ export function generateMetadata({ params }: { params: Params }): Metadata {
   };
 }
 
-/** 見出し付きの節。中身が無ければ何も描画しない。 */
+/** 見出し付きの節。上の罫線で区切り、カードや色帯は使わない。 */
 function Section({
   id,
   title,
@@ -56,11 +58,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="mb-14">
-      <h2
-        id={id}
-        className="text-xl font-bold text-surface-50 mb-4 pb-2 border-b border-surface-800"
-      >
+    <section aria-labelledby={id} className="mt-12 pt-8 border-t border-rule">
+      <h2 id={id} className="text-xl font-semibold tracking-tight text-ink mb-4">
         {title}
       </h2>
       {children}
@@ -68,24 +67,35 @@ function Section({
   );
 }
 
-function Paragraph({ children }: { children: React.ReactNode }) {
+function Paragraph({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <p className="text-surface-300 leading-relaxed mb-4 last:mb-0">{children}</p>
+    <p className={cn("leading-[1.8] text-ink-muted mb-4 last:mb-0", className)}>{children}</p>
   );
 }
 
 function List({ items }: { items: readonly string[] }) {
   return (
-    <ul className="space-y-2">
+    <ul className="list-disc pl-5 space-y-2 leading-[1.8] text-ink-muted marker:text-ink-subtle">
       {items.map((item) => (
-        <li
-          key={item}
-          className="text-surface-300 leading-relaxed pl-5 relative before:content-[''] before:absolute before:left-0 before:top-[0.7em] before:w-1.5 before:h-1.5 before:rounded-full before:bg-brand-500"
-        >
-          {item}
-        </li>
+        <li key={item}>{item}</li>
       ))}
     </ul>
+  );
+}
+
+/** 「体制」「構成」などの項目と値の組。狭い画面では縦に積む。 */
+function Facts({ rows }: { rows: readonly (readonly [string, string | undefined])[] }) {
+  return (
+    <dl className="space-y-3">
+      {rows
+        .filter((row): row is readonly [string, string] => Boolean(row[1]))
+        .map(([label, value]) => (
+          <div key={label} className="flex flex-col sm:flex-row sm:gap-4">
+            <dt className="shrink-0 sm:w-28 text-sm leading-[1.8] text-ink-subtle">{label}</dt>
+            <dd className="leading-[1.8] text-ink-muted">{value}</dd>
+          </div>
+        ))}
+    </dl>
   );
 }
 
@@ -110,54 +120,33 @@ export default function ProjectDetail({ params }: { params: Params }) {
   // 読ませる内容が無い作品はページを持たない
   if (!project || !hasCaseStudy(project)) notFound();
 
-  const periodLabel = project.period.end
-    ? `${project.period.start.replace("-", "/")}〜${project.period.end.replace("-", "/")}`
-    : `${project.period.start.replace("-", "/")}〜`;
+  const period = periodLabel(project);
+  const team = teamLabel(project);
   const toc = buildToc(project);
 
   return (
     <>
       <Header />
-      <main id="main" className="min-h-screen bg-surface-950 px-6 py-12 sm:py-16">
-        <div className="max-w-3xl mx-auto">
-          <TextLink href="/#projects" tone="subtle" className="mb-8">
+      <main id="main" className="pt-4 pb-16 sm:pt-8">
+        <div className={container}>
+          <TextLink href="/#projects" className="text-sm mb-6">
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             作品一覧へ戻る
           </TextLink>
 
           {/* 見出し */}
-          <p className="text-brand-500 text-sm font-semibold mb-3">
-            {project.name}
-          </p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-surface-50 leading-snug mb-5">
+          <div className="flex items-baseline justify-between gap-4 mb-2">
+            <p className="text-[15px] font-medium text-ink-muted">{project.name}</p>
+            <p className="shrink-0 font-mono text-[13px] text-ink-subtle">{period}</p>
+          </div>
+          <h1 className="text-[28px] leading-[1.4] sm:text-[34px] sm:leading-[1.35] font-semibold tracking-[-0.02em] text-ink mb-5">
             {project.headline}
           </h1>
-          <p className="text-surface-300 leading-relaxed mb-6">{project.summary}</p>
+          <Paragraph className="text-[17px]">{project.summary}</Paragraph>
 
-          {/* 一覧の代表作と同じ根拠を、ここでも最初に見せる（画像の代わり） */}
-          {project.evidence?.length ? (
-            <EvidenceLog lines={project.evidence} className="bg-surface-900 mb-6" />
-          ) : null}
+          <MetaLine project={project} className="mt-5" />
 
-          <div className="flex flex-wrap items-center gap-3 text-sm text-surface-400 mb-6">
-            <span>{periodLabel}</span>
-            <span aria-hidden="true">·</span>
-            <span>
-              {project.team.kind === "team"
-                ? `チーム開発（${project.team.members}人）`
-                : "個人開発"}
-            </span>
-          </div>
-
-          <div className="flex flex-wrap gap-1.5 mb-6">
-            {project.stack.map((tech) => (
-              <Badge key={tech} variant="tech">
-                {tech}
-              </Badge>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap gap-4 mb-12">
+          <div className="flex flex-wrap gap-x-5 mt-1">
             {project.links.demo && (
               <TextLink
                 href={project.links.demo}
@@ -175,6 +164,7 @@ export default function ProjectDetail({ params }: { params: Params }) {
                 href={project.links.github}
                 target="_blank"
                 rel="noopener noreferrer"
+                tone="accent"
                 aria-label={`${project.name}のコードを見る（新しいタブで開く）`}
               >
                 <Github className="w-4 h-4" aria-hidden="true" />
@@ -183,36 +173,36 @@ export default function ProjectDetail({ params }: { params: Params }) {
             )}
           </div>
 
-          {/* 目次 */}
+          {/* 一覧の代表作と同じ根拠を、ここでも最初に見せる（画像の代わり） */}
+          {project.evidence?.length ? (
+            <EvidenceLog lines={project.evidence} className="mt-6" />
+          ) : null}
+
+          {/* 目次。カードにはせず、罫線の間に並べる */}
           {toc.length > 2 && (
-            <nav
-              aria-label="このページの目次"
-              className="bg-surface-900 rounded-2xl p-5 mb-14"
-            >
-              <p className="text-surface-400 text-xs font-semibold mb-3">目次</p>
-              <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            <nav aria-label="このページの目次" className="mt-10">
+              <p className="text-sm text-ink-subtle mb-1">目次</p>
+              <ol className="flex flex-wrap gap-x-5">
                 {toc.map(({ id, label }) => (
                   <li key={id}>
-                    <a
-                      href={`#${id}`}
-                      className="text-sm text-brand-500 hover:text-brand-400 transition-colors"
-                    >
+                    <a href={`#${id}`} className={textLink({ tone: "muted" })}>
                       {label}
                     </a>
                   </li>
                 ))}
-              </ul>
+              </ol>
             </nav>
           )}
 
-          {/* 背景と目的 */}
+          {/* 背景と目的。目的は色帯でなく、字の濃さと小見出しで区別する */}
           {(project.problem || project.goal) && (
             <Section id="problem" title="背景と目的">
               {project.problem && <Paragraph>{project.problem}</Paragraph>}
               {project.goal && (
-                <p className="text-surface-200 leading-relaxed border-l-2 border-brand-600 pl-4">
-                  {project.goal}
-                </p>
+                <div className="mt-5">
+                  <p className="text-sm font-medium text-ink mb-1">目的</p>
+                  <p className="text-[17px] font-medium leading-[1.8] text-ink">{project.goal}</p>
+                </div>
               )}
             </Section>
           )}
@@ -220,32 +210,14 @@ export default function ProjectDetail({ params }: { params: Params }) {
           {/* 体制と構成 */}
           <Section id="role" title="体制と構成">
             {project.diagram && <FlowDiagram diagram={project.diagram} />}
-            <dl className="space-y-3">
-              <div className="flex flex-col sm:flex-row sm:gap-4">
-                <dt className="text-surface-400 text-sm sm:w-32 shrink-0">体制</dt>
-                <dd className="text-surface-300">
-                  {project.team.kind === "team"
-                    ? `チーム開発（${project.team.members}人）`
-                    : "個人開発"}
-                </dd>
-              </div>
-              {project.team.kind === "team" && (
-                <div className="flex flex-col sm:flex-row sm:gap-4">
-                  <dt className="text-surface-400 text-sm sm:w-32 shrink-0">担当範囲</dt>
-                  <dd className="text-surface-300">{project.team.myRole}</dd>
-                </div>
-              )}
-              <div className="flex flex-col sm:flex-row sm:gap-4">
-                <dt className="text-surface-400 text-sm sm:w-32 shrink-0">制作時期</dt>
-                <dd className="text-surface-300">{periodLabel}</dd>
-              </div>
-              {project.architecture && (
-                <div className="flex flex-col sm:flex-row sm:gap-4">
-                  <dt className="text-surface-400 text-sm sm:w-32 shrink-0">構成</dt>
-                  <dd className="text-surface-300">{project.architecture}</dd>
-                </div>
-              )}
-            </dl>
+            <Facts
+              rows={[
+                ["体制", team],
+                ["担当範囲", project.team.kind === "team" ? project.team.myRole : undefined],
+                ["制作時期", period],
+                ["構成", project.architecture],
+              ]}
+            />
           </Section>
 
           {/* 主な機能 */}
@@ -261,25 +233,20 @@ export default function ProjectDetail({ params }: { params: Params }) {
               <div className="space-y-6">
                 {project.decisions.map(({ question, answer }) => (
                   <div key={question}>
-                    <h3 className="text-base font-bold text-surface-100 mb-2">
-                      {question}
-                    </h3>
-                    <p className="text-surface-300 leading-relaxed">{answer}</p>
+                    <h3 className="font-semibold text-ink mb-1">{question}</h3>
+                    <Paragraph>{answer}</Paragraph>
                   </div>
                 ))}
               </div>
             </Section>
           ) : null}
 
-          {/* 詰まった点と解決 */}
+          {/* 詰まった点と解決。カードにはせず、件ごとに細い罫線で区切る */}
           {project.challenges?.length ? (
             <Section id="challenges" title="詰まった点と解決">
-              <div className="space-y-8">
+              <div className="divide-y divide-rule">
                 {project.challenges.map((challenge) => (
-                  <dl
-                    key={challenge.problem}
-                    className="bg-surface-900 rounded-2xl ring-1 ring-white/5 p-6 space-y-5"
-                  >
+                  <dl key={challenge.problem} className="py-5 first:pt-0 last:pb-0 space-y-4">
                     {(
                       [
                         ["起きたこと", challenge.problem],
@@ -288,8 +255,8 @@ export default function ProjectDetail({ params }: { params: Params }) {
                       ] as const
                     ).map(([label, text]) => (
                       <div key={label}>
-                        <dt className="font-mono text-xs text-brand-400 mb-2">{label}</dt>
-                        <dd className="text-surface-300 leading-relaxed">{text}</dd>
+                        <dt className="text-sm font-medium text-ink mb-1">{label}</dt>
+                        <dd className="leading-[1.8] text-ink-muted">{text}</dd>
                       </div>
                     ))}
                   </dl>
@@ -308,26 +275,13 @@ export default function ProjectDetail({ params }: { params: Params }) {
           {/* テストと運用 */}
           {project.testing || project.deployment || project.cicd ? (
             <Section id="quality" title="テストと運用">
-              <dl className="space-y-3">
-                {project.testing && (
-                  <div className="flex flex-col sm:flex-row sm:gap-4">
-                    <dt className="text-surface-400 text-sm sm:w-32 shrink-0">テスト</dt>
-                    <dd className="text-surface-300">{project.testing}</dd>
-                  </div>
-                )}
-                {project.deployment && (
-                  <div className="flex flex-col sm:flex-row sm:gap-4">
-                    <dt className="text-surface-400 text-sm sm:w-32 shrink-0">動作環境</dt>
-                    <dd className="text-surface-300">{project.deployment}</dd>
-                  </div>
-                )}
-                {project.cicd && (
-                  <div className="flex flex-col sm:flex-row sm:gap-4">
-                    <dt className="text-surface-400 text-sm sm:w-32 shrink-0">CI/CD</dt>
-                    <dd className="text-surface-300">{project.cicd}</dd>
-                  </div>
-                )}
-              </dl>
+              <Facts
+                rows={[
+                  ["テスト", project.testing],
+                  ["動作環境", project.deployment],
+                  ["CI/CD", project.cicd],
+                ]}
+              />
             </Section>
           ) : null}
 
@@ -337,20 +291,15 @@ export default function ProjectDetail({ params }: { params: Params }) {
               {project.learned?.length ? <List items={project.learned} /> : null}
               {project.futureWork?.length ? (
                 <>
-                  <h3 className="text-base font-bold text-surface-100 mt-8 mb-3">
-                    今なら変えること
-                  </h3>
+                  <h3 className="font-semibold text-ink mt-8 mb-2">今なら変えること</h3>
                   <List items={project.futureWork} />
                 </>
               ) : null}
             </Section>
           ) : null}
 
-          <div className="pt-4 border-t border-surface-800">
-            <Link
-              href="/#projects"
-              className="inline-flex items-center gap-2 py-2 text-sm text-surface-400 hover:text-surface-200 transition-colors"
-            >
+          <div className="mt-12 pt-4 border-t border-rule">
+            <Link href="/#projects" className={cn(textLink({ tone: "muted" }), "text-sm")}>
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               作品一覧へ戻る
             </Link>

@@ -62,6 +62,27 @@ test.describe("トップページ", () => {
   });
 });
 
+test.describe("レイアウトの回帰防止", () => {
+  test("ヘッダーの名前と本文の左端が揃っている", async ({ page }) => {
+    await page.goto("/");
+    const logoX = await page.locator("header a").first().evaluate((el) => el.getBoundingClientRect().x);
+    const h1X = await page.locator("h1").evaluate((el) => el.getBoundingClientRect().x);
+    expect(Math.abs(logoX - h1X)).toBeLessThanOrEqual(1);
+  });
+
+  test("390px 幅で、最初の画面に導線が入り、横スクロールが出ない", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    const cta = await page.locator('a[href="#projects"]').first().boundingBox();
+    expect(cta).not.toBeNull();
+    expect(cta!.y + cta!.height).toBeLessThanOrEqual(844);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    );
+    expect(overflow).toBe(false);
+  });
+});
+
 test.describe("アクセシビリティの回帰防止", () => {
   test("リンクのアクセシブルネームが一意である", async ({ page }) => {
     await page.goto("/");
@@ -132,7 +153,7 @@ test.describe("作品詳細（Case Study）", () => {
     for (const project of projects) {
       const selector = `a[href="/projects/${project.slug}"]`;
       const has = withCaseStudy.some((p) => p.slug === project.slug);
-      // 作品カード内には1つだけ。代表作は Hero にも導線があるため、ページ全体では数えない
+      // 作品カード内には1つだけ
       await expect(
         page.locator("article").locator(selector),
         `${project.slug} のカード内の詳細リンク`,
