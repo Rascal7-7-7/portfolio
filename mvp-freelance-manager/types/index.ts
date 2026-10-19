@@ -18,6 +18,8 @@ export interface Task {
   readonly title: string;
   readonly dueDate: ISODate;
   readonly done: boolean;
+  /** 完了にした日（アクティビティ表示用）。古い保存データには無い */
+  readonly doneOn?: ISODate | null;
 }
 
 export interface Invoice {

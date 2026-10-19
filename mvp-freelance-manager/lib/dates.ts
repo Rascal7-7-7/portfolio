@@ -66,3 +66,18 @@ export function formatRelative(today: ISODate, target: ISODate): string {
   if (days > 0) return `あと${days}日`;
   return `${-days}日超過`;
 }
+
+/** 過去の日付を「今日」「昨日」「3日前」「2ヶ月前」で表す（アクティビティ用） */
+export function formatAgo(today: ISODate, past: ISODate): string {
+  const days = diffDays(past, today);
+  if (days <= 0) return "今日";
+  if (days === 1) return "昨日";
+  if (days < 30) return `${days}日前`;
+  return `${Math.floor(days / 30)}ヶ月前`;
+}
+
+/** 日付入力の表示 "2026年10月20日（火）"。ブラウザのロケールに左右されない */
+export function formatInputDate(value: ISODate): string {
+  const date = parseISODate(value);
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日（${"日月火水木金土"[date.getDay()]}）`;
+}

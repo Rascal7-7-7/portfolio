@@ -4,18 +4,26 @@ import Link from "next/link";
 import { useAppStore } from "@/lib/store";
 import { formatLongDate, formatMonthLabel } from "@/lib/dates";
 import { dashboardSummary, monthlyRevenue, projectName, sortTasks, taskGroup } from "@/lib/selectors";
-import { formatYen } from "@/lib/utils";
+import { useDelta } from "@/lib/useDelta";
+import { cn, formatYen } from "@/lib/utils";
 import { Card, MoreLink, Page, PageHeader, PageSkeleton } from "@/components/ui";
 import { RevenueChart } from "@/components/RevenueChart";
 import { TaskRow } from "@/components/TaskRow";
 import { InvoiceList } from "@/components/InvoiceList";
 import { ActiveProjects } from "@/components/ActiveProjects";
+import type { AppData, ISODate } from "@/types";
 
 interface SummaryRow {
   href: string;
   label: string;
   value: string;
   sub: string;
+  /** 直前の操作で変わった金額。数秒だけ表示する */
+  delta?: number;
+}
+
+function signedYen(delta: number): string {
+  return `${delta > 0 ? "+" : "−"}${formatYen(Math.abs(delta))}`;
 }
 
 /** 右側の要約。タイルではなく1枚のパネルに行として並べる */
@@ -27,7 +35,12 @@ function SummaryList({ rows }: { rows: readonly SummaryRow[] }) {
           <li key={r.label} className="min-w-0">
             <Link href={r.href} className="flex h-full flex-col justify-center px-3 py-3 hover:bg-warm-50 sm:px-5 sm:py-3.5">
               <span className="text-xs text-warm-500">{r.label}</span>
-              <span className="num mt-0.5 text-base font-semibold text-ink sm:text-lg">{r.value}</span>
+              <span className="mt-0.5 flex flex-wrap items-baseline gap-x-2">
+                <span key={r.value} className={cn("num text-base font-semibold text-ink sm:text-lg", r.delta && "anim-rise")}>
+                  {r.value}
+                </span>
+                {r.delta ? <span className="num anim-rise text-xs text-warm-500">{signedYen(r.delta)}</span> : null}
+              </span>
               <span className="num text-[11px] text-warm-500 sm:text-xs">{r.sub}</span>
             </Link>
           </li>
@@ -40,9 +53,13 @@ function SummaryList({ rows }: { rows: readonly SummaryRow[] }) {
 export function DashboardView() {
   const store = useAppStore();
   if (!store) return <PageSkeleton />;
-  const { data, today } = store;
+  return <Dashboard data={store.data} today={store.today} />;
+}
 
+function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
   const s = dashboardSummary(data, today);
+  const paidDelta = useDelta(s.thisMonthPaid);
+  const outstandingDelta = useDelta(s.outstandingTotal);
   const revenue = monthlyRevenue(data.invoices, today);
   const focusTasks = sortTasks(
     data.tasks.filter((t) => ["overdue", "today"].includes(taskGroup(t, today)) || (t.done && t.dueDate === today)),
@@ -58,6 +75,7 @@ export function DashboardView() {
       href: "/invoices",
       label: "未入金の請求",
       value: formatYen(s.outstandingTotal),
+      delta: outstandingDelta,
       sub: s.overdueCount > 0 ? `${s.outstandingCount}件 ・ うち期限超過 ${formatYen(s.overdueTotal)}` : `${s.outstandingCount}件`,
     },
     {
@@ -92,8 +110,21 @@ export function DashboardView() {
           <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 px-4 pt-4 sm:px-5 sm:pt-5">
             <div className="min-w-0">
               <h2 className="text-[13px] text-warm-500">今月の入金</h2>
-              <p className="num mt-1 text-[28px] leading-none font-semibold tracking-tight text-ink">
-                {formatYen(s.thisMonthPaid)}
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                <p
+                  key={s.thisMonthPaid}
+                  className={cn("num text-[28px] leading-none font-semibold tracking-tight text-ink", paidDelta && "anim-rise")}
+                >
+                  {formatYen(s.thisMonthPaid)}
+                </p>
+                {paidDelta !== 0 && (
+                  <span className="num anim-rise rounded bg-blue-tint/60 px-1.5 py-0.5 text-sm font-semibold text-blue-active">
+                    {signedYen(paidDelta)}
+                  </span>
+                )}
+              </div>
+              <p role="status" className="sr-only">
+                {paidDelta !== 0 ? `今月の入金が ${signedYen(paidDelta)} 変わりました` : ""}
               </p>
               <p className="num mt-2 text-xs text-warm-500">
                 見込み込み {formatYen(s.thisMonthPaid + s.thisMonthExpected)}
@@ -104,7 +135,10 @@ export function DashboardView() {
             </p>
           </div>
           <div className="px-3 pt-2 pb-4 sm:px-5">
-            <RevenueChart data={revenue} />
+            <RevenueChart
+              data={revenue}
+              growFrom={paidDelta > 0 ? (s.thisMonthPaid - paidDelta) / s.thisMonthPaid : null}
+            />
           </div>
         </Card>
         <SummaryList rows={summary} />
@@ -133,7 +167,7 @@ export function DashboardView() {
       </div>
 
       <Card title="進行中の案件" action={<MoreLink href="/projects">案件一覧</MoreLink>}>
-        <ActiveProjects data={data} />
+        <ActiveProjects data={data} today={today} />
       </Card>
     </Page>
   );

@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { addDays } from "@/lib/dates";
 import { actions } from "@/lib/store";
 import { buttonStyles } from "@/components/ui";
+import { DateInput } from "@/components/DateInput";
 import type { ISODate } from "@/types";
 
 export function TaskQuickAdd({ projectId, today }: { projectId: string; today: ISODate }) {
@@ -36,14 +37,7 @@ export function TaskQuickAdd({ projectId, today }: { projectId: string; today: I
       <label className="sr-only" htmlFor="task-due">
         期日
       </label>
-      <input
-        id="task-due"
-        type="date"
-        value={dueDate}
-        onChange={(e) => setDueDate(e.target.value)}
-        required
-        className={`${buttonStyles.input} num sm:w-40`}
-      />
+      <DateInput id="task-due" value={dueDate} onChange={setDueDate} required className="shrink-0 sm:w-56" />
       <button type="submit" className={`${buttonStyles.secondary} shrink-0`}>
         <Plus size={15} aria-hidden />
         追加

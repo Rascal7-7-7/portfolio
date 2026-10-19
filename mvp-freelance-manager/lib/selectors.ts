@@ -124,6 +124,34 @@ export function sortTasks(tasks: readonly Task[]): Task[] {
   );
 }
 
+export interface ActivityItem {
+  readonly key: string;
+  readonly date: ISODate;
+  readonly kind: "issued" | "paid" | "task";
+  readonly text: string;
+}
+
+/** 案件の操作履歴を既存データから組み立てる（新しい順）。履歴テーブルは持たない */
+export function projectActivity(projectId: string, data: AppData, limit = 8): ActivityItem[] {
+  const invoices = data.invoices.filter((inv) => inv.projectId === projectId);
+  const items: ActivityItem[] = [
+    ...invoices.flatMap((inv): ActivityItem[] => [
+      { key: `${inv.id}-issued`, date: inv.issuedOn, kind: "issued", text: `請求書 ${inv.number} を発行` },
+      ...(inv.paidOn
+        ? [{ key: `${inv.id}-paid`, date: inv.paidOn, kind: "paid" as const, text: `${inv.number} の入金を記録` }]
+        : []),
+    ]),
+    ...data.tasks
+      .filter((t) => t.projectId === projectId && t.done)
+      .map((t): ActivityItem => ({ key: `${t.id}-done`, date: t.doneOn ?? t.dueDate, kind: "task", text: `タスク「${t.title}」を完了` })),
+  ];
+  // 同じ日は「完了 → 入金 → 発行」の順（後で起きやすい操作を上に）
+  const order = { task: 0, paid: 1, issued: 2 } as const;
+  return items
+    .toSorted((a, b) => b.date.localeCompare(a.date) || order[a.kind] - order[b.kind])
+    .slice(0, limit);
+}
+
 export function projectName(data: AppData, projectId: string): string {
   return data.projects.find((p) => p.id === projectId)?.name ?? "（削除された案件）";
 }

@@ -51,6 +51,7 @@ function tasks(today: ISODate): Task[] {
     title,
     dueDate: d(offset),
     done,
+    doneOn: done ? d(offset) : null,
   }));
 }
 
