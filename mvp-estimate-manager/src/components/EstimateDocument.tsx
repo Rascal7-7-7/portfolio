@@ -62,10 +62,15 @@ export default function EstimateDocument({ estimate, id }: Props) {
           </p>
         </div>
 
-        {/* 角印は発行者欄の右端に少し重ねて押すのが和文帳票の慣習 */}
-        <address className="relative pr-12 text-xs not-italic leading-relaxed text-body">
-          <CompanySeal className="absolute -top-1.5 right-0 h-14 w-14" />
-          <p className="text-sm font-semibold text-navy">{ISSUER.name}</p>
+        {/*
+          角印は社名の末尾に半分かかるように押すのが和文帳票の慣習。
+          印影の下端を社名の行の下端にそろえ、上の余白へはみ出させて住所・電話・登録番号の文字には掛けない
+        */}
+        <address className="pt-8 text-xs not-italic leading-relaxed text-body">
+          <p className="relative w-fit text-sm font-semibold text-navy">
+            {ISSUER.name}
+            <CompanySeal className="absolute bottom-0 left-full -ml-6 h-12 w-12" />
+          </p>
           {/* 住所は語の途中で折らず、空白の位置でだけ改行する */}
           <p>
             {ISSUER.address.split(" ").map((part, i) => (

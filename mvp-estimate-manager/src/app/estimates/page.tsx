@@ -10,7 +10,7 @@ export default function EstimatesPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-navy">見積一覧</h1>
-          <p className="mt-1 text-sm text-body">
+          <p className="mt-1 text-balance text-sm text-body">
             明細を入れるだけで税込金額を自動計算。送付から受注までを1画面で追えます。
           </p>
         </div>

@@ -73,7 +73,7 @@ export default function EstimateForm({ initial }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="grid grid-cols-[minmax(0,1fr)] gap-8 xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+    <form onSubmit={handleSubmit} noValidate className="grid grid-cols-[minmax(0,1fr)] gap-8 pb-16 xl:pb-0 xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       <div className="space-y-8">
         {!initial && (
           <button
@@ -145,9 +145,6 @@ export default function EstimateForm({ initial }: Props) {
               <span className="font-semibold text-navy">合計（税込）</span>
               <span className="text-2xl font-semibold text-navy">{formatYen(totals.total)}</span>
             </p>
-            <a href="#estimate-preview" className="mt-1 block text-right text-xs font-semibold text-primary underline underline-offset-2 xl:hidden">
-              見積書の見た目を確認 ↓
-            </a>
           </section>
         </fieldset>
 
@@ -181,6 +178,24 @@ export default function EstimateForm({ initial }: Props) {
       <div id="estimate-preview" className="scroll-mt-4 rounded bg-canvas p-3 sm:p-6 xl:sticky xl:p-4 xl:top-4 xl:self-start">
         <p className="mb-3 text-xs font-medium text-body">見積書プレビュー（入力と同時に更新）</p>
         <EstimateDocument estimate={preview} id={initial?.id} />
+      </div>
+
+      {/*
+        プレビューが横に並ばない幅では、入力中も合計が見えるよう画面下に固定する。
+        スマホは下部ナビ（罫線込みで高さ 61px）の上、md 以上はサイドバー（w-60）の右に置く
+      */}
+      <div className="fixed inset-x-0 bottom-[calc(3.8125rem+env(safe-area-inset-bottom))] z-30 flex items-center justify-between gap-3 border-t border-line bg-white px-4 py-2 md:bottom-0 md:left-60 md:pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:pl-8 md:pr-8 xl:hidden print:hidden">
+        <p className="tnum min-w-0">
+          <span className="block text-xs text-muted">合計（税込）</span>
+          <span className="block text-lg font-semibold leading-tight text-navy">{formatYen(totals.total)}</span>
+        </p>
+        <a
+          href="#estimate-preview"
+          className="inline-flex shrink-0 items-center gap-1 rounded border border-line px-3 py-2 text-sm font-semibold text-primary hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          見積書を確認
+          <span aria-hidden="true">↓</span>
+        </a>
       </div>
     </form>
   );

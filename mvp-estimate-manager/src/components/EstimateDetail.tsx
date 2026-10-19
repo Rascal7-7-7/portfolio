@@ -24,7 +24,7 @@ interface Action {
 
 const ACTIONS: Record<EstimateStatus, Action[]> = {
   draft: [
-    { to: "sent", label: "送付済みにする", icon: "send", tone: "primary", message: "送付済みにしました（デモのため実際のメールは送信されません）" },
+    { to: "sent", label: "送付済みにする", icon: "send", tone: "primary", message: "送付済みにしました（デモのため実際のメールは送信されません）。「お客様の画面を見る」で先方に届く画面を確認できます" },
   ],
   sent: [
     { to: "won", label: "受注にする", icon: "check", tone: "primary", message: "受注にしました。一覧の受注金額・受注率に反映されます" },
@@ -95,6 +95,12 @@ export default function EstimateDetail({ id, justSaved }: Props) {
                 {action.label}
               </button>
             ))}
+            {estimate.status !== "draft" && (
+              <Link href={`/estimates/${estimate.id}/customer`} className={`${BUTTON} ${TONE_CLASS.neutral}`}>
+                <Icon name="eye" />
+                お客様の画面を見る（デモ）
+              </Link>
+            )}
             <span className="hidden flex-1 sm:block" />
             <Link href={`/estimates/${estimate.id}/edit`} className={`${BUTTON} ${TONE_CLASS.neutral}`}>
               <Icon name="edit" />

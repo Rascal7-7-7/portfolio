@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import type { Estimate, EstimateStatus } from "@/types";
 import { STATUSES, STATUS_LABELS } from "@/types";
 import { useEstimates } from "@/lib/store";
-import { calcTotals, summarize } from "@/lib/calc";
+import { calcTotals, monthlyWon, summarize } from "@/lib/calc";
 import { cn, daysBetween, estimateNumber, formatDate, formatYen, todayISO } from "@/lib/utils";
 import Icon from "@/components/Icon";
 import KpiCards from "@/components/KpiCards";
@@ -15,6 +15,7 @@ import StatusBadge from "@/components/StatusBadge";
 type Filter = EstimateStatus | "all";
 
 const DUE_SOON_DAYS = 7;
+const SPARK_MONTHS = 6;
 
 /** 一覧の列。見出し行と各行で同じ grid を使い、列をそろえる */
 const ROW_GRID = "sm:grid-cols-[88px_minmax(0,1fr)_96px_120px_128px]";
@@ -60,7 +61,7 @@ export default function EstimateList() {
 
   return (
     <div className="space-y-8">
-      <KpiCards summary={summary} />
+      <KpiCards summary={summary} monthly={monthlyWon(estimates, todayISO(), SPARK_MONTHS)} />
 
       <section aria-label="見積一覧">
         <div className="flex flex-col gap-3 border-b border-line sm:flex-row sm:items-end sm:justify-between">
