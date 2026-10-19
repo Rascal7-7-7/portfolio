@@ -145,11 +145,9 @@ function Toast({ message }: { message: string | null }) {
       className="fixed z-[60] left-4 right-4 bottom-24 md:bottom-8 md:left-auto md:right-8 md:max-w-sm pointer-events-none"
     >
       {message && (
-        <div className="flex items-start gap-3 bg-[#1a3844] text-white rounded-xl px-4 py-3 shadow-lg">
-          <span className="material-symbols-outlined text-[#98f994] shrink-0" aria-hidden="true">
-            notifications_active
-          </span>
-          <p className="text-sm font-medium leading-relaxed">{message}</p>
+        <div className="flex items-start gap-2.5 bg-ink text-white rounded-md px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+          <span className="material-symbols-outlined shrink-0 mt-px" aria-hidden="true">check</span>
+          <p className="text-sm leading-relaxed">{message}</p>
         </div>
       )}
     </div>
