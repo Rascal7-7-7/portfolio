@@ -4,8 +4,12 @@ export type TaxRate = 8 | 10;
 
 export type PackageShape = 'bag' | 'tin' | 'jar' | 'pump' | 'bottle' | 'box';
 
+/** ラベルに添える、素材にちなんだ小さな印 */
+export type Motif = 'bean' | 'tea' | 'wheat' | 'hinoki' | 'petal' | 'herb';
+
 export type Visual = {
   shape: PackageShape;
+  motif: Motif;
   /** 背景グラデーション */
   from: string;
   to: string;

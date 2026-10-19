@@ -89,10 +89,18 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
             <div className="grid grid-cols-3 gap-2 sm:flex">
               {sub.status === 'active' ? (
                 <>
-                  <ActionButton onClick={() => run('skip')} tone="primary" disabled={firstPending}>
-                    <SkipForward className="h-4 w-4" aria-hidden />
-                    {firstPending ? '初回発送準備中' : '次回をスキップ'}
-                  </ActionButton>
+                  {firstPending ? (
+                    // 押せないものはボタンの形にせず、状態と理由を文字で示す
+                    <p className="flex flex-col justify-center text-xs leading-snug text-on-surface-variant sm:pr-2">
+                      <span className="font-medium text-on-surface">初回発送準備中</span>
+                      <span>届いた後からスキップできます</span>
+                    </p>
+                  ) : (
+                    <ActionButton onClick={() => run('skip')} tone="primary">
+                      <SkipForward className="h-4 w-4" aria-hidden />
+                      次回をスキップ
+                    </ActionButton>
+                  )}
                   <ActionButton onClick={() => run('pause')}>
                     <Pause className="h-4 w-4" aria-hidden />
                     お休みする
@@ -130,20 +138,17 @@ type ActionButtonProps = {
   children: React.ReactNode;
   tone?: 'neutral' | 'primary' | 'danger';
   className?: string;
-  disabled?: boolean;
 };
 
-function ActionButton({ onClick, children, tone = 'neutral', className, disabled = false }: ActionButtonProps) {
+function ActionButton({ onClick, children, tone = 'neutral', className }: ActionButtonProps) {
   return (
     <button
       type="button"
       onClick={onClick}
-      disabled={disabled}
       className={cn(
         // スマホは3列グリッドに収めるため、アイコンを上に積む
         'inline-flex flex-col items-center justify-center gap-1 whitespace-nowrap rounded-sm px-1 py-2 text-xs font-medium transition-colors sm:flex-row sm:gap-1.5 sm:px-3 sm:text-sm',
-        disabled && 'cursor-not-allowed bg-surface-container text-on-surface-variant',
-        !disabled && tone === 'primary' && 'bg-primary text-on-primary hover:opacity-90',
+        tone === 'primary' && 'bg-primary text-on-primary hover:opacity-90',
         tone === 'danger' && 'bg-error text-on-error hover:opacity-90',
         tone === 'neutral' && 'text-on-surface ring-1 ring-outline-variant hover:ring-on-surface',
         className,

@@ -1,9 +1,62 @@
 // 外部画像を使わず、商品ごとの配色とパッケージ形状をインライン SVG で描く。
 import { useId, type ReactNode } from 'react';
-import type { PackageShape, Product, Visual } from '@/lib/types';
+import type { Motif, PackageShape, Product, Visual } from '@/lib/types';
 import { cn } from '@/lib/cn';
 
 const LABEL_BG = '#f8f4ea';
+
+// 素材にちなんだ印。±10 の枠に1色で描き、呼び出し側で位置と大きさを決める
+const line = (c: string) => ({ stroke: c, strokeWidth: 1.4, strokeLinecap: 'round' as const, fill: 'none' });
+const MOTIFS: Record<Motif, (c: string) => ReactNode> = {
+  bean: (c) => (
+    <g transform="rotate(25)">
+      <ellipse rx="6" ry="9" fill={c} />
+      <path d="M1.2 -8 C -2.6 -3, 2.6 3, -1.2 8" stroke={LABEL_BG} strokeWidth="1.2" fill="none" />
+    </g>
+  ),
+  tea: (c) => (
+    <g fill={c}>
+      <path d="M0 10 L0 -2" {...line(c)} />
+      <path d="M0 -1 Q 2 -6 0 -10 Q -2 -6 0 -1 Z" />
+      <path d="M0 5 Q -9 3 -9 -4 Q -2 -2 0 5 Z" />
+      <path d="M0 2 Q 8 1 8 -5 Q 2 -4 0 2 Z" />
+    </g>
+  ),
+  wheat: (c) => (
+    <g fill={c}>
+      <path d="M0 10 L0 -8" {...line(c)} />
+      {[-6, -2, 2].map((y) => (
+        <g key={y}>
+          <ellipse cx="-2.4" cy={y} rx="1.7" ry="3.2" transform={`rotate(-28 -2.4 ${y})`} />
+          <ellipse cx="2.4" cy={y} rx="1.7" ry="3.2" transform={`rotate(28 2.4 ${y})`} />
+        </g>
+      ))}
+      <ellipse cy="-9" rx="1.5" ry="2.8" />
+    </g>
+  ),
+  hinoki: (c) => (
+    <g {...line(c)} strokeWidth="1.6">
+      <path d="M0 10 L0 -9 M0 5 L-6 1 M0 5 L6 1 M0 0 L-5 -4 M0 0 L5 -4 M0 -5 L-3 -8 M0 -5 L3 -8" />
+    </g>
+  ),
+  petal: (c) => (
+    <g fill={c}>
+      {[0, 72, 144, 216, 288].map((r) => (
+        <ellipse key={r} cy="-4.6" rx="2.8" ry="4.6" transform={`rotate(${r})`} />
+      ))}
+      <circle r="1.6" fill={LABEL_BG} />
+    </g>
+  ),
+  herb: (c) => (
+    <g fill={c}>
+      <path d="M-1 10 Q 0 0 2 -9" {...line(c)} />
+      <ellipse cx="-3.6" cy="5" rx="2.2" ry="3.6" transform="rotate(-55 -3.6 5)" />
+      <ellipse cx="3.6" cy="1" rx="2.2" ry="3.6" transform="rotate(55 3.6 1)" />
+      <ellipse cx="-2.6" cy="-3.5" rx="2" ry="3.2" transform="rotate(-45 -2.6 -3.5)" />
+      <ellipse cx="2.4" cy="-9" rx="1.8" ry="2.6" />
+    </g>
+  ),
+};
 
 type Props = {
   product: Product;
@@ -36,8 +89,6 @@ export function ProductVisual({ product, className, decorative = false }: Props)
             <feComposite in2="SourceAlpha" operator="in" />
           </filter>
         </defs>
-        <path d="M18 262 C 30 200, 80 180, 104 196 C 82 214, 52 238, 18 262 Z" fill={visual.ink} opacity="0.1" />
-        <path d="M18 262 L 96 200" stroke={visual.ink} strokeOpacity="0.14" strokeWidth="1.5" fill="none" />
         <ellipse cx="120" cy="252" rx="66" ry="7" fill="#000" opacity="0.12" />
         {SHAPES[visual.shape](visual)}
         <Label shape={visual.shape} visual={visual} nameEn={product.nameEn} paperId={paperId} />
@@ -135,10 +186,8 @@ function Label({ shape, visual, nameEn, paperId }: LabelProps) {
       <text x={cx} y={box.y + 14} fontSize="5.5" letterSpacing="2" opacity="0.7">
         MORI
       </text>
-      <path
-        d={`M${cx - 6} ${box.y + 24} Q ${cx} ${box.y + 16} ${cx + 6} ${box.y + 24} Q ${cx} ${box.y + 30} ${cx - 6} ${box.y + 24} Z`}
-        fill={visual.accent}
-      />
+      {/* 背景の装飾は置かず、容器とラベルだけで見せる。素材の印はラベルに小さく1つだけ */}
+      <g transform={`translate(${cx} ${box.y + 23}) scale(0.62)`}>{MOTIFS[visual.motif](visual.accent)}</g>
       {words.map((w, i) => (
         <text key={w} x={cx} y={box.y + 40 + i * (fontSize + 2)} fontSize={fontSize} fontWeight="600">
           {w}
