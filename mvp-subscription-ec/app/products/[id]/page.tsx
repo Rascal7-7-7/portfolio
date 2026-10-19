@@ -75,7 +75,7 @@ export default async function ProductDetailPage({ params }: Params) {
                 <dt className="w-24 flex-shrink-0 text-on-surface-variant">{t.label}</dt>
                 <dd className="flex flex-1 items-center gap-2 text-xs text-on-surface-variant">
                   <span className="sr-only">
-                    {t.value}/5（{tasteWord(t)}）
+                    5段階中{t.value}（{tasteWord(t)}）
                   </span>
                   {/* 両端の言葉は商品内でいちばん長い語の幅に揃え、目盛りの位置を全行で合わせる */}
                   <span aria-hidden className="flex-shrink-0 text-right" style={{ width: `${endWidth}em` }}>

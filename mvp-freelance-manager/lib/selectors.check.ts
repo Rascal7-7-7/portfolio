@@ -85,6 +85,7 @@ assert.ok(fromEstimate, "est-0014 の請求がある");
 assert.equal(fromEstimate.amount, 1_243_000);
 assert.equal(fromEstimate.paidOn, null);
 assert.equal(fromEstimate.estimateNo, "EST-0014");
+assert.equal(fromEstimate.number, "INV-0017", "見積管理 src/lib/utils.ts の HIKAE_INVOICE_NUMBERS と一致");
 assert.equal(fromEstimate.issuedOn, today);
 assert.equal(createSeed("2026-10-20").invoices.find((i) => i.id === ESTIMATE_INVOICE_ID)?.dueOn, "2026-11-30", "納品月末締め翌月末払い");
 assert.equal(createSeed("2026-12-15").invoices.find((i) => i.id === ESTIMATE_INVOICE_ID)?.dueOn, "2027-01-31", "年をまたいでも翌月末");

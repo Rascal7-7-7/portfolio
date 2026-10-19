@@ -208,8 +208,9 @@ function Voices({ store, wide }: TemplateProps) {
 
 /** 紹介文の「吉祥寺駅から徒歩5分」から駅名と徒歩分数を拾う（入力項目は増やさない）。無ければ null */
 const stationOf = (text: string) => {
-  const m = text.match(/([^\s、。]+?駅)\S*?から徒歩(\d+)分/)
-  return m ? { name: m[1], walk: `徒歩${m[2]}分` } : null
+  // 駅名は「駅」の直前に続く漢字・カタカナだけを拾う（「当院は吉祥寺駅」の「当院は」を含めない）。全角数字も受ける
+  const m = text.match(/([一-龠々ァ-ヶー]{1,10}駅)[^。]*?から徒歩([0-9０-９]+)分/)
+  return m ? { name: m[1], walk: `徒歩${Number(m[2].normalize('NFKC'))}分` } : null
 }
 
 /**

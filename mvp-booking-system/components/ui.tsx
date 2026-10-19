@@ -4,10 +4,10 @@ import type { Staff } from '@/lib/types';
 
 const FOCUS = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand';
 
-/** 担当ごとのごく淡い色分け。スケジュールの列と予約ページのイニシャルで同じ色を使う */
-export const STAFF_TONE: Record<Staff, { dot: string; soft: string }> = {
-  山本: { dot: 'bg-staff1', soft: 'bg-staff1-soft' },
-  石井: { dot: 'bg-staff2', soft: 'bg-staff2-soft' },
+/** 担当ごとのごく淡い色分け。スケジュールの担当タブと列見出しで使う */
+export const STAFF_TONE: Record<Staff, { dot: string }> = {
+  山本: { dot: 'bg-staff1' },
+  石井: { dot: 'bg-staff2' },
 };
 
 const VARIANT = {
