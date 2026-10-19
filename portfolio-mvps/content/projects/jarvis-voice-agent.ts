@@ -20,7 +20,8 @@ export const jarvisVoiceAgent: Project = {
   evidence: [
     "$ bench router=gemma4:e2b",
     "「gitで強制プッシュして」 → 実行系に分類",
-    "危険な操作の分類精度  0.75（4回に1回間違える）",
+    "危険な操作の分類精度  0.75",
+    "→ 4回に1回は危険な操作を取り違える",
     "→ LLM を信頼境界にしない",
     "→ 前後を決定的なポリシー層で挟む",
   ],

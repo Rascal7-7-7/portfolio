@@ -33,6 +33,14 @@ export default function ReservationDetailView({ id }: { id: number }) {
 
   const changeStatus = (to: ReservationStatus) => {
     if (to === r.status) return;
+    // キャンセルから戻すと、その間に入った同じ担当の予約と重なることがある
+    if (r.status === 'canceled' && to !== 'canceled') {
+      const conflict = findConflict(reservations, r, r.id);
+      if (conflict) {
+        notify(`${conflict.reservation_time} の ${conflict.customer_name} 様の予約と重なるため、戻せません`);
+        return;
+      }
+    }
     update(r.id, { status: to });
     notify(`${r.customer_name} 様の予約を「${STATUS_LABEL[to]}」に変更しました`);
   };

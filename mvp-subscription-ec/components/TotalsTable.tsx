@@ -19,7 +19,7 @@ export function TotalsTable({ totals }: { totals: Totals }) {
             {taxes.map((t, i) => (
               <span key={t.rate} className="whitespace-nowrap">
                 {i > 0 && ' / '}
-                {t.rate}%対象 {yen(t.amount)}
+                消費税{t.rate}% {yen(t.amount)}
               </span>
             ))}
           </dd>

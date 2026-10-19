@@ -156,6 +156,13 @@ function ApprovalArea({ estimate, onApprove }: ApprovalProps) {
     const reason = estimate.status === "draft" ? "この見積はまだ送付されていません。" : "この見積は辞退済みです。";
     return <p className="rounded border border-line bg-canvas p-4 text-sm text-body">{reason}</p>;
   }
+  if (daysBetween(todayISO(), estimate.validUntil) < 0) {
+    return (
+      <p className="rounded border border-line bg-canvas p-4 text-sm text-body">
+        有効期限が過ぎているため、承認できません。再見積りを{ISSUER.name}にご依頼ください。
+      </p>
+    );
+  }
   return (
     <>
       <button
