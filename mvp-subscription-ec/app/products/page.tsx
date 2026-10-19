@@ -101,12 +101,12 @@ export default function ProductsPage() {
       {/* How it works */}
       <section id="how" className="mx-auto max-w-6xl scroll-mt-20 px-4 sm:px-6">
         <div className="rounded-lg bg-primary px-6 py-10 text-on-primary sm:px-10">
-          <p className="label-editorial text-inverse-primary">How it works</p>
+          <p className="label-editorial text-primary-container">How it works</p>
           <h2 className="mt-2 font-headline text-2xl font-light sm:text-3xl">定期便のしくみ</h2>
           <ol className="mt-8 grid gap-6 sm:grid-cols-3">
             {STEPS.map((s) => (
               <li key={s.n} className="border-t border-on-primary/25 pt-4">
-                <p className="tnum font-headline text-sm text-inverse-primary">{s.n}</p>
+                <p className="tnum font-headline text-sm text-primary-container">{s.n}</p>
                 <p className="mt-2 font-semibold">{s.title}</p>
                 <p className="mt-1 text-sm leading-relaxed text-on-primary/80">{s.body}</p>
               </li>

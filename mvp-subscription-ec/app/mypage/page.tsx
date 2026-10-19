@@ -5,21 +5,20 @@ import { RotateCcw, UserRound } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
 import { DEMO_USER } from '@/lib/catalog';
 import { formatJa, nextAfter, todayIso } from '@/lib/date';
-import { yen } from '@/lib/pricing';
+import { monthlyEquivalent, yen } from '@/lib/pricing';
 import type { Subscription } from '@/lib/types';
 import { SubscriptionCard, type SubscriptionCommand } from './_components/SubscriptionCard';
-
-const STATUS_ORDER: Record<Subscription['status'], number> = { active: 0, paused: 1, canceled: 2 };
 
 export default function MyPage() {
   const { state, loaded, dispatch } = useStore();
   const [message, setMessage] = useState('');
   if (!loaded) return <main className="min-h-[60vh]" aria-busy="true" />;
 
-  const subs = [...state.subscriptions].sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
+  // 並べ替えない：操作したカードが動くと、デモ中に目で追えなくなる
+  const subs = state.subscriptions;
   const active = subs.filter((s) => s.status === 'active');
   const nextDates = active.flatMap((s) => (s.nextDelivery ? [s.nextDelivery] : [])).sort();
-  const monthlySpend = active.reduce((sum, s) => sum + (s.interval === 'monthly' ? s.unitPrice * s.quantity : 0), 0);
+  const monthlySpend = monthlyEquivalent(active);
 
   const run = (sub: Subscription, command: SubscriptionCommand, name: string) => {
     const today = todayIso();
@@ -50,7 +49,7 @@ export default function MyPage() {
       <dl className="mt-6 grid grid-cols-3 divide-x divide-outline-variant/50 rounded-lg bg-surface-container-lowest py-4 shadow-elevation-1 ring-1 ring-outline-variant/40">
         <Stat label="契約中の定期便" value={`${active.length}件`} />
         <Stat label="次回お届け" value={nextDates[0] ? formatJa(nextDates[0]) : '—'} />
-        <Stat label="毎月便の合計" value={yen(monthlySpend)} />
+        <Stat label="月あたりの目安" value={yen(monthlySpend)} />
       </dl>
 
       <p role="status" aria-live="polite" className="mt-4 min-h-[1.25rem] text-sm font-medium text-primary">

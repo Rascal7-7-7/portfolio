@@ -24,7 +24,7 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
       <div className="flex flex-1 flex-col p-4 sm:p-5">
         <p className="label-editorial text-on-surface-variant">{product.category}</p>
-        <h3 className="mt-1.5 font-headline text-base font-semibold leading-snug text-on-surface">{product.name}</h3>
+        <h3 className="mt-1.5 font-headline text-base font-semibold leading-snug text-on-surface [word-break:auto-phrase]">{product.name}</h3>
         <p className="mt-1 line-clamp-2 flex-1 text-xs leading-relaxed text-on-surface-variant">{product.tagline}</p>
         <div className="mt-4 flex flex-col gap-1 border-t border-outline-variant/40 pt-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
