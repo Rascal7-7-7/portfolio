@@ -69,12 +69,12 @@ export default function PublishDialog({ doc, open, onClose }: Props) {
         {!published ? (
           <div className="mt-6 space-y-2">
             <label htmlFor="f-slug" className="text-[13px] font-medium">公開URL</label>
-            {/* 390px でも入力欄が切れないよう、スマホでは縦積みにしてドメインは下に小さく出す */}
+            {/* 390px でも入力欄が切れないよう、スマホでは縦積みにしてドメインは下に小さく出す。sm 以上は1行の URL として並べる */}
             <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
               <span className="text-xs text-ed-muted sm:text-sm">https://</span>
               <input id="f-slug" value={slug} onChange={(e) => setSlug(sanitizeSlug(e.target.value))} className={`${inputCls} min-w-0`} />
+              <span className="shrink-0 text-xs text-ed-muted sm:text-sm">.{MOCK_DOMAIN}</span>
             </div>
-            <p className="text-xs text-ed-muted">.{MOCK_DOMAIN}</p>
           </div>
         ) : (
           <div className="mt-6 rounded-md border border-ed-line bg-ed-bg p-4">
@@ -94,11 +94,11 @@ export default function PublishDialog({ doc, open, onClose }: Props) {
             閉じる
           </button>
           {!published ? (
-            <button type="button" onClick={publish} className="flex-1 rounded-md bg-accent py-2.5 text-sm font-semibold text-white hover:bg-[#0862c4]">
+            <button type="button" onClick={publish} className="flex-1 rounded-md bg-ed-ink py-2.5 text-sm font-semibold text-white hover:bg-[#33333a]">
               公開する
             </button>
           ) : (
-            <Link href={`/lp/${slug}`} className="flex flex-1 items-center justify-center gap-1.5 rounded-md bg-accent py-2.5 text-sm font-semibold text-white hover:bg-[#0862c4]">
+            <Link href={`/lp/${slug}`} className="flex flex-1 items-center justify-center gap-1.5 rounded-md bg-ed-ink py-2.5 text-sm font-semibold text-white hover:bg-[#33333a]">
               公開ページを開く
               <Icon name="external" className="h-3.5 w-3.5" />
             </Link>

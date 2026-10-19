@@ -40,5 +40,6 @@ export function infoRows(s: StoreInfo): [string, string][] {
 
 const ORDER: readonly SectionKey[] = ['features', 'menu', 'voices', 'access', 'cta']
 
-/** 表示中のセクションだけを順に並べる（番号付きの見出しで使う） */
-export const visibleSections = (sections: LPDoc['sections']) => ORDER.filter((k) => sections[k])
+/** 実際に描画されるセクションだけを順に並べる（番号付きの見出しで使う）。品目0件のメニューは描画されないので除く */
+export const visibleSections = (sections: LPDoc['sections'], store: StoreInfo) =>
+  ORDER.filter((k) => sections[k] && (k !== 'menu' || menuItems(store).length > 0))
