@@ -17,6 +17,16 @@ const KANJI_NUM = ['一', '二', '三', '四', '五', '六']
 /** 「、」「。」などの直後で列を分ける（縦書きの見出しを句ごとの列にする） */
 const toLines = (text: string) => text.split(/(?<=[、。！？])/).filter(Boolean)
 
+/**
+ * 紹介文を「お店の考え（最後の一文）」と「それ以外（駅からの距離など）」に分ける。入力項目は増やさない。
+ * 紹介文は「駅から徒歩○分。」で始まり、想いで締めることが多いので、最後の一文を見出し側に出す。
+ * ponytail: 「。」で区切るだけの判定。順序が逆の紹介文では案内文が上に出る（その場合も文章は欠けない）
+ */
+const splitDescription = (text: string) => {
+  const sentences = text.trim().split(/(?<=。)/).filter((s) => s.trim())
+  return { concept: (sentences[sentences.length - 1] ?? '').trim(), rest: sentences.slice(0, -1).join('').trim() }
+}
+
 const pad = (wide: boolean) => (wide ? 'px-16 py-24' : 'px-6 py-16')
 
 function H2({ text, lead, wide }: { text: string; lead?: string; wide: boolean }) {
@@ -49,21 +59,30 @@ function Nav({ store, wide }: TemplateProps) {
 
 function Hero({ store, wide }: TemplateProps) {
   const rows = [store.hours && `${hoursWord(store)} ${store.hours}`, store.closed && `定休 ${store.closed}`, store.address].filter(Boolean)
+  const { concept, rest } = splitDescription(store.description)
   return (
-    <section className={cx('grid items-end', wide ? 'min-h-[600px] grid-cols-[minmax(0,1fr)_auto] gap-16 px-16 pb-24 pt-16' : 'gap-12 px-6 pb-16 pt-10')}>
-      <div className={cx(wide ? 'max-w-[30em]' : 'order-2')}>
-        <p className={cx(ACCENT, 'text-xs tracking-[0.2em]')}>{CATEGORIES[store.category].label}</p>
-        {store.description && <p className={cx(MUTED, 'mt-6 text-[15px] leading-[2.1] tracking-[0.06em]')}>{store.description}</p>}
-        {rows.length > 0 && (
-          <ul className={cx(LINE, 'mt-8 space-y-1 border-l pl-4 text-[13px] leading-relaxed tracking-[0.06em]')}>
-            {rows.map((r) => (
-              <li key={r}>{r}</li>
-            ))}
-          </ul>
+    <section className={cx('grid', wide ? 'min-h-[600px] grid-cols-[minmax(0,1fr)_auto] gap-16 px-16 pb-24 pt-16' : 'gap-12 px-6 pb-16 pt-10')}>
+      {/* 左上にお店の考えを一文、下に案内。縦書きの見出しと上端・下端をそろえる（GLITCH COFFEE の組み方） */}
+      <div className={cx('flex flex-col justify-between gap-12', wide ? 'max-w-[30em] pt-3' : 'order-2')}>
+        {concept && (
+          <p className={cx('font-mincho font-semibold leading-[2] tracking-[0.1em]', wide ? 'max-w-[18em] text-[22px]' : 'text-[18px]')}>
+            <Phrases text={concept} />
+          </p>
         )}
-        <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-          <a href="#reserve" className={BTN}>{ctaLabel(store)}</a>
-          <a href="#menu" className="border-b border-[#2e2620]/40 pb-0.5 text-sm tracking-[0.12em] hover:border-[#2e2620]">メニューを見る</a>
+        <div>
+          <p className={cx(ACCENT, 'text-xs tracking-[0.2em]')}>{CATEGORIES[store.category].label}</p>
+          {rest && <p className={cx(MUTED, 'mt-6 text-[15px] leading-[2.1] tracking-[0.06em]')}>{rest}</p>}
+          {rows.length > 0 && (
+            <ul className={cx(LINE, 'mt-8 space-y-1 border-l pl-4 text-[13px] leading-relaxed tracking-[0.06em]')}>
+              {rows.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+          )}
+          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+            <a href="#reserve" className={BTN}>{ctaLabel(store)}</a>
+            <a href="#menu" className="border-b border-[#2e2620]/40 pb-0.5 text-sm tracking-[0.12em] hover:border-[#2e2620]">メニューを見る</a>
+          </div>
         </div>
       </div>
       {/* 縦書きのキャッチコピー。句読点で列を改め、長すぎる列は max-height で文節単位に折り返す */}
