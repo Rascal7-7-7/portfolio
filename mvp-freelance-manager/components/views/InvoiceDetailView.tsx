@@ -8,6 +8,7 @@ import { invoiceStatus } from "@/lib/selectors";
 import { buttonStyles, Page, PageSkeleton } from "@/components/ui";
 import { InvoiceStatusBadge } from "@/components/StatusBadge";
 import { InvoiceDocument } from "@/components/InvoiceDocument";
+import { EstimateSource } from "@/components/ExternalLink";
 
 export function InvoiceDetailView({ id }: { id: string }) {
   const store = useAppStore();
@@ -65,6 +66,12 @@ export function InvoiceDetailView({ id }: { id: string }) {
             </button>
           </div>
         </div>
+
+        {invoice.estimateNo && (
+          <p className="mb-4 text-xs print:hidden">
+            <EstimateSource estimateNo={invoice.estimateNo} />
+          </p>
+        )}
 
         <InvoiceDocument invoice={invoice} project={project} />
         <p className="mt-3 text-xs text-warm-500 print:hidden">デモのため、実際の送付は行いません。</p>

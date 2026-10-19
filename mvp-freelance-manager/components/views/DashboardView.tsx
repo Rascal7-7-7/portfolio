@@ -11,6 +11,7 @@ import {
   sortTasks,
   taskGroup,
   type DashboardSummary,
+  type MonthlyRevenue,
 } from "@/lib/selectors";
 import { useDelta } from "@/lib/useDelta";
 import { cn, formatYen } from "@/lib/utils";
@@ -44,6 +45,7 @@ interface FlowStep {
 /**
  * freee の「請求 → 入金 → 残り」に倣い、請求したお金がどこまで回収できたかを1行で見せる。
  * 請求 = 今月の入金 + 未入金の合計（来月以降が期日の未入金も含む）なので、入金を記録すると「入金」が増え「残り」が同額減る。
+ * 月次グラフの今月分（今月期日の分だけ）と額が違うため、その差を下に一行で書く。
  * 増減バッジは見出し行に出し、数字の行の高さは固定して下の要素を動かさない
  */
 function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
@@ -54,7 +56,7 @@ function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
   const billed = s.thisMonthPaid + s.outstandingTotal;
   const ratio = billed > 0 ? s.thisMonthPaid / billed : 0;
   const steps: FlowStep[] = [
-    { label: "請求", value: billed, sub: "今月の入金＋未入金" },
+    { label: "請求", value: billed, sub: "入金＋未入金（全期日）" },
     { label: "今月の入金", value: s.thisMonthPaid, delta: paidDelta, sub: `請求の ${Math.round(ratio * 100)}%` },
     {
       label: "残り",
@@ -119,7 +121,46 @@ function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
           style={{ width: `${ratio * 100}%` }}
         />
       </div>
+      {s.laterDueTotal > 0 && (
+        <p className="num border-t border-line px-3 py-2 text-[11px] text-warm-500 sm:px-5 sm:text-xs">
+          来月以降が期日の {formatYen(s.laterDueTotal)} を含みます。下のグラフの今月分は今月が期日の請求だけです。
+        </p>
+      )}
     </Card>
+  );
+}
+
+/** グラフの数値を確かめるための月別の表（Linear の小さな表に倣い、罫線は行の区切りだけ） */
+function MonthlyTable({ rows }: { rows: readonly MonthlyRevenue[] }) {
+  const th = "px-2 py-1.5 font-medium";
+  return (
+    <table className="num mt-4 w-full text-xs">
+      <caption className="sr-only">月別の入金と入金見込み</caption>
+      <thead className="text-warm-500">
+        <tr className="border-b border-line">
+          <th scope="col" className={`${th} text-left`}>月</th>
+          <th scope="col" className={`${th} text-right`}>入金</th>
+          <th scope="col" className={`${th} text-right`}>見込み</th>
+          <th scope="col" className={`${th} text-right`}>計</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((m, i) => {
+          const current = i === rows.length - 1;
+          return (
+            <tr key={m.month} className={cn("border-b border-line last:border-0", current ? "font-semibold text-ink" : "text-warm-900")}>
+              <th scope="row" className={`${th} text-left`}>
+                {formatMonthLabel(m.month)}
+                {current && <span className="ml-1 font-normal text-warm-500">今月</span>}
+              </th>
+              <td className="px-2 py-1.5 text-right">{formatYen(m.paid)}</td>
+              <td className="px-2 py-1.5 text-right">{m.expected > 0 ? formatYen(m.expected) : "—"}</td>
+              <td className="px-2 py-1.5 text-right">{formatYen(m.paid + m.expected)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }
 
@@ -197,6 +238,7 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
               data={revenue}
               growFrom={paidDelta > 0 ? (s.thisMonthPaid - paidDelta) / s.thisMonthPaid : null}
             />
+            <MonthlyTable rows={revenue} />
           </div>
         </Card>
         <SummaryList rows={summary} />

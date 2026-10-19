@@ -1,7 +1,7 @@
 // 集計ロジックの最小チェック: `npm run check`（Node 24 の型除去で直接実行）
 import assert from "node:assert/strict";
 import { addDays, diffDays, formatAgo, formatInputDate, shiftMonth } from "./dates.ts";
-import { createSeed } from "./seed.ts";
+import { createSeed, ESTIMATE_INVOICE_ID } from "./seed.ts";
 import {
   dashboardSummary,
   invoiceStatus,
@@ -12,7 +12,7 @@ import {
   sortInvoices,
   taskGroup,
 } from "./selectors.ts";
-import { formatYen, toDigits } from "./utils.ts";
+import { estimateUrl, formatYen, taxIncluded, toDigits } from "./utils.ts";
 
 const today = "2026-03-01";
 assert.equal(addDays(today, -1), "2026-02-28");
@@ -29,7 +29,7 @@ assert.ok(revenue.every((m) => m.paid > 0), "ダミーデータは毎月入金�
 
 const summary = dashboardSummary(data, today);
 assert.equal(summary.thisMonthPaid, revenue[5].paid);
-assert.equal(summary.outstandingCount, 3);
+assert.equal(summary.outstandingCount, 4);
 assert.equal(summary.overdueCount, 1);
 assert.ok(summary.todayTaskCount >= summary.overdueTaskCount);
 
@@ -78,5 +78,34 @@ assert.ok(activity.some((a) => a.text.startsWith("請求書 INV-")));
 assert.equal(formatAgo(today, today), "今日");
 assert.equal(formatAgo(today, addDays(today, -3)), "3日前");
 assert.equal(formatInputDate("2026-10-20"), "2026年10月20日（火）");
+
+// シリーズの約束事（見積管理・予約管理と値を合わせる）
+const fromEstimate = data.invoices.find((i) => i.id === ESTIMATE_INVOICE_ID);
+assert.ok(fromEstimate, "est-0014 の請求がある");
+assert.equal(fromEstimate.amount, 1_243_000);
+assert.equal(fromEstimate.paidOn, null);
+assert.equal(fromEstimate.estimateNo, "EST-0014");
+assert.equal(diffDays(today, fromEstimate.dueOn), 30);
+const minato = data.projects.find((p) => p.id === fromEstimate.projectId);
+assert.equal(minato?.client, "株式会社みなと不動産");
+assert.equal(minato?.name, "コーポレートサイト リニューアル");
+assert.equal(minato?.amount, 1_243_000);
+assert.equal(minato?.status, "in_progress");
+assert.equal(estimateUrl("EST-0014"), "https://mvp-estimate-manager.vercel.app/estimates/14");
+assert.equal(data.projects.find((p) => p.name === "予約管理システム開発")?.client, "Hair Salon Lien 表参道店");
+assert.ok(!data.projects.some((p) => p.client.includes("ミナト")), "紛らわしい取引先名を残さない");
+assert.equal(new Set(data.invoices.map((i) => i.number)).size, data.invoices.length, "請求番号は重複しない");
+
+// 明細の合計（税抜）＋消費税 = 請求額。seed の請求はすべて 2〜4 行の明細を持つ
+for (const i of data.invoices) {
+  assert.ok(i.items && i.items.length >= 2 && i.items.length <= 4, `${i.number}: 明細は 2〜4 行`);
+  assert.equal(i.items.reduce((sum, it) => sum + it.amount, 0) + taxIncluded(i.amount), i.amount, `${i.number}: 明細の合計がずれている`);
+}
+
+// 「請求と回収」の残り = グラフに出る未入金（今月以前が期日）＋ 来月以降が期日の分
+const charted = data.invoices.filter((i) => !i.paidOn && i.dueOn.slice(0, 7) <= revenue[5].month).reduce((sum, i) => sum + i.amount, 0);
+assert.equal(charted + summary.laterDueTotal, summary.outstandingTotal);
+const later = dashboardSummary(createSeed("2026-10-19"), "2026-10-19").laterDueTotal;
+assert.ok(later >= 1_243_000, "10/19 なら est-0014（11/18 期日）は来月以降の分に入る");
 
 console.log("selectors.check: ok");

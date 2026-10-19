@@ -10,6 +10,10 @@ export interface Project {
   readonly amount: number;
   readonly status: ProjectStatus;
   readonly dueDate: ISODate;
+  /** 元になった見積の番号（見積マネージャー側の EST-xxxx） */
+  readonly estimateNo?: string;
+  /** 納品物のデモ URL */
+  readonly deliverableUrl?: string;
 }
 
 export interface Task {
@@ -30,6 +34,15 @@ export interface Invoice {
   readonly issuedOn: ISODate;
   readonly dueOn: ISODate;
   readonly paidOn: ISODate | null;
+  readonly estimateNo?: string;
+  /** 明細（税抜）。合計は amount の税抜額と一致させる。無い請求は「案件名 1式」で表示 */
+  readonly items?: readonly InvoiceItem[];
+}
+
+export interface InvoiceItem {
+  readonly name: string;
+  readonly qty: string;
+  readonly amount: number;
 }
 
 export type InvoiceStatus = "paid" | "unpaid" | "overdue";
