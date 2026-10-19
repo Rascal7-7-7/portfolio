@@ -1,7 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { hasCaseStudy, type Project, type Verification } from "@/content/projects";
-import { TextLink } from "./ui/TextLink";
+import { cn } from "@/lib/cn";
+import { TextLink, textLink } from "./ui/TextLink";
 
 /** 閲覧者がどこまで確かめられるか。一覧の時点で分かるようにする。 */
 const verificationLabels = {
@@ -15,20 +16,61 @@ export function periodLabel({ period }: Project): string {
   return period.end ? `${start}〜${period.end.replace("-", "/")}` : `${start}〜`;
 }
 
-export function metaLabel({ team, verification }: Project): string {
-  const teamLabel = team.kind === "team" ? `チーム開発（${team.members}人）` : "個人開発";
-  return `${teamLabel} · ${verificationLabels[verification]}`;
+export function teamLabel({ team }: Project): string {
+  return team.kind === "team" ? `チーム開発（${team.members}人）` : "個人開発";
+}
+
+/** 作品名と制作時期の行。日付は右寄せの等幅にする。 */
+export function ProjectTitle({
+  project,
+  as: Heading,
+  className,
+}: {
+  project: Project;
+  as: "h3" | "h4";
+  className: string;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <Heading className={cn("font-semibold tracking-tight text-ink", className)}>
+        {project.name}
+      </Heading>
+      <p className="shrink-0 font-mono text-[13px] text-ink-subtle">{periodLabel(project)}</p>
+    </div>
+  );
+}
+
+/**
+ * 体制・確認方法・技術の1行。
+ * 「コードで確認できる」が語の途中で折り返さないよう、項目ごとに inline-block で区切る。
+ */
+export function MetaLine({ project, className }: { project: Project; className?: string }) {
+  const items = [teamLabel(project), verificationLabels[project.verification], ...project.stack];
+  return (
+    <p className={cn("text-sm leading-relaxed text-ink-subtle", className)}>
+      {items.map((item, i) => (
+        <span key={item} className="inline-block">
+          {item}
+          {i < items.length - 1 && (
+            <span className="mx-1.5" aria-hidden="true">
+              ·
+            </span>
+          )}
+        </span>
+      ))}
+    </p>
+  );
 }
 
 /** Case Study・デモ・コードへの導線。無いものは出さない。 */
 export function ProjectLinks({ project }: { project: Project }) {
   const { name, links } = project;
   return (
-    <div className="flex flex-wrap gap-x-5 gap-y-1">
+    <div className="flex flex-wrap gap-x-5">
       {hasCaseStudy(project) && (
         <Link
           href={`/projects/${project.slug}`}
-          className="inline-flex items-center gap-1.5 py-2 text-sm text-brand-500 hover:text-brand-400 font-medium transition-colors"
+          className={textLink({ tone: "accent" })}
           aria-label={`${name}の制作の記録を読む`}
         >
           制作の記録を読む

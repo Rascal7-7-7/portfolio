@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main id="main" className="min-h-screen bg-surface-950">
+      <main id="main">
         <Hero />
         <MVPGrid />
         <About />

@@ -1,4 +1,6 @@
 import { profile } from "@/content/profile";
+import { cn } from "@/lib/cn";
+import { container } from "./ui/container";
 
 /**
  * トップと Case Study の両方で使う。
@@ -11,36 +13,34 @@ const navItems = [
   { href: "/#contact", label: "連絡先" },
 ];
 
+const navLink =
+  "inline-flex items-center py-2 text-ink-muted hover:text-ink transition-colors";
+
 export function Header() {
   return (
     <>
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-3 focus:left-3 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-brand-700 focus:text-white"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-3 focus:left-3 focus:px-4 focus:py-2 focus:rounded-md focus:bg-accent focus:text-white"
       >
         メインコンテンツへスキップ
       </a>
-      <header
-        id="top"
-        className="sticky top-0 z-50 border-b border-white/5 bg-surface-950/85 backdrop-blur"
-      >
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+      <header id="top">
+        {/* 幅と余白は本文と同じ container を使い、名前の左端を本文に揃える */}
+        <div className={cn(container, "h-16 flex items-center justify-between gap-4")}>
           <a
             href="/#top"
-            className="font-bold text-surface-50 whitespace-nowrap"
+            className="font-semibold text-ink whitespace-nowrap"
             aria-label={`${profile.name} — トップページへ`}
           >
             {profile.name}
           </a>
 
           <nav aria-label="サイト内ナビゲーション">
-            <ul className="flex items-center gap-1 sm:gap-4 text-sm">
+            <ul className="flex items-center gap-4 sm:gap-5 text-[15px]">
               {navItems.map(({ href, label }) => (
                 <li key={href}>
-                  <a
-                    href={href}
-                    className="inline-flex items-center px-2 py-2 text-surface-300 hover:text-surface-50 transition-colors"
-                  >
+                  <a href={href} className={navLink}>
                     {label}
                   </a>
                 </li>
@@ -50,7 +50,7 @@ export function Header() {
                   href={profile.links.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-2 py-2 text-surface-300 hover:text-surface-50 transition-colors"
+                  className={navLink}
                   aria-label="GitHub（新しいタブで開く）"
                 >
                   GitHub

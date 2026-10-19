@@ -11,15 +11,15 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-24 bg-surface-950">
+    <main className="min-h-screen flex items-center justify-center px-6 py-24">
       <div className="max-w-lg w-full text-center">
-        <p className="text-brand-500 text-sm font-semibold tracking-widest mb-4">
-          404 NOT FOUND
+        <p className="font-mono text-[13px] text-ink-subtle mb-4">
+          404 not found
         </p>
-        <h1 className="text-3xl sm:text-4xl font-bold text-surface-50 mb-4">
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-ink mb-4">
           ページが見つかりませんでした
         </h1>
-        <p className="text-surface-400 leading-relaxed mb-10">
+        <p className="text-ink-muted leading-relaxed mb-10">
           URLが変更されたか、削除された可能性があります。
           <br className="hidden sm:block" />
           トップページから目的の内容を探してください。
