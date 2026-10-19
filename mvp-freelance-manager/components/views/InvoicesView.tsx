@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useAppStore } from "@/lib/store";
-import { invoiceStatus, monthlyRevenue } from "@/lib/selectors";
+import { invoiceStatus, monthlyRevenue, sortInvoices } from "@/lib/selectors";
 import { formatMonthLabel } from "@/lib/dates";
 import { cn, formatYen } from "@/lib/utils";
 import { buttonStyles, Card, Page, PageHeader, PageSkeleton } from "@/components/ui";
@@ -11,8 +11,16 @@ import { InvoiceList } from "@/components/InvoiceList";
 import { InvoiceForm } from "@/components/InvoiceForm";
 import { INVOICE_STATUS_LABEL, type InvoiceStatus } from "@/types";
 
-type Filter = InvoiceStatus | "all";
-const FILTERS: Filter[] = ["all", "overdue", "unpaid", "paid"];
+/** 「未入金」は期限超過を含む（ダッシュボードと同じ定義）。期限超過はその内訳 */
+type Filter = "all" | "outstanding" | "overdue" | "paid";
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: "all", label: "すべて" },
+  { key: "outstanding", label: "未入金" },
+  { key: "overdue", label: "うち期限超過" },
+  { key: "paid", label: INVOICE_STATUS_LABEL.paid },
+];
+const matches = (filter: Filter, status: InvoiceStatus): boolean =>
+  filter === "all" || (filter === "outstanding" ? status !== "paid" : status === filter);
 
 export function InvoicesView() {
   const store = useAppStore();
@@ -21,10 +29,11 @@ export function InvoicesView() {
   if (!store) return <PageSkeleton />;
   const { data, today } = store;
 
-  const sorted = data.invoices.toSorted((a, b) => b.issuedOn.localeCompare(a.issuedOn));
-  const visible = filter === "all" ? sorted : sorted.filter((inv) => invoiceStatus(inv, today) === filter);
-  const total = (status: InvoiceStatus) =>
-    data.invoices.filter((inv) => invoiceStatus(inv, today) === status).reduce((s, inv) => s + inv.amount, 0);
+  const sorted = sortInvoices(data.invoices, today);
+  const visible = sorted.filter((inv) => matches(filter, invoiceStatus(inv, today)));
+  const total = (f: Filter) =>
+    data.invoices.filter((inv) => matches(f, invoiceStatus(inv, today))).reduce((s, inv) => s + inv.amount, 0);
+  const overdueTotal = total("overdue");
   const revenue = monthlyRevenue(data.invoices, today);
 
   return (
@@ -43,26 +52,28 @@ export function InvoicesView() {
 
       {showForm && (
         <Card title="新しい請求書" className="mb-5">
-          <InvoiceForm projects={data.projects} today={today} onCreated={() => setShowForm(false)} />
+          <InvoiceForm projects={data.projects} invoices={data.invoices} today={today} onCreated={() => setShowForm(false)} />
         </Card>
       )}
 
-      <dl className="mb-5 grid grid-cols-3 gap-3">
-        {(["overdue", "unpaid", "paid"] as const).map((s) => (
-          <div key={s} className="min-w-0 rounded-xl border border-line bg-canvas p-3 shadow-card sm:p-4">
-            <dt className={cn("text-[11px] font-semibold sm:text-xs", s === "overdue" ? "text-orange" : "text-warm-500")}>
-              {INVOICE_STATUS_LABEL[s]}
-              {s === "paid" && "（累計）"}
-            </dt>
-            <dd className="num mt-1 truncate text-sm font-bold text-ink sm:text-xl">{formatYen(total(s))}</dd>
-          </div>
-        ))}
+      <dl className="mb-5 grid grid-cols-2 gap-3">
+        <div className="min-w-0 rounded-xl border border-line bg-canvas p-3 shadow-card sm:p-4">
+          <dt className="text-[11px] font-semibold text-warm-500 sm:text-xs">未入金</dt>
+          <dd className="num mt-1 truncate text-base font-bold text-ink sm:text-xl">{formatYen(total("outstanding"))}</dd>
+          <dd className={cn("num mt-0.5 text-[11px] sm:text-xs", overdueTotal > 0 ? "font-semibold text-orange" : "text-warm-500")}>
+            うち期限超過 {formatYen(overdueTotal)}
+          </dd>
+        </div>
+        <div className="min-w-0 rounded-xl border border-line bg-canvas p-3 shadow-card sm:p-4">
+          <dt className="text-[11px] font-semibold text-warm-500 sm:text-xs">入金済（累計）</dt>
+          <dd className="num mt-1 truncate text-base font-bold text-ink sm:text-xl">{formatYen(total("paid"))}</dd>
+        </div>
       </dl>
 
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="min-w-0 lg:col-span-2">
           <div className="mb-3 flex gap-1.5 overflow-x-auto pb-1" role="group" aria-label="状態で絞り込み">
-            {FILTERS.map((f) => (
+            {FILTERS.map(({ key: f, label }) => (
               <button
                 key={f}
                 type="button"
@@ -73,7 +84,7 @@ export function InvoicesView() {
                   filter === f ? "bg-ink text-white" : "bg-black/5 text-warm-500 hover:bg-black/10",
                 )}
               >
-                {f === "all" ? "すべて" : INVOICE_STATUS_LABEL[f]}
+                {label}
               </button>
             ))}
           </div>

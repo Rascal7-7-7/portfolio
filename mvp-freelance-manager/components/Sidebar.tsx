@@ -17,6 +17,8 @@ function isActive(href: string, pathname: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+const DEMO_NOTE = "デモ版：データはこのブラウザ内にだけ保存されます";
+
 function resetDemo(): void {
   if (window.confirm("操作内容を消して、ダミーデータの状態に戻しますか？")) actions.reset();
 }
@@ -66,23 +68,20 @@ export function Sidebar() {
           })}
         </nav>
         <div className="m-3 rounded-lg border border-line bg-canvas p-3">
-          <p className="text-xs font-semibold text-ink">デモ用モックアップ</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-warm-500">
-            データはダミーです。操作はこのブラウザにだけ保存されます。
-          </p>
+          <p className="text-xs leading-relaxed text-warm-500">{DEMO_NOTE}</p>
           <button
             type="button"
             onClick={resetDemo}
             className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-blue hover:underline"
           >
             <RotateCcw size={12} aria-hidden />
-            初期状態に戻す
+            デモデータに戻す
           </button>
         </div>
         </div>
       </aside>
 
-      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-canvas/90 px-4 py-3 backdrop-blur md:hidden">
+      <header className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-y-1 border-b border-line bg-canvas/90 px-4 py-2.5 backdrop-blur md:hidden">
         <Logo />
         <button
           type="button"
@@ -90,8 +89,9 @@ export function Sidebar() {
           className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-warm-500 hover:bg-black/5"
         >
           <RotateCcw size={12} aria-hidden />
-          リセット
+          デモデータに戻す
         </button>
+        <p className="w-full text-[11px] text-warm-500">{DEMO_NOTE}</p>
       </header>
 
       <nav

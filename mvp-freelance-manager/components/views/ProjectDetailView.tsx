@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ArrowLeft, ListChecks, Receipt } from "lucide-react";
 import { actions, useAppStore } from "@/lib/store";
 import { formatDate, formatRelative } from "@/lib/dates";
-import { projectProgress, sortTasks } from "@/lib/selectors";
+import { dueLabel, projectProgress, sortTasks, sortInvoices } from "@/lib/selectors";
 import { formatYen } from "@/lib/utils";
 import { buttonStyles, Card, Page, PageSkeleton } from "@/components/ui";
 import { TaskRow } from "@/components/TaskRow";
@@ -36,13 +36,13 @@ export function ProjectDetailView({ id }: { id: string }) {
 
   const prog = projectProgress(project, data);
   const tasks = sortTasks(data.tasks.filter((t) => t.projectId === id));
-  const invoices = data.invoices.filter((inv) => inv.projectId === id);
+  const invoices = sortInvoices(data.invoices.filter((inv) => inv.projectId === id), today);
   const uninvoiced = Math.max(0, project.amount - prog.invoiced);
   const meta = [
     { label: "受注額", value: formatYen(project.amount) },
     { label: "請求済", value: formatYen(prog.invoiced) },
     { label: "入金済", value: formatYen(prog.paid) },
-    { label: "納期", value: `${formatDate(project.dueDate)}（${formatRelative(today, project.dueDate)}）` },
+    { label: dueLabel(project), value: `${formatDate(project.dueDate)}（${formatRelative(today, project.dueDate)}）` },
   ];
 
   return (
@@ -118,8 +118,9 @@ export function ProjectDetailView({ id }: { id: string }) {
           {showInvoiceForm && (
             <div className="border-b border-line bg-warm-50">
               <InvoiceForm
-                key={uninvoiced}
-                projects={[{ ...project, amount: uninvoiced || project.amount }]}
+                key={prog.invoiced}
+                projects={[project]}
+                invoices={data.invoices}
                 today={today}
                 defaultProjectId={project.id}
                 onCreated={() => setShowInvoiceForm(false)}

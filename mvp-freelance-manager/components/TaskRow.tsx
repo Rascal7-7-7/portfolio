@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { actions } from "@/lib/store";
 import { formatDate, formatRelative } from "@/lib/dates";
@@ -24,20 +25,41 @@ const DUE_STYLE = {
   done: "text-warm-300",
 } as const;
 
+/** 完了にした行を打ち消し線の状態で少し残してから移動させ、次の行が詰まって誤クリックされるのを防ぐ */
+const COMPLETE_DELAY_MS = 300;
+
 export function TaskRow({ task, today, project, deletable }: TaskRowProps) {
-  const group = taskGroup(task, today);
+  const [completing, setCompleting] = useState(false);
+  const done = task.done || completing;
+  const group = done ? "done" : taskGroup(task, today);
+
+  function toggle(): void {
+    if (completing) return;
+    if (task.done) return actions.toggleTask(task.id);
+    setCompleting(true);
+    // 行が移動するとこのコンポーネントは外れることがある（React 19 ではアンマウント後の setState は無害）
+    window.setTimeout(() => {
+      actions.toggleTask(task.id);
+      setCompleting(false);
+    }, COMPLETE_DELAY_MS);
+  }
 
   return (
-    <li className="flex items-center gap-3 px-4 py-2.5 sm:px-5">
+    <li
+      className={cn(
+        "flex items-center gap-3 px-4 py-2.5 transition-opacity duration-300 motion-reduce:transition-none sm:px-5",
+        completing && "opacity-60",
+      )}
+    >
       <input
         type="checkbox"
-        checked={task.done}
-        onChange={() => actions.toggleTask(task.id)}
+        checked={done}
+        onChange={toggle}
         aria-label={`${task.title}（完了にする）`}
         className="h-[18px] w-[18px] shrink-0 cursor-pointer accent-[#0075de]"
       />
       <div className="min-w-0 flex-1">
-        <p className={cn("line-clamp-2 text-sm break-words", task.done ? "text-warm-300 line-through" : "text-ink")}>
+        <p className={cn("line-clamp-2 text-sm break-words", done ? "text-warm-300 line-through" : "text-ink")}>
           {task.title}
         </p>
         {project && (
