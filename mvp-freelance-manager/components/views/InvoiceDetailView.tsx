@@ -32,7 +32,7 @@ export function InvoiceDetailView({ id }: { id: string }) {
 
   return (
     <Page>
-      <div className="mx-auto max-w-3xl">
+      <div className="max-w-3xl">
         <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-3 print:hidden">
           <Link href="/invoices" className="inline-flex items-center gap-1 text-xs text-warm-500 hover:text-ink">
             <ArrowLeft size={14} aria-hidden />
