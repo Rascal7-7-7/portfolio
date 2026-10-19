@@ -12,10 +12,10 @@ import { canSkip } from '@/lib/store';
 
 export type SubscriptionCommand = 'skip' | 'pause' | 'resume' | 'cancel';
 
-const STATUS: Record<SubscriptionStatus, { label: string; className: string }> = {
-  active: { label: '継続中', className: 'bg-primary/10 text-primary' },
-  paused: { label: 'お休み中', className: 'bg-tertiary/10 text-tertiary' },
-  canceled: { label: '解約済み', className: 'bg-surface-container text-on-surface-variant' },
+const STATUS_LABEL: Record<SubscriptionStatus, string> = {
+  active: '継続中',
+  paused: 'お休み中',
+  canceled: '解約済み',
 };
 
 type Props = {
@@ -28,7 +28,6 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
   const product = findProduct(sub.productId);
   if (!product) return null;
 
-  const status = STATUS[sub.status];
   const canceled = sub.status === 'canceled';
   const firstPending = sub.status === 'active' && !canSkip(sub);
   const run = (cmd: SubscriptionCommand) => {
@@ -39,26 +38,24 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
   return (
     <article
       className={cn(
-        'rounded-lg bg-surface-container-lowest p-4 shadow-elevation-1 ring-1 ring-outline-variant/40 sm:p-5',
+        'py-5',
         canceled && 'opacity-60',
       )}
       aria-label={`${product.name}の定期便`}
     >
       <div className="flex gap-4">
-        <ProductVisual product={product} decorative className="h-24 w-20 flex-shrink-0 rounded-md" />
+        <ProductVisual product={product} decorative className="h-24 w-20 flex-shrink-0" />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <h3 className="min-w-0 font-medium text-on-surface">
               <Phrases parts={product.nameParts} />
             </h3>
-            <span className={cn('flex-shrink-0 rounded px-2 py-0.5 text-[11px] font-semibold', status.className)}>
-              {status.label}
-            </span>
+            <span className="flex-shrink-0 text-xs text-on-surface-variant">{STATUS_LABEL[sub.status]}</span>
           </div>
           <p className="tnum mt-1 text-xs text-on-surface-variant">
             {INTERVAL_LABEL[sub.interval]} · {sub.quantity}点 · 1回 {yen(sub.unitPrice * sub.quantity)}（税込・送料無料）
           </p>
-          <p className="tnum mt-0.5 text-[11px] text-on-surface-variant">
+          <p className="tnum mt-0.5 text-xs text-on-surface-variant">
             {sub.id} · {formatJaLong(sub.startedAt)}開始 · お届け済み {sub.deliveredCount}回
           </p>
 
@@ -69,14 +66,14 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
                 <span className="tnum font-headline text-lg font-semibold text-on-surface">{formatJa(sub.nextDelivery)}</span>
               </p>
             )}
-            {sub.status === 'paused' && <p className="text-sm text-tertiary">お休み中です。再開すると3日後にお届けします。</p>}
+            {sub.status === 'paused' && <p className="text-sm text-on-surface-variant">お休み中です。再開すると3日後にお届けします。</p>}
             {canceled && <p className="text-sm text-on-surface-variant">この定期便は解約済みです。</p>}
           </div>
         </div>
       </div>
 
       {!canceled && (
-        <div className="mt-4 border-t border-outline-variant/50 pt-4">
+        <div className="mt-4">
           {confirming ? (
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between" role="alertdialog" aria-label="解約の確認">
               <p className="text-sm text-on-surface">本当に解約しますか？ スキップやお休みもできます。</p>
@@ -134,11 +131,11 @@ function ActionButton({ onClick, children, tone = 'neutral', className, disabled
       disabled={disabled}
       className={cn(
         // スマホは3列グリッドに収めるため、アイコンを上に積む
-        'inline-flex flex-col items-center justify-center gap-1 whitespace-nowrap rounded-md px-1 py-2 text-xs font-medium transition-colors sm:flex-row sm:gap-1.5 sm:px-3 sm:text-sm',
+        'inline-flex flex-col items-center justify-center gap-1 whitespace-nowrap rounded-sm px-1 py-2 text-xs font-medium transition-colors sm:flex-row sm:gap-1.5 sm:px-3 sm:text-sm',
         disabled && 'cursor-not-allowed bg-surface-container text-on-surface-variant',
         !disabled && tone === 'primary' && 'bg-primary text-on-primary hover:opacity-90',
         tone === 'danger' && 'bg-error text-on-error hover:opacity-90',
-        tone === 'neutral' && 'text-on-surface-variant ring-1 ring-outline-variant hover:bg-surface-container',
+        tone === 'neutral' && 'text-on-surface ring-1 ring-outline-variant hover:ring-on-surface',
         className,
       )}
     >

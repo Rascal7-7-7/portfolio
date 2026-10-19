@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import { RotateCcw, UserRound } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
 import { DEMO_USER } from '@/lib/catalog';
 import { formatJa, nextAfter, todayIso } from '@/lib/date';
@@ -36,17 +36,12 @@ export default function MyPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-      <div className="flex items-center gap-4">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <UserRound className="h-6 w-6" aria-hidden />
-        </span>
-        <div>
-          <p className="text-xs text-on-surface-variant">マイページ（デモユーザー）</p>
-          <h1 className="font-headline text-2xl font-light text-on-background">{DEMO_USER.name} 様</h1>
-        </div>
+      <div>
+        <p className="text-xs text-on-surface-variant">マイページ（デモユーザー）</p>
+        <h1 className="mt-1 font-headline text-2xl font-light text-on-background sm:text-3xl">{DEMO_USER.name} 様</h1>
       </div>
 
-      <dl className="mt-6 grid grid-cols-3 divide-x divide-outline-variant/50 rounded-lg bg-surface-container-lowest py-4 shadow-elevation-1 ring-1 ring-outline-variant/40">
+      <dl className="mt-6 grid grid-cols-3 divide-x divide-outline-variant/60 border-y border-outline-variant/60 py-4">
         <Stat label="契約中の定期便" value={`${active.length}件`} />
         <Stat label="次回お届け" value={nextDates[0] ? formatJa(nextDates[0]) : '—'} />
         <Stat label="月あたりの目安" value={yen(monthlySpend)} />
@@ -58,14 +53,14 @@ export default function MyPage() {
 
       <h2 className="mb-3 mt-2 text-sm font-semibold text-on-surface">定期便の管理</h2>
       {subs.length === 0 ? (
-        <p className="rounded-lg bg-surface-container p-6 text-center text-sm text-on-surface-variant">
+        <p className="border-y border-outline-variant/60 py-6 text-center text-sm text-on-surface-variant">
           定期便はまだありません。
           <Link href="/products" className="ml-1 text-primary hover:underline">
             商品を見る
           </Link>
         </p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="divide-y divide-outline-variant/60 border-y border-outline-variant/60">
           {subs.map((sub) => (
             <li key={sub.id}>
               <SubscriptionCard subscription={sub} onCommand={(cmd, name) => run(sub, cmd, name)} />
@@ -74,7 +69,7 @@ export default function MyPage() {
         </ul>
       )}
 
-      <div className="mt-10 border-t border-outline-variant/50 pt-4 text-right">
+      <div className="mt-6 text-right">
         <button
           type="button"
           onClick={() => {
@@ -94,7 +89,7 @@ export default function MyPage() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="px-3 text-center">
-      <dt className="text-[11px] text-on-surface-variant">{label}</dt>
+      <dt className="text-xs text-on-surface-variant">{label}</dt>
       <dd className="tnum mt-1 whitespace-nowrap font-headline text-sm font-semibold text-on-surface sm:text-lg">{value}</dd>
     </div>
   );

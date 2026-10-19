@@ -88,12 +88,6 @@ const config: Config = {
         '3xl': '1.5rem',
         full: '9999px',
       },
-      boxShadow: {
-        // Stripe の多層シャドウを、ブランドの深緑で色付けして流用
-        'elevation-1': 'rgba(28,40,24,0.06) 0px 3px 6px',
-        'elevation-2': 'rgba(28,40,24,0.08) 0px 15px 35px',
-        'elevation-3': 'rgba(38,58,34,0.25) 0px 30px 45px -30px, rgba(0,0,0,0.1) 0px 18px 36px -18px',
-      },
       aspectRatio: {
         '4/5': '4 / 5',
         '3/4': '3 / 4',

@@ -1,4 +1,3 @@
-import { RefreshCw } from 'lucide-react';
 import type { OrderLine } from '@/lib/types';
 import { INTERVAL_LABEL, findProduct } from '@/lib/catalog';
 import { formatJa, nextAfter } from '@/lib/date';
@@ -19,9 +18,8 @@ export function RecurringSummary({ lines, firstDelivery }: Props) {
   if (subs.length === 0) return null;
 
   return (
-    <div className="rounded-md bg-primary/5 p-3 ring-1 ring-primary/15">
-      <p className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-        <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+    <div className="border-t border-outline-variant/60 pt-4">
+      <p className="text-xs font-semibold text-on-surface">
         2回目以降のお届け（定期便）
       </p>
       <ul className="mt-2 space-y-2">
@@ -42,7 +40,7 @@ export function RecurringSummary({ lines, firstDelivery }: Props) {
           </li>
         ))}
       </ul>
-      <p className="mt-2 text-[11px] leading-relaxed text-on-surface-variant">
+      <p className="mt-2 text-xs leading-relaxed text-on-surface-variant">
         毎回この金額（税込・送料無料）。スキップ・お休み・解約はマイページからいつでも。
       </p>
     </div>
