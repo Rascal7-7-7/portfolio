@@ -11,6 +11,7 @@ import LoadingState from '@/components/LoadingState';
 import { needsAttention } from '@/components/ReservationRow';
 import StatusBadge from '@/components/StatusBadge';
 import { PageHeader, STAFF_TONE, StatStrip, btn } from '@/components/ui';
+import Icon, { type IconName } from '@/components/Icon';
 
 const SLOT_H = 112;
 /** これより低いカードは1行目に名前まで詰める */
@@ -104,11 +105,11 @@ export default function ScheduleView() {
   );
 }
 
-function DayButton({ label, icon, onClick }: { label: string; icon: string; onClick: () => void }) {
+function DayButton({ label, icon, onClick }: { label: string; icon: IconName; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} aria-label={label}
       className="h-8 w-9 flex items-center justify-center bg-canvas text-body hover:bg-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand">
-      <span className="material-symbols-outlined" aria-hidden="true">{icon}</span>
+      <Icon name={icon} />
     </button>
   );
 }
@@ -187,16 +188,17 @@ function Timeline({ byStaff, nowMin }: { byStaff: (s: Staff) => Reservation[]; n
           ))}
         </div>
         {STAFF.map((s, i) => (
-          <StaffColumn key={s} list={byStaff(s)} divider={i > 0} tone={STAFF_TONE[s].soft} nowTop={nowTop} />
+          <StaffColumn key={s} list={byStaff(s)} divider={i > 0} nowTop={nowTop} />
         ))}
       </div>
     </div>
   );
 }
 
-function StaffColumn({ list, divider, tone, nowTop }: { list: Reservation[]; divider: boolean; tone: string; nowTop: number | null }) {
+/** 列の地は白のまま。担当の色は列見出しの色見本だけに使う（地を塗ると意味のない帯に見える） */
+function StaffColumn({ list, divider, nowTop }: { list: Reservation[]; divider: boolean; nowTop: number | null }) {
   return (
-    <div className={`relative ${tone} ${divider ? 'border-l border-line' : ''}`} style={{ height: SLOT_H * OPEN_HOURS.length }}>
+    <div className={`relative ${divider ? 'border-l border-line' : ''}`} style={{ height: SLOT_H * OPEN_HOURS.length }}>
       {OPEN_HOURS.map((h, i) => (
         <div key={h} className="absolute left-0 right-0 border-t border-line" style={{ top: i * SLOT_H + 3 }} />
       ))}

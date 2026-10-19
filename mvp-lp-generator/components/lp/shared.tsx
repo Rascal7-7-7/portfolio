@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import { CATEGORIES } from '@/lib/categories'
 import { toPhrases } from '@/lib/phrase'
 import type { LPDoc, SectionKey, StoreInfo } from '@/lib/types'
 
@@ -34,10 +35,14 @@ export const ctaLabel = (s: StoreInfo) => s.ctaLabel || 'ご予約はこちら'
 export const menuItems = (s: StoreInfo) => s.menu.filter((m) => m.name)
 export const num = (i: number) => String(i + 1).padStart(2, '0')
 
+export const menuTitle = (s: StoreInfo) => CATEGORIES[s.category].menuTitle
+/** 「営業」か「受付」（業種で呼び方が違う） */
+export const hoursWord = (s: StoreInfo) => CATEGORIES[s.category].hours
+
 export function infoRows(s: StoreInfo): [string, string][] {
   const rows: [string, string][] = [
     ['住所', s.address],
-    ['営業時間', s.hours],
+    [`${hoursWord(s)}時間`, s.hours],
     ['定休日', s.closed],
     ['電話', s.phone],
   ]

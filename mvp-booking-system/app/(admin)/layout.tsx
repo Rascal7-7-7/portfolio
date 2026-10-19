@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import NavItem from '@/components/NavItem';
 import { SHOP } from '@/lib/seed';
+import Icon from '@/components/Icon';
 
 /** 管理画面（スタッフ側）の枠。お客様の予約ページ /book はこの外にある */
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -30,7 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="px-2 pt-4 border-t border-line">
             <Link href="/book"
               className="flex items-center gap-2.5 -mx-2 px-2 py-1.5 rounded-md text-sm text-ink hover:bg-subtle focus-visible:outline-2 focus-visible:outline-brand">
-              <span className="material-symbols-outlined" aria-hidden="true">storefront</span>
+              <Icon name="storefront" />
               <span>お客様の予約ページ</span>
             </Link>
             <p className="text-xs text-dim mt-1 leading-relaxed">デモ：お客様の画面で予約すると、管理画面に入ってきます</p>

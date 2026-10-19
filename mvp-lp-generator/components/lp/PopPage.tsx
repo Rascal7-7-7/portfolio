@@ -1,10 +1,11 @@
 import { CATEGORIES } from '@/lib/categories'
 import { cx } from '@/lib/cx'
-import { catchCopy, ctaLabel, infoRows, menuItems, num, Phrases, storeName, type TemplateProps } from './shared'
+import { catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, Phrases, storeName, type TemplateProps } from './shared'
 
 /*
  * ポップ: 街の整体院・教室のサイト（STUDIO「ぬくもり鍼灸・整骨院」の白い箱に載せた見出し・
- * ヘッダーの電話番号・英字の小見出し・角の小さいボタン、「SORA」の大きな色面）を手本にした構成。
+ * ヘッダーの電話番号・角の小さいボタン、「SORA」の大きな色面）を手本にした構成。
+ * 英字の小見出しと大きな通し番号は「AI 製 LP の型」に見えるため使わず、和文の見出しだけにする。
  * 写真の代わりに珊瑚色の大きな色面を置き、見出しだけを白い箱で切り抜く。
  * カードは使わず、線と色面（白／クリーム）の切り替えで区切る。影・グラデーションは使わない。
  */
@@ -20,14 +21,17 @@ const BTN =
 
 const pad = (wide: boolean) => (wide ? 'px-14 py-24' : 'px-5 py-16')
 
-/** 英字の小見出し＋和文の見出し（手本の「Features / 当院の特徴」の組み方） */
-function H2({ en, text, lead, wide, onColor }: { en: string; text: string; lead?: string; wide: boolean; onColor?: boolean }) {
+/**
+ * 和文の見出しだけ。英字の小見出し（FEATURES 等）は「AI 製 LP の型」に見えるので置かない。
+ * 下に珊瑚色の短い太線を敷いて、色面と同じ色で全体をつなぐ
+ */
+function H2({ text, lead, wide, onColor }: { text: string; lead?: string; wide: boolean; onColor?: boolean }) {
   return (
     <div className="text-center">
-      <p className={cx(!onColor && ACCENT, 'text-xs font-extrabold tracking-[0.16em]')}>{en}</p>
-      <h2 className={cx('mt-3 font-extrabold', wide ? 'text-[32px]' : 'text-[24px]')}>
+      <h2 className={cx('font-extrabold leading-snug', wide ? 'text-[32px]' : 'text-[24px]')}>
         <Phrases text={text} lead={lead} />
       </h2>
+      <span aria-hidden className={cx('mx-auto mt-4 block h-1.5 w-12 rounded-full', onColor ? 'bg-[#1f2a37]' : CORAL)} />
     </div>
   )
 }
@@ -39,8 +43,8 @@ function Nav({ store, wide }: TemplateProps) {
       <div className="flex shrink-0 items-center gap-6">
         {wide && store.phone && (
           <div className="text-right leading-tight">
-            <p className="text-lg font-extrabold tabular-nums">Tel. {store.phone}</p>
-            {store.hours && <p className={cx(MUTED, 'text-[11px] font-bold')}>受付 {store.hours}</p>}
+            <p className="text-lg font-extrabold tabular-nums">電話 {store.phone}</p>
+            {store.hours && <p className={cx(MUTED, 'text-[11px] font-bold')}>{hoursWord(store)} {store.hours}</p>}
           </div>
         )}
         <a href="#reserve" className="rounded-md bg-[#1f2a37] px-4 py-2 text-xs font-bold text-white hover:bg-[#33435a]">
@@ -57,17 +61,17 @@ function LeadMenu({ store, wide }: TemplateProps) {
   if (!lead) return null
   return (
     <div className={cx('rounded-lg bg-white', wide ? 'px-7 py-8' : 'mt-10 px-6 py-6')}>
-      <p className={cx(ACCENT, 'text-xs font-extrabold tracking-[0.16em]')}>おすすめメニュー</p>
+      <p className={cx(ACCENT, 'text-xs font-extrabold')}>おすすめメニュー</p>
       <p className="mt-3 text-lg font-extrabold">
         <Phrases text={lead.name} />
       </p>
       {lead.description && <p className={cx(MUTED, 'mt-1 text-xs font-medium')}>{lead.description}</p>}
       <p className={cx('mt-4 border-b-2 pb-5 font-extrabold leading-none tabular-nums', RULE, wide ? 'text-[clamp(32px,4.6cqw,60px)]' : 'text-[48px]')}>{lead.price}</p>
+      {/* 項目ごとに改行を禁止し、項目の間でだけ折り返す（「定休 毎週火／曜日」のような語中改行を防ぐ） */}
       {(store.hours || store.closed) && (
-        <p className="mt-4 text-xs font-bold">
-          {store.hours && `受付 ${store.hours}`}
-          {store.hours && store.closed && '　'}
-          {store.closed && `定休 ${store.closed}`}
+        <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold">
+          {store.hours && <span className="whitespace-nowrap">{hoursWord(store)} {store.hours}</span>}
+          {store.closed && <span className="whitespace-nowrap">定休 {store.closed}</span>}
         </p>
       )}
     </div>
@@ -107,16 +111,16 @@ function Hero(props: TemplateProps) {
 function Features({ store, wide }: TemplateProps) {
   return (
     <section className={pad(wide)}>
-      <H2 en="FEATURES" lead={`${storeName(store)}が`} text="選ばれる理由" wide={wide} />
-      <ol className={cx('mx-auto mt-12 grid max-w-6xl', LINE, wide ? 'grid-cols-3' : 'border-b')}>
-        {store.features.map((f, i) => (
+      <H2 lead={`${storeName(store)}が`} text="選ばれる理由" wide={wide} />
+      {/* 大きな 01/02/03 は置かず、見出しを珊瑚色の文字にして本文で読ませる */}
+      <ul className={cx('mx-auto mt-12 grid max-w-6xl', LINE, wide ? 'grid-cols-3' : 'border-b')}>
+        {store.features.map((f) => (
           <li key={f.title} className={cx(LINE, wide ? 'border-l px-8 py-2 first:border-l-0 first:pl-0 last:pr-0' : 'border-t py-7')}>
-            <p className={cx(ACCENT, 'text-[40px] font-extrabold leading-none tabular-nums')}>{num(i)}</p>
-            <h3 className="mt-5 text-lg font-extrabold"><Phrases text={f.title} /></h3>
+            <h3 className={cx(ACCENT, 'text-xl font-extrabold leading-snug')}><Phrases text={f.title} /></h3>
             <p className={cx(MUTED, 'mt-2 text-sm leading-[1.9]')}>{f.text}</p>
           </li>
         ))}
-      </ol>
+      </ul>
     </section>
   )
 }
@@ -126,7 +130,7 @@ function Menu({ store, wide }: TemplateProps) {
   if (items.length === 0) return null
   return (
     <section id="menu" className={cx(CREAM, pad(wide))}>
-      <H2 en="MENU" text="メニュー・料金" wide={wide} />
+      <H2 text={menuTitle(store)} wide={wide} />
       <ul className={cx('mx-auto mt-12 max-w-3xl divide-y divide-[#1f2a37]/15 border-y-2', RULE)}>
         {items.map((m) => (
           <li key={m.name} className={cx('flex items-center justify-between gap-4', wide ? 'px-2 py-6' : 'py-5')}>
@@ -145,7 +149,7 @@ function Menu({ store, wide }: TemplateProps) {
 function Voices({ store, wide }: TemplateProps) {
   return (
     <section className={pad(wide)}>
-      <H2 en="VOICE" text="お客様の声" wide={wide} />
+      <H2 text="お客様の声" wide={wide} />
       <div className={cx('mx-auto mt-12 grid max-w-4xl', wide ? 'grid-cols-2 gap-12' : 'gap-10')}>
         {store.voices.map((v) => (
           <figure key={v.name} className={cx('border-t-2 pt-6', RULE)}>
@@ -162,7 +166,7 @@ function Voices({ store, wide }: TemplateProps) {
 function Access({ store, wide }: TemplateProps) {
   return (
     <section id="access" className={cx(CREAM, pad(wide))}>
-      <H2 en="ACCESS" text="アクセス・受付時間" wide={wide} />
+      <H2 text={`アクセス・${hoursWord(store)}時間`} wide={wide} />
       <dl className={cx('mx-auto mt-12 max-w-2xl border-y-2 text-sm', RULE)}>
         {infoRows(store).map(([k, v]) => (
           <div key={k} className={cx(LINE, 'grid grid-cols-[6em_minmax(0,1fr)] gap-4 border-b py-4 last:border-b-0', wide && 'px-2')}>
@@ -179,7 +183,7 @@ function Cta({ store, wide }: TemplateProps) {
   return (
     <section id="reserve" className={wide ? 'p-6' : 'p-3'}>
       <div className={cx('rounded-lg text-center', CORAL, wide ? 'px-14 py-20' : 'px-5 py-14')}>
-        <H2 en="RESERVE" text="まずはお気軽にご予約ください" wide={wide} onColor />
+        <H2 text="まずはお気軽にご予約ください" wide={wide} onColor />
         <div className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
           <a href="#reserve" className={BTN}>{ctaLabel(store)}</a>
           {store.phone && (

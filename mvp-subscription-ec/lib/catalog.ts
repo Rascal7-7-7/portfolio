@@ -35,7 +35,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '焙煎度', value: '深煎り' },
       { label: '産地', value: 'エチオピア / グアテマラ' },
     ],
-    visual: { shape: 'bag', from: '#efe6d6', to: '#d9c6a5', ink: '#3d2c22', accent: '#c9925a' },
+    visual: { shape: 'bag', motif: 'bean', from: '#efe6d6', to: '#d9c6a5', ink: '#3d2c22', accent: '#c9925a' },
   },
   {
     id: 'uji-gyokuro',
@@ -53,7 +53,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '産地', value: '京都府宇治市' },
       { label: '淹れ方', value: '60℃・2分' },
     ],
-    visual: { shape: 'tin', from: '#e4ecd9', to: '#c3d5ad', ink: '#2f4a2f', accent: '#b8cf8f' },
+    visual: { shape: 'tin', motif: 'tea', from: '#e4ecd9', to: '#c3d5ad', ink: '#2f4a2f', accent: '#b8cf8f' },
   },
   {
     id: 'honey-granola',
@@ -71,7 +71,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '原材料', value: 'オーツ麦、はちみつ、くるみ ほか' },
       { label: '賞味期限', value: '製造から60日' },
     ],
-    visual: { shape: 'jar', from: '#f5e9d2', to: '#e8cf9f', ink: '#6b4a2b', accent: '#d9a556' },
+    visual: { shape: 'jar', motif: 'wheat', from: '#f5e9d2', to: '#e8cf9f', ink: '#6b4a2b', accent: '#d9a556' },
   },
   {
     id: 'hinoki-soap',
@@ -89,7 +89,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '香り', value: 'ひのき・柚子' },
       { label: '生産', value: '長野県木曽町' },
     ],
-    visual: { shape: 'pump', from: '#e7eee8', to: '#c9d8cd', ink: '#4c6a5a', accent: '#a7c4b0' },
+    visual: { shape: 'pump', motif: 'hinoki', from: '#e7eee8', to: '#c9d8cd', ink: '#4c6a5a', accent: '#a7c4b0' },
   },
   {
     id: 'wild-toner',
@@ -107,7 +107,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '使用目安', value: '約1.5ヶ月' },
       { label: '無添加', value: '香料・着色料・アルコール' },
     ],
-    visual: { shape: 'bottle', from: '#efe5e7', to: '#d9c3c9', ink: '#7a5562', accent: '#e3b9c3' },
+    visual: { shape: 'bottle', motif: 'petal', from: '#efe5e7', to: '#d9c3c9', ink: '#7a5562', accent: '#e3b9c3' },
   },
   {
     id: 'herb-tea',
@@ -126,7 +126,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: 'カフェイン', value: 'なし' },
       { label: '産地', value: '鳥取県 / 高知県' },
     ],
-    visual: { shape: 'box', from: '#f0ead8', to: '#dccfa6', ink: '#8a6b33', accent: '#e9c77b' },
+    visual: { shape: 'box', motif: 'herb', from: '#f0ead8', to: '#dccfa6', ink: '#8a6b33', accent: '#e9c77b' },
   },
 ];
 

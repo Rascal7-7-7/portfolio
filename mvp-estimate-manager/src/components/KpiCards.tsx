@@ -4,6 +4,7 @@ import { formatYen } from "@/lib/utils";
 interface Kpi {
   label: string;
   value: string;
+  delta?: number;
   note: string;
   extra?: React.ReactNode;
 }
@@ -12,15 +13,18 @@ interface Props {
   summary: Summary;
   /** 月別受注額（古い順）。受注金額の欄にスパークラインで添える */
   monthly: MonthlyAmount[];
+  /** 承認直後に一覧へ戻ったとき、受注金額の横に数秒だけ出す増分（税込）。0 なら出さない */
+  wonDelta?: number;
 }
 
 /** Stripe Dashboard の概要欄にならい、カードではなく罫線で区切った1本の帯で並べる */
-export default function KpiCards({ summary, monthly }: Props) {
+export default function KpiCards({ summary, monthly, wonDelta = 0 }: Props) {
   const { count, pendingAmount, wonAmount, winRatePercent } = summary;
   const kpis: Kpi[] = [
     {
       label: "受注金額（税込）",
       value: formatYen(wonAmount),
+      delta: wonDelta,
       note: `受注 ${count.won} 件`,
       extra: <WonTrend monthly={monthly} />,
     },
@@ -38,7 +42,14 @@ export default function KpiCards({ summary, monthly }: Props) {
       {kpis.map((kpi) => (
         <div key={kpi.label} className="bg-white px-4 py-4">
           <dt className="text-xs text-muted">{kpi.label}</dt>
-          <dd className="tnum mt-1 text-xl font-semibold text-navy sm:text-2xl">{kpi.value}</dd>
+          <dd className="tnum mt-1 flex flex-wrap items-baseline gap-x-2 text-xl font-semibold text-navy sm:text-2xl">
+            {kpi.value}
+            {kpi.delta ? (
+              <span className="delta-in rounded bg-primary-soft px-1.5 py-0.5 text-xs font-semibold text-primary">
+                +{formatYen(kpi.delta)}
+              </span>
+            ) : null}
+          </dd>
           <dd className="tnum mt-0.5 text-xs text-muted">{kpi.note}</dd>
           {kpi.extra}
         </div>

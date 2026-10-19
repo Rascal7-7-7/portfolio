@@ -1,6 +1,7 @@
 'use client';
 
 import { toDateStr } from '@/lib/date';
+import Icon, { type IconName } from '@/components/Icon';
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
@@ -63,11 +64,11 @@ export default function MonthCalendar({ month, today, selected, isAvailable, can
   );
 }
 
-function MonthButton({ label, icon, disabled, onClick }: { label: string; icon: string; disabled: boolean; onClick: () => void }) {
+function MonthButton({ label, icon, disabled, onClick }: { label: string; icon: IconName; disabled: boolean; onClick: () => void }) {
   return (
     <button type="button" aria-label={label} disabled={disabled} onClick={onClick}
       className="size-8 flex items-center justify-center rounded-md text-body hover:bg-muted disabled:text-line-strong disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-brand">
-      <span className="material-symbols-outlined" aria-hidden="true">{icon}</span>
+      <Icon name={icon} />
     </button>
   );
 }

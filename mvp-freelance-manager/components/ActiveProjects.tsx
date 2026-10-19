@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { diffDays, formatRelative } from "@/lib/dates";
 import { dueLabel, projectProgress } from "@/lib/selectors";
-import { clientInitial, cn, formatYen } from "@/lib/utils";
+import { cn, formatYen } from "@/lib/utils";
 import type { AppData, ISODate } from "@/types";
 
 /** Linear のプロジェクト一覧に倣い、名前・進捗・金額を1行に並べる */
@@ -23,28 +23,19 @@ export function ActiveProjects({ data, today }: { data: AppData; today: ISODate 
               href={`/projects/${p.id}`}
               className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 px-4 py-3 hover:bg-warm-50 sm:grid-cols-[minmax(0,1fr)_minmax(0,220px)_140px] sm:gap-x-8 sm:px-5"
             >
-              <div className="col-span-2 flex min-w-0 items-start gap-3 sm:col-span-1">
-                {/* 取引先の頭文字。色で塗り分けず無彩色にそろえる */}
-                <span
-                  aria-hidden
-                  className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-warm-200 text-xs font-semibold text-warm-900"
-                >
-                  {clientInitial(p.client)}
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium break-words text-ink">{p.name}</p>
-                  <p className="flex flex-wrap gap-x-2.5 text-xs text-warm-500">
-                    <span className="min-w-0 truncate">{p.client}</span>
-                    <span
-                      className={cn("num whitespace-nowrap", late && "font-semibold text-orange")}
-                      title={`${dueLabel(p)}まで`}
-                    >
-                      {formatRelative(today, p.dueDate)}
-                    </span>
-                  </p>
-                </div>
+              <div className="col-span-2 min-w-0 sm:col-span-1">
+                <p className="text-sm font-medium break-words text-ink">{p.name}</p>
+                <p className="flex flex-wrap gap-x-2.5 text-xs text-warm-500">
+                  <span className="min-w-0 truncate">{p.client}</span>
+                  <span
+                    className={cn("num whitespace-nowrap", late && "font-semibold text-orange")}
+                    title={`${dueLabel(p)}まで`}
+                  >
+                    {formatRelative(today, p.dueDate)}
+                  </span>
+                </p>
               </div>
-              <div className="flex items-center gap-2 pl-10 sm:pl-0">
+              <div className="flex items-center gap-2">
                 <div
                   className="h-1 flex-1 overflow-hidden rounded-full bg-warm-200"
                   role="progressbar"

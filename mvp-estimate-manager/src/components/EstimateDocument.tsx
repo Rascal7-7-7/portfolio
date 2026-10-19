@@ -64,7 +64,8 @@ export default function EstimateDocument({ estimate, id }: Props) {
 
         {/*
           角印は社名の末尾に半分かかるように押すのが和文帳票の慣習。
-          印影の下端を社名の行の下端にそろえ、上の余白へはみ出させて住所・電話・登録番号の文字には掛けない
+          印影の下端を社名の行の下端にそろえ、上の余白へはみ出させて住所・電話・登録番号の文字には掛けない。
+          朱肉は社名の上に重なる（z-10）。乗算だと黒字が勝って印が下敷きに見えるため、通常合成で少し透かして下の文字を読ませる
         */}
         <address className="pt-8 text-xs not-italic leading-relaxed text-body">
           <p className="relative w-fit text-sm font-semibold text-navy">
@@ -154,7 +155,7 @@ function CompanySeal({ className }: { className?: string }) {
     <svg
       viewBox="0 0 64 64"
       aria-hidden="true"
-      className={`pointer-events-none mix-blend-multiply [print-color-adjust:exact] ${className ?? ""}`}
+      className={`pointer-events-none z-10 opacity-[0.82] [print-color-adjust:exact] ${className ?? ""}`}
       style={{ color: "#c8322b" }}
     >
       <rect x="2" y="2" width="60" height="60" rx="2" fill="none" stroke="currentColor" strokeWidth="3" />

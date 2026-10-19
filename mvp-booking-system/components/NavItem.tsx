@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Icon, { type IconName } from '@/components/Icon';
 
 export default function NavItem({
   href, icon, label, mobile = false,
 }: {
-  href: string; icon: string; label: string; mobile?: boolean;
+  href: string; icon: IconName; label: string; mobile?: boolean;
 }) {
   const pathname = usePathname();
   const isActive = href === '/reservations'
@@ -22,7 +23,7 @@ export default function NavItem({
           isActive ? 'text-ink font-bold' : 'text-dim'
         }`}
       >
-        <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: '22px' }}>{icon}</span>
+        <Icon name={icon} size={22} />
         <span className="text-[11px]">{label}</span>
       </Link>
     );
@@ -36,7 +37,7 @@ export default function NavItem({
         isActive ? 'bg-emphasis text-ink font-medium' : 'text-body hover:bg-subtle'
       }`}
     >
-      <span className="material-symbols-outlined" aria-hidden="true">{icon}</span>
+      <Icon name={icon} />
       <span>{label}</span>
     </Link>
   );
