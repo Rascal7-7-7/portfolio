@@ -84,7 +84,7 @@ export default function PublishDialog({ doc, open, onClose }: Props) {
           </div>
         ) : (
           <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/10 p-4">
-            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-accent">PUBLIC URL</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/70">PUBLIC URL</p>
             <p className="mt-1 break-all text-sm font-semibold">{mockPublicUrl(slug)}</p>
             <button type="button" onClick={copy} className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/80 hover:text-white">
               <Icon name={copied ? 'check' : 'copy'} className="h-3.5 w-3.5" />

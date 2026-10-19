@@ -34,7 +34,7 @@ function TemplatePicker({ value, onChange }: { value: TemplateKey; onChange: (k:
         >
           <span aria-hidden className="flex -space-x-1">
             {THEMES[k].swatch.map((c) => (
-              <span key={c} className="h-4 w-4 rounded-full border border-black/40" style={{ backgroundColor: c }} />
+              <span key={c} className="h-4 w-4 rounded-full border border-white/25" style={{ backgroundColor: c }} />
             ))}
           </span>
           {THEMES[k].label}
@@ -96,8 +96,11 @@ export default function PreviewPane({ doc, generating, onTemplate }: Props) {
             <div className="min-h-0 flex-1 overflow-y-auto bg-white">{page}</div>
           </div>
         ) : (
-          <div className="h-[78vh] w-[390px] max-w-full overflow-hidden rounded-[2.75rem] border-[10px] border-[#1d1d1f] bg-black shadow-2xl [clip-path:inset(0_round_2.75rem)] lg:h-full lg:max-h-[800px]">
-            <div className="h-full overflow-y-auto rounded-[2.1rem] bg-white [scrollbar-width:none]">{page}</div>
+          // 枠はボーダーでなく padding で描く。スクロール領域の角の白抜けを防ぐため、画面側を mask で角丸クリップする
+          <div data-phone className="h-[78vh] w-[390px] max-w-full rounded-[2.75rem] bg-[#1d1d1f] p-[10px] shadow-2xl lg:h-full lg:max-h-[800px]">
+            <div className="h-full overflow-hidden rounded-[2.1rem] bg-white [-webkit-mask-image:linear-gradient(#000,#000)] [mask-image:linear-gradient(#000,#000)]">
+              <div className="h-full overflow-y-auto [scrollbar-width:none]">{page}</div>
+            </div>
           </div>
         )}
         {generating && <GeneratingOverlay />}

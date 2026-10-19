@@ -20,7 +20,7 @@ export default function EditorForm({ doc, onStore, onMenu, onToggleSection, onSa
     <div className="space-y-4 p-5 lg:p-6">
       <div>
         <h1 className="text-[22px] font-semibold tracking-tight">お店の情報を入れるだけ。</h1>
-        <p className="mt-1 text-sm text-ed-muted">5項目でLPが完成します。右側にその場で反映されます。</p>
+        <p className="mt-1 text-sm text-ed-muted">5項目でLPが完成します。入力はプレビューにその場で反映されます。</p>
       </div>
 
       <div>
@@ -68,7 +68,7 @@ export default function EditorForm({ doc, onStore, onMenu, onToggleSection, onSa
         <button
           type="button"
           onClick={onGenerate}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(0,153,255,0.4),0_10px_30px_-10px_rgba(0,153,255,0.7)] transition hover:brightness-110 active:scale-[0.99]"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(10,114,224,0.5),0_10px_30px_-10px_rgba(10,114,224,0.8)] transition hover:brightness-110 active:scale-[0.99]"
         >
           <Icon name="sparkle" />
           LPを生成する

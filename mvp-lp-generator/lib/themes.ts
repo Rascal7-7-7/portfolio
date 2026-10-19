@@ -25,6 +25,7 @@ export interface Theme {
   readonly mapRoad: string
 }
 
+// 文字色はすべて WCAG AA（本文 4.5:1 / 大きな文字 3:1）を満たす値にしている
 // Tailwind の任意値クラスはビルド時に文字列から抽出されるため、すべてリテラルで書く
 export const THEMES: Record<TemplateKey, Theme> = {
   natural: {
@@ -36,9 +37,9 @@ export const THEMES: Record<TemplateKey, Theme> = {
     heroBg: 'bg-[#faf6ef]',
     navBg: 'bg-[#faf6ef]/90',
     heading: 'font-mincho font-semibold tracking-wide',
-    eyebrow: 'text-[11px] tracking-[0.35em] uppercase text-[#a0652f]',
+    eyebrow: 'text-[11px] tracking-[0.35em] uppercase text-[#8a5526]',
     muted: 'text-[#3b2f25]/70',
-    accent: 'text-[#a0652f]',
+    accent: 'text-[#8a5526]',
     btn: 'bg-[#3b2f25] text-[#faf6ef] hover:bg-[#2a211a] rounded-full',
     btnGhost: 'border border-[#3b2f25]/25 hover:bg-[#3b2f25]/5 rounded-full',
     card: 'bg-white border border-[#3b2f25]/10 rounded-2xl shadow-[0_18px_40px_-24px_rgba(59,47,37,0.35)]',
@@ -80,16 +81,16 @@ export const THEMES: Record<TemplateKey, Theme> = {
     heroBg: 'bg-[#e9f8f1]',
     navBg: 'bg-[#e9f8f1]/90',
     heading: 'font-gothic font-extrabold tracking-tight',
-    eyebrow: 'text-xs font-bold tracking-wider text-[#ff6b4a]',
+    eyebrow: 'text-xs font-bold tracking-wider text-[#c2412d]',
     muted: 'text-[#1f2a37]/65',
-    accent: 'text-[#ff6b4a]',
-    btn: 'bg-[#ff6b4a] text-white hover:bg-[#f25a37] rounded-2xl shadow-[0_5px_0_#d9462a] active:translate-y-0.5 active:shadow-[0_3px_0_#d9462a]',
+    accent: 'text-[#c2412d]',
+    btn: 'bg-[#ff6b4a] text-[#1f2a37] hover:bg-[#ff7d5f] rounded-2xl shadow-[0_5px_0_#d9462a] active:translate-y-0.5 active:shadow-[0_3px_0_#d9462a]',
     btnGhost: 'border-2 border-[#1f2a37] hover:bg-[#1f2a37]/5 rounded-2xl',
     card: 'bg-white border-2 border-[#1f2a37] rounded-3xl shadow-[6px_6px_0_#1f2a37]',
     alt: 'bg-[#fff6dc]',
     art: 'bg-gradient-to-br from-[#ffe08a] via-[#ffb38a] to-[#ff6b4a]',
     line: 'border-[#1f2a37]/10',
-    ctaBand: 'bg-[#ff6b4a] text-white',
+    ctaBand: 'bg-[#ff6b4a] text-[#1f2a37]',
     mapBase: '#dff3ea',
     mapRoad: 'rgba(255,255,255,0.95)',
   },
