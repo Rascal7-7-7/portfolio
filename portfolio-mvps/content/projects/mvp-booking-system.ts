@@ -5,14 +5,14 @@ export const mvpBookingSystem: Project = {
   name: "予約管理システム",
   headline: "紙やLINEの予約管理を画面に載せ替える管理ツール",
   summary:
-    "LINE・電話・Web・店頭で受けた予約を1画面にまとめるモックアップです。予約の登録・編集・削除、確定待ち→確定→完了のワンクリック更新、日別スケジュール、確認通知の送信演出までを、API やデータベースを使わずブラウザ内のダミーデータで操作できます。",
+    "LINE・電話・Web・店頭で受けた予約を1画面にまとめるモックアップです。お客様向けの予約ページ（メニュー→日付→空き時間→申し込み）で入った予約が管理画面の一覧に「確定待ち」で届き、確定・確認通知の送信演出、担当者別の日別スケジュールまでを、API やデータベースを使わずブラウザ内のダミーデータで操作できます。",
   tier: "standard",
   categories: ["web"],
   team: { kind: "solo" },
   period: { start: "2026-03" },
   stack: ["Next.js (App Router)", "React", "TypeScript", "Tailwind CSS"],
   highlights: [
-    { label: "予約の登録・編集・削除", type: "check" },
+    { label: "空き枠だけを出すお客様向け予約ページ", type: "check" },
     { label: "受付経路（LINE・電話・Web）の一元管理", type: "data" },
     { label: "ワンクリックのステータス更新と通知演出", type: "check" },
   ],

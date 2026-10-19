@@ -79,7 +79,7 @@ export default function ReservationDetailView({ id }: { id: number }) {
               {formatFullDate(r.reservation_date)} {r.reservation_time}〜<span className="text-dim mx-1.5" aria-hidden="true">·</span>{r.service_name}
               {menu && <span className="text-dim">（{menu.minutes}分・¥{menu.price.toLocaleString()}）</span>}
             </p>
-            <p className="text-xs text-dim mt-1">受付：{CHANNEL_LABEL[r.channel]}</p>
+            <p className="text-xs text-dim mt-1">担当：{r.staff}<span className="mx-1.5" aria-hidden="true">·</span>受付：{CHANNEL_LABEL[r.channel]}</p>
           </div>
           {next && (
             <button type="button" onClick={() => changeStatus(next.to)} className={btn('primary', 'lg')}>
@@ -117,8 +117,8 @@ export default function ReservationDetailView({ id }: { id: number }) {
 }
 
 function toInput(r: Reservation): ReservationInput {
-  const { customer_name, customer_email, customer_phone, reservation_date, reservation_time, service_name, note, channel } = r;
-  return { customer_name, customer_email, customer_phone, reservation_date, reservation_time, service_name, note, channel };
+  const { customer_name, customer_email, customer_phone, reservation_date, reservation_time, service_name, note, channel, staff } = r;
+  return { customer_name, customer_email, customer_phone, reservation_date, reservation_time, service_name, note, channel, staff };
 }
 
 /** Cal.com の ToggleGroup と同じ形の切り替え。現在の状態は白地＋太字で示す */

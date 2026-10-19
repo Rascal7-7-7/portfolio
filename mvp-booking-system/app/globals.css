@@ -23,6 +23,8 @@
   --color-attn-bg: #ffedd5;
   --color-attn-soft: #fff7ed;
 
+  --color-chat: #8de055;       /* 送信文面の吹き出し（LINE のトーク画面の緑）。この用途以外には使わない */
+
   --font-sans: 'Noto Sans JP', system-ui, sans-serif;
 }
 

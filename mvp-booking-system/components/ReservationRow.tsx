@@ -23,6 +23,12 @@ export function ReservationTableHeader() {
   );
 }
 
+/** 30分以内に入った予約。お客様の予約ページから来た予約を一覧で見つけやすくする */
+const NEW_WITHIN_MS = 30 * 60_000;
+function isNew(r: Reservation): boolean {
+  return Date.now() - new Date(r.created_at).getTime() < NEW_WITHIN_MS;
+}
+
 export default function ReservationRow({ r }: { r: Reservation }) {
   const attention = needsAttention(r);
   const canceled = r.status === 'canceled';
@@ -40,9 +46,13 @@ export default function ReservationRow({ r }: { r: Reservation }) {
       <div className="flex-1 min-w-0">
         <p className={`text-sm font-medium text-ink truncate ${canceled ? 'line-through' : ''}`}>
           {r.customer_name}<span className="font-normal text-xs text-dim ml-0.5">様</span>
+          {isNew(r) && (
+            <span className="ml-2 inline-block rounded-[4px] border border-line-strong px-1 py-px text-[11px] leading-none font-medium text-ink no-underline align-[1px]">新着</span>
+          )}
         </p>
         <p className="text-xs text-dim truncate mt-0.5">
           {r.service_name}<span aria-hidden="true"> · </span><ChannelBadge channel={r.channel} />
+          <span className="hidden md:inline"><span aria-hidden="true"> · </span>担当 {r.staff}</span>
         </p>
         {attention && <p className="md:hidden text-xs text-attn font-medium mt-1">確認通知 未送信</p>}
       </div>
