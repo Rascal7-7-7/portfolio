@@ -1,27 +1,70 @@
-export const dynamic = 'force-dynamic';
-
+import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { query } from '@/lib/db';
-import { Product, SubscriptionPlan } from '@/lib/types';
-import { ProductDetailClient } from './_components/ProductDetailClient';
+import { ChevronLeft } from 'lucide-react';
+import { BRAND, PRODUCTS, findProduct } from '@/lib/catalog';
+import { ProductVisual } from '@/components/ProductVisual';
+import { PlanPicker } from './_components/PlanPicker';
 
-export default async function ProductDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+type Params = { params: Promise<{ id: string }> };
 
-  const [product] = await query<Product>(
-    'SELECT * FROM products WHERE id = $1',
-    [id]
-  );
+export function generateStaticParams() {
+  return PRODUCTS.map((p) => ({ id: p.id }));
+}
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const product = findProduct((await params).id);
+  return { title: product ? `${product.name} — ${BRAND.en}` : BRAND.en };
+}
+
+export default async function ProductDetailPage({ params }: Params) {
+  const product = findProduct((await params).id);
   if (!product) notFound();
 
-  const plans = await query<SubscriptionPlan>(
-    'SELECT * FROM subscription_plans WHERE product_id = $1 ORDER BY price DESC',
-    [id]
-  );
+  return (
+    <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+      <Link
+        href="/products"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-on-surface-variant transition-colors hover:text-on-surface"
+      >
+        <ChevronLeft className="h-4 w-4" aria-hidden />
+        商品一覧
+      </Link>
 
-  return <ProductDetailClient product={product} plans={plans} />;
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <ProductVisual product={product} className="aspect-[4/5] rounded-lg shadow-elevation-2" />
+        </div>
+
+        <div>
+          <p className="label-editorial text-primary">
+            {product.category}
+            {product.badge && <span className="ml-2 text-on-surface-variant">· {product.badge}</span>}
+          </p>
+          <h1 className="mt-2 font-headline text-3xl font-light leading-snug tracking-[-0.01em] text-on-background sm:text-4xl">
+            {product.name}
+          </h1>
+          <p className="mt-3 text-base text-on-surface">{product.tagline}</p>
+          <p className="mt-4 text-sm leading-loose text-on-surface-variant">{product.description}</p>
+
+          <div className="mt-8">
+            <PlanPicker product={product} />
+          </div>
+
+          <dl className="mt-10 divide-y divide-outline-variant/50 border-y border-outline-variant/50 text-sm">
+            {product.specs.map((s) => (
+              <div key={s.label} className="flex gap-4 py-3">
+                <dt className="w-24 flex-shrink-0 text-on-surface-variant">{s.label}</dt>
+                <dd className="text-on-surface">{s.value}</dd>
+              </div>
+            ))}
+            <div className="flex gap-4 py-3">
+              <dt className="w-24 flex-shrink-0 text-on-surface-variant">消費税</dt>
+              <dd className="text-on-surface">{product.taxRate === 8 ? '8%（軽減税率対象）' : '10%'}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </main>
+  );
 }

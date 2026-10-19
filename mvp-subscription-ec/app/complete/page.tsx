@@ -1,179 +1,100 @@
-export const dynamic = 'force-dynamic';
-
+'use client';
 import Link from 'next/link';
-import { CheckCircle, Package, Calendar, RefreshCw, ArrowRight } from 'lucide-react';
-import { query } from '@/lib/db';
-import { SubscriptionDetail } from '@/lib/types';
+import { ArrowRight, CheckCircle2, Truck } from 'lucide-react';
+import { useStore } from '@/components/StoreProvider';
+import { ProductVisual } from '@/components/ProductVisual';
+import { PlanBadge } from '@/components/PlanBadge';
+import { TotalsTable } from '@/components/TotalsTable';
+import { CheckoutSteps } from '@/components/CheckoutSteps';
+import { DEMO_USER, findProduct } from '@/lib/catalog';
+import { formatJaLong } from '@/lib/date';
+import { yen } from '@/lib/pricing';
 
-export default async function CompletePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ subscriptionId?: string }>;
-}) {
-  const { subscriptionId } = await searchParams;
+export default function CompletePage() {
+  const { state, loaded } = useStore();
+  if (!loaded) return <main className="min-h-[60vh]" aria-busy="true" />;
 
-  if (!subscriptionId) return <Fallback />;
+  const order = state.lastOrder;
+  if (!order) {
+    return (
+      <main className="mx-auto max-w-lg px-4 py-24 text-center">
+        <p className="text-on-surface-variant">表示できるご注文がありません</p>
+        <Link href="/products" className="mt-4 inline-block text-sm text-primary hover:underline">
+          商品一覧へ
+        </Link>
+      </main>
+    );
+  }
 
-  const [sub] = await query<SubscriptionDetail>(
-    `SELECT
-       s.id, s.order_id, s.status, s.next_delivery_date, s.created_at, s.updated_at,
-       p.name  AS product_name,
-       sp.name AS plan_name,
-       sp.price,
-       oi.quantity,
-       o.customer_name,
-       o.email
-     FROM subscriptions s
-     JOIN orders o          ON s.order_id   = o.id
-     JOIN order_items oi    ON oi.order_id  = o.id
-     JOIN products p        ON oi.product_id = p.id
-     JOIN subscription_plans sp ON oi.plan_id = sp.id
-     WHERE s.id = $1
-     LIMIT 1`,
-    [subscriptionId]
-  );
-
-  if (!sub) return <Fallback />;
-
-  const nextDeliveryDate = sub.next_delivery_date
-    ? new Date(sub.next_delivery_date)
-    : null;
-
-  const nextDeliveryLabel = nextDeliveryDate
-    ? nextDeliveryDate.toLocaleDateString('ja-JP', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : null;
-
-  const nextDeliveryDay = nextDeliveryDate?.getDate() ?? null;
-  const nextDeliveryMonth = nextDeliveryDate
-    ? nextDeliveryDate.toLocaleDateString('ja-JP', { month: 'long' })
-    : null;
+  const subscriptionCount = order.lines.filter((l) => l.interval !== 'once').length;
 
   return (
-    <main className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
-      {/* Header */}
-      <div className="text-center mb-10">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-          <CheckCircle className="w-8 h-8 text-primary" />
-        </div>
-        <p className="text-xs font-semibold text-primary mb-2">
-          ご申込完了
-        </p>
-        <h1 className="font-headline text-2xl sm:text-3xl font-bold text-on-surface mb-2">
-          ありがとうございます
-        </h1>
-        <p className="text-on-surface-variant text-sm">
-          {sub.customer_name} 様のご申込を受け付けました。
+    <main className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+      <CheckoutSteps current={2} />
+
+      <div className="text-center">
+        <CheckCircle2 className="mx-auto h-14 w-14 text-primary" strokeWidth={1.5} aria-hidden />
+        <h1 className="mt-4 font-headline text-3xl font-light text-on-background">ご注文ありがとうございます</h1>
+        <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
+          {DEMO_USER.name} 様のお申し込みを受け付けました。
           <br />
-          確認メールを{' '}
-          <span className="font-medium text-on-surface">{sub.email}</span>{' '}
-          宛にお送りします。
+          ご注文番号 <span className="tnum font-medium text-on-surface">{order.id}</span>
         </p>
       </div>
 
-      {/* Bento grid */}
-      <div className="grid grid-cols-2 gap-3 mb-5">
-        {/* Contract plan — full width */}
-        <div className="col-span-2 bg-surface-container-lowest rounded-2xl border border-outline-variant/40 p-5 shadow-elevation-1">
-          <div className="flex items-center gap-2 mb-4">
-            <Package className="w-4 h-4 text-primary" />
-            <p className="text-xs font-semibold text-on-surface-variant">
-              ご契約プラン
+      <div className="mt-8 flex items-center gap-4 rounded-lg bg-primary p-5 text-on-primary shadow-elevation-3">
+        <Truck className="h-8 w-8 flex-shrink-0 text-inverse-primary" aria-hidden />
+        <div>
+          <p className="text-xs text-on-primary/75">初回お届け予定</p>
+          <p className="tnum font-headline text-xl font-semibold">{formatJaLong(order.firstDelivery)}</p>
+          {subscriptionCount > 0 && (
+            <p className="mt-0.5 text-xs text-on-primary/75">
+              定期便 {subscriptionCount} 件を開始しました。2回目以降はマイページで確認できます。
             </p>
-          </div>
-          <div className="space-y-2.5">
-            <Row label="商品名" value={sub.product_name} />
-            <Row label="プラン" value={sub.plan_name} />
-            <Row label="数量" value={`${sub.quantity}点`} />
-            <div className="flex justify-between items-center pt-2 border-t border-outline-variant/40">
-              <span className="text-sm text-on-surface-variant">お支払い金額</span>
-              <span className="font-headline font-bold text-xl text-primary">
-                ¥{(sub.price * sub.quantity).toLocaleString()}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Next delivery */}
-        {nextDeliveryLabel && (
-          <div className="col-span-2 sm:col-span-1 bg-primary text-on-primary rounded-2xl p-5">
-            <div className="flex items-center gap-1.5 mb-3">
-              <Calendar className="w-4 h-4 text-on-primary/70" />
-              <p className="text-[11px] font-semibold text-on-primary/70">
-                次回お届け予定
-              </p>
-            </div>
-            {nextDeliveryDay && nextDeliveryMonth ? (
-              <div>
-                <p className="text-on-primary/70 text-sm">{nextDeliveryMonth}</p>
-                <p className="font-headline font-bold text-5xl leading-none">
-                  {nextDeliveryDay}
-                  <span className="text-xl font-medium ml-1 text-on-primary/70">日</span>
-                </p>
-              </div>
-            ) : (
-              <p className="font-semibold text-lg">{nextDeliveryLabel}</p>
-            )}
-          </div>
-        )}
-
-        {/* Status */}
-        <div className={`${nextDeliveryLabel ? 'col-span-2 sm:col-span-1' : 'col-span-2'} bg-surface-container rounded-2xl p-5`}>
-          <div className="flex items-center gap-1.5 mb-3">
-            <RefreshCw className="w-4 h-4 text-primary" />
-            <p className="text-[11px] font-semibold tracking-widest text-on-surface-variant uppercase">
-              ステータス
-            </p>
-          </div>
-          <span className="inline-flex items-center gap-1.5 bg-primary/10 text-primary font-semibold text-sm px-3 py-1.5 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            定期便 有効
-          </span>
-          <p className="text-on-surface-variant text-xs mt-2 leading-relaxed">
-            マイページからいつでも停止・解約できます
-          </p>
+          )}
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="space-y-3">
+      <section className="mt-4 rounded-lg bg-surface-container-lowest p-5 shadow-elevation-1 ring-1 ring-outline-variant/40">
+        <h2 className="mb-4 text-sm font-semibold text-on-surface">ご注文内容</h2>
+        <ul className="mb-4 space-y-3 border-b border-outline-variant/60 pb-4">
+          {order.lines.map((l) => {
+            const product = findProduct(l.productId);
+            if (!product) return null;
+            return (
+              <li key={`${l.productId}-${l.interval}`} className="flex items-center gap-3">
+                <ProductVisual product={product} decorative className="h-14 w-12 flex-shrink-0 rounded" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm text-on-surface">
+                    {product.name} <span className="tnum text-on-surface-variant">× {l.quantity}</span>
+                  </p>
+                  <div className="mt-1">
+                    <PlanBadge interval={l.interval} />
+                  </div>
+                </div>
+                <p className="tnum text-sm text-on-surface">{yen(l.unitPrice * l.quantity)}</p>
+              </li>
+            );
+          })}
+        </ul>
+        <TotalsTable totals={order.totals} />
+      </section>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <Link
-          href={`/subscriptions/${sub.id}`}
-          className="w-full bg-primary text-on-primary py-4 rounded-xl font-semibold text-base flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          href="/mypage"
+          className="flex items-center justify-center gap-2 rounded-md bg-primary py-3.5 font-medium text-on-primary hover:opacity-90"
         >
-          定期便の管理画面へ
-          <ArrowRight className="w-4 h-4" />
+          マイページで定期便を見る
+          <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
         <Link
           href="/products"
-          className="w-full border border-outline-variant text-on-surface-variant py-4 rounded-xl font-medium text-base text-center block hover:bg-surface-container transition-colors"
+          className="flex items-center justify-center rounded-md py-3.5 font-medium text-primary ring-1 ring-primary/30 hover:bg-primary/5"
         >
-          引き続き商品を見る
+          ショップに戻る
         </Link>
       </div>
-    </main>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between items-center text-sm">
-      <span className="text-on-surface-variant">{label}</span>
-      <span className="font-medium text-on-surface">{value}</span>
-    </div>
-  );
-}
-
-function Fallback() {
-  return (
-    <main className="max-w-2xl mx-auto px-4 py-24 text-center">
-      <p className="text-on-surface-variant mb-4">申込情報が見つかりません</p>
-      <Link href="/products" className="text-primary hover:underline text-sm">
-        ショップへ
-      </Link>
     </main>
   );
 }

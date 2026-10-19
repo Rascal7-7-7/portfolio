@@ -5,16 +5,16 @@ export const mvpSubscriptionEc: Project = {
   name: "サブスクEC",
   headline: "定期便の申し込みフローを通したD2C向けEC",
   summary:
-    "商品一覧・詳細からカートに入れ、定期便プランを選んで申し込みまで進めます。決済はデモ用のモックUIで、実際の課金は発生しません。注文とサブスクの状態を画面で確認できます。",
+    "架空ブランドのストアフロントで、商品詳細から定期便のお届け間隔を選び、カート・申し込み・マイページまで一通り操作できるモックアップです。データはブラウザ内だけで動き、決済はモックUIのため実際の課金は発生しません。",
   tier: "standard",
   categories: ["web"],
   team: { kind: "solo" },
   period: { start: "2026-03" },
-  stack: ["Next.js", "API Routes", "PostgreSQL"],
+  stack: ["Next.js", "TypeScript", "Tailwind CSS"],
   highlights: [
-    { label: "定期便プランの選択", type: "check" },
-    { label: "カート〜申込フロー（決済はデモ）", type: "check" },
-    { label: "注文・サブスクの管理", type: "data" },
+    { label: "定期便の割引・送料・税込の金額計算", type: "check" },
+    { label: "カート〜申込フロー（決済はモック）", type: "check" },
+    { label: "マイページで定期便のスキップ・お休み・解約", type: "data" },
   ],
   verification: "live-demo",
   links: {

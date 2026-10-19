@@ -1,59 +1,42 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import { RefreshCw, ArrowRight } from 'lucide-react';
-import { Product, SubscriptionPlan } from '@/lib/types';
+import type { Product } from '@/lib/types';
+import { unitPrice, yen } from '@/lib/pricing';
+import { ProductVisual } from '@/components/ProductVisual';
 
-type Props = {
-  product: Product;
-  plans: SubscriptionPlan[];
-};
-
-export function ProductCard({ product, plans }: Props) {
-  const minPrice = plans.length > 0 ? Math.min(...plans.map(p => p.price)) : 0;
-  const hasSubscription = plans.some(p => p.interval_label !== null);
-
+export function ProductCard({ product }: { product: Product }) {
+  const subPrice = unitPrice(product.price, 'monthly');
   return (
     <Link
       href={`/products/${product.id}`}
-      className="group flex flex-col bg-surface-container-lowest rounded-2xl overflow-hidden shadow-elevation-1 hover:shadow-elevation-3 transition-shadow"
+      className="group flex flex-col overflow-hidden rounded-lg bg-surface-container-lowest shadow-elevation-1 ring-1 ring-outline-variant/40 transition-shadow hover:shadow-elevation-3"
     >
-      {/* Image — 4/5 aspect ratio */}
-      <div className="relative aspect-[4/5] bg-surface-container overflow-hidden">
-        <Image
-          src={product.image_url}
-          alt={product.name}
-          fill
-          className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      <div className="relative">
+        <ProductVisual
+          product={product}
+          decorative
+          className="aspect-[4/5] transition-transform duration-500 group-hover:scale-[1.02]"
         />
-        {hasSubscription && (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1 bg-primary/90 backdrop-blur-sm text-on-primary text-xs font-semibold px-2.5 py-1 rounded-full">
-            <RefreshCw className="w-3 h-3" />
-            定期便あり
+        {product.badge && (
+          <span className="absolute left-3 top-3 rounded bg-on-surface px-2 py-1 text-[11px] font-medium text-surface">
+            {product.badge}
           </span>
         )}
       </div>
-
-      {/* Info */}
-      <div className="p-4 flex flex-col flex-1">
-        <h2 className="font-headline font-semibold text-on-surface text-base leading-snug mb-2 line-clamp-2">
-          {product.name}
-        </h2>
-        <p className="text-on-surface-variant text-xs leading-relaxed line-clamp-2 mb-4 flex-1">
-          {product.description}
-        </p>
-        <div className="flex items-end justify-between mt-auto">
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <p className="label-editorial text-on-surface-variant">{product.category}</p>
+        <h3 className="mt-1.5 font-headline text-base font-semibold leading-snug text-on-surface">{product.name}</h3>
+        <p className="mt-1 line-clamp-2 flex-1 text-xs leading-relaxed text-on-surface-variant">{product.tagline}</p>
+        <div className="mt-4 flex flex-col gap-1 border-t border-outline-variant/40 pt-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-[11px] text-on-surface-variant mb-0.5">定期便から</p>
-            <p className="font-headline font-bold text-primary text-xl">
-              ¥{minPrice.toLocaleString()}
-              <span className="text-sm font-normal text-on-surface-variant">〜</span>
+            <p className="text-[11px] text-primary">定期便 10%OFF</p>
+            <p className="tnum whitespace-nowrap font-headline text-lg font-semibold text-on-surface sm:text-xl">
+              {yen(subPrice)}
+              <span className="ml-1 text-[11px] font-normal text-on-surface-variant">税込</span>
             </p>
           </div>
-          <span className="flex items-center gap-0.5 text-sm font-medium text-primary group-hover:gap-1.5 transition-all">
-            詳細
-            <ArrowRight className="w-4 h-4" />
-          </span>
+          <p className="tnum whitespace-nowrap text-xs text-on-surface-variant">
+            単品 <span className="line-through">{yen(product.price)}</span>
+          </p>
         </div>
       </div>
     </Link>

@@ -1,64 +1,77 @@
-export type Product = {
-  id: number;
-  name: string;
-  description: string;
-  image_url: string;
-  created_at: string;
-  updated_at: string;
+export type Interval = 'once' | 'monthly' | 'bimonthly';
+export type SubscriptionInterval = Exclude<Interval, 'once'>;
+export type TaxRate = 8 | 10;
+
+export type PackageShape = 'bag' | 'tin' | 'jar' | 'pump' | 'bottle' | 'box';
+
+export type Visual = {
+  shape: PackageShape;
+  /** 背景グラデーション */
+  from: string;
+  to: string;
+  /** パッケージ本体の色 */
+  ink: string;
+  /** ラベル・装飾の差し色 */
+  accent: string;
 };
 
-export type SubscriptionPlan = {
-  id: number;
-  product_id: number;
+export type Product = {
+  id: string;
   name: string;
+  nameEn: string;
+  category: string;
+  tagline: string;
+  description: string;
+  /** 税込の通常価格（円） */
   price: number;
-  interval_label: string | null;
-  created_at: string;
-  updated_at: string;
+  taxRate: TaxRate;
+  badge?: string;
+  specs: ReadonlyArray<{ label: string; value: string }>;
+  visual: Visual;
 };
 
 export type CartItem = {
-  productId: number;
-  productName: string;
-  productImageUrl: string;
-  planId: number;
-  planName: string;
-  price: number;
+  productId: string;
+  interval: Interval;
   quantity: number;
+};
+
+export type SubscriptionStatus = 'active' | 'paused' | 'canceled';
+
+export type Subscription = {
+  id: string;
+  productId: string;
+  interval: SubscriptionInterval;
+  quantity: number;
+  /** 割引後の税込単価 */
+  unitPrice: number;
+  status: SubscriptionStatus;
+  /** YYYY-MM-DD。一時停止・解約中は null */
+  nextDelivery: string | null;
+  startedAt: string;
+  deliveredCount: number;
+};
+
+export type Totals = {
+  listSubtotal: number;
+  discount: number;
+  subtotal: number;
+  shipping: number;
+  total: number;
+  taxByRate: Record<TaxRate, number>;
+};
+
+export type OrderLine = {
+  productId: string;
+  interval: Interval;
+  quantity: number;
+  unitPrice: number;
 };
 
 export type Order = {
-  id: number;
-  customer_name: string;
-  email: string;
-  total_amount: number;
-  created_at: string;
-  updated_at: string;
-};
-
-export type OrderItem = {
-  id: number;
-  order_id: number;
-  product_id: number;
-  plan_id: number;
-  quantity: number;
-  price: number;
-};
-
-export type Subscription = {
-  id: number;
-  order_id: number;
-  status: 'active' | 'paused' | 'canceled';
-  next_delivery_date: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
-export type SubscriptionDetail = Subscription & {
-  product_name: string;
-  plan_name: string;
-  price: number;
-  quantity: number;
-  customer_name: string;
-  email: string;
+  id: string;
+  placedAt: string;
+  lines: OrderLine[];
+  totals: Totals;
+  firstDelivery: string;
 };
