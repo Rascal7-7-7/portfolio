@@ -24,7 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <nav aria-label="画面の切り替え" className="flex flex-col gap-0.5 flex-1">
             <NavItem href="/reservations" icon="event_note" label="予約一覧" />
-            <NavItem href="/reservations/new" icon="add" label="新規登録" />
+            <NavItem href="/reservations/new" icon="add" label="新規予約" />
             <NavItem href="/schedule" icon="calendar_view_day" label="スケジュール" />
           </nav>
 
@@ -47,7 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* モバイル: ボトムナビ */}
       <nav aria-label="画面の切り替え" className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-canvas border-t border-line flex">
         <NavItem href="/reservations" icon="event_note" label="予約一覧" mobile />
-        <NavItem href="/reservations/new" icon="add" label="新規登録" mobile />
+        <NavItem href="/reservations/new" icon="add" label="新規予約" mobile />
         <NavItem href="/schedule" icon="calendar_view_day" label="スケジュール" mobile />
         <NavItem href="/book" icon="storefront" label="予約ページ" mobile />
       </nav>
