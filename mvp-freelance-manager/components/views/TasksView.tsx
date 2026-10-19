@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 import { Card, Page, PageHeader, PageSkeleton } from "@/components/ui";
 import { TaskRow } from "@/components/TaskRow";
 
-const GROUPS: { key: TaskGroup; label: string; accent?: string }[] = [
-  { key: "overdue", label: "期限切れ", accent: "text-orange" },
-  { key: "today", label: "今日", accent: "text-blue" },
+/** 期限切れの見出しだけが、この画面で唯一の警告色 */
+const GROUPS: { key: TaskGroup; label: string; alert?: boolean }[] = [
+  { key: "overdue", label: "期限切れ", alert: true },
+  { key: "today", label: "今日" },
   { key: "week", label: "7日以内" },
   { key: "later", label: "それ以降" },
   { key: "done", label: "完了" },
@@ -30,17 +31,18 @@ export function TasksView() {
         title="タスク"
         description={`全案件の未完了タスク ${open}件を、期日順にまとめています。`}
       />
-      <div className="grid gap-5">
+      {/* Linear のリスト表示に倣い、1枚のリストを件数付きのグループ見出しで区切る */}
+      <Card className="overflow-hidden">
         {GROUPS.map((g) => {
           const items = sorted.filter((t) => taskGroup(t, today) === g.key);
           if (items.length === 0) return null;
           return (
-            <Card
-              key={g.key}
-              title={g.label}
-              icon={<span className={cn("num text-xs font-bold", g.accent)}>{items.length}</span>}
-            >
-              <ul className="divide-y divide-line">
+            <section key={g.key} aria-label={g.label} className="[&:last-child>ul]:border-b-0">
+              <h2 className="flex items-center gap-2 border-b border-line bg-warm-100 px-4 py-2 text-xs font-semibold sm:px-5">
+                <span className={cn(g.alert ? "text-orange" : "text-ink")}>{g.label}</span>
+                <span className="num font-normal text-warm-500">{items.length}</span>
+              </h2>
+              <ul className="divide-y divide-line border-b border-line">
                 {items.map((t) => (
                   <TaskRow
                     key={t.id}
@@ -50,10 +52,10 @@ export function TasksView() {
                   />
                 ))}
               </ul>
-            </Card>
+            </section>
           );
         })}
-      </div>
+      </Card>
     </Page>
   );
 }
