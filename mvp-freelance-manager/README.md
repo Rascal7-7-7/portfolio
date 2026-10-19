@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FreelanceHub（mvp-freelance-manager）
 
-## Getting Started
+個人事業の「案件・タスク・請求と入金」をひとつのダッシュボードにまとめるモックアップです。
 
-First, run the development server:
+- API・DB・外部通信は使いません。ダミーデータ（`lib/seed.ts`）は閲覧日を基準にした相対日付で生成されます。
+- 操作内容はブラウザの localStorage にだけ保存されます（日付が変わる／「初期状態に戻す」でダミーデータに戻ります）。
+- 認証・決済・実際の請求書送付はありません。
+
+## 画面
+
+| パス | 内容 |
+|---|---|
+| `/dashboard` | 今月の入金・未入金・進行中案件・今日のタスク、月次の入金推移、期限超過の請求 |
+| `/projects` | 案件一覧（進行中・見積中・完了・失注で絞り込み）、`/projects/new` で登録 |
+| `/projects/[id]` | 案件のタスク追加・完了、請求書の作成・入金記録 |
+| `/tasks` | 全案件のタスクを期限切れ・今日・7日以内…に分けて表示 |
+| `/invoices` | 請求書の作成、入金済への切り替え、月別の入金表 |
+
+## 開発
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci
+npm run dev      # http://localhost:3000
+npm run build
+npm run lint
+npm run check    # 集計ロジックのセルフチェック（Node 24 以上）
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
