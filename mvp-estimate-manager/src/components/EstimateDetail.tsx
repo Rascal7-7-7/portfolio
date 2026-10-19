@@ -10,7 +10,6 @@ import EstimateDocument from "@/components/EstimateDocument";
 import Icon, { type IconName } from "@/components/Icon";
 import LoadingState from "@/components/LoadingState";
 import NotFoundState from "@/components/NotFoundState";
-import StatusBadge from "@/components/StatusBadge";
 import StatusStepper from "@/components/StatusStepper";
 
 interface Action {
@@ -66,8 +65,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
 
   return (
     <div className="mx-auto max-w-6xl p-4 sm:p-8 print:max-w-none print:p-0">
-      {/* 一覧・作成画面と同じ max-w-6xl の枠で左端を揃え、帳票は読みやすい幅に留める */}
-      <div className="max-w-4xl print:max-w-none">
+      {/* 一覧・作成画面と同じ max-w-6xl の枠で左右端を揃え、帳票だけ読みやすい幅に留める */}
       <div className="print:hidden">
         <Link href="/estimates" className="inline-flex items-center gap-1 text-sm text-body hover:text-navy">
           <Icon name="back" />
@@ -77,10 +75,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
         <section aria-label="ステータス" className="mt-4 space-y-5 border-b border-line pb-6">
           <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <div className="min-w-0">
-              <p className="tnum flex items-center gap-2 text-sm text-muted">
-                {estimateNumber(estimate.id)}
-                <StatusBadge status={estimate.status} />
-              </p>
+              <p className="tnum text-sm text-muted">{estimateNumber(estimate.id)}</p>
               <h1 className="mt-1 text-2xl font-semibold text-navy">{estimate.subject}</h1>
               <p className="mt-0.5 text-sm text-body">{estimate.clientName}</p>
             </div>
@@ -139,9 +134,8 @@ export default function EstimateDetail({ id, justSaved }: Props) {
         </section>
       </div>
 
-      <div className="mt-6 rounded bg-canvas p-3 sm:p-6 print:mt-0 print:bg-white print:p-0">
+      <div className="mt-6 max-w-4xl rounded bg-canvas p-3 sm:p-6 print:mt-0 print:max-w-none print:bg-white print:p-0">
         <EstimateDocument estimate={estimate} id={estimate.id} />
-      </div>
       </div>
     </div>
   );
