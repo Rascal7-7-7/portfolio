@@ -1,149 +1,127 @@
 'use client';
 import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { ShoppingBag, ArrowRight, ArrowLeft, RefreshCw, Plus, Minus, Trash2 } from 'lucide-react';
-import { useCart } from '@/hooks/useCart';
+import { ArrowRight, ShoppingBag, Trash2, Truck } from 'lucide-react';
+import { useStore } from '@/components/StoreProvider';
+import { ProductVisual } from '@/components/ProductVisual';
+import { QuantityStepper } from '@/components/QuantityStepper';
+import { TotalsTable } from '@/components/TotalsTable';
+import { PlanBadge } from '@/components/PlanBadge';
+import { CheckoutSteps } from '@/components/CheckoutSteps';
+import { cartTotals, toCartLines } from '@/lib/cart';
+import { remainingForFreeShipping, yen } from '@/lib/pricing';
 
 export default function CartPage() {
-  const { items, loaded, removeItem, updateQuantity, totalAmount } = useCart();
-  const router = useRouter();
+  const { state, loaded, dispatch } = useStore();
+  if (!loaded) return <main className="min-h-[60vh]" aria-busy="true" />;
 
-  if (!loaded) return null;
+  const lines = toCartLines(state.cart);
+  if (lines.length === 0) return <EmptyCart />;
 
-  if (items.length === 0) {
-    return (
-      <main className="max-w-2xl mx-auto px-4 py-24 text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-surface-container rounded-full mb-4">
-          <ShoppingBag className="w-8 h-8 text-outline" />
-        </div>
-        <h1 className="font-headline text-xl font-semibold text-on-surface mb-2">
-          カートに商品がありません
-        </h1>
-        <p className="text-on-surface-variant text-sm mb-8">
-          商品一覧からプランを選んでカートに追加してください
-        </p>
-        <Link
-          href="/products"
-          className="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-xl font-medium hover:opacity-90 transition-opacity"
-        >
-          ショップを見る
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-      </main>
-    );
-  }
-
-  const hasSubscription = items.some(item =>
-    item.planName.includes('定期') || item.planName.includes('回')
-  );
+  const totals = cartTotals(lines);
+  const hasSubscription = lines.some((l) => l.interval !== 'once');
+  const remaining = remainingForFreeShipping(totals.subtotal, hasSubscription);
 
   return (
-    <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="font-headline text-2xl font-bold text-on-surface mb-6">カート</h1>
+    <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <CheckoutSteps current={0} />
+      <h1 className="mb-6 font-headline text-2xl font-light text-on-background sm:text-3xl">カート</h1>
 
-      {/* Subscription context banner */}
-      {hasSubscription && (
-        <div className="flex items-start gap-3 bg-primary/8 border border-primary/20 rounded-xl px-4 py-3 mb-5">
-          <RefreshCw className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-on-surface">
-            <span className="font-medium">定期便プランが含まれています。</span>
-            <span className="text-on-surface-variant ml-1">
-              申込後、マイページからいつでも停止・解約できます。
-            </span>
-          </p>
-        </div>
-      )}
-
-      {/* Cart items */}
-      <div className="space-y-3 mb-6">
-        {items.map(item => (
-          <div
-            key={`${item.productId}-${item.planId}`}
-            className="bg-surface-container-lowest rounded-2xl border border-outline-variant/40 p-4 flex gap-4 shadow-elevation-1"
-          >
-            <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container">
-              <Image
-                src={item.productImageUrl}
-                alt={item.productName}
-                fill
-                className="object-cover"
-                sizes="80px"
-              />
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-on-surface text-sm truncate">
-                {item.productName}
-              </h3>
-              <span className="inline-block text-[11px] font-medium bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full mt-1">
-                {item.planName}
-              </span>
-
-              <div className="flex items-center justify-between mt-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => updateQuantity(item.productId, item.planId, item.quantity - 1)}
-                    className="w-7 h-7 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-colors"
-                    aria-label="数量を減らす"
-                  >
-                    <Minus className="w-3 h-3 text-on-surface-variant" />
-                  </button>
-                  <span className="text-sm font-semibold text-on-surface w-5 text-center">
-                    {item.quantity}
-                  </span>
-                  <button
-                    onClick={() => updateQuantity(item.productId, item.planId, item.quantity + 1)}
-                    className="w-7 h-7 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-colors"
-                    aria-label="数量を増やす"
-                  >
-                    <Plus className="w-3 h-3 text-on-surface-variant" />
-                  </button>
+      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+        <section aria-label="カートの商品">
+          <ul className="divide-y divide-outline-variant/50 rounded-lg bg-surface-container-lowest shadow-elevation-1 ring-1 ring-outline-variant/40">
+            {lines.map((line) => (
+              <li key={`${line.productId}-${line.interval}`} className="flex gap-4 p-4">
+                <Link href={`/products/${line.productId}`} className="flex-shrink-0">
+                  <ProductVisual product={line.product} decorative className="h-24 w-20 rounded-md sm:h-28 sm:w-24" />
+                </Link>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-medium text-on-surface">{line.product.name}</p>
+                      <div className="mt-1">
+                        <PlanBadge interval={line.interval} />
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => dispatch({ type: 'removeFromCart', productId: line.productId, interval: line.interval })}
+                      className="rounded p-1.5 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-error"
+                      aria-label={`${line.product.name}をカートから削除`}
+                    >
+                      <Trash2 className="h-4 w-4" aria-hidden />
+                    </button>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    <QuantityStepper
+                      value={line.quantity}
+                      label={`${line.product.name}の数量`}
+                      onChange={(quantity) =>
+                        dispatch({ type: 'setQuantity', productId: line.productId, interval: line.interval, quantity })
+                      }
+                    />
+                    <div className="tnum text-right">
+                      <p className="font-headline font-semibold text-on-surface">{yen(line.unitPrice * line.quantity)}</p>
+                      {line.unitPrice < line.product.price && (
+                        <p className="text-[11px] text-on-surface-variant line-through">
+                          {yen(line.product.price * line.quantity)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
+              </li>
+            ))}
+          </ul>
+          <Link href="/products" className="mt-4 inline-block text-sm text-primary hover:underline">
+            ← 買い物を続ける
+          </Link>
+        </section>
 
-                <div className="flex items-center gap-3">
-                  <span className="font-headline font-bold text-on-surface">
-                    ¥{(item.price * item.quantity).toLocaleString()}
-                  </span>
-                  <button
-                    onClick={() => removeItem(item.productId, item.planId)}
-                    className="text-outline hover:text-error transition-colors"
-                    aria-label="削除"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
+        <aside className="lg:sticky lg:top-24 lg:self-start">
+          <div className="rounded-lg bg-surface-container-lowest p-5 shadow-elevation-2 ring-1 ring-outline-variant/40">
+            <p className="mb-4 flex items-center gap-2 rounded-md bg-primary/5 px-3 py-2 text-xs text-primary">
+              <Truck className="h-4 w-4 flex-shrink-0" aria-hidden />
+              {hasSubscription
+                ? '定期便を含むため送料無料です'
+                : remaining > 0
+                  ? `あと ${yen(remaining)} で送料無料`
+                  : '送料無料の対象です'}
+            </p>
+            <TotalsTable totals={totals} />
+            <Link
+              href="/checkout"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3.5 font-medium text-on-primary transition-opacity hover:opacity-90"
+            >
+              ご購入手続きへ
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+            {hasSubscription && (
+              <p className="mt-3 text-center text-[11px] leading-relaxed text-on-surface-variant">
+                定期便は2回目以降も同じ割引価格。スキップ・解約はマイページから。
+              </p>
+            )}
           </div>
-        ))}
+        </aside>
       </div>
+    </main>
+  );
+}
 
-      {/* Total */}
-      <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant/40 px-5 py-4 mb-5 shadow-elevation-1 flex justify-between items-center">
-        <span className="text-on-surface-variant font-medium text-sm">合計金額（税込）</span>
-        <span className="font-headline font-bold text-2xl text-primary">
-          ¥{totalAmount.toLocaleString()}
-        </span>
-      </div>
-
-      <button
-        onClick={() => router.push('/checkout')}
-        className="w-full bg-primary text-on-primary py-4 rounded-xl font-semibold text-base flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+function EmptyCart() {
+  return (
+    <main className="mx-auto max-w-lg px-4 py-24 text-center">
+      <span className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-full bg-surface-container">
+        <ShoppingBag className="h-7 w-7 text-outline" aria-hidden />
+      </span>
+      <h1 className="font-headline text-xl font-semibold text-on-surface">カートは空です</h1>
+      <p className="mt-2 text-sm text-on-surface-variant">気になる商品を、定期便か単品でカートに入れてください。</p>
+      <Link
+        href="/products"
+        className="mt-8 inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-on-primary hover:opacity-90"
       >
-        申込内容を確認する
-        <ArrowRight className="w-5 h-5" />
-      </button>
-
-      <div className="text-center mt-4">
-        <Link
-          href="/products"
-          className="text-on-surface-variant text-sm hover:text-on-surface transition-colors inline-flex items-center gap-1"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          ショップに戻る
-        </Link>
-      </div>
+        商品を見る
+        <ArrowRight className="h-4 w-4" aria-hidden />
+      </Link>
     </main>
   );
 }

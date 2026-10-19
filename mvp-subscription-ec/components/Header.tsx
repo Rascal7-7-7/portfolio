@@ -1,42 +1,53 @@
 'use client';
 import Link from 'next/link';
-import { ShoppingBag, Store } from 'lucide-react';
-import { useCart } from '@/hooks/useCart';
+import { usePathname } from 'next/navigation';
+import { ShoppingBag, UserRound } from 'lucide-react';
+import { useStore } from '@/components/StoreProvider';
+import { BRAND } from '@/lib/catalog';
+import { cn } from '@/lib/cn';
 
 export function Header() {
-  const { totalItems, loaded } = useCart();
+  const { state, loaded } = useStore();
+  const pathname = usePathname();
+  const count = state.cart.reduce((sum, i) => sum + i.quantity, 0);
+
+  const navClass = (href: string) =>
+    cn(
+      'relative inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface',
+      pathname.startsWith(href) && 'text-on-surface font-medium',
+    );
 
   return (
-    <header className="sticky top-0 z-50 bg-background/85 backdrop-blur-md border-b border-outline-variant/40">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* Brand */}
-        <Link href="/products" className="flex flex-col leading-none group">
-          <span className="font-label text-[10px] font-semibold tracking-[0.18em] text-on-surface-variant uppercase">
-            Mori Digital Atelier
-          </span>
-          <span className="font-headline text-base font-semibold text-on-surface tracking-wide group-hover:text-primary transition-colors">
-            森の定期便
+    <header className="sticky top-0 z-50 border-b border-outline-variant/40 bg-background/85 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <Link href="/products" className="group flex flex-col leading-none">
+          <span className="label-editorial text-[10px] text-on-surface-variant">{BRAND.en}</span>
+          <span className="mt-1 font-headline text-base font-semibold tracking-wide text-on-surface transition-colors group-hover:text-primary">
+            {BRAND.ja}
           </span>
         </Link>
 
-        {/* Nav */}
-        <nav className="flex items-center gap-1">
-          <Link
-            href="/products"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors"
-          >
-            <Store className="w-4 h-4" />
+        <nav aria-label="メインメニュー" className="flex items-center gap-1">
+          <Link href="/products" className={cn(navClass('/products'), 'hidden sm:inline-flex')}>
             ショップ
+          </Link>
+          <Link href="/mypage" className={navClass('/mypage')} aria-label="マイページ">
+            <UserRound className="h-4 w-4" aria-hidden />
+            <span className="hidden sm:inline">マイページ</span>
           </Link>
           <Link
             href="/cart"
-            className="relative flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors"
+            className={navClass('/cart')}
+            aria-label={loaded && count > 0 ? `カート（${count}点）` : 'カート'}
           >
-            <ShoppingBag className="w-4 h-4" />
+            <ShoppingBag className="h-4 w-4" aria-hidden />
             <span className="hidden sm:inline">カート</span>
-            {loaded && totalItems > 0 && (
-              <span className="absolute top-1 right-1 bg-primary text-on-primary text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
-                {totalItems}
+            {loaded && count > 0 && (
+              <span
+                aria-hidden
+                className="tnum absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-on-primary"
+              >
+                {count}
               </span>
             )}
           </Link>
