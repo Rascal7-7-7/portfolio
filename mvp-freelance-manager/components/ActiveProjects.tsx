@@ -34,7 +34,7 @@ export function ActiveProjects({ data }: { data: AppData }) {
                   aria-valuemax={prog.total}
                   aria-valuenow={prog.done}
                 >
-                  <div className="h-full bg-warm-900" style={{ width: `${ratio * 100}%` }} />
+                  <div className="h-full bg-blue" style={{ width: `${ratio * 100}%` }} />
                 </div>
                 <span className="num w-16 shrink-0 text-right text-xs text-warm-500">
                   タスク {prog.done}/{prog.total}

@@ -53,9 +53,10 @@ export function PageHeader({ eyebrow, title, description, action }: PageHeaderPr
   );
 }
 
-export function Page({ children, narrow }: { children: ReactNode; narrow?: boolean }) {
+/** 本文幅は全ページ共通。ページごとに幅を変えると移動のたびに左端が揺れる */
+export function Page({ children }: { children: ReactNode }) {
   return (
-    <main className={cn("mx-auto w-full px-4 py-6 sm:px-8 sm:py-8", narrow ? "max-w-4xl" : "max-w-6xl")}>
+    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8 sm:py-8">
       {children}
     </main>
   );
@@ -74,7 +75,8 @@ export function MetricStrip({ items, className }: { items: readonly Metric[]; cl
     <dl
       className={cn(
         "grid divide-line overflow-hidden rounded-lg border border-line bg-canvas",
-        items.length === 3 ? "grid-cols-3 divide-x" : "grid-cols-2 divide-x",
+        // 3項目はスマホで横に詰めると補足が切れるため、縦積みにする
+        items.length === 3 ? "grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0" : "grid-cols-2 divide-x",
         className,
       )}
     >

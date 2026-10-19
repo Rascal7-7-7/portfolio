@@ -45,14 +45,14 @@ export function NewProjectView() {
   const field = "block text-xs font-medium text-warm-900";
 
   return (
-    <Page narrow>
+    <Page>
       <Link href="/projects" className="mb-4 inline-flex items-center gap-1 text-xs text-warm-500 hover:text-ink">
         <ArrowLeft size={14} aria-hidden />
         案件一覧
       </Link>
       <PageHeader title="案件を登録" description="登録するとタスクと請求書をこの案件に紐づけられます。" />
 
-      <form onSubmit={submit} noValidate className="grid gap-4 rounded-lg border border-line bg-canvas p-5 sm:grid-cols-2">
+      <form onSubmit={submit} noValidate className="grid max-w-3xl gap-4 rounded-lg border border-line bg-canvas p-5 sm:grid-cols-2">
         <label className={`${field} sm:col-span-2`}>
           案件名 <span className="font-normal">（必須）</span>
           <input name="name" required maxLength={MAX_TEXT} placeholder="例：サービスサイト制作" className={`${buttonStyles.input} mt-1`} />

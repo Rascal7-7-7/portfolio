@@ -58,7 +58,11 @@ export function InvoicesView() {
       <MetricStrip
         className="mb-6"
         items={[
-          { label: "未入金", value: formatYen(total("outstanding")), sub: `うち期限超過 ${formatYen(overdueTotal)}` },
+          {
+            label: "未入金",
+            value: formatYen(total("outstanding")),
+            sub: overdueTotal > 0 ? <span className="font-semibold text-orange">うち期限超過 {formatYen(overdueTotal)}</span> : undefined,
+          },
           { label: "入金済（累計）", value: formatYen(total("paid")) },
         ]}
       />

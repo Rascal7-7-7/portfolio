@@ -11,7 +11,7 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: { default: "FreelanceHub — 個人事業の業務をまとめて管理", template: "%s | FreelanceHub" },
+  title: { default: "Hikae — 個人事業の業務をまとめて管理", template: "%s | Hikae" },
   description: "案件・タスク・請求と入金をひとつの画面で。フリーランス向けバックオフィスのデモ",
 };
 
