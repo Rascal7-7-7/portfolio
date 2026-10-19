@@ -60,3 +60,32 @@ export function findConflict(
     && r.staff === input.staff && r.reservation_date === input.reservation_date
     && toMinutes(r.reservation_time) < end && start < toMinutes(r.reservation_time) + durationMin(r));
 }
+
+export interface Placed { r: Reservation; lane: number; lanes: number }
+
+/**
+ * 時間が重なる予約だけ横に並べる（list は時刻順）。
+ * 日表示は担当ごと（重なるのは手入力で二重に入れた場合だけ）、週表示は日ごとのリストを渡す
+ */
+export function placeInLanes(list: Reservation[]): Placed[] {
+  const placed: Placed[] = [];
+  let cluster: { r: Reservation; lane: number }[] = [];
+  let laneEnds: number[] = [];
+  const flush = () => {
+    placed.push(...cluster.map(c => ({ ...c, lanes: laneEnds.length })));
+    cluster = [];
+    laneEnds = [];
+  };
+  for (const r of list) {
+    const start = toMinutes(r.reservation_time);
+    if (laneEnds.length > 0 && laneEnds.every(end => end <= start)) flush();
+    const free = laneEnds.findIndex(end => end <= start);
+    const lane = free === -1 ? laneEnds.length : free;
+    const end = start + durationMin(r);
+    laneEnds = laneEnds.map((e, i) => (i === lane ? end : e));
+    if (lane === laneEnds.length) laneEnds = [...laneEnds, end];
+    cluster = [...cluster, { r, lane }];
+  }
+  flush();
+  return placed;
+}

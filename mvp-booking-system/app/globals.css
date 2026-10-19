@@ -38,6 +38,17 @@
   --color-staff2: #7489a6;
   --color-staff2-soft: #f5f7fb;
 
+  /* 週表示のメニュー種別。状態色（attn）・accent・担当色と取り違えないよう、彩度を落とした淡色にしている。
+     地はごく淡く、左の線だけ少し濃くして区別する（文字はいつもの ink / dim のまま） */
+  --color-menu-cut: #e9f2f3;
+  --color-menu-cut-line: #6f9aa0;
+  --color-menu-color: #f1eff7;
+  --color-menu-color-line: #9a8fb8;
+  --color-menu-perm: #eff3ea;
+  --color-menu-perm-line: #8ea07a;
+  --color-menu-care: #f3f1ee;
+  --color-menu-care-line: #a49b8f;
+
   --color-chat: #8de055;       /* 送信文面の吹き出し（LINE のトーク画面の緑）。この用途以外には使わない */
 
   /* Web フォントは読み込まない（外部通信なし）。OS の日本語フォントを使う */
@@ -48,6 +59,9 @@ body {
   background-color: var(--color-canvas);
   color: var(--color-body);
   -webkit-font-smoothing: antialiased;
+  /* 日本語を文節で折り返し、語の途中での改行と行末1文字だけの行を避ける（lang="ja" 前提、非対応ブラウザは通常の折り返し） */
+  word-break: auto-phrase;
+  text-wrap: pretty;
 }
 
 /* 予約ページから戻ったときの新着行。淡いアクセント色から元の地へ戻す（行のリンクに掛け、ホバー色より優先させる） */

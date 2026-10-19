@@ -191,7 +191,7 @@ export default function BookingView() {
                     onSelect={chooseDate}
                   />
                   <p className="mt-4 text-xs text-dim leading-relaxed">
-                    スタイリスト2名の予定から、メニューの所要時間（{menu.minutes}分）が丸ごと空いている時間だけを表示しています。
+                    スタイリスト2名の予定から、メニューの所要時間<span className="whitespace-nowrap">（{menu.minutes}分）</span>が丸ごと空いている時間だけを表示しています。
                   </p>
                 </section>
 
@@ -289,7 +289,7 @@ function Confirmed({ done, onAgain, onAdmin }: { done: Done; onAgain: () => void
       </dl>
       <div className="mt-6 flex flex-col gap-2">
         <Link href={`/reservations?new=${done.id}`} onClick={onAdmin} className={btn('accent', 'lg')}>
-          管理画面で確認する<span className="font-normal opacity-80">（お店側の画面）</span>
+          お店側の画面で確認する
         </Link>
         <button type="button" onClick={onAgain} className={btn('secondary', 'lg')}>別の予約をする</button>
       </div>
