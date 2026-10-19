@@ -42,8 +42,8 @@ interface FlowStep {
 }
 
 /**
- * freee の「請求 → 入金 → 残り」に倣い、今月お金がどこまで回収できたかを1行で見せる。
- * 請求 = 今月の入金 + 未入金の合計 なので、入金を記録すると「入金」が増え「残り」が同額減る。
+ * freee の「請求 → 入金 → 残り」に倣い、請求したお金がどこまで回収できたかを1行で見せる。
+ * 請求 = 今月の入金 + 未入金の合計（来月以降が期日の未入金も含む）なので、入金を記録すると「入金」が増え「残り」が同額減る。
  * 増減バッジは見出し行に出し、数字の行の高さは固定して下の要素を動かさない
  */
 function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
@@ -54,8 +54,8 @@ function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
   const billed = s.thisMonthPaid + s.outstandingTotal;
   const ratio = billed > 0 ? s.thisMonthPaid / billed : 0;
   const steps: FlowStep[] = [
-    { label: "請求", value: billed, sub: "入金済＋未入金" },
-    { label: "入金", value: s.thisMonthPaid, delta: paidDelta, sub: `請求の ${Math.round(ratio * 100)}%` },
+    { label: "請求", value: billed, sub: "今月の入金＋未入金" },
+    { label: "今月の入金", value: s.thisMonthPaid, delta: paidDelta, sub: `請求の ${Math.round(ratio * 100)}%` },
     {
       label: "残り",
       value: s.outstandingTotal,
@@ -66,7 +66,7 @@ function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
   ];
 
   return (
-    <Card title="今月の請求と入金" className="mb-6" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
+    <Card title="請求と回収" className="mb-6" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
       <ol className="grid grid-cols-3">
         {steps.map((st, i) => (
           <li key={st.label} className={cn("relative min-w-0 px-3 pt-3 pb-3 sm:px-5 sm:pt-4", i > 0 && "border-l border-line")}>
@@ -109,7 +109,7 @@ function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
       <div
         className="mx-3 mb-4 h-1.5 overflow-hidden rounded-full bg-warm-200 sm:mx-5"
         role="progressbar"
-        aria-label="今月の請求の回収率"
+        aria-label="請求の回収率"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(ratio * 100)}
