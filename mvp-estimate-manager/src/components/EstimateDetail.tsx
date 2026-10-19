@@ -61,7 +61,9 @@ export default function EstimateDetail({ id, justSaved }: Props) {
   };
 
   return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-8 print:max-w-none print:p-0">
+    <div className="mx-auto max-w-6xl p-4 sm:p-8 print:max-w-none print:p-0">
+      {/* 一覧・作成画面と同じ max-w-6xl の枠で左端を揃え、帳票は読みやすい幅に留める */}
+      <div className="max-w-4xl print:max-w-none">
       <div className="print:hidden">
         <Link href="/estimates" className="inline-flex items-center gap-1 text-sm text-body hover:text-navy">
           <Icon name="back" />
@@ -107,7 +109,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
           <p
             role="status"
             aria-live="polite"
-            className={notice ? "flex items-start gap-2 rounded border border-line bg-canvas px-3 py-2 text-sm text-navy" : "sr-only"}
+            className={notice ? "text-balance flex items-start gap-2 rounded border border-line bg-canvas px-3 py-2 text-sm text-navy" : "sr-only"}
           >
             {notice && <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-primary" />}
             {notice}
@@ -117,6 +119,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
 
       <div className="mt-6 rounded bg-canvas p-3 sm:p-6 print:mt-0 print:bg-white print:p-0">
         <EstimateDocument estimate={estimate} id={estimate.id} />
+      </div>
       </div>
     </div>
   );

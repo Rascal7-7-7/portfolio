@@ -13,7 +13,7 @@ export default function EditEstimate({ id }: { id: number }) {
   if (!estimate) return <NotFoundState />;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-5 p-4 sm:p-8">
+    <div className="mx-auto max-w-6xl space-y-5 p-4 sm:p-8">
       <h1 className="text-2xl font-semibold tracking-tight text-navy">
         見積を編集 <span className="tnum text-base font-normal text-muted">{estimateNumber(id)}</span>
       </h1>

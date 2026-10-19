@@ -21,3 +21,15 @@ body {
     background: #fff;
   }
 }
+
+/*
+ * 日本語の見出し・件名で末尾の1文字だけが次行に落ちるのを防ぐ。
+ * balance は行長をそろえ（Chrome/Safari/Firefox）、auto-phrase は文節で折る（Chromium のみ・未対応ブラウザでは無視）。
+ */
+h1,
+h2,
+h3,
+.text-balance {
+  text-wrap: balance;
+  word-break: auto-phrase;
+}
