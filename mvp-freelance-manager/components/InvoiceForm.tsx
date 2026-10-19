@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { addDays } from "@/lib/dates";
 import { actions } from "@/lib/store";
 import { remainingBillable } from "@/lib/selectors";
-import { formatYen } from "@/lib/utils";
+import { formatYen, toDigits } from "@/lib/utils";
 import { buttonStyles } from "@/components/ui";
 import { DateInput } from "@/components/DateInput";
 import type { Invoice, ISODate, Project } from "@/types";
@@ -79,13 +79,13 @@ export function InvoiceForm({ projects, invoices, today, defaultProjectId, onCre
       )}
       <label className="block text-xs font-medium text-warm-900">
         請求金額（円）
+        {/* 内部は数字だけで持ち、表示は3桁カンマ。全角数字・カンマ入りの貼り付けもそのまま受ける */}
         <input
-          type="number"
+          type="text"
           inputMode="numeric"
-          min={1}
-          step={1000}
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          autoComplete="off"
+          value={amount ? Number(amount).toLocaleString("ja-JP") : ""}
+          onChange={(e) => setAmount(toDigits(e.target.value))}
           aria-describedby="invoice-remaining"
           className={`${buttonStyles.input} num mt-1`}
         />

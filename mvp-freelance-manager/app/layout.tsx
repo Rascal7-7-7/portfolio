@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
+import { PaidToast } from "@/components/PaidToast";
 
 const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-jp",
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col pb-20 md:pb-0">{children}</div>
         </div>
+        <PaidToast />
       </body>
     </html>
   );

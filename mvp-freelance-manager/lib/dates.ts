@@ -47,6 +47,12 @@ export function formatDate(value: ISODate): string {
   return `${date.getMonth() + 1}/${date.getDate()}`;
 }
 
+/** 帳票用 "2026年10月19日" */
+export function formatFullDate(value: ISODate): string {
+  const date = parseISODate(value);
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+}
+
 /** "10月19日(日)" */
 export function formatLongDate(value: ISODate): string {
   return new Intl.DateTimeFormat("ja-JP", { month: "long", day: "numeric", weekday: "short" }).format(

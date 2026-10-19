@@ -25,8 +25,19 @@ function resetDemo(): void {
 
 function Logo() {
   return (
-    <Link href="/dashboard" className="rounded text-[17px] font-semibold tracking-tight text-ink" aria-label="Hikae ダッシュボード">
-      Hikae
+    // 名前の由来「控え」を、帳票の控え印のような小さな枠付きの「控」で添える。画像は使わず文字組みだけで作る
+    <Link
+      href="/dashboard"
+      className="inline-flex items-center gap-1.5 rounded text-ink"
+      aria-label="Hikae ダッシュボード"
+    >
+      <span className="text-[18px] leading-none font-bold tracking-[-0.035em]">Hikae</span>
+      <span
+        aria-hidden
+        className="rounded-[3px] border border-current px-[3px] py-[2px] text-[10px] leading-none font-medium text-warm-500"
+      >
+        控
+      </span>
     </Link>
   );
 }
@@ -37,7 +48,7 @@ export function Sidebar() {
   return (
     <>
       {/* 背景と罫線は外側（ページ全高に伸びる）、中身だけ sticky にして長いページでも背景が途切れない */}
-      <aside className="hidden w-60 shrink-0 border-r border-line bg-warm-100 md:block">
+      <aside className="hidden w-60 shrink-0 border-r border-line bg-warm-100 md:block print:hidden">
         <div className="sticky top-0 flex h-screen flex-col">
         <div className="px-5 py-5">
           <Logo />
@@ -78,7 +89,7 @@ export function Sidebar() {
         </div>
       </aside>
 
-      <header className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-y-1 border-b border-line bg-canvas px-4 py-2.5 md:hidden">
+      <header className="sticky top-0 z-40 flex flex-wrap items-center justify-between gap-y-1 border-b border-line bg-canvas px-4 py-2.5 md:hidden print:hidden">
         <Logo />
         <button
           type="button"
@@ -93,7 +104,7 @@ export function Sidebar() {
 
       <nav
         aria-label="メイン"
-        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-line bg-canvas px-2 pt-1.5 pb-[max(6px,env(safe-area-inset-bottom))] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-line bg-canvas px-2 pt-1.5 pb-[max(6px,env(safe-area-inset-bottom))] md:hidden print:hidden"
       >
         {NAV_ITEMS.map(({ href, short, icon: Icon }) => {
           const active = isActive(href, pathname);

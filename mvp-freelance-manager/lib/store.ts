@@ -65,6 +65,28 @@ export function useAppStore(): Snapshot | null {
   return useSyncExternalStore(subscribe, getSnapshot, () => null);
 }
 
+/** 入金を記録した直後に出すトースト。保存はしない（再読み込みで消えてよい） */
+export interface PaidToast {
+  /** 同じ請求を続けて記録しても表示タイマーを掛け直せるよう、毎回変わる番号 */
+  readonly key: number;
+  readonly invoiceId: string;
+  readonly number: string;
+  readonly amount: number;
+  readonly client: string;
+}
+
+let paidToast: PaidToast | null = null;
+let toastSeq = 0;
+
+function setPaidToast(next: PaidToast | null): void {
+  paidToast = next;
+  listeners.forEach((l) => l());
+}
+
+export function usePaidToast(): PaidToast | null {
+  return useSyncExternalStore(subscribe, () => paidToast, () => null);
+}
+
 function newId(prefix: string): string {
   return `${prefix}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 }
@@ -117,17 +139,29 @@ export const actions = {
     return id;
   },
   setInvoicePaid(id: string, paid: boolean): void {
-    const today = getSnapshot().today;
+    const { today, data } = getSnapshot();
+    const invoice = data.invoices.find((inv) => inv.id === id);
     update((d) => ({
       ...d,
       invoices: d.invoices.map((inv) =>
         inv.id === id ? { ...inv, paidOn: paid ? today : null } : inv,
       ),
     }));
+    if (paid && invoice) {
+      const client = data.projects.find((p) => p.id === invoice.projectId)?.client ?? "";
+      toastSeq += 1;
+      setPaidToast({ key: toastSeq, invoiceId: id, number: invoice.number, amount: invoice.amount, client });
+    } else if (paidToast?.invoiceId === id) {
+      setPaidToast(null);
+    }
+  },
+  clearPaidToast(): void {
+    setPaidToast(null);
   },
   reset(): void {
     const today = todayISO();
     snapshot = { today, data: createSeed(today) };
+    paidToast = null;
     persist(snapshot);
     listeners.forEach((l) => l());
   },
