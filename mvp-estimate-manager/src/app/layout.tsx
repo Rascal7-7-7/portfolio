@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Sidebar, { MobileNav } from "@/components/Sidebar";
+import Sidebar, { MobileNav, ResetDemoButton } from "@/components/Sidebar";
 import { EstimatesProvider } from "@/lib/store";
 
 export const metadata: Metadata = {
@@ -18,9 +18,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="min-w-0 flex-1">
               <header className="flex h-12 items-center border-b border-line bg-white px-4 md:hidden print:hidden">
                 <p className="text-sm font-bold text-navy">見積マネージャー</p>
-                <span className="ml-2 rounded bg-canvas px-1.5 py-0.5 text-[10px] text-muted">デモ</span>
+                <span className="ml-2 rounded bg-canvas px-1.5 py-0.5 text-[11px] text-muted">デモ</span>
+                <ResetDemoButton className="ml-auto -mr-2 px-2 py-2" />
               </header>
-              <main className="pb-20 md:pb-0 print:pb-0">{children}</main>
+              <main className="pb-20 md:pb-0 print:pb-0">
+                {children}
+                <p className="px-4 pb-4 text-center text-xs text-muted md:hidden print:hidden">
+                  デモ版：データはこのブラウザ内にだけ保存されます（送信・外部通信なし）。
+                </p>
+              </main>
             </div>
           </div>
           <MobileNav />

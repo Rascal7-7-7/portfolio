@@ -8,6 +8,10 @@ import {
   hasCaseStudy,
   type Project,
 } from "@/content/projects";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { EvidenceLog } from "@/components/EvidenceLog";
+import { FlowDiagram } from "@/components/FlowDiagram";
 import { Badge } from "@/components/ui/Badge";
 import { TextLink } from "@/components/ui/TextLink";
 
@@ -112,243 +116,248 @@ export default function ProjectDetail({ params }: { params: Params }) {
   const toc = buildToc(project);
 
   return (
-    <main id="main" className="min-h-screen bg-surface-950 px-6 py-16">
-      <div className="max-w-3xl mx-auto">
-        <TextLink href="/#projects" tone="subtle" className="mb-8">
-          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          作品一覧へ戻る
-        </TextLink>
+    <>
+      <Header />
+      <main id="main" className="min-h-screen bg-surface-950 px-6 py-12 sm:py-16">
+        <div className="max-w-3xl mx-auto">
+          <TextLink href="/#projects" tone="subtle" className="mb-8">
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            作品一覧へ戻る
+          </TextLink>
 
-        {/* 見出し */}
-        <p className="text-brand-500 text-sm font-semibold mb-3">
-          {project.name}
-        </p>
-        <h1 className="text-3xl sm:text-4xl font-bold text-surface-50 leading-snug mb-5">
-          {project.headline}
-        </h1>
-        <p className="text-surface-300 leading-relaxed mb-6">{project.summary}</p>
+          {/* 見出し */}
+          <p className="text-brand-500 text-sm font-semibold mb-3">
+            {project.name}
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-surface-50 leading-snug mb-5">
+            {project.headline}
+          </h1>
+          <p className="text-surface-300 leading-relaxed mb-6">{project.summary}</p>
 
-        <div className="flex flex-wrap items-center gap-3 text-sm text-surface-400 mb-6">
-          <span>{periodLabel}</span>
-          <span aria-hidden="true">·</span>
-          <span>
-            {project.team.kind === "team"
-              ? `チーム開発（${project.team.members}人）`
-              : "個人開発"}
-          </span>
-        </div>
+          {/* 一覧の代表作と同じ根拠を、ここでも最初に見せる（画像の代わり） */}
+          {project.evidence?.length ? (
+            <EvidenceLog lines={project.evidence} className="bg-surface-900 mb-6" />
+          ) : null}
 
-        <div className="flex flex-wrap gap-1.5 mb-6">
-          {project.stack.map((tech) => (
-            <Badge key={tech} variant="tech">
-              {tech}
-            </Badge>
-          ))}
-        </div>
+          <div className="flex flex-wrap items-center gap-3 text-sm text-surface-400 mb-6">
+            <span>{periodLabel}</span>
+            <span aria-hidden="true">·</span>
+            <span>
+              {project.team.kind === "team"
+                ? `チーム開発（${project.team.members}人）`
+                : "個人開発"}
+            </span>
+          </div>
 
-        <div className="flex flex-wrap gap-4 mb-12">
-          {project.links.demo && (
-            <TextLink
-              href={project.links.demo}
-              target="_blank"
-              rel="noopener noreferrer"
-              tone="accent"
-              aria-label={`${project.name}のデモを見る（新しいタブで開く）`}
+          <div className="flex flex-wrap gap-1.5 mb-6">
+            {project.stack.map((tech) => (
+              <Badge key={tech} variant="tech">
+                {tech}
+              </Badge>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-4 mb-12">
+            {project.links.demo && (
+              <TextLink
+                href={project.links.demo}
+                target="_blank"
+                rel="noopener noreferrer"
+                tone="accent"
+                aria-label={`${project.name}のデモを見る（新しいタブで開く）`}
+              >
+                デモを見る
+                <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+              </TextLink>
+            )}
+            {project.links.github && (
+              <TextLink
+                href={project.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${project.name}のコードを見る（新しいタブで開く）`}
+              >
+                <Github className="w-4 h-4" aria-hidden="true" />
+                コードを見る
+              </TextLink>
+            )}
+          </div>
+
+          {/* 目次 */}
+          {toc.length > 2 && (
+            <nav
+              aria-label="このページの目次"
+              className="bg-surface-900 rounded-2xl p-5 mb-14"
             >
-              デモを見る
-              <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
-            </TextLink>
+              <p className="text-surface-400 text-xs font-semibold mb-3">目次</p>
+              <ul className="flex flex-wrap gap-x-5 gap-y-2">
+                {toc.map(({ id, label }) => (
+                  <li key={id}>
+                    <a
+                      href={`#${id}`}
+                      className="text-sm text-brand-500 hover:text-brand-400 transition-colors"
+                    >
+                      {label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           )}
-          {project.links.github && (
-            <TextLink
-              href={project.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${project.name}のコードを見る（新しいタブで開く）`}
-            >
-              <Github className="w-4 h-4" aria-hidden="true" />
-              コードを見る
-            </TextLink>
+
+          {/* 背景と目的 */}
+          {(project.problem || project.goal) && (
+            <Section id="problem" title="背景と目的">
+              {project.problem && <Paragraph>{project.problem}</Paragraph>}
+              {project.goal && (
+                <p className="text-surface-200 leading-relaxed border-l-2 border-brand-600 pl-4">
+                  {project.goal}
+                </p>
+              )}
+            </Section>
           )}
-        </div>
 
-        {/* 目次 */}
-        {toc.length > 2 && (
-          <nav
-            aria-label="このページの目次"
-            className="bg-surface-900 rounded-2xl p-5 mb-14"
-          >
-            <p className="text-surface-400 text-xs font-semibold mb-3">目次</p>
-            <ul className="flex flex-wrap gap-x-5 gap-y-2">
-              {toc.map(({ id, label }) => (
-                <li key={id}>
-                  <a
-                    href={`#${id}`}
-                    className="text-sm text-brand-500 hover:text-brand-400 transition-colors"
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        )}
-
-        {/* 背景と目的 */}
-        {(project.problem || project.goal) && (
-          <Section id="problem" title="背景と目的">
-            {project.problem && <Paragraph>{project.problem}</Paragraph>}
-            {project.goal && (
-              <p className="text-surface-200 leading-relaxed border-l-2 border-brand-600 pl-4">
-                {project.goal}
-              </p>
-            )}
-          </Section>
-        )}
-
-        {/* 体制と構成 */}
-        <Section id="role" title="体制と構成">
-          <dl className="space-y-3">
-            <div className="flex flex-col sm:flex-row sm:gap-4">
-              <dt className="text-surface-400 text-sm sm:w-32 shrink-0">体制</dt>
-              <dd className="text-surface-300">
-                {project.team.kind === "team"
-                  ? `チーム開発（${project.team.members}人）`
-                  : "個人開発"}
-              </dd>
-            </div>
-            {project.team.kind === "team" && (
-              <div className="flex flex-col sm:flex-row sm:gap-4">
-                <dt className="text-surface-400 text-sm sm:w-32 shrink-0">担当範囲</dt>
-                <dd className="text-surface-300">{project.team.myRole}</dd>
-              </div>
-            )}
-            <div className="flex flex-col sm:flex-row sm:gap-4">
-              <dt className="text-surface-400 text-sm sm:w-32 shrink-0">制作時期</dt>
-              <dd className="text-surface-300">{periodLabel}</dd>
-            </div>
-            {project.architecture && (
-              <div className="flex flex-col sm:flex-row sm:gap-4">
-                <dt className="text-surface-400 text-sm sm:w-32 shrink-0">構成</dt>
-                <dd className="text-surface-300">{project.architecture}</dd>
-              </div>
-            )}
-          </dl>
-        </Section>
-
-        {/* 主な機能 */}
-        {project.features?.length ? (
-          <Section id="features" title="主な機能">
-            <List items={project.features} />
-          </Section>
-        ) : null}
-
-        {/* 技術選定 */}
-        {project.decisions?.length ? (
-          <Section id="decisions" title="技術選定">
-            <div className="space-y-6">
-              {project.decisions.map(({ question, answer }) => (
-                <div key={question}>
-                  <h3 className="text-base font-bold text-surface-100 mb-2">
-                    {question}
-                  </h3>
-                  <p className="text-surface-300 leading-relaxed">{answer}</p>
-                </div>
-              ))}
-            </div>
-          </Section>
-        ) : null}
-
-        {/* 詰まった点と解決 */}
-        {project.challenges?.length ? (
-          <Section id="challenges" title="詰まった点と解決">
-            <div className="space-y-8">
-              {project.challenges.map((challenge) => (
-                <div key={challenge.problem} className="bg-surface-900 rounded-2xl p-6">
-                  <h3 className="text-base font-bold text-surface-100 mb-4">
-                    起きたこと
-                  </h3>
-                  <p className="text-surface-300 leading-relaxed mb-5">
-                    {challenge.problem}
-                  </p>
-
-                  <h3 className="text-base font-bold text-surface-100 mb-2">
-                    どう切り分けたか
-                  </h3>
-                  <p className="text-surface-300 leading-relaxed mb-5">
-                    {challenge.investigation}
-                  </p>
-
-                  <h3 className="text-base font-bold text-surface-100 mb-2">
-                    どう直したか
-                  </h3>
-                  <p className="text-surface-300 leading-relaxed">
-                    {challenge.solution}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </Section>
-        ) : null}
-
-        {/* セキュリティ */}
-        {project.security?.length ? (
-          <Section id="security" title="セキュリティ">
-            <List items={project.security} />
-          </Section>
-        ) : null}
-
-        {/* テストと運用 */}
-        {project.testing || project.deployment || project.cicd ? (
-          <Section id="quality" title="テストと運用">
+          {/* 体制と構成 */}
+          <Section id="role" title="体制と構成">
+            {project.diagram && <FlowDiagram diagram={project.diagram} />}
             <dl className="space-y-3">
-              {project.testing && (
+              <div className="flex flex-col sm:flex-row sm:gap-4">
+                <dt className="text-surface-400 text-sm sm:w-32 shrink-0">体制</dt>
+                <dd className="text-surface-300">
+                  {project.team.kind === "team"
+                    ? `チーム開発（${project.team.members}人）`
+                    : "個人開発"}
+                </dd>
+              </div>
+              {project.team.kind === "team" && (
                 <div className="flex flex-col sm:flex-row sm:gap-4">
-                  <dt className="text-surface-400 text-sm sm:w-32 shrink-0">テスト</dt>
-                  <dd className="text-surface-300">{project.testing}</dd>
+                  <dt className="text-surface-400 text-sm sm:w-32 shrink-0">担当範囲</dt>
+                  <dd className="text-surface-300">{project.team.myRole}</dd>
                 </div>
               )}
-              {project.deployment && (
+              <div className="flex flex-col sm:flex-row sm:gap-4">
+                <dt className="text-surface-400 text-sm sm:w-32 shrink-0">制作時期</dt>
+                <dd className="text-surface-300">{periodLabel}</dd>
+              </div>
+              {project.architecture && (
                 <div className="flex flex-col sm:flex-row sm:gap-4">
-                  <dt className="text-surface-400 text-sm sm:w-32 shrink-0">動作環境</dt>
-                  <dd className="text-surface-300">{project.deployment}</dd>
-                </div>
-              )}
-              {project.cicd && (
-                <div className="flex flex-col sm:flex-row sm:gap-4">
-                  <dt className="text-surface-400 text-sm sm:w-32 shrink-0">CI/CD</dt>
-                  <dd className="text-surface-300">{project.cicd}</dd>
+                  <dt className="text-surface-400 text-sm sm:w-32 shrink-0">構成</dt>
+                  <dd className="text-surface-300">{project.architecture}</dd>
                 </div>
               )}
             </dl>
           </Section>
-        ) : null}
 
-        {/* 学んだこと */}
-        {project.learned?.length || project.futureWork?.length ? (
-          <Section id="learned" title="学んだこと">
-            {project.learned?.length ? <List items={project.learned} /> : null}
-            {project.futureWork?.length ? (
-              <>
-                <h3 className="text-base font-bold text-surface-100 mt-8 mb-3">
-                  今なら変えること
-                </h3>
-                <List items={project.futureWork} />
-              </>
-            ) : null}
-          </Section>
-        ) : null}
+          {/* 主な機能 */}
+          {project.features?.length ? (
+            <Section id="features" title="主な機能">
+              <List items={project.features} />
+            </Section>
+          ) : null}
 
-        <div className="pt-4 border-t border-surface-800">
-          <Link
-            href="/#projects"
-            className="inline-flex items-center gap-2 py-2 text-sm text-surface-400 hover:text-surface-200 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            作品一覧へ戻る
-          </Link>
+          {/* 技術選定 */}
+          {project.decisions?.length ? (
+            <Section id="decisions" title="技術選定">
+              <div className="space-y-6">
+                {project.decisions.map(({ question, answer }) => (
+                  <div key={question}>
+                    <h3 className="text-base font-bold text-surface-100 mb-2">
+                      {question}
+                    </h3>
+                    <p className="text-surface-300 leading-relaxed">{answer}</p>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          ) : null}
+
+          {/* 詰まった点と解決 */}
+          {project.challenges?.length ? (
+            <Section id="challenges" title="詰まった点と解決">
+              <div className="space-y-8">
+                {project.challenges.map((challenge) => (
+                  <dl
+                    key={challenge.problem}
+                    className="bg-surface-900 rounded-2xl ring-1 ring-white/5 p-6 space-y-5"
+                  >
+                    {(
+                      [
+                        ["起きたこと", challenge.problem],
+                        ["どう切り分けたか", challenge.investigation],
+                        ["どう直したか", challenge.solution],
+                      ] as const
+                    ).map(([label, text]) => (
+                      <div key={label}>
+                        <dt className="font-mono text-xs text-brand-400 mb-2">{label}</dt>
+                        <dd className="text-surface-300 leading-relaxed">{text}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                ))}
+              </div>
+            </Section>
+          ) : null}
+
+          {/* セキュリティ */}
+          {project.security?.length ? (
+            <Section id="security" title="セキュリティ">
+              <List items={project.security} />
+            </Section>
+          ) : null}
+
+          {/* テストと運用 */}
+          {project.testing || project.deployment || project.cicd ? (
+            <Section id="quality" title="テストと運用">
+              <dl className="space-y-3">
+                {project.testing && (
+                  <div className="flex flex-col sm:flex-row sm:gap-4">
+                    <dt className="text-surface-400 text-sm sm:w-32 shrink-0">テスト</dt>
+                    <dd className="text-surface-300">{project.testing}</dd>
+                  </div>
+                )}
+                {project.deployment && (
+                  <div className="flex flex-col sm:flex-row sm:gap-4">
+                    <dt className="text-surface-400 text-sm sm:w-32 shrink-0">動作環境</dt>
+                    <dd className="text-surface-300">{project.deployment}</dd>
+                  </div>
+                )}
+                {project.cicd && (
+                  <div className="flex flex-col sm:flex-row sm:gap-4">
+                    <dt className="text-surface-400 text-sm sm:w-32 shrink-0">CI/CD</dt>
+                    <dd className="text-surface-300">{project.cicd}</dd>
+                  </div>
+                )}
+              </dl>
+            </Section>
+          ) : null}
+
+          {/* 学んだこと */}
+          {project.learned?.length || project.futureWork?.length ? (
+            <Section id="learned" title="学んだこと">
+              {project.learned?.length ? <List items={project.learned} /> : null}
+              {project.futureWork?.length ? (
+                <>
+                  <h3 className="text-base font-bold text-surface-100 mt-8 mb-3">
+                    今なら変えること
+                  </h3>
+                  <List items={project.futureWork} />
+                </>
+              ) : null}
+            </Section>
+          ) : null}
+
+          <div className="pt-4 border-t border-surface-800">
+            <Link
+              href="/#projects"
+              className="inline-flex items-center gap-2 py-2 text-sm text-surface-400 hover:text-surface-200 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              作品一覧へ戻る
+            </Link>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 }

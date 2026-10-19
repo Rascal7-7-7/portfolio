@@ -5,7 +5,7 @@ import { TextLink } from "./ui/TextLink";
 
 export function Contact() {
   return (
-    <section id="contact" className="py-24 px-6" aria-labelledby="contact-heading">
+    <section id="contact" className="py-16 sm:py-24 px-6" aria-labelledby="contact-heading">
       <div className="max-w-6xl mx-auto">
         <SectionHeader
           id="contact-heading"
@@ -27,10 +27,10 @@ export function Contact() {
           </TextLink>
           <TextLink
             href={`mailto:${profile.links.email}`}
-            aria-label="メールを送る"
+            aria-label={`メールを送る（${profile.links.email}）`}
           >
             <Mail className="w-4 h-4" aria-hidden="true" />
-            メールを送る
+            {profile.links.email}
           </TextLink>
         </div>
       </div>

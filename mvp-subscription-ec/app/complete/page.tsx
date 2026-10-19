@@ -6,6 +6,7 @@ import { ProductVisual } from '@/components/ProductVisual';
 import { PlanBadge } from '@/components/PlanBadge';
 import { TotalsTable } from '@/components/TotalsTable';
 import { CheckoutSteps } from '@/components/CheckoutSteps';
+import { RecurringSummary } from '@/components/RecurringSummary';
 import { DEMO_USER, findProduct } from '@/lib/catalog';
 import { formatJaLong } from '@/lib/date';
 import { yen } from '@/lib/pricing';
@@ -34,7 +35,7 @@ export default function CompletePage() {
 
       <div className="text-center">
         <CheckCircle2 className="mx-auto h-14 w-14 text-primary" strokeWidth={1.5} aria-hidden />
-        <h1 className="mt-4 font-headline text-3xl font-light text-on-background">ご注文ありがとうございます</h1>
+        <h1 className="mt-4 font-headline text-3xl font-light text-on-background [word-break:auto-phrase]">ご注文ありがとうございます</h1>
         <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
           {DEMO_USER.name} 様のお申し込みを受け付けました。
           <br />
@@ -43,12 +44,12 @@ export default function CompletePage() {
       </div>
 
       <div className="mt-8 flex items-center gap-4 rounded-lg bg-primary p-5 text-on-primary shadow-elevation-3">
-        <Truck className="h-8 w-8 flex-shrink-0 text-inverse-primary" aria-hidden />
+        <Truck className="h-8 w-8 flex-shrink-0 text-primary-container" aria-hidden />
         <div>
-          <p className="text-xs text-on-primary/75">初回お届け予定</p>
+          <p className="text-xs text-on-primary/90">初回お届け予定</p>
           <p className="tnum font-headline text-xl font-semibold">{formatJaLong(order.firstDelivery)}</p>
           {subscriptionCount > 0 && (
-            <p className="mt-0.5 text-xs text-on-primary/75">
+            <p className="mt-0.5 text-xs text-on-primary/90">
               定期便 {subscriptionCount} 件を開始しました。2回目以降はマイページで確認できます。
             </p>
           )}
@@ -78,6 +79,9 @@ export default function CompletePage() {
           })}
         </ul>
         <TotalsTable totals={order.totals} />
+        <div className="mt-4">
+          <RecurringSummary lines={order.lines} firstDelivery={order.firstDelivery} />
+        </div>
       </section>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">

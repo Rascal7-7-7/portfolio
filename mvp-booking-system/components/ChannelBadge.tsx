@@ -9,7 +9,7 @@ const STYLE: Record<Channel, string> = {
 
 export default function ChannelBadge({ channel }: { channel: Channel }) {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${STYLE[channel]}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold ${STYLE[channel]}`}>
       {CHANNEL_LABEL[channel]}
     </span>
   );

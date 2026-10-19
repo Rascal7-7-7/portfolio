@@ -1,6 +1,6 @@
 // 金額計算はここに集約する（税込価格ベース）。
 // node --test で直接読めるよう、型以外の import は持たない。
-import type { Interval, TaxRate, Totals } from './types';
+import type { Interval, Subscription, SubscriptionInterval, TaxRate, Totals } from './types';
 
 export const SUBSCRIPTION_DISCOUNT_RATE = 0.1;
 export const SHIPPING_FEE = 660;
@@ -57,6 +57,14 @@ export function calcTotals(lines: ReadonlyArray<PricingLine>): Totals {
 export function remainingForFreeShipping(subtotal: number, hasSubscription: boolean): number {
   if (hasSubscription) return 0;
   return Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+}
+
+// date.ts にも同じ対応表がある。node --test で値 import を持てないためここにも置く。
+const MONTHS_PER_INTERVAL: Record<SubscriptionInterval, number> = { monthly: 1, bimonthly: 2 };
+
+/** 定期便の月あたり金額の目安（2ヶ月ごと便は半額換算、1円未満は四捨五入） */
+export function monthlyEquivalent(subs: ReadonlyArray<Pick<Subscription, 'interval' | 'unitPrice' | 'quantity'>>): number {
+  return Math.round(subs.reduce((sum, s) => sum + (s.unitPrice * s.quantity) / MONTHS_PER_INTERVAL[s.interval], 0));
 }
 
 export function yen(amount: number): string {

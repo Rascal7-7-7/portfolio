@@ -38,6 +38,7 @@ export interface DashboardSummary {
   readonly outstandingTotal: number;
   readonly outstandingCount: number;
   readonly overdueCount: number;
+  readonly overdueTotal: number;
   readonly activeProjectCount: number;
   readonly activeProjectAmount: number;
   readonly todayTaskCount: number;
@@ -47,6 +48,7 @@ export interface DashboardSummary {
 export function dashboardSummary(data: AppData, today: ISODate): DashboardSummary {
   const [revenue] = monthlyRevenue(data.invoices, today, 1);
   const unpaid = data.invoices.filter((inv) => !inv.paidOn);
+  const overdue = unpaid.filter((inv) => invoiceStatus(inv, today) === "overdue");
   const active = data.projects.filter((p) => p.status === "in_progress");
   const openTasks = data.tasks.filter((t) => !t.done);
   return {
@@ -54,7 +56,8 @@ export function dashboardSummary(data: AppData, today: ISODate): DashboardSummar
     thisMonthExpected: revenue.expected,
     outstandingTotal: unpaid.reduce((sum, inv) => sum + inv.amount, 0),
     outstandingCount: unpaid.length,
-    overdueCount: unpaid.filter((inv) => invoiceStatus(inv, today) === "overdue").length,
+    overdueCount: overdue.length,
+    overdueTotal: overdue.reduce((sum, inv) => sum + inv.amount, 0),
     activeProjectCount: active.length,
     activeProjectAmount: active.reduce((sum, p) => sum + p.amount, 0),
     todayTaskCount: openTasks.filter((t) => diffDays(today, t.dueDate) <= 0).length,
@@ -78,6 +81,29 @@ export function projectProgress(project: Project, data: AppData): ProjectProgres
     invoiced: invoices.reduce((sum, inv) => sum + inv.amount, 0),
     paid: invoices.filter((inv) => inv.paidOn).reduce((sum, inv) => sum + inv.amount, 0),
   };
+}
+
+/** 受注額 − 既存の請求額合計。0 以下なら追加の請求はできない */
+export function remainingBillable(project: Project, invoices: readonly Invoice[]): number {
+  const invoiced = invoices.filter((inv) => inv.projectId === project.id).reduce((sum, inv) => sum + inv.amount, 0);
+  return project.amount - invoiced;
+}
+
+const STATUS_ORDER: Record<InvoiceStatus, number> = { overdue: 0, unpaid: 1, paid: 2 };
+
+/** 期限超過 → 未入金（期日が近い順）→ 入金済（新しい順） */
+export function sortInvoices(invoices: readonly Invoice[], today: ISODate): Invoice[] {
+  return invoices.toSorted((a, b) => {
+    const sa = invoiceStatus(a, today);
+    const sb = invoiceStatus(b, today);
+    if (sa !== sb) return STATUS_ORDER[sa] - STATUS_ORDER[sb];
+    return sa === "paid" ? (b.paidOn ?? "").localeCompare(a.paidOn ?? "") : a.dueOn.localeCompare(b.dueOn);
+  });
+}
+
+/** 年間契約は「納期」ではなく「契約満了」。ponytail: 案件名で判定、契約種別を持たせるならフィールド化する */
+export function dueLabel(project: Project): string {
+  return project.name.includes("年間契約") ? "契約満了" : "納期";
 }
 
 export type TaskGroup = "overdue" | "today" | "week" | "later" | "done";

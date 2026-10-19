@@ -14,14 +14,30 @@ interface Props {
   onGenerate: () => void
 }
 
+function GenerateButton({ onClick, className }: { onClick: () => void; className?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cx(className, 'flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(10,114,224,0.5),0_10px_30px_-10px_rgba(10,114,224,0.8)] transition hover:brightness-110 active:scale-[0.99]')}
+    >
+      <Icon name="sparkle" />
+      LPを生成する
+    </button>
+  )
+}
+
 export default function EditorForm({ doc, onStore, onMenu, onToggleSection, onSample, onGenerate }: Props) {
   const s = doc.store
   return (
     <div className="space-y-4 p-5 lg:p-6">
       <div>
         <h1 className="text-[22px] font-semibold tracking-tight">お店の情報を入れるだけ。</h1>
-        <p className="mt-1 text-sm text-ed-muted">5項目でLPが完成します。右側にその場で反映されます。</p>
+        <p className="mt-1 text-sm text-ed-muted">5項目でLPが完成します。入力はプレビューにその場で反映されます。</p>
       </div>
+
+      {/* スマホでは入力欄が長いので、上部にも生成ボタンを置く */}
+      <GenerateButton onClick={onGenerate} className="lg:hidden" />
 
       <div>
         <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-ed-muted">サンプルから始める</p>
@@ -65,14 +81,7 @@ export default function EditorForm({ doc, onStore, onMenu, onToggleSection, onSa
         <Field id="f-address" label="住所">
           <TextInput id="f-address" value={s.address} onChange={(e) => onStore({ address: e.target.value })} />
         </Field>
-        <button
-          type="button"
-          onClick={onGenerate}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(0,153,255,0.4),0_10px_30px_-10px_rgba(0,153,255,0.7)] transition hover:brightness-110 active:scale-[0.99]"
-        >
-          <Icon name="sparkle" />
-          LPを生成する
-        </button>
+        <GenerateButton onClick={onGenerate} />
       </Group>
 
       <Group step="2" title="営業情報・予約ボタン">

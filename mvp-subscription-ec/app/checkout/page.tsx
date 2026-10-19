@@ -7,6 +7,7 @@ import { useStore } from '@/components/StoreProvider';
 import { TotalsTable } from '@/components/TotalsTable';
 import { PlanBadge } from '@/components/PlanBadge';
 import { CheckoutSteps } from '@/components/CheckoutSteps';
+import { RecurringSummary } from '@/components/RecurringSummary';
 import { DEMO_USER } from '@/lib/catalog';
 import { cartTotals, toCartLines } from '@/lib/cart';
 import { firstDelivery, formatJa, todayIso } from '@/lib/date';
@@ -135,6 +136,9 @@ export default function CheckoutPage() {
               ))}
             </ul>
             <TotalsTable totals={totals} />
+            <div className="mt-4">
+              <RecurringSummary lines={lines} firstDelivery={delivery} />
+            </div>
             <button
               type="button"
               onClick={placeOrder}

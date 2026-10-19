@@ -1,7 +1,7 @@
 // 実行: npm test（node --test。Node 22.18+ / 24 の型ストリップで TS を直接実行する）
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { calcTotals, includedTax, remainingForFreeShipping, unitPrice } from './pricing.ts';
+import { calcTotals, includedTax, monthlyEquivalent, remainingForFreeShipping, unitPrice } from './pricing.ts';
 import { addMonths, firstDelivery, formatJa, nextAfter } from './date.ts';
 
 test('定期便は10%OFF、単品は定価', () => {
@@ -50,4 +50,16 @@ test('お届け日：初回は3日後、スキップは間隔ぶん先へ（月�
   assert.equal(nextAfter('2026-12-15', 'bimonthly'), '2027-02-15');
   assert.equal(addMonths('2027-01-31', 1), '2027-02-28');
   assert.equal(formatJa('2026-11-02'), '11月2日(月)');
+});
+
+test('マイページの月あたり目安：2ヶ月ごと便は半額換算して合算', () => {
+  assert.equal(
+    monthlyEquivalent([
+      { interval: 'monthly', unitPrice: 2916, quantity: 1 },
+      { interval: 'bimonthly', unitPrice: 2232, quantity: 2 },
+    ]),
+    5148,
+  );
+  assert.equal(monthlyEquivalent([{ interval: 'bimonthly', unitPrice: 1463, quantity: 1 }]), 732); // 731.5 → 四捨五入
+  assert.equal(monthlyEquivalent([]), 0);
 });

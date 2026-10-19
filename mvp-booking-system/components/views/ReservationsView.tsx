@@ -17,7 +17,8 @@ export default function ReservationsView() {
 
   const active     = todayList.filter(r => r.status !== 'canceled');
   const pending    = todayList.filter(r => r.status === 'pending');
-  const unnotified = sorted.filter(r => r.reservation_date >= today && needsAttention(r));
+  // スケジュール画面の「未通知」と同じく本日分だけ数える
+  const unnotified = todayList.filter(needsAttention);
 
   const handleReset = () => {
     reset();
@@ -47,8 +48,8 @@ export default function ReservationsView() {
         <SummaryCard label="本日の予約" value={active.length} accent="#00288e"
           sub={`キャンセル除く・全${todayList.length}件`} />
         <SummaryCard label="本日 確定待ち" value={pending.length} accent="#1a3844"
-          sub={pending.length > 0 ? 'ワンクリックで確定できます' : '確定待ちなし'} />
-        <SummaryCard label="確認通知 未送信" value={unnotified.length} accent="#ba1a1a"
+          sub={pending.length > 0 ? '詳細画面からワンクリックで確定' : '確定待ちなし'} />
+        <SummaryCard label="本日 確認通知 未送信" value={unnotified.length} accent="#ba1a1a"
           sub={unnotified.length > 0 ? '赤い線の予約が対象です' : 'すべて送信済み'} alert={unnotified.length > 0} />
       </div>
 
@@ -116,7 +117,10 @@ function SummaryCard({ label, value, accent, sub, alert = false }: SummaryCardPr
     <div className="bg-white rounded-xl p-3 md:p-6 shadow-sm flex flex-col justify-between"
       style={{ borderBottom: `4px solid ${accent}` }}>
       <div>
-        <p className="text-[11px] md:text-xs font-bold text-[#444653] mb-1 md:mb-2 leading-tight">{label}</p>
+        <p className="text-[11px] md:text-xs font-bold text-[#444653] mb-1 md:mb-2 leading-tight">
+          {/* 狭い幅でも「未送信」などの語の途中で折り返さない */}
+          {label.split(' ').map((w, i) => <span key={i}>{i > 0 && ' '}<span className="whitespace-nowrap">{w}</span></span>)}
+        </p>
         <p className="text-2xl md:text-4xl font-extrabold" style={{ color: accent }}>
           {value}<span className="text-xs md:text-base font-bold text-[#444653] ml-0.5 md:ml-1">件</span>
         </p>

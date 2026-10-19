@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --test src/lib/calc.test.ts"
+    "test": "node --test src/lib/calc.test.ts src/components/estimate-form/item-check.test.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

@@ -14,7 +14,7 @@ export function TotalsTable({ totals }: { totals: Totals }) {
       <div className="flex justify-between text-xs text-on-surface-variant">
         <dt>うち消費税</dt>
         <dd>
-          8%対象 {yen(totals.taxByRate[8])} / 10%対象 {yen(totals.taxByRate[10])}
+          消費税（8%）{yen(totals.taxByRate[8])} / 消費税（10%）{yen(totals.taxByRate[10])}
         </dd>
       </div>
     </dl>

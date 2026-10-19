@@ -1,10 +1,10 @@
 import type { CategoryKey, SectionKey } from './types'
 
-export const CATEGORIES: Record<CategoryKey, { label: string; emoji: string; motif: readonly string[] }> = {
-  cafe: { label: 'カフェ・飲食店', emoji: '☕', motif: ['🥐', '🍰', '🌿'] },
-  salon: { label: '美容室・サロン', emoji: '✂️', motif: ['💇‍♀️', '✨', '🌸'] },
-  seitai: { label: '整体・マッサージ', emoji: '🌿', motif: ['🧘', '💆', '🍃'] },
-  other: { label: 'その他の店舗', emoji: '🏪', motif: ['⭐', '🎁', '💡'] },
+export const CATEGORIES: Record<CategoryKey, { label: string; en: string; emoji: string }> = {
+  cafe: { label: 'カフェ・飲食店', en: 'Café', emoji: '☕' },
+  salon: { label: '美容室・サロン', en: 'Hair & Beauty', emoji: '✂️' },
+  seitai: { label: '整体・マッサージ', en: 'Body Care', emoji: '🌿' },
+  other: { label: 'その他の店舗', en: 'Welcome', emoji: '🏪' },
 }
 
 export const CATEGORY_KEYS = Object.keys(CATEGORIES) as CategoryKey[]

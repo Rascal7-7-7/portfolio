@@ -100,7 +100,7 @@ function FormSection({ icon, title, children }: { icon: string; title: string; c
     <fieldset className="bg-white rounded-xl p-5 md:p-7 shadow-sm">
       <legend className="sr-only">{title}</legend>
       <div className="flex items-center gap-2 mb-4 md:mb-5 pb-4 border-b border-[#f3f4f5]" aria-hidden="true">
-        <span className="material-symbols-outlined text-[#00288e]">{icon}</span>
+        <span className="material-symbols-outlined text-[#00288e]" aria-hidden="true">{icon}</span>
         <span className="text-sm font-bold text-[#1a3844]">{title}</span>
       </div>
       {children}

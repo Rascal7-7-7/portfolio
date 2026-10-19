@@ -60,6 +60,7 @@ export type {
   Category,
   Challenge,
   Decision,
+  FlowDiagram,
   Highlight,
   Period,
   Project,

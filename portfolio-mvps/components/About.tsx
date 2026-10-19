@@ -12,7 +12,7 @@ const blocks = [
   },
   {
     title: "作ったものは公開する",
-    body: "ローカルで動かして終わりにせず、サーバー・Docker・データベース・ネットワークを組み合わせて、実際にサービスとして動かすところまでを習慣にしています。",
+    body: "ローカルで動かして終わりにせず、サーバー・Docker・データベース・ネットワークを組み合わせて動かしています。小さく作ったものは公開URLで触れる状態に、代表作はソースコードを公開しています。",
   },
   {
     title: "これから",
@@ -22,7 +22,7 @@ const blocks = [
 
 export function About() {
   return (
-    <section id="about" className="py-20 px-6 bg-surface-900/40" aria-labelledby="about-heading">
+    <section id="about" className="py-16 sm:py-20 px-6 bg-surface-900/40" aria-labelledby="about-heading">
       <div className="max-w-6xl mx-auto">
         <SectionHeader
           id="about-heading"

@@ -42,6 +42,13 @@ export function formatDate(iso: string): string {
   return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 }
 
+const WEEKDAYS_JA = "日月火水木金土";
+
+/** フォーム表示用：2026年10月19日（月） */
+export function formatDateWithWeekday(iso: string): string {
+  return `${formatDate(iso)}（${WEEKDAYS_JA[parseISODate(iso).getDay()]}）`;
+}
+
 export function estimateNumber(id: number): string {
   return `EST-${String(id).padStart(4, "0")}`;
 }

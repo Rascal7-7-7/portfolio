@@ -5,6 +5,8 @@ const PATHS = {
   copy: 'M9 9h11v11H9zM5 15H4V4h11v1',
   external: 'M14 4h6v6M20 4l-9 9M18 14v6H4V6h6',
   check: 'M5 12l5 5 9-10',
+  clock: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 7v5l3 2',
+  pin: 'M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12zM12 6.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5z',
   rocket: 'M5 19l3-1 8-8a5 5 0 0 0-3-3l-8 8-1 3zM14 4c3 0 6 3 6 6M9 15l-3-3',
 } as const
 

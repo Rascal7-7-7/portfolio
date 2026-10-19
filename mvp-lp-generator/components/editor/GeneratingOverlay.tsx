@@ -13,7 +13,7 @@ export default function GeneratingOverlay() {
   }, [])
 
   return (
-    <div role="status" aria-live="polite" className="absolute inset-0 z-20 flex items-center justify-center bg-ed-bg/70 backdrop-blur-md">
+    <div role="status" aria-live="polite" className="absolute inset-0 z-20 flex items-start justify-center bg-ed-bg/70 pt-24 lg:items-center lg:pt-0 backdrop-blur-md">
       <div className="w-72 rounded-2xl border border-white/10 bg-ed-panel p-6 text-center shadow-2xl">
         <div aria-hidden className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-accent" />
         <p className="mt-4 text-sm font-semibold">LPを生成しています</p>

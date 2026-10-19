@@ -9,7 +9,7 @@ const config: Config = {
         primary: { DEFAULT: "#533afd", hover: "#4434d4", soft: "#eeebff" },
         navy: "#061b31",
         body: "#425466",
-        muted: "#64748d",
+        muted: "#5f6f87",
         line: "#e5edf5",
         canvas: "#f6f9fc",
       },

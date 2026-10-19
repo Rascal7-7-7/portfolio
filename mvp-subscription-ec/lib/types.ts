@@ -18,6 +18,8 @@ export type Visual = {
 export type Product = {
   id: string;
   name: string;
+  /** 改行してよい位置で区切った商品名（join すると name。空白は単独要素） */
+  nameParts: ReadonlyArray<string>;
   nameEn: string;
   category: string;
   tagline: string;

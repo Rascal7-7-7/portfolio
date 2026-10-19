@@ -16,14 +16,14 @@ import StatusBadge from '@/components/StatusBadge';
 
 const FORM_ID = 'edit-reservation';
 
-/** 次に押すべきボタン。受付 → 確定 → 完了 の一本道 */
+/** 次に押すべきボタン。確定待ち → 確定 → 完了 の一本道 */
 const NEXT_STEP: Partial<Record<ReservationStatus, { to: ReservationStatus; label: string; icon: string }>> = {
   pending:   { to: 'confirmed', label: '予約を確定する',   icon: 'event_available' },
   confirmed: { to: 'completed', label: '来店完了にする',   icon: 'task_alt' },
 };
 
 export default function ReservationDetailView({ id }: { id: number }) {
-  const { reservations, update, remove, notify } = useStore();
+  const { reservations, today, update, remove, notify } = useStore();
   const router = useRouter();
   if (!reservations) return <LoadingState />;
 
@@ -39,7 +39,7 @@ export default function ReservationDetailView({ id }: { id: number }) {
   const sendNotice = (kind: 'confirmation' | 'reminder') => {
     const via = CHANNEL_NOTIFY_VIA[r.channel];
     update(r.id, kind === 'confirmation' ? { confirmation_sent: true } : { reminder_sent: true });
-    const what = kind === 'confirmation' ? '予約確認' : '前日リマインド';
+    const what = kind === 'confirmation' ? '予約確認' : '前日連絡';
     notify(`${r.customer_name} 様へ${what}を${via}で送信しました（デモのため実際には送信されません）`);
   };
 
@@ -111,7 +111,7 @@ export default function ReservationDetailView({ id }: { id: number }) {
 
         {/* スマホでは連絡パネルをフォームより先に出す（デモで最初に押す操作のため） */}
         <div className="md:col-span-4 space-y-5 order-first md:order-none">
-          <NotificationPanel reservation={r} onSend={sendNotice} />
+          <NotificationPanel reservation={r} today={today} onSend={sendNotice} />
           <div className="bg-white rounded-xl p-5 shadow-sm text-[11px] text-[#444653] space-y-1">
             <p>登録：{formatDateTime(r.created_at)}</p>
             <p>最終更新：{formatDateTime(r.updated_at)}</p>

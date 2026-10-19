@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import type { Project } from "@/content/projects";
+import { EvidenceLog } from "./EvidenceLog";
 import { Badge } from "./ui/Badge";
 import { ProjectLinks, metaLabel, periodLabel } from "./ProjectMeta";
 
@@ -42,12 +43,7 @@ export function FeaturedProject({ project }: { project: Project }) {
       </div>
 
       {evidence && (
-        <figure className="md:col-span-2 self-start rounded-xl bg-surface-950 ring-1 ring-white/5 p-5">
-          <figcaption className="font-mono text-xs text-brand-400 mb-3">根拠</figcaption>
-          <pre className="font-mono text-xs sm:text-[13px] leading-relaxed text-surface-300 whitespace-pre-wrap">
-            {evidence.join("\n")}
-          </pre>
-        </figure>
+        <EvidenceLog lines={evidence} className="md:col-span-2 self-start bg-surface-950" />
       )}
     </article>
   );

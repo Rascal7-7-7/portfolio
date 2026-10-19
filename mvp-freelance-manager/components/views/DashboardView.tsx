@@ -67,7 +67,7 @@ export function DashboardView() {
           label="未入金の請求"
           value={formatYen(s.outstandingTotal)}
           icon={<Wallet size={17} />}
-          sub={s.overdueCount > 0 ? `${s.outstandingCount}件・うち期限超過${s.overdueCount}件` : `${s.outstandingCount}件`}
+          sub={s.overdueCount > 0 ? `${s.outstandingCount}件・うち期限超過 ${formatYen(s.overdueTotal)}` : `${s.outstandingCount}件`}
           tone={s.overdueCount > 0 ? "alert" : "default"}
         />
         <KpiCard

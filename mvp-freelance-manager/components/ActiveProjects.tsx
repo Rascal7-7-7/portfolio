@@ -18,7 +18,7 @@ export function ActiveProjects({ data }: { data: AppData }) {
           <li key={p.id}>
             <Link href={`/projects/${p.id}`} className="block px-4 py-3 hover:bg-warm-50 sm:px-5">
               <div className="flex items-baseline justify-between gap-3">
-                <p className="min-w-0 truncate text-sm font-medium text-ink">{p.name}</p>
+                <p className="min-w-0 text-sm font-medium break-words text-ink">{p.name}</p>
                 <p className="num shrink-0 text-sm font-semibold text-ink">{formatYen(p.amount)}</p>
               </div>
               <div className="mt-0.5 flex items-center justify-between gap-3 text-xs text-warm-500">

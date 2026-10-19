@@ -17,7 +17,7 @@ export function needsAttention(r: Reservation): boolean {
 
 export function ReservationTableHeader() {
   return (
-    <div className="hidden md:grid grid-cols-12 px-4 py-2 text-[10px] font-bold text-[#444653] tracking-widest bg-[#f3f4f5] rounded-lg">
+    <div className="hidden md:grid grid-cols-12 px-4 py-2 text-[11px] font-bold text-[#444653] tracking-wider bg-[#f3f4f5] rounded-lg">
       <div className="col-span-2">予約日時</div>
       <div className="col-span-4">顧客名 / メニュー</div>
       <div className="col-span-2 text-center">状態</div>
@@ -37,15 +37,16 @@ export default function ReservationRow({ r, isToday, muted = false }: Props) {
   return (
     <Link
       href={`/reservations/${r.id}`}
-      className={`flex md:grid md:grid-cols-12 items-center bg-white px-4 py-3 md:py-4 rounded-xl shadow-sm transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00288e] gap-3 md:gap-0 ${
-        r.status === 'canceled' || muted ? 'opacity-60' : ''
+      className={`flex md:grid md:grid-cols-12 items-center px-4 py-3 md:py-4 rounded-xl transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00288e] gap-3 md:gap-0 ${
+        // 透明度で薄くすると文字のコントラストが AA を割るため、背景色で「済んだ予約」を表す
+        r.status === 'canceled' || muted ? 'bg-[#f3f4f5] ring-1 ring-black/5' : 'bg-white shadow-sm'
       } ${borderCls}`}
     >
       <div className="shrink-0 w-14 md:w-auto md:col-span-2">
         <p className={`text-base font-black ${isToday ? 'text-[#00288e]' : 'text-[#191c1d]'}`}>
           {r.reservation_time}
         </p>
-        <p className="text-[10px] font-bold text-[#444653] mt-0.5">{formatShortDate(r.reservation_date)}</p>
+        <p className="text-[11px] font-bold text-[#444653] mt-0.5">{formatShortDate(r.reservation_date)}</p>
       </div>
 
       <div className="flex-1 min-w-0 md:col-span-4">
@@ -55,7 +56,7 @@ export default function ReservationRow({ r, isToday, muted = false }: Props) {
         </p>
         <p className="text-xs text-[#444653] truncate mt-0.5">{r.service_name}</p>
         {attention && (
-          <p className="md:hidden text-[10px] text-[#ba1a1a] font-bold mt-1">確認通知 未送信</p>
+          <p className="md:hidden text-[11px] text-[#ba1a1a] font-bold mt-1">確認通知 未送信</p>
         )}
       </div>
 
