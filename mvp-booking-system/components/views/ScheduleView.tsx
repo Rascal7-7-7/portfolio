@@ -160,7 +160,7 @@ function Timeline({ list }: { list: Reservation[] }) {
 function Card({ r }: { r: Reservation }) {
   return (
     <Link href={`/reservations/${r.id}`}
-      className={`flex items-start gap-3 bg-white rounded-lg px-4 py-3 shadow-sm ring-1 ring-black/5 hover:shadow-md transition-shadow focus-visible:outline-2 focus-visible:outline-[#00288e] ${r.status === 'canceled' ? 'opacity-60' : ''}`}
+      className={`flex items-start gap-3 rounded-lg px-4 py-3 ring-1 ring-black/5 hover:shadow-md transition-shadow focus-visible:outline-2 focus-visible:outline-[#00288e] ${r.status === 'canceled' ? 'bg-[#f3f4f5]' : 'bg-white shadow-sm'}`}
       style={{ borderLeft: `4px solid ${accentColor(r)}` }}>
       <div className="shrink-0 w-14">
         <p className="text-base font-black text-[#191c1d]">{r.reservation_time}</p>
