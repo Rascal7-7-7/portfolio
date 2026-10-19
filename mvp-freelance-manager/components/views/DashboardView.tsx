@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { formatLongDate, formatMonthLabel } from "@/lib/dates";
@@ -22,13 +21,6 @@ import { InvoiceList } from "@/components/InvoiceList";
 import { ActiveProjects } from "@/components/ActiveProjects";
 import type { AppData, ISODate } from "@/types";
 
-interface SummaryRow {
-  href: string;
-  label: string;
-  value: string;
-  sub: string;
-}
-
 function signedYen(delta: number): string {
   return `${delta > 0 ? "+" : "−"}${formatYen(Math.abs(delta))}`;
 }
@@ -44,7 +36,7 @@ interface FlowStep {
 
 /**
  * freee の「請求 → 入金 → 残り」に倣い、請求したお金がどこまで回収できたかを1行で見せる。
- * 請求 = 今月の入金 + 未入金の合計（来月以降が期日の未入金も含む）なので、入金を記録すると「入金」が増え「残り」が同額減る。
+ * 請求額 = 今月の入金 + 未回収の合計（来月以降が期日の未回収も含む）なので、入金を記録すると「入金」が増え「残り」が同額減る。
  * 月次グラフの今月分（今月期日の分だけ）と額が違うため、その差を下に一行で書く。
  * 増減バッジは見出し行に出し、数字の行の高さは固定して下の要素を動かさない
  */
@@ -56,8 +48,8 @@ function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
   const billed = s.thisMonthPaid + s.outstandingTotal;
   const ratio = billed > 0 ? s.thisMonthPaid / billed : 0;
   const steps: FlowStep[] = [
-    { label: "請求", value: billed, sub: "入金＋未入金（全期日）" },
-    { label: "今月の入金", value: s.thisMonthPaid, delta: paidDelta, sub: `請求の ${Math.round(ratio * 100)}%` },
+    { label: "請求額", value: billed, sub: "今月の入金＋未回収" },
+    { label: "今月の入金", value: s.thisMonthPaid, delta: paidDelta, sub: `請求額の ${Math.round(ratio * 100)}%` },
     {
       label: "残り",
       value: s.outstandingTotal,
@@ -123,7 +115,7 @@ function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
       </div>
       {s.laterDueTotal > 0 && (
         <p className="num border-t border-line px-3 py-2 text-[11px] text-warm-500 sm:px-5 sm:text-xs">
-          来月以降が期日の {formatYen(s.laterDueTotal)} を含みます。下のグラフの今月分は今月が期日の請求だけです。
+          未回収には来月以降が期日の {formatYen(s.laterDueTotal)} を含みます。下のグラフの今月分は今月が期日の請求だけです。
         </p>
       )}
     </Card>
@@ -164,25 +156,6 @@ function MonthlyTable({ rows }: { rows: readonly MonthlyRevenue[] }) {
   );
 }
 
-/** 右側の要約。タイルではなく1枚のパネルに行として並べる */
-function SummaryList({ rows }: { rows: readonly SummaryRow[] }) {
-  return (
-    <Card className="flex flex-col">
-      <ul className="grid flex-1 grid-cols-1 divide-y divide-line sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y">
-        {rows.map((r) => (
-          <li key={r.label} className="min-w-0">
-            <Link href={r.href} className="flex h-full flex-col justify-center px-3 py-3 hover:bg-warm-50 sm:px-5 sm:py-3.5">
-              <span className="text-xs text-warm-500">{r.label}</span>
-              <span className="num mt-0.5 text-base font-semibold text-ink sm:text-lg">{r.value}</span>
-              <span className="num text-[11px] text-warm-500 sm:text-xs">{r.sub}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </Card>
-  );
-}
-
 export function DashboardView() {
   const store = useAppStore();
   if (!store) return <PageSkeleton />;
@@ -204,45 +177,27 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
   const firstMonth = formatMonthLabel(revenue[0].month);
   const lastMonth = formatMonthLabel(revenue[revenue.length - 1].month);
 
-  const summary: SummaryRow[] = [
-    {
-      href: "/projects",
-      label: "進行中の案件",
-      value: `${s.activeProjectCount}件`,
-      sub: `受注額 ${formatYen(s.activeProjectAmount)}`,
-    },
-    {
-      href: "/tasks",
-      label: "今日やること",
-      value: `${s.todayTaskCount}件`,
-      sub: s.overdueTaskCount > 0 ? `うち期限切れ ${s.overdueTaskCount}件` : "期限切れなし",
-    },
-  ];
-
   return (
     <Page>
       <PageHeader eyebrow={formatLongDate(today)} title="ダッシュボード" />
 
       <BillingFlow summary={s} paidDelta={paidDelta} outstandingDelta={outstandingDelta} />
 
-      <div className="mb-6 grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-4 pt-4 sm:px-5 sm:pt-5">
-            <h2 className="text-[13px] font-semibold text-ink">入金の推移</h2>
-            <p className="num text-xs text-warm-500">
-              {firstMonth}から{lastMonth}の入金 <span className="font-medium text-ink">{formatYen(sixMonthTotal)}</span>
-            </p>
-          </div>
-          <div className="px-3 pt-2 pb-4 sm:px-5">
-            <RevenueChart
-              data={revenue}
-              growFrom={paidDelta > 0 ? (s.thisMonthPaid - paidDelta) / s.thisMonthPaid : null}
-            />
-            <MonthlyTable rows={revenue} />
-          </div>
-        </Card>
-        <SummaryList rows={summary} />
-      </div>
+      <Card className="mb-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-4 pt-4 sm:px-5 sm:pt-5">
+          <h2 className="text-[13px] font-semibold text-ink">入金の推移</h2>
+          <p className="num text-xs text-warm-500">
+            {firstMonth}から{lastMonth}の入金 <span className="font-medium text-ink">{formatYen(sixMonthTotal)}</span>
+          </p>
+        </div>
+        <div className="px-3 pt-2 pb-4 sm:px-5">
+          <RevenueChart
+            data={revenue}
+            growFrom={paidDelta > 0 ? (s.thisMonthPaid - paidDelta) / s.thisMonthPaid : null}
+          />
+          <MonthlyTable rows={revenue} />
+        </div>
+      </Card>
 
       <div className="mb-4 grid gap-4 lg:grid-cols-5 lg:items-start">
         {/* 「入金済にする」がデモの山場なので、見た目もフォーカス順も今日やることより先に置く */}
