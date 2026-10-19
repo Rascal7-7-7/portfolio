@@ -16,6 +16,7 @@ import {
   draftFromEstimate,
   emptyDraft,
   emptyItem,
+  parseItem,
   sampleDraft,
   toDraftItem,
   toPreview,
@@ -36,7 +37,11 @@ export default function EstimateForm({ initial }: Props) {
   const [errors, setErrors] = useState<string[]>([]);
 
   const preview = toPreview(draft);
-  const amounts = preview.items.map(lineAmount);
+  // 行ごとの金額。数量・単価が不正な行は null（行内に赤字で理由を出し、合計には入れない）
+  const amounts = draft.items.map((item) => {
+    const parsed = parseItem(item);
+    return parsed ? lineAmount(parsed) : null;
+  });
   const totals = calcTotals(preview.items.filter((item) => item.name.trim() !== ""));
 
   const setField = (field: TextField, value: string) => setDraft((d) => ({ ...d, [field]: value }));
