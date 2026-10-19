@@ -78,7 +78,9 @@ export default function EstimateList() {
 
       <section aria-label="見積一覧">
         <div className="flex flex-col gap-3 border-b border-line sm:flex-row sm:items-end sm:justify-between">
-          <div role="group" aria-label="ステータスで絞り込み" className="-mx-4 flex overflow-x-auto px-4 sm:mx-0 sm:px-0">
+          {/* 狭い幅ではタブが横にスクロールする。右端のフェードで続きがあることを示す（末尾は余白に掛かるだけ） */}
+          <div className="relative -mx-4 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-10 after:bg-gradient-to-l after:from-white after:content-[''] sm:mx-0 sm:after:hidden">
+          <div role="group" aria-label="ステータスで絞り込み" className="flex overflow-x-auto pl-4 pr-10 sm:px-0">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -99,6 +101,7 @@ export default function EstimateList() {
                 </span>
               </button>
             ))}
+          </div>
           </div>
           <label className="relative mb-3 block sm:mb-2 sm:w-64">
             <span className="sr-only">取引先・件名で検索</span>

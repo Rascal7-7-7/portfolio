@@ -6,6 +6,7 @@ import { ISSUER } from "@/data/seed";
 import { useEstimates } from "@/lib/store";
 import { calcTotals, lineAmount, TAX_RATE_PERCENT } from "@/lib/calc";
 import { daysBetween, estimateNumber, formatDate, formatYen, todayISO } from "@/lib/utils";
+import EstimateDocument from "@/components/EstimateDocument";
 import Icon from "@/components/Icon";
 import LoadingState from "@/components/LoadingState";
 import NotFoundState from "@/components/NotFoundState";
@@ -42,7 +43,7 @@ export default function CustomerView({ id }: { id: number }) {
         </Link>
       </div>
 
-      <div className="mx-auto max-w-lg px-4 pb-12 pt-8 sm:pt-12">
+      <div className="mx-auto max-w-lg px-4 pt-8 sm:pt-12">
         <p className="text-sm font-semibold text-navy">{ISSUER.name}</p>
 
         <section aria-label="お見積り" className="mt-4 rounded-lg border border-line bg-white shadow-sm">
@@ -107,7 +108,28 @@ export default function CustomerView({ id }: { id: number }) {
             </dl>
           </div>
         </section>
+      </div>
 
+      {/*
+        管理側と同じ紙面（角印つき）。承認の前に正式な見積書を確かめられるよう、折りたたみで添える。
+        閉じた状態は上のカードと同じ幅、開くと帳票が読める幅（max-w-3xl）まで広げる
+      */}
+      <details className="group mx-auto mt-4 max-w-3xl px-4">
+        <summary
+          className={`mx-auto flex max-w-[calc(32rem-2rem)] cursor-pointer list-none items-center justify-between gap-2 rounded-lg border border-line bg-white px-6 py-4 text-sm font-semibold text-navy shadow-sm hover:bg-canvas [&::-webkit-details-marker]:hidden ${FOCUS}`}
+        >
+          <span className="inline-flex items-center gap-2">
+            <Icon name="file" className="h-4 w-4 text-muted" />
+            見積書を表示
+          </span>
+          <Icon name="chevron" className="h-4 w-4 text-muted group-open:rotate-180" />
+        </summary>
+        <div className="mt-3">
+          <EstimateDocument estimate={estimate} id={estimate.id} />
+        </div>
+      </details>
+
+      <div className="mx-auto max-w-lg px-4 pb-12">
         <p className="mt-6 text-balance text-center text-xs text-muted">
           ご不明な点は {ISSUER.name}<span className="whitespace-nowrap">（TEL {ISSUER.tel}）</span>までお問い合わせください。
         </p>

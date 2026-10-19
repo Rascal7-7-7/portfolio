@@ -177,7 +177,7 @@ export default function EstimateForm({ initial }: Props) {
       {/* Stripe の請求書エディタと同じく、右側にグレー地の上で帳票プレビューを並べる */}
       <div id="estimate-preview" className="scroll-mt-4 rounded bg-canvas p-3 sm:p-6 xl:sticky xl:p-4 xl:top-4 xl:self-start">
         <p className="mb-3 text-xs font-medium text-body">見積書プレビュー（入力と同時に更新）</p>
-        <EstimateDocument estimate={preview} id={initial?.id} />
+        <EstimateDocument estimate={preview} id={initial?.id} annotate />
       </div>
 
       {/*

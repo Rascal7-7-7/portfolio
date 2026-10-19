@@ -7,6 +7,8 @@ import { estimateNumber, formatDate, formatYen } from "@/lib/utils";
 interface Props {
   estimate: EstimateInput;
   id?: number;
+  /** 作成画面のプレビューで「自動採番」「自動計算」の注釈を添える */
+  annotate?: boolean;
 }
 
 const CELL = "px-2 py-2";
@@ -15,7 +17,7 @@ const CELL = "px-2 py-2";
  * 見積書の帳票。作成フォームのプレビューと詳細画面・印刷で共用する。
  * 組版は日本の一般的な見積書にならう：右上に番号・日付、中央に表題、左に宛名と御見積金額、右に発行者。
  */
-export default function EstimateDocument({ estimate, id }: Props) {
+export default function EstimateDocument({ estimate, id, annotate = false }: Props) {
   const items = estimate.items.filter((item) => item.name.trim() !== "");
   const { subtotal, tax, total } = calcTotals(items);
 
@@ -25,7 +27,10 @@ export default function EstimateDocument({ estimate, id }: Props) {
       className="border border-line bg-white px-5 py-6 text-[13px] leading-relaxed text-navy sm:px-8 sm:py-10 print:border-0 print:p-0"
     >
       <dl className="tnum ml-auto grid w-fit grid-cols-[auto_auto] gap-x-3 text-xs text-body">
-        <dt>見積番号</dt>
+        <dt className="relative">
+          見積番号
+          {annotate && <Annotation label="自動採番" className="right-full top-1/2 mr-2 -translate-y-1/2" />}
+        </dt>
         <dd className="text-right">{id ? estimateNumber(id) : "保存時に採番"}</dd>
         <dt>発行日</dt>
         <dd className="text-right">{estimate.issuedAt ? formatDate(estimate.issuedAt) : "—"}</dd>
@@ -51,7 +56,8 @@ export default function EstimateDocument({ estimate, id }: Props) {
             <dd className="tnum">{estimate.validUntil ? formatDate(estimate.validUntil) : "—"}</dd>
           </dl>
 
-          <p className="mt-5 flex items-stretch border border-navy">
+          <p className={`relative flex items-stretch border border-navy ${annotate ? "mt-9" : "mt-5"}`}>
+            {annotate && <Annotation label="自動計算" vertical className="bottom-full right-4" />}
             <span className="flex items-center whitespace-nowrap border-r border-navy bg-canvas px-3 text-xs font-semibold sm:text-sm">
               御見積金額
             </span>
@@ -70,7 +76,7 @@ export default function EstimateDocument({ estimate, id }: Props) {
         <address className="pt-8 text-xs not-italic leading-relaxed text-body">
           <p className="relative w-fit text-sm font-semibold text-navy">
             {ISSUER.name}
-            <CompanySeal className="absolute bottom-0 left-full -ml-6 h-12 w-12" />
+            <CompanySeal className="absolute bottom-0 left-full -ml-3 h-10 w-10 sm:-ml-6 sm:h-12 sm:w-12" />
           </p>
           {/* 住所は語の途中で折らず、空白の位置でだけ改行する */}
           <p>
@@ -144,6 +150,22 @@ export default function EstimateDocument({ estimate, id }: Props) {
         </div>
       )}
     </article>
+  );
+}
+
+/**
+ * 帳票の外から指す小さな注釈（Misoca のプレビューの説明書きにならう）。細い線＋短いラベルをアクセント1色で。
+ * 紙面の内容ではないので読み上げ・印刷からは外す（同じことは入力欄の合計表示とフォーム文言で伝わる）
+ */
+function Annotation({ label, vertical = false, className }: { label: string; vertical?: boolean; className: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute flex items-center whitespace-nowrap text-[10px] font-semibold leading-none text-primary print:hidden ${vertical ? "flex-col" : ""} ${className}`}
+    >
+      {label}
+      <span className={vertical ? "mt-1 h-2.5 w-px bg-primary" : "ml-1.5 h-px w-5 bg-primary"} />
+    </span>
   );
 }
 

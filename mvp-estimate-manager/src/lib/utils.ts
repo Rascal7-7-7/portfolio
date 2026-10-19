@@ -42,6 +42,12 @@ export function formatDate(iso: string): string {
   return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 }
 
+/** 履歴用の短い日付：9/24 */
+export function formatShortDate(iso: string): string {
+  const date = parseISODate(iso);
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+}
+
 const WEEKDAYS_JA = "日月火水木金土";
 
 /** フォーム表示用：2026年10月19日（月） */
