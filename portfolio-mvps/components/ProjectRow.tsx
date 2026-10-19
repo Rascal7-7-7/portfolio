@@ -1,24 +1,35 @@
 import type { Project } from "@/content/projects";
-import { ProjectLinks, metaLabel, periodLabel } from "./ProjectMeta";
+import { ProjectLinks, periodLabel } from "./ProjectMeta";
 
 /**
- * 代表作以外の作品。カードを並べるとどれも同じに見えるため、行のリストにする。
+ * 代表作以外の作品。代表作より目立たせないよう、作品名・一言説明・技術・リンクだけを
+ * 1〜2行に収め、説明文は折りたたむ。
  */
 export function ProjectRow({ project }: { project: Project }) {
   const { name, headline, summary, stack } = project;
 
   return (
-    <article className="grid grid-cols-1 sm:grid-cols-8 gap-2 sm:gap-6 py-6">
-      <p className="sm:col-span-2 font-mono text-xs text-surface-400 pt-1">{periodLabel(project)}</p>
-      <div className="sm:col-span-6">
-        <h3 className="text-lg font-bold text-surface-50">{name}</h3>
-        <p className="text-sm text-surface-200 mb-2">{headline}</p>
-        <p className="text-sm text-surface-400 leading-relaxed mb-3">{summary}</p>
-        <p className="font-mono text-xs text-surface-400 mb-1">
-          {metaLabel(project)} · {stack.join(" / ")}
-        </p>
-        <ProjectLinks project={project} />
+    <article className="py-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-x-6">
+        <h3 className="text-base font-bold text-surface-50">
+          {name}
+          <span className="block sm:inline sm:ml-3 text-sm font-normal text-surface-300">
+            {headline}
+          </span>
+        </h3>
+        <div className="shrink-0">
+          <ProjectLinks project={project} />
+        </div>
       </div>
+      <p className="font-mono text-xs text-surface-400">
+        {periodLabel(project)} · {stack.join(" / ")}
+      </p>
+      <details className="mt-1">
+        <summary className="w-fit cursor-pointer py-1 text-xs text-surface-400 hover:text-surface-200 transition-colors">
+          概要を読む
+        </summary>
+        <p className="text-sm text-surface-300 leading-relaxed pt-1 max-w-2xl">{summary}</p>
+      </details>
     </article>
   );
 }

@@ -37,14 +37,20 @@ export function Hero() {
           id="hero-heading"
           className="text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.1] tracking-[-0.03em] text-surface-50 mb-6 sm:mb-8"
         >
-          AIを<span className="text-brand-500">使う側</span>から、
+          {/* 語の途中で折り返さないよう、意味の切れ目ごとに inline-block で区切る */}
+          <span className="inline-block">
+            AIを<span className="text-brand-500">使う側</span>から、
+          </span>
           <br />
-          <span className="text-brand-500">仕組みと安全性</span>を考える側へ。
+          <span className="inline-block">
+            <span className="text-brand-500">仕組みと安全性</span>を
+          </span>
+          <span className="inline-block">考える側へ。</span>
         </h1>
 
         <p className="text-base sm:text-lg text-surface-300 max-w-2xl mb-8 sm:mb-10 leading-relaxed">
           生成AIをアプリに組み込むなかで、Prompt Injection や Jailbreak といった
-          AI特有のセキュリティ問題に関心を持つようになりました。作ったものは、動く状態で公開するところまでを習慣にしています。
+          AI特有のセキュリティ問題に関心を持つようになりました。小さく作ったものは公開URLで触れる状態に、代表作はソースコードを公開しています。
         </p>
 
         {/* 代表作 */}
