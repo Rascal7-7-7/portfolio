@@ -52,12 +52,15 @@ export function Header() {
             aria-label={loaded && count > 0 ? `カート（${count}点）` : 'カート'}
           >
             <ShoppingBag className="h-4 w-4" aria-hidden />
-            <span className="hidden sm:inline">カート</span>
-            {loaded && count > 0 && (
-              <span aria-hidden className="tnum">
-                ({count})
-              </span>
-            )}
+            {/* 下線が途切れないよう、文言と点数を1つの span にまとめる */}
+            <span>
+              <span className="hidden sm:inline">カート</span>
+              {loaded && count > 0 && (
+                <span aria-hidden className="tnum">
+                  {` (${count})`}
+                </span>
+              )}
+            </span>
           </Link>
         </nav>
       </div>

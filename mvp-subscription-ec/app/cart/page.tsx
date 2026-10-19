@@ -22,7 +22,7 @@ export default function CartPage() {
   const remaining = remainingForFreeShipping(totals.subtotal, hasSubscription);
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       <CheckoutSteps current={0} />
       <h1 className="mb-6 font-headline text-2xl font-light text-on-background sm:text-3xl">カート</h1>
 

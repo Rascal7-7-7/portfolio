@@ -36,7 +36,6 @@ export const PRODUCTS: ReadonlyArray<Product> = [
     badge: '定番',
     specs: [
       { label: '内容量', value: '200g（約20杯分）' },
-      { label: '焙煎度', value: '深煎り' },
       { label: '産地', value: 'エチオピア / グアテマラ' },
     ],
     taste: [
@@ -107,7 +106,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
     taxRate: 10,
     specs: [
       { label: '内容量', value: '250ml' },
-      { label: '香り', value: 'ひのき・柚子' },
+      { label: '香りの種類', value: 'ひのき・柚子' },
       { label: '生産', value: '長野県木曽町' },
     ],
     taste: [
