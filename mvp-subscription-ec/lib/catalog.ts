@@ -29,7 +29,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       'エチオピアとグアテマラの豆を、焙煎所で一回あたり5kgずつ小釜焙煎。深煎りなのに重すぎず、冷めても甘さが残ります。焙煎から3日以内に発送します。',
     price: 2480,
     taxRate: 8,
-    badge: '人気No.1',
+    badge: '定番',
     specs: [
       { label: '内容量', value: '200g（約20杯分）' },
       { label: '焙煎度', value: '深煎り' },
@@ -120,7 +120,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       'ノンカフェインの和ハーブを3種ブレンド。クロモジのすっきりした香りと柚子のほのかな酸味で、寝る前のひとときに。',
     price: 1980,
     taxRate: 8,
-    badge: '新商品',
+    badge: '新入荷',
     specs: [
       { label: '内容量', value: '15包（ティーバッグ）' },
       { label: 'カフェイン', value: 'なし' },

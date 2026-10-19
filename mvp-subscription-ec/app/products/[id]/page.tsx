@@ -23,32 +23,32 @@ export default async function ProductDetailPage({ params }: Params) {
   if (!product) notFound();
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+    <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10 lg:pt-6">
       <Link
         href="/products"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-on-surface-variant transition-colors hover:text-on-surface"
+        className="mb-4 inline-flex items-center gap-1 text-sm text-on-surface-variant transition-colors hover:text-on-surface"
       >
         <ChevronLeft className="h-4 w-4" aria-hidden />
         商品一覧
       </Link>
 
-      <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-14">
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <ProductVisual product={product} className="aspect-[5/4] lg:aspect-[4/5]" />
+          <ProductVisual product={product} className="aspect-[3/2] sm:aspect-[5/4] lg:aspect-square" />
         </div>
 
         <div>
           <p className="text-xs text-on-surface-variant">
             {product.category}
-            {product.badge && <span className="ml-2">【{product.badge}】</span>}
+            {product.badge && <span> ・ {product.badge}</span>}
           </p>
           <h1 className="mt-2 font-headline text-3xl font-light leading-snug tracking-[-0.01em] text-on-background sm:text-4xl">
             <Phrases parts={product.nameParts} />
           </h1>
           <p className="mt-3 text-base text-on-surface">{product.tagline}</p>
-          <p className="mt-4 text-sm leading-loose text-on-surface-variant">{product.description}</p>
+          <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">{product.description}</p>
 
-          <div className="mt-8">
+          <div className="mt-6">
             <PlanPicker product={product} />
           </div>
 
