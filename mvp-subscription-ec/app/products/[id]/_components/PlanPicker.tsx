@@ -120,7 +120,7 @@ export function PlanPicker({ product }: { product: Product }) {
       </button>
 
       {!buttonVisible && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant/60 bg-background/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant/60 bg-background px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 lg:hidden">
           <div className="mx-auto flex max-w-xl items-center gap-3">
             <p className="min-w-0 flex-1 leading-tight">
               <span className="block truncate text-xs text-on-surface-variant">{priceLabel}</span>
