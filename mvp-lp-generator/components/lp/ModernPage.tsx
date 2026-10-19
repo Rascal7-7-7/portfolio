@@ -17,7 +17,7 @@ const BTN =
 
 function Nav({ store, wide }: TemplateProps) {
   return (
-    <nav className={cx(LINE, 'sticky top-0 z-10 flex items-center justify-between border-b bg-[#0e0e0e]/95', wide ? 'px-14 py-5' : 'px-6 py-4')}>
+    <nav className={cx(LINE, 'sticky top-0 z-10 flex items-center justify-between border-b bg-[#0e0e0e]', wide ? 'px-14 py-5' : 'px-6 py-4')}>
       <span className="truncate text-[15px] font-semibold tracking-[0.06em]">{storeName(store)}</span>
       <div className="flex shrink-0 items-center gap-7 text-[13px]">
         {wide && (
@@ -97,7 +97,7 @@ export default function ModernPage(props: TemplateProps) {
           <ol className="divide-y divide-white/15">
             {store.features.map((f) => (
               <li key={f.title} className={cx('py-6 first:pt-0 last:pb-0', wide && 'grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10')}>
-                <h3 className="text-[17px] font-semibold">{f.title}</h3>
+                <h3 className="text-[17px] font-semibold"><Phrases text={f.title} /></h3>
                 <p className={cx(MUTED, 'text-sm leading-[1.9]', !wide && 'mt-2')}>{f.text}</p>
               </li>
             ))}
@@ -111,7 +111,7 @@ export default function ModernPage(props: TemplateProps) {
             {items.map((m) => (
               <li key={m.name} className="flex items-baseline justify-between gap-6 py-5 first:pt-0 last:pb-0">
                 <div className="min-w-0">
-                  <h3 className="text-[17px] font-medium">{m.name}</h3>
+                  <h3 className="text-[17px] font-medium"><Phrases text={m.name} /></h3>
                   {m.description && <p className={cx(MUTED, 'mt-1 text-xs')}>{m.description}</p>}
                 </div>
                 <p className={cx(ACCENT, 'shrink-0 text-xl tabular-nums')}>{m.price}</p>

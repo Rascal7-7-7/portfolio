@@ -51,17 +51,20 @@ function Nav({ store, wide }: TemplateProps) {
   )
 }
 
+/** 見出しの白い箱と同じ白い面に載せた価格（手本の「色面＋見出し箱＋価格」の組み） */
 function LeadMenu({ store, wide }: TemplateProps) {
   const lead = menuItems(store)[0]
   if (!lead) return null
   return (
-    <div className={cx('border-t-2 pt-5', RULE, !wide && 'mt-12')}>
-      <p className="text-xs font-extrabold tracking-[0.16em]">おすすめメニュー</p>
-      <p className="mt-3 text-lg font-extrabold">{lead.name}</p>
-      {lead.description && <p className="mt-1 text-xs font-medium">{lead.description}</p>}
-      <p className={cx('mt-4 font-extrabold leading-none tabular-nums', wide ? 'text-[64px]' : 'text-[48px]')}>{lead.price}</p>
+    <div className={cx('rounded-lg bg-white', wide ? 'px-7 py-8' : 'mt-10 px-6 py-6')}>
+      <p className={cx(ACCENT, 'text-xs font-extrabold tracking-[0.16em]')}>おすすめメニュー</p>
+      <p className="mt-3 text-lg font-extrabold">
+        <Phrases text={lead.name} />
+      </p>
+      {lead.description && <p className={cx(MUTED, 'mt-1 text-xs font-medium')}>{lead.description}</p>}
+      <p className={cx('mt-4 border-b-2 pb-5 font-extrabold leading-none tabular-nums', RULE, wide ? 'text-[clamp(32px,4.6cqw,60px)]' : 'text-[48px]')}>{lead.price}</p>
       {(store.hours || store.closed) && (
-        <p className="mt-5 text-xs font-bold">
+        <p className="mt-4 text-xs font-bold">
           {store.hours && `受付 ${store.hours}`}
           {store.hours && store.closed && '　'}
           {store.closed && `定休 ${store.closed}`}
@@ -75,16 +78,12 @@ function Hero(props: TemplateProps) {
   const { store, wide } = props
   return (
     <section className={wide ? 'px-6 pt-6' : 'px-3 pt-3'}>
-      {/* 写真の代わりの大きな色面。右上に一段明るい大きな円をはみ出させて、面に奥行きと温かさを出す */}
-      <div className={cx('relative isolate overflow-hidden rounded-lg', CORAL, wide ? 'min-h-[560px] px-14 pb-16 pt-12' : 'px-5 pb-10 pt-8')}>
-        <span
-          aria-hidden
-          className={cx('absolute -z-10 rounded-full bg-[#ff8466]', wide ? '-right-24 -top-48 h-[580px] w-[580px]' : '-right-32 -top-28 h-[320px] w-[320px]')}
-        />
+      {/* 写真の代わりの大きな色面。装飾は置かず、白い見出し箱と白い価格の面だけで組む */}
+      <div className={cx('rounded-lg', CORAL, wide ? 'px-14 pb-16 pt-12' : 'px-5 pb-10 pt-8')}>
         <p className="text-sm font-bold">
           {CATEGORIES[store.category].label}｜{storeName(store)}
         </p>
-        <div className={cx(wide ? 'mt-28 grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-end gap-14' : 'mt-14')}>
+        <div className={cx(wide ? 'mt-16 grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-12' : 'mt-12')}>
           <div className="min-w-0">
             {/* 1行ずつ白い箱で切り抜く。折り返した行にも箱が付くよう box-decoration-break: clone */}
             <h1 className={cx('font-extrabold', wide ? 'text-[clamp(30px,4.4cqw,46px)] leading-[1.9]' : 'text-[24px] leading-[1.95]')}>
@@ -113,7 +112,7 @@ function Features({ store, wide }: TemplateProps) {
         {store.features.map((f, i) => (
           <li key={f.title} className={cx(LINE, wide ? 'border-l px-8 py-2 first:border-l-0 first:pl-0 last:pr-0' : 'border-t py-7')}>
             <p className={cx(ACCENT, 'text-[40px] font-extrabold leading-none tabular-nums')}>{num(i)}</p>
-            <h3 className="mt-5 text-lg font-extrabold">{f.title}</h3>
+            <h3 className="mt-5 text-lg font-extrabold"><Phrases text={f.title} /></h3>
             <p className={cx(MUTED, 'mt-2 text-sm leading-[1.9]')}>{f.text}</p>
           </li>
         ))}
@@ -132,7 +131,7 @@ function Menu({ store, wide }: TemplateProps) {
         {items.map((m) => (
           <li key={m.name} className={cx('flex items-center justify-between gap-4', wide ? 'px-2 py-6' : 'py-5')}>
             <div className="min-w-0">
-              <h3 className="text-[17px] font-extrabold">{m.name}</h3>
+              <h3 className="text-[17px] font-extrabold"><Phrases text={m.name} /></h3>
               {m.description && <p className={cx(MUTED, 'mt-1 text-xs')}>{m.description}</p>}
             </div>
             <p className={cx(ACCENT, 'shrink-0 font-extrabold tabular-nums', wide ? 'text-2xl' : 'text-xl')}>{m.price}</p>
