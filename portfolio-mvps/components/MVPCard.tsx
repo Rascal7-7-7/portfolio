@@ -1,6 +1,11 @@
 import { ArrowRight, CheckCircle, Database } from "lucide-react";
 import Link from "next/link";
-import { hasCaseStudy, type Highlight, type Project } from "@/content/projects";
+import {
+  hasCaseStudy,
+  type Highlight,
+  type Project,
+  type Verification,
+} from "@/content/projects";
 import { Badge } from "./ui/Badge";
 import { TextLink } from "./ui/TextLink";
 
@@ -9,8 +14,16 @@ const highlightIcons = {
   data: Database,
 } satisfies Record<Highlight["type"], unknown>;
 
+/** 閲覧者がどこまで確かめられるか。カードの時点で分かるようにする。 */
+const verificationLabels = {
+  "live-demo": "デモで操作できる",
+  "demo-video": "動画で確認できる",
+  "code-only": "コードで確認できる",
+} satisfies Record<Verification, string>;
+
 export function MVPCard({ project }: { project: Project }) {
-  const { name, headline, summary, stack, highlights, period, team, links } = project;
+  const { name, headline, summary, stack, highlights, period, team, links, verification } =
+    project;
 
   const periodLabel = period.end
     ? `${period.start.replace("-", "/")}〜${period.end.replace("-", "/")}`
@@ -25,15 +38,14 @@ export function MVPCard({ project }: { project: Project }) {
         <span>{periodLabel}</span>
         <span aria-hidden="true">·</span>
         <span>{teamLabel}</span>
+        <span aria-hidden="true">·</span>
+        <span>{verificationLabels[verification]}</span>
       </div>
 
-      {/* Value message — the headline */}
-      <h3 className="text-lg font-bold text-surface-50 leading-snug mb-2">
-        {headline}
-      </h3>
+      {/* 作品名を主見出しにする。記憶と質問の単位になるため */}
+      <h3 className="text-xl font-bold text-surface-50 leading-snug mb-2">{name}</h3>
 
-      {/* Sub title */}
-      <p className="text-xs text-surface-400 font-medium mb-3">{name}</p>
+      <p className="text-sm text-surface-200 font-medium mb-3">{headline}</p>
 
       {/* Description */}
       <p className="text-sm text-surface-300 leading-relaxed mb-5">{summary}</p>
