@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import NavItem from '@/components/NavItem';
+import { StoreProvider } from '@/lib/store';
+import { SHOP } from '@/lib/seed';
 
 export const metadata: Metadata = {
   title: '予約管理システム',
-  description: '小規模店舗向け予約管理・通知確認システム',
+  description: '紙の台帳やLINEで受けていた予約を、1つの画面で管理するデモ（ダミーデータ）',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -32,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
             <span className="text-sm font-black text-[#00288e]">予約管理システム</span>
           </div>
+          <span className="text-[10px] text-[#444653]">{SHOP.name} {SHOP.branch}</span>
         </header>
 
         {/* デスクトップ: サイドバー */}
@@ -44,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
               <div>
                 <h1 className="text-base font-black text-[#00288e] leading-tight">予約管理システム</h1>
-                <p className="text-[9px] text-[#757684] uppercase tracking-widest mt-0.5">Digital Sanctuary</p>
+                <p className="text-[10px] text-[#444653] mt-0.5">{SHOP.name} {SHOP.branch}</p>
               </div>
             </div>
           </div>
@@ -63,17 +66,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <span className="material-symbols-outlined text-[#00288e]" style={{ fontSize: '16px' }}>account_circle</span>
               </div>
               <div>
-                <p className="text-xs font-bold text-[#191c1d]">管理者</p>
-                <p className="text-[10px] text-[#757684]">店舗マネージャー</p>
+                <p className="text-xs font-bold text-[#191c1d]">受付スタッフ</p>
+                <p className="text-[10px] text-[#444653]">デモ版・ダミーデータ</p>
               </div>
             </div>
           </div>
         </aside>
 
         {/* メインコンテンツ */}
-        <main className="flex-1 min-h-screen pt-14 pb-20 md:pt-0 md:pb-0 md:ml-64">
-          {children}
-        </main>
+        <StoreProvider>
+          <main className="flex-1 min-h-screen pt-14 pb-20 md:pt-0 md:pb-0 md:ml-64">
+            {children}
+          </main>
+        </StoreProvider>
 
         {/* モバイル: ボトムナビ */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[#e7e8e9] flex">
