@@ -22,7 +22,7 @@ interface SummaryRow {
 function SummaryList({ rows }: { rows: readonly SummaryRow[] }) {
   return (
     <Card className="flex flex-col">
-      <ul className="grid flex-1 grid-cols-3 divide-x divide-line lg:grid-cols-1 lg:divide-x-0 lg:divide-y">
+      <ul className="grid flex-1 grid-cols-1 divide-y divide-line sm:grid-cols-3 sm:divide-x sm:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y">
         {rows.map((r) => (
           <li key={r.label} className="min-w-0">
             <Link href={r.href} className="flex h-full flex-col justify-center px-3 py-3 hover:bg-warm-50 sm:px-5 sm:py-3.5">
@@ -77,6 +77,15 @@ export function DashboardView() {
   return (
     <Page>
       <PageHeader eyebrow={formatLongDate(today)} title="ダッシュボード" />
+
+      {s.overdueCount > 0 && (
+        <p role="status" className="num -mt-3 mb-5 text-sm text-orange">
+          支払期限を過ぎた未入金が {s.overdueCount}件（{formatYen(s.overdueTotal)}）あります。
+          <Link href="/invoices" className="ml-1 rounded font-medium underline underline-offset-2 hover:no-underline">
+            請求一覧で確認
+          </Link>
+        </p>
+      )}
 
       <div className="mb-6 grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">

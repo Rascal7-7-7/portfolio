@@ -23,7 +23,7 @@ export function ProjectDetailView({ id }: { id: string }) {
   const project = data.projects.find((p) => p.id === id);
   if (!project) {
     return (
-      <Page narrow>
+      <Page>
         <p className="py-16 text-center text-sm text-warm-500">
           案件が見つかりません。
           <Link href="/projects" className="ml-1 text-blue hover:underline">
@@ -46,7 +46,7 @@ export function ProjectDetailView({ id }: { id: string }) {
   ];
 
   return (
-    <Page narrow>
+    <Page>
       <Link href="/projects" className="mb-4 inline-flex items-center gap-1 text-xs text-warm-500 hover:text-ink">
         <ArrowLeft size={14} aria-hidden />
         案件一覧

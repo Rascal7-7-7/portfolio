@@ -56,7 +56,7 @@ export function TaskRow({ task, today, project, deletable }: TaskRowProps) {
         checked={done}
         onChange={toggle}
         aria-label={`${task.title}（完了にする）`}
-        className="h-[18px] w-[18px] shrink-0 cursor-pointer accent-[#31302e]"
+        className="h-[18px] w-[18px] shrink-0 cursor-pointer accent-blue"
       />
       <div className="min-w-0 flex-1">
         <p className={cn("line-clamp-2 text-sm break-words", done ? "text-warm-300 line-through" : "text-ink")}>

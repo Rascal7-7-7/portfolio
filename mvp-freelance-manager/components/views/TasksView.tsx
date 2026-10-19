@@ -25,7 +25,7 @@ export function TasksView() {
   const open = sorted.filter((t) => !t.done).length;
 
   return (
-    <Page narrow>
+    <Page>
       <PageHeader
         eyebrow={formatLongDate(today)}
         title="タスク"
