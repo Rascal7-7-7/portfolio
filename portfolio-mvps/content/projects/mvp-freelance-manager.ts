@@ -17,6 +17,7 @@ export const mvpFreelanceManager: Project = {
     { label: "請求書作成と入金記録", type: "check" },
   ],
   verification: "live-demo",
+  thumbnail: "/projects/mvp-freelance-manager.webp",
   links: {
     demo: "https://mvp-freelance-manager.vercel.app/dashboard",
     github: "https://github.com/Rascal7-7-7/portfolio/tree/main/mvp-freelance-manager",
