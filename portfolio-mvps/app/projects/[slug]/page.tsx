@@ -43,6 +43,8 @@ export function generateMetadata({ params }: { params: Params }): Metadata {
       description: project.headline,
       url: `/projects/${project.slug}`,
       type: "article",
+      // openGraph を書くと親（layout）の値が丸ごと置き換わるため、画像も明示する
+      images: ["/opengraph-image.png"],
     },
   };
 }
@@ -209,7 +211,9 @@ export default function ProjectDetail({ params }: { params: Params }) {
 
           {/* 体制と構成 */}
           <Section id="role" title="体制と構成">
-            {project.diagram && <FlowDiagram diagram={project.diagram} />}
+            {project.diagram && (
+              <FlowDiagram id={project.slug} diagram={project.diagram} className="mb-8" />
+            )}
             <Facts
               rows={[
                 ["体制", team],

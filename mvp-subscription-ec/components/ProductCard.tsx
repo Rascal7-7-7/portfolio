@@ -19,7 +19,9 @@ export function ProductCard({ product }: { product: Product }) {
         <h3 className="mt-1 font-headline text-[15px] font-semibold leading-snug text-on-surface underline-offset-4 group-hover:underline sm:text-base">
           <Phrases parts={product.nameParts} />
         </h3>
-        <p className="mt-1 line-clamp-2 flex-1 text-xs leading-relaxed text-on-surface-variant">{product.tagline}</p>
+        <p className="mt-1 flex-1 text-xs leading-relaxed text-on-surface-variant">
+          <Phrases parts={product.taglineParts} />
+        </p>
         {size && <p className="mt-2 text-xs text-on-surface-variant">{size}</p>}
         <p className="tnum mt-2 text-sm text-on-surface">
           <span className="whitespace-nowrap">
@@ -27,6 +29,8 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
           <span className="ml-3 whitespace-nowrap text-xs text-on-surface-variant">単品 {yen(product.price)}</span>
         </p>
+        {/* 送料ルールは lib/pricing.ts の shippingFee と同じ（定期便を含む注文は無料） */}
+        <p className="mt-1 text-xs text-on-surface-variant">定期便なら送料無料</p>
       </div>
     </Link>
   );

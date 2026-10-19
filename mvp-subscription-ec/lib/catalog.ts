@@ -17,6 +17,9 @@ export const INTERVAL_LABEL: Record<Interval, string> = {
 
 export const SUBSCRIPTION_INTERVALS: ReadonlyArray<SubscriptionInterval> = ['monthly', 'bimonthly'];
 
+/** 「|」で区切った文節の配列にする（Phrases で語中改行を防ぐため） */
+const phrases = (text: string): ReadonlyArray<string> => text.split('|');
+
 export const PRODUCTS: ReadonlyArray<Product> = [
   {
     id: 'forest-roast',
@@ -24,9 +27,10 @@ export const PRODUCTS: ReadonlyArray<Product> = [
     nameParts: ['深森ブレンド', ' ', 'コーヒー豆'],
     nameEn: 'Forest Roast',
     category: 'コーヒー',
-    tagline: '杉の香りとベリーの余韻。朝いちばんの一杯に。',
-    description:
-      'エチオピアとグアテマラの豆を、焙煎所で一回あたり5kgずつ小釜焙煎。深煎りなのに重すぎず、冷めても甘さが残ります。焙煎から3日以内に発送します。',
+    taglineParts: phrases('杉の香りと|ベリーの余韻。|朝いちばんの|一杯に。'),
+    descriptionParts: phrases(
+      'エチオピアと|グアテマラの|豆を、|焙煎所で|一回あたり|5kgずつ|小釜焙煎。|深煎りなのに|重すぎず、|冷めても|甘さが|残ります。|焙煎から|3日以内に|発送します。',
+    ),
     price: 2480,
     taxRate: 8,
     badge: '定番',
@@ -43,9 +47,10 @@ export const PRODUCTS: ReadonlyArray<Product> = [
     nameParts: ['宇治', ' ', '特選玉露'],
     nameEn: 'Uji Gyokuro',
     category: '日本茶',
-    tagline: 'とろりとした旨み。ぬるめのお湯でゆっくりと。',
-    description:
-      '京都・宇治の契約茶園で、新芽を覆って育てた一番茶のみを使用。60℃ほどのお湯で淹れると、出汁のような深い旨みが広がります。',
+    taglineParts: phrases('とろりとした|旨み。|ぬるめの|お湯で|ゆっくりと。'),
+    descriptionParts: phrases(
+      '京都・宇治の|契約茶園で、|新芽を|覆って|育てた|一番茶のみを|使用。|60℃ほどの|お湯で|淹れると、|出汁のような|深い旨みが|広がります。',
+    ),
     price: 3240,
     taxRate: 8,
     specs: [
@@ -61,9 +66,10 @@ export const PRODUCTS: ReadonlyArray<Product> = [
     nameParts: ['森の', 'はちみつ', 'グラノーラ'],
     nameEn: 'Honey Granola',
     category: 'フード',
-    tagline: '国産はちみつと雑穀を、低温でじっくり焼き上げて。',
-    description:
-      '岩手の百花はちみつ、国産オーツ麦、くるみ、かぼちゃの種を140℃で90分。甘さ控えめで、ヨーグルトにもそのままでも。',
+    taglineParts: phrases('国産はちみつと|雑穀を、|低温で|じっくり|焼き上げて。'),
+    descriptionParts: phrases(
+      '岩手の|百花はちみつ、|国産オーツ麦、|くるみ、|かぼちゃの種を|140℃で|90分。|甘さ控えめで、|ヨーグルトにも|そのままでも。',
+    ),
     price: 1620,
     taxRate: 8,
     specs: [
@@ -79,9 +85,10 @@ export const PRODUCTS: ReadonlyArray<Product> = [
     nameParts: ['ひのきの', 'ハンドソープ'],
     nameEn: 'Hinoki Hand Soap',
     category: 'ボディケア',
-    tagline: '木曽ひのきの精油で、手洗いを森林浴に。',
-    description:
-      '木曽ひのきの間伐材から蒸留した精油を配合。植物由来の洗浄成分で、洗い上がりはしっとり。詰め替えにも使えるガラスボトルです。',
+    taglineParts: phrases('木曽ひのきの|精油で、|手洗いを|森林浴に。'),
+    descriptionParts: phrases(
+      '木曽ひのきの|間伐材から|蒸留した|精油を配合。|植物由来の|洗浄成分で、|洗い上がりは|しっとり。|詰め替えにも|使える|ガラスボトルです。',
+    ),
     price: 2200,
     taxRate: 10,
     specs: [
@@ -97,9 +104,10 @@ export const PRODUCTS: ReadonlyArray<Product> = [
     nameParts: ['和草の', '化粧水'],
     nameEn: 'Wild Herb Toner',
     category: 'スキンケア',
-    tagline: 'どくだみと月桃。ゆらぎやすい肌のための一本。',
-    description:
-      '国内の契約農園で育てたどくだみ・月桃・ヨモギを低温抽出。香料・着色料・アルコール不使用で、敏感な季節の肌にもなじみます。',
+    taglineParts: phrases('どくだみと|月桃。|ゆらぎやすい|肌のための|一本。'),
+    descriptionParts: phrases(
+      '国内の|契約農園で|育てた|どくだみ・|月桃・|ヨモギを|低温抽出。|香料・|着色料・|アルコール|不使用で、|敏感な季節の|肌にも|なじみます。',
+    ),
     price: 3960,
     taxRate: 10,
     specs: [
@@ -115,9 +123,10 @@ export const PRODUCTS: ReadonlyArray<Product> = [
     nameParts: ['和ハーブ', ' ', 'ブレンドティー'],
     nameEn: 'Herbal Blend',
     category: 'お茶',
-    tagline: 'ヨモギ・クロモジ・柚子皮。夜にほっと一息。',
-    description:
-      'ノンカフェインの和ハーブを3種ブレンド。クロモジのすっきりした香りと柚子のほのかな酸味で、寝る前のひとときに。',
+    taglineParts: phrases('ヨモギ・|クロモジ・|柚子皮。|夜に|ほっと|一息。'),
+    descriptionParts: phrases(
+      'ノンカフェインの|和ハーブを|3種ブレンド。|クロモジの|すっきりした|香りと|柚子の|ほのかな|酸味で、|寝る前の|ひとときに。',
+    ),
     price: 1980,
     taxRate: 8,
     badge: '新入荷',

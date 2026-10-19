@@ -40,11 +40,12 @@ export default function Editor({ initial }: { initial: LPDoc }) {
     setDoc((d) => ({ ...d, store: { ...d.store, menu: d.store.menu.map((m, i) => (i === index ? { ...m, ...patch } : m)) } }))
   const toggleSection = (key: SectionKey) => setDoc((d) => ({ ...d, sections: { ...d.sections, [key]: !d.sections[key] } }))
   const setTemplate = (template: TemplateKey) => setDoc((d) => ({ ...d, template }))
+  const canPublish = doc.store.storeName.trim() !== ''
 
   return (
     <div className="flex min-h-dvh flex-col bg-ed-bg text-ed-ink lg:h-dvh">
       <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-ed-line bg-ed-panel px-4 lg:px-6">
-        <p className="flex items-baseline gap-2">
+        <p className="flex shrink-0 items-baseline gap-2 whitespace-nowrap">
           <span className="text-[15px] font-semibold">LP Concierge</span>
           <span className="hidden text-xs text-ed-muted sm:inline">デモ版</span>
         </p>
@@ -55,13 +56,25 @@ export default function Editor({ initial }: { initial: LPDoc }) {
           <li aria-hidden>—</li>
           <li>3. 公開</li>
         </ol>
-        <button
-          type="button"
-          onClick={() => setPublishOpen(true)}
-          className="rounded-md bg-ed-ink px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#33333a]"
-        >
-          公開する
-        </button>
+        <div className="flex shrink-0 items-center gap-3">
+          {/* 店舗名が空の LP は公開ページのタイトルも見出しも決まらないので、公開に進ませない */}
+          {!canPublish && (
+            <p id="publish-blocked" className="text-xs font-medium text-[#b42318]">
+              {/* スマホのヘッダーに収まるよう短く出す */}
+              <span className="sm:hidden">店舗名が必要です</span>
+              <span className="hidden sm:inline">店舗名を入力すると公開できます</span>
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={() => setPublishOpen(true)}
+            disabled={!canPublish}
+            aria-describedby={canPublish ? undefined : 'publish-blocked'}
+            className="rounded-md bg-ed-ink px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#33333a] disabled:cursor-not-allowed disabled:bg-ed-line disabled:text-ed-muted"
+          >
+            公開する
+          </button>
+        </div>
       </header>
 
       <div role="tablist" aria-label="表示切替" className="flex border-b border-ed-line bg-ed-panel lg:hidden">

@@ -12,10 +12,12 @@ import {
   sortInvoices,
   taskGroup,
 } from "./selectors.ts";
-import { formatYen } from "./utils.ts";
+import { formatYen, toDigits } from "./utils.ts";
 
 const today = "2026-03-01";
 assert.equal(addDays(today, -1), "2026-02-28");
+assert.equal(toDigits("２２0,000円"), "220000");
+assert.equal(toDigits("00"), "");
 assert.equal(diffDays(today, "2026-03-04"), 3);
 assert.equal(shiftMonth("2026-01-31", -1), "2025-12");
 

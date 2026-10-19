@@ -26,8 +26,9 @@ export type Product = {
   nameParts: ReadonlyArray<string>;
   nameEn: string;
   category: string;
-  tagline: string;
-  description: string;
+  /** 文節ごとに区切ったひとこと・説明文（join すると本文） */
+  taglineParts: ReadonlyArray<string>;
+  descriptionParts: ReadonlyArray<string>;
   /** 税込の通常価格（円） */
   price: number;
   taxRate: TaxRate;

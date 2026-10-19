@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { actions } from "@/lib/store";
 import { formatDate, formatRelative } from "@/lib/dates";
 import { invoiceStatus } from "@/lib/selectors";
@@ -33,22 +34,24 @@ export function InvoiceList({ invoices, data, today, empty, withProject = true }
         const status = invoiceStatus(inv, today);
         return (
           <li key={inv.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 sm:flex-nowrap sm:px-5">
-            <div className="min-w-0 flex-1 basis-full sm:basis-auto">
+            {/* 行の左側から請求書の紙面を開く。請求番号を青くしてリンクだと分かるようにする */}
+            <Link href={`/invoices/${inv.id}`} className="group min-w-0 flex-1 basis-full rounded sm:basis-auto">
               {withProject ? (
                 <>
                   <p className="text-sm font-medium break-words text-ink">{project?.client ?? "—"}</p>
                   <p className="text-xs break-words text-warm-500">{project?.name}</p>
                   <p className="num mt-0.5 text-xs text-warm-500">
-                    {inv.number} ・ <span className="whitespace-nowrap">{dueText(inv, today)}</span>
+                    <span className="text-blue group-hover:underline">{inv.number}</span> ・{" "}
+                    <span className="whitespace-nowrap">{dueText(inv, today)}</span>
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="num text-sm font-medium text-ink">{inv.number}</p>
+                  <p className="num text-sm font-medium text-blue group-hover:underline">{inv.number}</p>
                   <p className="num mt-0.5 text-xs text-warm-500">{dueText(inv, today)}</p>
                 </>
               )}
-            </div>
+            </Link>
             <div className="flex flex-1 items-center gap-3 sm:flex-none sm:flex-col sm:items-end sm:gap-1">
               <InvoiceStatusBadge status={status} />
               <p className="num ml-auto text-sm font-medium whitespace-nowrap text-ink sm:order-first sm:ml-0">

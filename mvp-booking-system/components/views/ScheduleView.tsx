@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { addDays, formatFullDate, toMinutes } from '@/lib/date';
-import { CLOSE_MIN, OPEN_MIN, availableSlots, durationMin, endTime, toTime } from '@/lib/slots';
+import { addDays, dayParts, diffDays, formatFullDate, toMinutes, weekOf } from '@/lib/date';
+import { CLOSE_MIN, OPEN_MIN, availableSlots, durationMin, endTime, placeInLanes, toTime } from '@/lib/slots';
 import { sortByDateTime, useStore } from '@/lib/store';
 import { MENUS, STAFF, type Reservation, type Staff } from '@/lib/types';
 import ChannelBadge from '@/components/ChannelBadge';
@@ -12,6 +12,7 @@ import { needsAttention } from '@/components/ReservationRow';
 import StatusBadge from '@/components/StatusBadge';
 import { PageHeader, STAFF_TONE, StatStrip, btn } from '@/components/ui';
 import Icon, { type IconName } from '@/components/Icon';
+import WeekGrid, { WeekLegend } from '@/components/WeekGrid';
 
 const SLOT_H = 112;
 /** これより低いカードは1行目に名前まで詰める */
@@ -43,25 +44,105 @@ function useNowMinutes(): number {
   return now;
 }
 
+type Mode = 'day' | 'week';
+
 export default function ScheduleView() {
   const { reservations, today } = useStore();
   const [offset, setOffset] = useState(0);
+  // デスクトップは週表示から。スマホは幅が足りないので常に日表示（タブも出さない）
+  const [mode, setMode] = useState<Mode>('week');
   const [staff, setStaff] = useState<Staff>(STAFF[0]);
   const now = useNowMinutes();
   if (!reservations) return <LoadingState />;
 
   const date = addDays(today, offset);
+  const nowInHours = now >= OPEN_MIN && now < CLOSE_MIN ? now : null;
+  const pickDay = (d: string) => { setOffset(diffDays(today, d)); setMode('day'); };
+
+  return (
+    <div className="px-4 md:px-10 py-6 md:py-10 max-w-5xl">
+      <PageHeader title="スケジュール" action={<ModeTabs mode={mode} onChange={setMode} />} />
+      {mode === 'week' && (
+        <div className="hidden md:block">
+          <WeekSection date={date} today={today} reservations={reservations} nowMin={nowInHours}
+            onMove={days => setOffset(o => (days === 0 ? 0 : o + days))} onPickDay={pickDay} />
+        </div>
+      )}
+      <div className={mode === 'week' ? 'md:hidden' : ''}>
+        <DaySection date={date} offset={offset} today={today} reservations={reservations} now={now}
+          nowMin={offset === 0 ? nowInHours : null} staff={staff} onStaff={setStaff} onOffset={setOffset} />
+      </div>
+    </div>
+  );
+}
+
+/** 日表示 / 週表示の切り替え（デスクトップだけ） */
+function ModeTabs({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => void }) {
+  return (
+    <div role="group" aria-label="表示の切り替え" className="hidden md:grid grid-cols-2 gap-0.5 p-0.5 rounded-md border border-line bg-muted">
+      {([['day', '日'], ['week', '週']] as const).map(([m, label]) => (
+        <button key={m} type="button" aria-pressed={mode === m} onClick={() => onChange(m)}
+          className={`h-7 px-4 rounded-[5px] text-sm focus-visible:outline-2 focus-visible:outline-brand ${
+            mode === m ? 'bg-canvas text-ink font-medium shadow-[0_0_0_1px_var(--color-line),0_1px_2px_rgba(0,0,0,0.06)]' : 'text-dim hover:text-ink'
+          }`}>
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function WeekSection({ date, today, reservations, nowMin, onMove, onPickDay }: {
+  date: string; today: string; reservations: Reservation[]; nowMin: number | null;
+  onMove: (days: number) => void; onPickDay: (d: string) => void;
+}) {
+  const days = weekOf(date);
+  const weeksAway = diffDays(weekOf(today)[0], days[0]) / 7;
+  const list = reservations.filter(r => days.includes(r.reservation_date));
+  const active = list.filter(r => r.status !== 'canceled');
+  const pending = list.filter(r => r.status === 'pending');
+  const unnotified = list.filter(needsAttention);
+  const last = dayParts(days[6]);
+  return (
+    <>
+      <div className="flex items-center justify-between gap-2 mb-6">
+        <div className="min-w-0" aria-live="polite">
+          <p className="text-base font-bold text-ink tabular-nums">{formatFullDate(days[0])} 〜 {last.day}日（{last.weekday}）</p>
+          <p className="text-xs text-dim mt-0.5">{weeksAway === 0 ? '今週' : weeksAway > 0 ? `${weeksAway}週後` : `${-weeksAway}週前`}</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {weeksAway !== 0 && (
+            <button type="button" onClick={() => onMove(0)} className={btn('secondary', 'sm')}>今週に戻る</button>
+          )}
+          <div className="inline-flex rounded-md border border-line-strong divide-x divide-line-strong overflow-hidden">
+            <DayButton label="前の週" icon="chevron_left" onClick={() => onMove(-7)} />
+            <DayButton label="次の週" icon="chevron_right" onClick={() => onMove(7)} />
+          </div>
+        </div>
+      </div>
+      <StatStrip items={[
+        { label: 'この週の予約', value: active.length, note: `キャンセル除く・全${list.length}件` },
+        { label: '確定待ち', value: pending.length },
+        { label: '未通知', value: unnotified.length, alert: unnotified.length > 0 },
+      ]} />
+      <div className="mb-3"><WeekLegend /></div>
+      <WeekGrid days={days} reservations={list} today={today} nowMin={nowMin} onPickDay={onPickDay} />
+    </>
+  );
+}
+
+function DaySection({ date, offset, today, reservations, now, nowMin, staff, onStaff: setStaff, onOffset: setOffset }: {
+  date: string; offset: number; today: string; reservations: Reservation[]; now: number; nowMin: number | null;
+  staff: Staff; onStaff: (s: Staff) => void; onOffset: (update: number | ((o: number) => number)) => void;
+}) {
   const list = sortByDateTime(reservations.filter(r => r.reservation_date === date));
   // 「予約件数」と重ならない指標として、まだ予約を受けられる枠を出す（本日は過ぎた時刻を除く）
   const open = date < today ? 0 : availableSlots(reservations, date, SHORTEST.minutes, date === today ? now : 0).length;
-  const nowMin = offset === 0 && now >= OPEN_MIN && now < CLOSE_MIN ? now : null;
   const unnotified = list.filter(needsAttention);
   const byStaff = (s: Staff) => list.filter(r => r.staff === s);
 
   return (
-    <div className="px-4 md:px-10 py-6 md:py-10 max-w-5xl">
-      <PageHeader title="日別スケジュール" description="ホワイトボードや紙の予定表の代わりに、担当ごとの1日の流れを確認できます。" />
-
+    <>
       <div className="flex items-center justify-between gap-2 mb-6">
         <div className="min-w-0" aria-live="polite">
           <p className="text-base font-bold text-ink tabular-nums">{formatFullDate(date)}</p>
@@ -101,7 +182,7 @@ export default function ScheduleView() {
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }
 
@@ -132,32 +213,6 @@ function StaffSwitcher({ current, counts, onChange }: { current: Staff; counts: 
       })}
     </div>
   );
-}
-
-interface Placed { r: Reservation; lane: number; lanes: number }
-
-/** 同じ担当で時間が重なる予約（手入力で二重に入れた場合）だけ横に並べる（list は時刻順） */
-export function placeInLanes(list: Reservation[]): Placed[] {
-  const placed: Placed[] = [];
-  let cluster: { r: Reservation; lane: number }[] = [];
-  let laneEnds: number[] = [];
-  const flush = () => {
-    placed.push(...cluster.map(c => ({ ...c, lanes: laneEnds.length })));
-    cluster = [];
-    laneEnds = [];
-  };
-  for (const r of list) {
-    const start = toMinutes(r.reservation_time);
-    if (laneEnds.length > 0 && laneEnds.every(end => end <= start)) flush();
-    const free = laneEnds.findIndex(end => end <= start);
-    const lane = free === -1 ? laneEnds.length : free;
-    const end = start + durationMin(r);
-    laneEnds = laneEnds.map((e, i) => (i === lane ? end : e));
-    if (lane === laneEnds.length) laneEnds = [...laneEnds, end];
-    cluster = [...cluster, { r, lane }];
-  }
-  flush();
-  return placed;
 }
 
 /** デスクトップ: 営業時間の時間軸に、担当ごとの列で予約を並べる */

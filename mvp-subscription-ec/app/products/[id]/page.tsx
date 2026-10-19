@@ -45,8 +45,12 @@ export default async function ProductDetailPage({ params }: Params) {
           <h1 className="mt-2 font-headline text-3xl font-light leading-snug tracking-[-0.01em] text-on-background sm:text-4xl">
             <Phrases parts={product.nameParts} />
           </h1>
-          <p className="mt-3 text-base text-on-surface">{product.tagline}</p>
-          <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">{product.description}</p>
+          <p className="mt-3 text-base text-on-surface">
+            <Phrases parts={product.taglineParts} />
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
+            <Phrases parts={product.descriptionParts} />
+          </p>
 
           <div className="mt-6">
             <PlanPicker product={product} />

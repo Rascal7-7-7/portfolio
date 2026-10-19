@@ -66,14 +66,14 @@ export type FlowStep = {
 };
 
 /**
- * Case Study の構成図。本流を縦に並べ、読み取り専用の脇道を下に添える。
+ * Case Study の構成図。本流を縦に並べ、脇道（読み取り専用の経路や、本流を支える層）を下に添える。
  * 図にできる事実がある作品にだけ持たせる。
  */
 export type FlowDiagram = {
   /** 図全体の説明。支援技術向けの代替テキストになる。 */
   readonly description: string;
   readonly steps: readonly FlowStep[];
-  /** 本流から一方向にだけ読む経路（左から右へ）。 */
+  /** 本流の下に添える経路（左から右へ）。 */
   readonly sidePath?: {
     readonly steps: readonly Omit<FlowStep, "boundary">[];
     readonly note: string;

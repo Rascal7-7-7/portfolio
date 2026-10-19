@@ -22,7 +22,7 @@ export default function ProductsPage() {
   return (
     <main>
       {/* Hero */}
-      <section className="mx-auto grid max-w-6xl items-end gap-10 px-4 pb-8 pt-8 sm:px-6 sm:pb-16 sm:pt-16 lg:grid-cols-[1fr_1.1fr]">
+      <section className="mx-auto grid max-w-6xl items-end gap-6 px-4 pb-6 pt-6 sm:gap-10 sm:px-6 sm:pb-16 sm:pt-16 lg:grid-cols-[1fr_1.1fr]">
         <div>
           <h1 className="font-headline text-[1.75rem] font-light leading-[1.2] tracking-[-0.02em] text-on-background sm:text-5xl">
             森が育てた素材を、
@@ -47,18 +47,23 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        <div className="hidden grid-cols-3 gap-2 sm:grid" aria-hidden>
+        {/* スマホでも最初の画面で商品が見えるよう、低い横並びで出す */}
+        <div className="grid grid-cols-3 gap-2" aria-hidden>
           {heroItems.map((p) => (
-            <ProductVisual key={p.id} product={p} decorative className="aspect-[3/4]" />
+            <ProductVisual key={p.id} product={p} decorative className="aspect-[4/3] sm:aspect-[3/4]" />
           ))}
         </div>
       </section>
 
       {/* Perks */}
       <section aria-label="定期便の特典" className="border-y border-outline-variant/60">
-        <ul className="mx-auto grid max-w-6xl grid-cols-3 divide-x divide-outline-variant/60 px-4 sm:px-6">
+        {/* 商品グリッドと同じ列幅・間隔にして、文字の開始位置を揃える。区切り線は列間の中央に引く */}
+        <ul className="mx-auto grid max-w-6xl grid-cols-3 gap-x-3 px-4 sm:gap-x-6 sm:px-6">
           {PERKS.map(({ title, body }) => (
-            <li key={title.join('')} className="px-2 py-4 text-center sm:px-6 sm:py-6 sm:text-left first:sm:pl-0">
+            <li
+              key={title.join('')}
+              className="relative py-4 text-center before:absolute before:inset-y-0 before:-left-1.5 before:border-l before:border-outline-variant/60 first:before:hidden sm:py-6 sm:text-left sm:before:-left-3"
+            >
               <p className="text-xs font-semibold text-on-surface sm:text-sm">
                 <Phrases parts={title} />
               </p>
@@ -87,7 +92,7 @@ export default function ProductsPage() {
       <section id="how" className="mx-auto max-w-6xl scroll-mt-20 px-4 sm:px-6">
         <div className="border-t border-outline-variant/60 pt-8 sm:pt-12">
           <h2 className="font-headline text-xl font-light text-on-surface sm:text-2xl">定期便のしくみ</h2>
-          <ol className="mt-6 grid gap-6 sm:mt-8 sm:grid-cols-3 sm:gap-10">
+          <ol className="mt-6 grid gap-6 sm:mt-8 sm:grid-cols-3">
             {STEPS.map((s) => (
               <li key={s.n}>
                 <p className="font-semibold text-on-surface">

@@ -1,9 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { formatLongDate, formatMonthLabel } from "@/lib/dates";
-import { dashboardSummary, monthlyRevenue, projectName, sortTasks, taskGroup } from "@/lib/selectors";
+import {
+  dashboardSummary,
+  monthlyRevenue,
+  projectName,
+  sortTasks,
+  taskGroup,
+  type DashboardSummary,
+} from "@/lib/selectors";
 import { useDelta } from "@/lib/useDelta";
 import { cn, formatYen } from "@/lib/utils";
 import { Card, MoreLink, Page, PageHeader, PageSkeleton } from "@/components/ui";
@@ -18,29 +26,113 @@ interface SummaryRow {
   label: string;
   value: string;
   sub: string;
-  /** 直前の操作で変わった金額。数秒だけ表示する */
-  delta?: number;
 }
 
 function signedYen(delta: number): string {
   return `${delta > 0 ? "+" : "−"}${formatYen(Math.abs(delta))}`;
 }
 
+interface FlowStep {
+  label: string;
+  value: number;
+  sub: string;
+  /** 直前の操作で変わった金額。数秒だけ表示する */
+  delta?: number;
+  warn?: boolean;
+}
+
+/**
+ * freee の「請求 → 入金 → 残り」に倣い、請求したお金がどこまで回収できたかを1行で見せる。
+ * 請求 = 今月の入金 + 未入金の合計（来月以降が期日の未入金も含む）なので、入金を記録すると「入金」が増え「残り」が同額減る。
+ * 増減バッジは見出し行に出し、数字の行の高さは固定して下の要素を動かさない
+ */
+function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
+  summary: DashboardSummary;
+  paidDelta: number;
+  outstandingDelta: number;
+}) {
+  const billed = s.thisMonthPaid + s.outstandingTotal;
+  const ratio = billed > 0 ? s.thisMonthPaid / billed : 0;
+  const steps: FlowStep[] = [
+    { label: "請求", value: billed, sub: "今月の入金＋未入金" },
+    { label: "今月の入金", value: s.thisMonthPaid, delta: paidDelta, sub: `請求の ${Math.round(ratio * 100)}%` },
+    {
+      label: "残り",
+      value: s.outstandingTotal,
+      delta: outstandingDelta,
+      sub: s.overdueCount > 0 ? `うち期限超過 ${formatYen(s.overdueTotal)}` : "期限超過なし",
+      warn: s.overdueCount > 0,
+    },
+  ];
+
+  return (
+    <Card title="請求と回収" className="mb-6" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
+      <ol className="grid grid-cols-3">
+        {steps.map((st, i) => (
+          <li key={st.label} className={cn("relative min-w-0 px-3 pt-3 pb-3 sm:px-5 sm:pt-4", i > 0 && "border-l border-line")}>
+            {i > 0 && (
+              <ChevronRight
+                size={14}
+                aria-hidden
+                className="absolute top-1/2 -left-[8px] -translate-y-1/2 rounded-full bg-canvas text-warm-300"
+              />
+            )}
+            <p className="flex h-5 items-center justify-between gap-1 text-xs text-warm-500">
+              {st.label}
+              {st.delta ? (
+                <span className="num anim-rise rounded bg-blue-tint/60 px-1 text-[11px] font-semibold text-blue-active">
+                  {signedYen(st.delta)}
+                </span>
+              ) : null}
+            </p>
+            <p
+              key={st.value}
+              className={cn(
+                "num mt-0.5 flex h-7 items-center text-base font-semibold tracking-tight text-ink sm:text-[22px]",
+                st.delta && "anim-rise",
+              )}
+            >
+              {formatYen(st.value)}
+            </p>
+            {/* スマホの3列では補足が2行に折り返すため、2行分の高さを常に取っておく */}
+            <p
+              className={cn(
+                "num min-h-[2lh] text-[11px] sm:min-h-0 sm:text-xs",
+                st.warn ? "font-semibold text-orange" : "text-warm-500",
+              )}
+            >
+              {st.sub}
+            </p>
+          </li>
+        ))}
+      </ol>
+      <div
+        className="mx-3 mb-4 h-1.5 overflow-hidden rounded-full bg-warm-200 sm:mx-5"
+        role="progressbar"
+        aria-label="請求の回収率"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(ratio * 100)}
+      >
+        <div
+          className="h-full rounded-full bg-blue transition-[width] duration-500 motion-reduce:transition-none"
+          style={{ width: `${ratio * 100}%` }}
+        />
+      </div>
+    </Card>
+  );
+}
+
 /** 右側の要約。タイルではなく1枚のパネルに行として並べる */
 function SummaryList({ rows }: { rows: readonly SummaryRow[] }) {
   return (
     <Card className="flex flex-col">
-      <ul className="grid flex-1 grid-cols-1 divide-y divide-line sm:grid-cols-3 sm:divide-x sm:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y">
+      <ul className="grid flex-1 grid-cols-1 divide-y divide-line sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y">
         {rows.map((r) => (
           <li key={r.label} className="min-w-0">
             <Link href={r.href} className="flex h-full flex-col justify-center px-3 py-3 hover:bg-warm-50 sm:px-5 sm:py-3.5">
               <span className="text-xs text-warm-500">{r.label}</span>
-              <span className="mt-0.5 flex flex-wrap items-baseline gap-x-2">
-                <span key={r.value} className={cn("num text-base font-semibold text-ink sm:text-lg", r.delta && "anim-rise")}>
-                  {r.value}
-                </span>
-                {r.delta ? <span className="num anim-rise text-xs text-warm-500">{signedYen(r.delta)}</span> : null}
-              </span>
+              <span className="num mt-0.5 text-base font-semibold text-ink sm:text-lg">{r.value}</span>
               <span className="num text-[11px] text-warm-500 sm:text-xs">{r.sub}</span>
             </Link>
           </li>
@@ -69,15 +161,9 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
     .toSorted((a, b) => a.dueOn.localeCompare(b.dueOn));
   const sixMonthTotal = revenue.reduce((sum, m) => sum + m.paid, 0);
   const firstMonth = formatMonthLabel(revenue[0].month);
+  const lastMonth = formatMonthLabel(revenue[revenue.length - 1].month);
 
   const summary: SummaryRow[] = [
-    {
-      href: "/invoices",
-      label: "未入金の請求",
-      value: formatYen(s.outstandingTotal),
-      delta: outstandingDelta,
-      sub: s.overdueCount > 0 ? `${s.outstandingCount}件 ・ うち期限超過 ${formatYen(s.overdueTotal)}` : `${s.outstandingCount}件`,
-    },
     {
       href: "/projects",
       label: "進行中の案件",
@@ -96,50 +182,14 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
     <Page>
       <PageHeader eyebrow={formatLongDate(today)} title="ダッシュボード" />
 
-      {/* 入金処理で警告が解消しても下の要素が動かないよう、同じ場所・同じ高さで文言だけ置き換える。
-          390px 幅では警告が2行に折り返すため、スマホでは2行分の高さを確保する */}
-      <p role="status" className="num -mt-3 mb-5 min-h-[2lh] text-sm sm:min-h-0">
-        {s.overdueCount > 0 ? (
-          <span className="text-orange">
-            支払期限を過ぎた未入金が {s.overdueCount}件（{formatYen(s.overdueTotal)}）あります。
-            <Link href="/invoices" className="ml-1 rounded font-medium underline underline-offset-2 hover:no-underline">
-              請求一覧で確認
-            </Link>
-          </span>
-        ) : (
-          <span className="text-warm-500">期限超過の請求はありません</span>
-        )}
-      </p>
+      <BillingFlow summary={s} paidDelta={paidDelta} outstandingDelta={outstandingDelta} />
 
       <div className="mb-6 grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 px-4 pt-4 sm:px-5 sm:pt-5">
-            <div className="min-w-0">
-              <h2 className="text-[13px] text-warm-500">今月の入金</h2>
-              {/* 増減バッジの出入りで高さが変わらないよう、行の高さを数字に固定する */}
-              <div className="mt-1 flex h-7 items-center gap-x-2.5">
-                <p
-                  key={s.thisMonthPaid}
-                  className={cn("num text-[28px] leading-none font-semibold tracking-tight text-ink", paidDelta && "anim-rise")}
-                >
-                  {formatYen(s.thisMonthPaid)}
-                </p>
-                {paidDelta !== 0 && (
-                  <span className="num anim-rise rounded bg-blue-tint/60 px-1.5 py-0.5 text-sm font-semibold text-blue-active">
-                    {signedYen(paidDelta)}
-                  </span>
-                )}
-              </div>
-              <p role="status" className="sr-only">
-                {paidDelta !== 0 ? `今月の入金が ${signedYen(paidDelta)} 変わりました` : ""}
-              </p>
-              <p className="num mt-2 text-xs text-warm-500">
-                見込み込み {formatYen(s.thisMonthPaid + s.thisMonthExpected)}
-              </p>
-            </div>
-            {/* スマホでは常に独立した行にする。金額の桁やバッジ幅で折り返し位置が変わると下が動くため */}
-            <p className="num w-full text-xs text-warm-500 sm:w-auto">
-              {firstMonth}〜 6ヶ月計 <span className="font-medium text-ink">{formatYen(sixMonthTotal)}</span>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-4 pt-4 sm:px-5 sm:pt-5">
+            <h2 className="text-[13px] font-semibold text-ink">入金の推移</h2>
+            <p className="num text-xs text-warm-500">
+              {firstMonth}から{lastMonth}の入金 <span className="font-medium text-ink">{formatYen(sixMonthTotal)}</span>
             </p>
           </div>
           <div className="px-3 pt-2 pb-4 sm:px-5">
@@ -152,7 +202,7 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
         <SummaryList rows={summary} />
       </div>
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-5">
+      <div className="mb-4 grid gap-4 lg:grid-cols-5 lg:items-start">
         {/* 「入金済にする」がデモの山場なので、見た目もフォーカス順も今日やることより先に置く */}
         <Card title="未入金の請求" className="lg:col-span-3" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
           <InvoiceList invoices={unpaid} data={data} today={today} empty="未入金の請求はありません" />

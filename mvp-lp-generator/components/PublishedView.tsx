@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { findSampleBySlug } from '@/lib/samples'
+import { lpTitle } from '@/lib/pageTitle'
 import { loadPublished, mockPublicUrl } from '@/lib/storage'
 import type { LPDoc } from '@/lib/types'
 import LandingPage from './lp/LandingPage'
@@ -16,6 +17,8 @@ export default function PublishedView({ slug }: { slug: string }) {
     // エディタで「公開」したデータ → 無ければ同じ slug のサンプル
     const doc = loadPublished(slug) ?? findSampleBySlug(slug)
     setState(doc ? { status: 'ready', doc } : { status: 'missing' })
+    // 保存データの店名がサンプルと違う（または保存データだけの slug の）場合も、タブには店名を出す
+    if (doc) document.title = lpTitle(doc.store)
   }, [slug])
 
   if (state.status === 'loading') return <div className="min-h-dvh bg-white" />

@@ -2,26 +2,24 @@ import { profile } from "@/content/profile";
 import { SectionHeader } from "./ui/SectionHeader";
 import { container } from "./ui/container";
 
-const blocks = [
-  {
-    title: "いま学んでいること",
-    body: "生成AI・AIエージェント・ローカルLLMを、実際にアプリへ組み込みながら学んでいます。使ってみるだけでなく、組み込んだときに何が危ないのかを考えるようになりました。",
-  },
-  {
-    title: "興味の方向",
-    body: "AI特有のセキュリティ問題（Prompt Injection や Jailbreak）に関心があります。あわせて、OSSの脆弱性調査やCVE、通信解析など、システムが内部でどう動いていて、どこに問題が起きうるのかを考えることに面白さを感じています。",
-  },
-  {
-    title: "作ったものは公開する",
-    body: "ローカルで動かして終わりにせず、サーバー・Docker・データベース・ネットワークを組み合わせて動かしています。小さく作ったものは公開URLで触れる状態に、代表作はソースコードを公開しています。",
-  },
-  {
-    title: "これから",
-    body: "ひとつの分野に限定せず、AI・セキュリティ・クラウド・ネットワークを組み合わせて扱えるエンジニアを目指しています。",
-  },
+/*
+ * 小見出し＋説明文を4つ並べる型をやめ、文章として段落に組む。
+ * 本文の文言は変えていない（学んでいること→興味の方向は1つの流れとして同じ段落に置く）。
+ */
+const paragraphs = [
+  [
+    "生成AI・AIエージェント・ローカルLLMを、実際にアプリへ組み込みながら学んでいます。使ってみるだけでなく、組み込んだときに何が危ないのかを考えるようになりました。",
+    "AI特有のセキュリティ問題（Prompt Injection や Jailbreak）に関心があります。あわせて、OSSの脆弱性調査やCVE、通信解析など、システムが内部でどう動いていて、どこに問題が起きうるのかを考えることに面白さを感じています。",
+  ],
+  [
+    "ローカルで動かして終わりにせず、サーバー・Docker・データベース・ネットワークを組み合わせて動かしています。小さく作ったものは公開URLで触れる状態に、代表作はソースコードを公開しています。",
+  ],
 ];
 
-/** カードにはせず、小見出し付きの文章として縦に並べる。 */
+const closing =
+  "ひとつの分野に限定せず、AI・セキュリティ・クラウド・ネットワークを組み合わせて扱えるエンジニアを目指しています。";
+
+/** カードにも小見出しにもせず、文章として読ませる。 */
 export function About() {
   return (
     <section id="about" className="py-8 sm:py-10" aria-labelledby="about-heading">
@@ -32,13 +30,11 @@ export function About() {
           description={`${profile.school} ${profile.department}。${profile.activity}。`}
         />
 
-        <div className="space-y-6">
-          {blocks.map(({ title, body }) => (
-            <div key={title}>
-              <h3 className="font-semibold text-ink">{title}</h3>
-              <p className="mt-1 leading-[1.8] text-ink-muted">{body}</p>
-            </div>
+        <div className="space-y-4 leading-[1.8] text-ink-muted">
+          {paragraphs.map((sentences) => (
+            <p key={sentences[0]}>{sentences.join("")}</p>
           ))}
+          <p className="text-ink">{closing}</p>
         </div>
       </div>
     </section>
