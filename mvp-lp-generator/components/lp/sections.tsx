@@ -2,6 +2,8 @@ import { cx } from '@/lib/cx'
 import { toPhrases } from '@/lib/phrase'
 import type { Theme } from '@/lib/themes'
 import type { StoreInfo } from '@/lib/types'
+import Icon from '../Icon'
+import { Rings } from './Art'
 
 export interface SectionProps {
   store: StoreInfo
@@ -22,6 +24,8 @@ export function Phrases({ text, lead }: { text: string; lead?: string }) {
     </>
   )
 }
+
+const num = (i: number) => String(i + 1).padStart(2, '0')
 
 const pad = (wide: boolean) => (wide ? 'px-14 py-24' : 'px-6 py-16')
 
@@ -61,10 +65,10 @@ export function Features(props: SectionProps) {
       <div className={cx('mx-auto grid max-w-6xl gap-6', wide ? 'grid-cols-3' : 'grid-cols-1')}>
         {store.features.map((f, i) => (
           <article key={f.title} className={cx(t.card, 'p-7')}>
-            <div className="flex items-center gap-3">
-              <span aria-hidden className="text-3xl">{f.emoji}</span>
-              <span className={cx(t.accent, 'font-gothic text-xs font-bold')}>POINT {String(i + 1).padStart(2, '0')}</span>
-            </div>
+            <p className={cx(t.accent, 'flex items-baseline gap-3 font-gothic text-xs font-bold tracking-[0.2em]')}>
+              <span aria-hidden className="font-mincho text-4xl font-normal italic tracking-normal">{num(i)}</span>
+              POINT
+            </p>
             <h3 className={cx(t.heading, 'mt-5 text-lg')}>{f.title}</h3>
             <p className={cx(t.muted, 'mt-3 text-sm leading-relaxed')}>{f.text}</p>
           </article>
@@ -82,11 +86,13 @@ export function Menu(props: SectionProps) {
     <section id="menu" className={pad(wide)}>
       <Head {...props} eyebrow="MENU" title="メニュー・料金" />
       <div className={cx('mx-auto grid max-w-6xl', wide ? 'grid-cols-3 gap-6' : 'grid-cols-1 gap-4')}>
-        {items.map((m) => (
+        {items.map((m, i) => (
           // スマホでは横並びのメニュー表にして、大きなグラデーション面が続かないようにする
           <article key={m.name} className={cx(t.card, 'overflow-hidden', !wide && 'flex items-center')}>
-            <div className={cx(t.art, 'relative flex shrink-0 items-center justify-center', wide ? 'aspect-[16/10]' : 'm-3 h-20 w-20 rounded-xl')}>
-              <span aria-hidden className={cx('drop-shadow-lg', wide ? 'text-6xl' : 'text-4xl')}>{m.emoji}</span>
+            {/* 写真の代わりに番号と幾何学パターンで「品書き」らしく見せる */}
+            <div aria-hidden className={cx(t.art, t.artInk, 'relative flex shrink-0 items-center justify-center overflow-hidden', wide ? 'aspect-[16/10]' : 'm-3 h-20 w-20 rounded-xl')}>
+              <Rings className={cx('absolute opacity-25', wide ? '-right-[25%] -top-[40%] w-[90%]' : 'inset-0')} />
+              <span className={cx('relative font-mincho italic leading-none', wide ? 'text-7xl' : 'text-3xl')}>{num(i)}</span>
             </div>
             <div className={cx('flex min-w-0 flex-1', wide ? 'items-end justify-between gap-4 p-6' : 'flex-col gap-1 py-4 pl-1 pr-5')}>
               <div className="min-w-0">
@@ -140,7 +146,9 @@ export function Access(props: SectionProps) {
       <Head {...props} eyebrow="ACCESS" title="アクセス・営業時間" />
       <div className={cx('mx-auto grid max-w-5xl items-center gap-10', wide ? 'grid-cols-2' : 'grid-cols-1')}>
         <div role="img" aria-label={`${store.address} の地図イメージ`} style={map} className="relative aspect-[4/3] overflow-hidden rounded-3xl">
-          <span aria-hidden className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full text-5xl drop-shadow-lg">📍</span>
+          <span aria-hidden className={cx(t.ctaBand, 'absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-full items-center justify-center rounded-full rounded-bl-none -rotate-45 shadow-lg')}>
+            <span className="rotate-45"><Icon name="pin" className="h-5 w-5" /></span>
+          </span>
         </div>
         <dl>
           {rows.map(([k, v]) => (

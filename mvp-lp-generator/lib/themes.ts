@@ -19,6 +19,8 @@ export interface Theme {
   readonly card: string
   readonly alt: string
   readonly art: string
+  /** 線画・英字タイポの色（art の上に載せる装飾。文字情報ではない） */
+  readonly artInk: string
   readonly line: string
   readonly ctaBand: string
   readonly mapBase: string
@@ -45,6 +47,7 @@ export const THEMES: Record<TemplateKey, Theme> = {
     card: 'bg-white border border-[#3b2f25]/10 rounded-2xl shadow-[0_18px_40px_-24px_rgba(59,47,37,0.35)]',
     alt: 'bg-[#f2eadd]',
     art: 'bg-gradient-to-br from-[#f7e3c6] via-[#e8b885] to-[#b97a42]',
+    artInk: 'text-[#3b2f25]',
     line: 'border-[#3b2f25]/10',
     ctaBand: 'bg-[#3b2f25] text-[#faf6ef]',
     mapBase: '#efe6d6',
@@ -66,7 +69,9 @@ export const THEMES: Record<TemplateKey, Theme> = {
     btnGhost: 'border border-white/20 hover:bg-white/10 rounded-full',
     card: 'bg-white/[0.04] border border-white/10 rounded-2xl',
     alt: 'bg-[#141417]',
-    art: 'bg-gradient-to-br from-[#2a241c] via-[#7d6038] to-[#d9b779]',
+    // 金のグラデ面に絵を載せると色が沈むため、黒地に金の細線で見せる
+    art: 'bg-[radial-gradient(120%_90%_at_70%_20%,#3a2f1f_0%,#1a1712_55%,#111013_100%)]',
+    artInk: 'text-[#d9b779]',
     line: 'border-white/10',
     ctaBand: 'bg-gradient-to-br from-[#d9b779] to-[#b48f4f] text-[#0d0d0f]',
     mapBase: '#1b1b1f',
@@ -89,6 +94,7 @@ export const THEMES: Record<TemplateKey, Theme> = {
     card: 'bg-white border-2 border-[#1f2a37] rounded-3xl shadow-[6px_6px_0_#1f2a37]',
     alt: 'bg-[#fff6dc]',
     art: 'bg-gradient-to-br from-[#ffe08a] via-[#ffb38a] to-[#ff6b4a]',
+    artInk: 'text-[#1f2a37]',
     line: 'border-[#1f2a37]/10',
     ctaBand: 'bg-[#ff6b4a] text-[#1f2a37]',
     mapBase: '#dff3ea',

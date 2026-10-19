@@ -14,7 +14,8 @@ type Tab = 'form' | 'preview'
 export default function Editor({ initial }: { initial: LPDoc }) {
   const [doc, setDoc] = useState(initial)
   const [generating, setGenerating] = useState(false)
-  const [tab, setTab] = useState<Tab>('form')
+  // 1024px 未満で最初に見せるのは LP（タブは lg 以上では使われないので常に preview 始まりで良い）
+  const [tab, setTab] = useState<Tab>('preview')
   const [publishOpen, setPublishOpen] = useState(false)
   const timer = useRef<number | undefined>(undefined)
 
@@ -23,6 +24,8 @@ export default function Editor({ initial }: { initial: LPDoc }) {
   const generate = useCallback((next?: LPDoc) => {
     if (next) setDoc(next)
     setTab('preview')
+    // スマホでは下部のボタンから押されても LP の先頭（生成演出）が見えるようにする
+    window.scrollTo({ top: 0 })
     setGenerating(true)
     window.clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setGenerating(false), GENERATE_MS)
