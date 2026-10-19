@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar, { MobileNav, ResetDemoButton } from "@/components/Sidebar";
 import { EstimatesProvider } from "@/lib/store";
+import WonToast from "@/components/WonToast";
 
 export const metadata: Metadata = {
   title: "見積マネージャー",
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
           <MobileNav />
+          <WonToast />
         </EstimatesProvider>
       </body>
     </html>

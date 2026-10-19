@@ -20,7 +20,7 @@ const FOCUS = "focus-visible:outline focus-visible:outline-2 focus-visible:outli
  * 金額と期限を大きく見せて「承認する」の1操作で受注に進める。外部への送信はしない。
  */
 export default function CustomerView({ id }: { id: number }) {
-  const { estimates, setStatus } = useEstimates();
+  const { estimates, approve } = useEstimates();
 
   if (!estimates) return <LoadingState />;
   const estimate = estimates.find((e) => e.id === id);
@@ -66,7 +66,7 @@ export default function CustomerView({ id }: { id: number }) {
             </dl>
 
             <div className="mt-6">
-              <ApprovalArea estimate={estimate} onApprove={() => setStatus(estimate.id, "won")} />
+              <ApprovalArea estimate={estimate} onApprove={() => approve(estimate.id)} />
             </div>
           </div>
 
@@ -109,7 +109,7 @@ export default function CustomerView({ id }: { id: number }) {
         </section>
 
         <p className="mt-6 text-balance text-center text-xs text-muted">
-          ご不明な点は {ISSUER.name}（TEL {ISSUER.tel}）までお問い合わせください。
+          ご不明な点は {ISSUER.name}<span className="whitespace-nowrap">（TEL {ISSUER.tel}）</span>までお問い合わせください。
         </p>
       </div>
     </div>

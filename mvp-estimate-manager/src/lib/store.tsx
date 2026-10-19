@@ -4,10 +4,11 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { Estimate, EstimateInput, EstimateStatus } from "@/types";
 import { STATUSES } from "@/types";
 import { buildSeed } from "@/data/seed";
+import { calcTotals } from "@/lib/calc";
 import { todayISO } from "@/lib/utils";
 
 // ponytail: localStorage のみ。複数端末・複数人で共有するならサーバー保存が必要
-const STORAGE_KEY = "mvp-estimate-manager:v3";
+const STORAGE_KEY = "mvp-estimate-manager:v4";
 
 interface EstimatesContextValue {
   /** マウント前（localStorage 読み込み前）は null */
@@ -16,6 +17,20 @@ interface EstimatesContextValue {
   update: (id: number, input: EstimateInput) => void;
   setStatus: (id: number, status: EstimateStatus) => void;
   reset: () => void;
+  /** お客様画面での承認。受注にして、管理画面に戻ったときの通知と KPI の差分表示を予約する */
+  approve: (id: number) => void;
+  /** 未表示の受注通知（トースト用）。表示側が clearWonToast で消す */
+  wonToast: WonToast | null;
+  clearWonToast: () => void;
+  /** 一覧の受注金額 KPI にまだ見せていない増分（税込）。一覧側が takeWonDelta で受け取る */
+  wonDelta: number;
+  takeWonDelta: () => void;
+}
+
+export interface WonToast {
+  id: number;
+  subject: string;
+  amount: number;
 }
 
 const EstimatesContext = createContext<EstimatesContextValue | null>(null);
@@ -53,6 +68,9 @@ function saveStored(estimates: Estimate[]): void {
 
 export function EstimatesProvider({ children }: { children: React.ReactNode }) {
   const [estimates, setEstimates] = useState<Estimate[] | null>(null);
+  // 通知はページ遷移をまたいで残ればよいので保存しない（再読み込みで消える）
+  const [wonToast, setWonToast] = useState<WonToast | null>(null);
+  const [wonDelta, setWonDelta] = useState(0);
 
   // 相対日付のダミーデータはクライアントの「今日」で作る（SSR との日付ずれを避ける）
   useEffect(() => {
@@ -81,11 +99,29 @@ export function EstimatesProvider({ children }: { children: React.ReactNode }) {
     setEstimates((prev) => prev?.map((e) => (e.id === id ? { ...e, status } : e)) ?? prev);
   }, []);
 
-  const reset = useCallback(() => setEstimates(buildSeed(todayISO())), []);
+  const reset = useCallback(() => {
+    setEstimates(buildSeed(todayISO()));
+    setWonToast(null);
+    setWonDelta(0);
+  }, []);
+
+  const approve = useCallback(
+    (id: number) => {
+      const target = estimates?.find((e) => e.id === id);
+      if (!target || target.status === "won") return;
+      const amount = calcTotals(target.items).total;
+      setStatus(id, "won");
+      setWonToast({ id, subject: target.subject, amount });
+      setWonDelta((d) => d + amount);
+    },
+    [estimates, setStatus],
+  );
+  const clearWonToast = useCallback(() => setWonToast(null), []);
+  const takeWonDelta = useCallback(() => setWonDelta(0), []);
 
   const value = useMemo(
-    () => ({ estimates, create, update, setStatus, reset }),
-    [estimates, create, update, setStatus, reset],
+    () => ({ estimates, create, update, setStatus, reset, approve, wonToast, clearWonToast, wonDelta, takeWonDelta }),
+    [estimates, create, update, setStatus, reset, approve, wonToast, clearWonToast, wonDelta, takeWonDelta],
   );
 
   return <EstimatesContext.Provider value={value}>{children}</EstimatesContext.Provider>;

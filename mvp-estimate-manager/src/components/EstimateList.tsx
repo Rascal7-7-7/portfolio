@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Estimate, EstimateStatus } from "@/types";
 import { STATUSES, STATUS_LABELS } from "@/types";
 import { useEstimates } from "@/lib/store";
@@ -16,6 +16,7 @@ type Filter = EstimateStatus | "all";
 
 const DUE_SOON_DAYS = 7;
 const SPARK_MONTHS = 6;
+const DELTA_SHOW_MS = 5000;
 
 /** 一覧の列。見出し行と各行で同じ grid を使い、列をそろえる */
 const ROW_GRID = "sm:grid-cols-[88px_minmax(0,1fr)_96px_120px_128px]";
@@ -33,8 +34,20 @@ function DueNote({ estimate }: { estimate: Estimate }) {
 }
 
 export default function EstimateList() {
-  const { estimates } = useEstimates();
+  const { estimates, wonDelta, takeWonDelta } = useEstimates();
   const [filter, setFilter] = useState<Filter>("all");
+  // 承認で増えた受注額を受け取り、数秒だけ KPI に添える（受け取ったら store 側は 0 に戻す）
+  const [shownDelta, setShownDelta] = useState(0);
+  useEffect(() => {
+    if (wonDelta === 0) return;
+    setShownDelta(wonDelta);
+    takeWonDelta();
+  }, [wonDelta, takeWonDelta]);
+  useEffect(() => {
+    if (shownDelta === 0) return;
+    const timer = window.setTimeout(() => setShownDelta(0), DELTA_SHOW_MS);
+    return () => window.clearTimeout(timer);
+  }, [shownDelta]);
   const [keyword, setKeyword] = useState("");
 
   const sorted = useMemo(
@@ -61,7 +74,7 @@ export default function EstimateList() {
 
   return (
     <div className="space-y-8">
-      <KpiCards summary={summary} monthly={monthlyWon(estimates, todayISO(), SPARK_MONTHS)} />
+      <KpiCards summary={summary} monthly={monthlyWon(estimates, todayISO(), SPARK_MONTHS)} wonDelta={shownDelta} />
 
       <section aria-label="見積一覧">
         <div className="flex flex-col gap-3 border-b border-line sm:flex-row sm:items-end sm:justify-between">
