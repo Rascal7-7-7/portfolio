@@ -101,8 +101,8 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => (
-              <tr key={item.name} className="border-b border-line align-top">
+            {items.map((item, i) => (
+              <tr key={i} className="border-b border-line align-top">
                 <td className={CELL}>{item.name}</td>
                 <td className={`${CELL} num text-right whitespace-nowrap`}>{item.qty}</td>
                 <td className={`${CELL} num text-right whitespace-nowrap`}>{formatYen(item.amount)}</td>

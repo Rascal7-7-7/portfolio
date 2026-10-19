@@ -18,12 +18,12 @@ export function ExternalLink({ href, children }: { href: string; children: React
   );
 }
 
-/** 「見積 EST-0014 から作成」と見積マネージャー側の該当ページ */
+/** 「見積 EST-0014 の承認後に作成」と見積マネージャー側の該当ページ */
 export function EstimateSource({ estimateNo }: { estimateNo: string }) {
   return (
     <span className="inline-flex flex-wrap items-center gap-x-2">
       <span className="text-warm-500">
-        見積 <span className="num">{estimateNo}</span> から作成
+        見積 <span className="num">{estimateNo}</span> の承認後に作成（デモでは作成済み）
       </span>
       <ExternalLink href={estimateUrl(estimateNo)}>見積マネージャーで見る（デモ）</ExternalLink>
     </span>

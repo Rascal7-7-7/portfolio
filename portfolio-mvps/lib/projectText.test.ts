@@ -4,7 +4,8 @@ import { boundaryTerms, sharedMetaItems } from "./projectText";
 
 /**
  * トップの連作の説明は、各行から省いたメタ情報（時期・体制・確認方法・技術）を1回だけ書く。
- * 説明文の「API・DB を使わない」「公開デモがある」が、データとずれたら落とす。
+ * 説明文の「公開デモがある」が、データ（全作品にデモのリンクがあること）とずれたら落とす。
+ * 「API・DB を使わない」はデータに持たないため、ここでは検証していない。
  */
 describe("業務モックアップの連作", () => {
   const series = getProjectsByTier("standard");
