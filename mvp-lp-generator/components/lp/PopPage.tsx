@@ -7,13 +7,13 @@ import { catchCopy, ctaLabel, hoursWord, infoRows, initialOf, menuItems, menuTit
  * ポップ: 街の整体院・教室のサイト（STUDIO「ぬくもり鍼灸・整骨院」の白い箱に載せた見出し・
  * ヘッダーの電話番号・角の小さいボタン、「SORA」の大きな色面）を手本にした構成。
  * 英字の小見出しと大きな通し番号は「AI 製 LP の型」に見えるため使わず、和文の見出しだけにする。
- * 写真の代わりに珊瑚色の大きな色面を置き、見出しだけを白い箱で切り抜く。
+ * 写真の代わりに珊瑚色の大きな色面を置き、見出しだけを白い箱で切り抜く。差し色は珊瑚色の面の1色だけ。
  * カードは使わず、線と色面（白／クリーム）の切り替えで区切る。影・グラデーションは使わない。
  * 見出しは左揃え・飾りなし（中央寄せ＋短い下線はテンプレートの型に見える）。締めの色面だけ中央に組む。
  */
 const NAVY = 'text-[#1f2a37]'
 const MUTED = 'text-[#1f2a37]/75' // 白・クリーム地で約 5:1 以上
-const ACCENT = 'text-[#b43a26]' // 白で約 5.9:1 / クリーム地で約 5.4:1
+// 差し色は珊瑚色の面だけにする（文字の差し色を別に持つと2色になる）。見出し・価格は紺のまま太さで立てる
 const LINE = 'border-[#1f2a37]/15'
 const RULE = 'border-[#1f2a37]' // 区切りの太線
 const CORAL = 'bg-[#ff6b4a]' // 紺 #1f2a37 の文字で約 5.1:1（珊瑚色の上の文字は不透明の紺だけ）
@@ -53,18 +53,19 @@ function Nav({ store, wide }: TemplateProps) {
   )
 }
 
-/** 見出しの白い箱と同じ白い面に載せた価格（手本の「色面＋見出し箱＋価格」の組み） */
+/** 珊瑚色の面に直接載せた価格。白い箱で囲むと面の中に面が入るので、上の太線と大きな数字だけで区切る */
 function LeadMenu({ store, wide }: TemplateProps) {
   const lead = menuItems(store)[0]
   if (!lead) return null
   return (
-    <div className={cx('rounded-lg bg-white', wide ? 'px-7 py-8' : 'mt-10 px-6 py-6')}>
-      <p className={cx(ACCENT, 'text-xs font-extrabold')}>おすすめメニュー</p>
+    <div className={cx('border-t-4 border-[#1f2a37] pt-5', !wide && 'mt-10')}>
+      <p className="text-xs font-extrabold">おすすめメニュー</p>
       <p className="mt-3 text-lg font-extrabold">
         <Phrases text={lead.name} />
       </p>
-      {lead.description && <p className={cx(MUTED, 'mt-1 text-xs font-medium')}>{lead.description}</p>}
-      <p className={cx('mt-4 border-b-2 pb-5 font-extrabold leading-none tabular-nums', RULE, wide ? 'text-[clamp(32px,4.6cqw,60px)]' : 'text-[48px]')}>{lead.price}</p>
+      {/* 珊瑚色の上の文字は不透明の紺だけ（半透明にすると 4.5:1 を割る） */}
+      {lead.description && <p className="mt-1 text-xs font-medium">{lead.description}</p>}
+      <p className={cx('mt-4 border-b-2 pb-5 font-extrabold leading-none tabular-nums', RULE, wide ? 'text-[clamp(40px,5.6cqw,72px)]' : 'text-[56px]')}>{lead.price}</p>
       {/* 項目ごとに改行を禁止し、項目の間でだけ折り返す（「定休 毎週火／曜日」のような語中改行を防ぐ） */}
       {(store.hours || store.closed) && (
         <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold">
@@ -80,7 +81,7 @@ function Hero(props: TemplateProps) {
   const { store, wide } = props
   return (
     <section className={wide ? 'px-6 pt-6' : 'px-3 pt-3'}>
-      {/* 写真の代わりの大きな色面。装飾は置かず、白い見出し箱と白い価格の面だけで組む */}
+      {/* 写真の代わりの大きな色面。装飾は置かず、白い見出し箱と太線で区切った価格だけで組む */}
       <div className={cx('rounded-lg', CORAL, wide ? 'px-14 pb-16 pt-12' : 'px-5 pb-10 pt-8')}>
         <p className="text-sm font-bold">
           {CATEGORIES[store.category].label}｜{storeName(store)}
@@ -115,7 +116,8 @@ function Features({ store, wide }: TemplateProps) {
         「3列の特長カード」はテンプレートの型に見えるので使わない。PC では見出しと本文を横に組んだ段を
         左端をそろえて縦に積む（左右交互のずらしは配置のずれに見えるのでやめた）
       */}
-      <ul className={cx('mt-12', wide ? 'space-y-12' : 'border-b', LINE)}>
+      {/* 下端の線は置かない（直後のあいさつの太線と二重になる） */}
+      <ul className={cx('mt-12', wide && 'space-y-12')}>
         {store.features.map((f) => (
           <li
             key={f.title}
@@ -125,7 +127,7 @@ function Features({ store, wide }: TemplateProps) {
                 : cx('border-t py-7', LINE),
             )}
           >
-            <h3 className={cx(ACCENT, 'font-extrabold leading-snug', wide ? 'text-2xl' : 'text-xl')}><Phrases text={f.title} /></h3>
+            <h3 className={cx('font-extrabold leading-snug', wide ? 'text-2xl' : 'text-xl')}><Phrases text={f.title} /></h3>
             <p className={cx(MUTED, 'text-[15px] leading-[1.9]', !wide && 'mt-2')}>{f.text}</p>
           </li>
         ))}
@@ -145,7 +147,7 @@ function Greeting({ store, wide }: TemplateProps) {
     <section className={cx(pad(wide), '!pt-0')}>
       <div className={WRAP}>
       <div className={cx('border-t-2 pt-12', RULE, wide && 'grid grid-cols-[180px_minmax(0,1fr)] gap-12')}>
-        <p aria-hidden className={cx(CREAM, ACCENT, 'flex aspect-square items-center justify-center rounded-lg font-extrabold leading-none', wide ? 'text-[88px]' : 'w-24 text-[48px]')}>
+        <p aria-hidden className={cx(CREAM, 'flex aspect-square items-center justify-center rounded-lg font-extrabold leading-none', wide ? 'text-[88px]' : 'w-24 text-[48px]')}>
           {initialOf(owner.name)}
         </p>
         <div className={cx(!wide && 'mt-8')}>
@@ -176,7 +178,7 @@ function Menu({ store, wide }: TemplateProps) {
               <h3 className="text-[17px] font-extrabold"><Phrases text={m.name} /></h3>
               {m.description && <p className={cx(MUTED, 'mt-1 text-xs')}>{m.description}</p>}
             </div>
-            <p className={cx(ACCENT, 'shrink-0 font-extrabold tabular-nums', wide ? 'text-2xl' : 'text-xl')}>{m.price}</p>
+            <p className={cx('shrink-0 font-extrabold tabular-nums', wide ? 'text-2xl' : 'text-xl')}>{m.price}</p>
           </li>
         ))}
       </ul>
@@ -193,7 +195,7 @@ function Voices({ store, wide }: TemplateProps) {
       <div className={cx('mt-12 grid', wide ? 'grid-cols-2 gap-12' : 'gap-10')}>
         {store.voices.map((v) => (
           <figure key={v.name} className={cx('border-t-2 pt-6', RULE)}>
-            <span aria-hidden className={cx(ACCENT, 'block text-[44px] font-extrabold leading-[0.6]')}>“</span>
+            <span aria-hidden className={cx(MUTED, 'block text-[44px] font-extrabold leading-[0.6]')}>“</span>
             <blockquote className="mt-3 text-[15px] font-medium leading-[1.9]">{v.text}</blockquote>
             <figcaption className={cx(MUTED, 'mt-4 text-xs font-extrabold')}>{v.name}</figcaption>
           </figure>
@@ -204,12 +206,44 @@ function Voices({ store, wide }: TemplateProps) {
   )
 }
 
+/** 紹介文の「吉祥寺駅から徒歩5分」から駅名と徒歩分数を拾う（入力項目は増やさない）。無ければ null */
+const stationOf = (text: string) => {
+  const m = text.match(/([^\s、。]+?駅)\S*?から徒歩(\d+)分/)
+  return m ? { name: m[1], walk: `徒歩${m[2]}分` } : null
+}
+
+/**
+ * 駅から店までの略図（線1本と2つの点）。住所の表が正なので、図は aria-hidden の補助にとどめる。
+ * ponytail: 道順ではなく位置関係の目安。実際の地図が要るなら埋め込み地図に差し替える
+ */
+function RouteMap({ store }: { store: TemplateProps['store'] }) {
+  const station = stationOf(store.description)
+  return (
+    <div aria-hidden className="mt-10 text-xs font-extrabold">
+      <svg viewBox="0 0 240 120" className="w-full max-w-[280px]" fill="none" stroke="#1f2a37">
+        <line x1="0" y1="96" x2="240" y2="96" strokeWidth="1" strokeOpacity="0.3" />
+        <line x1="70" y1="0" x2="70" y2="120" strokeWidth="1" strokeOpacity="0.3" />
+        <path d="M24 96 H70 V28 H206" strokeWidth="3" strokeDasharray="1 7" strokeLinecap="round" />
+        <rect x="14" y="88" width="20" height="16" fill="#1f2a37" stroke="none" />
+        <circle cx="206" cy="28" r="9" fill="#ff6b4a" strokeWidth="3" />
+      </svg>
+      <div className="mt-3 flex max-w-[280px] justify-between gap-4">
+        <span>{station ? `${station.name}（${station.walk}）` : '最寄り駅'}</span>
+        <span className="text-right">{storeName(store)}</span>
+      </div>
+    </div>
+  )
+}
+
 function Access({ store, wide }: TemplateProps) {
   return (
     <section id="access" className={cx(CREAM, pad(wide))}>
       <div className={cx(WRAP, wide && 'grid grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] items-start gap-12')}>
-      {/* アクセスは見出しを左の列に置き、表を右に組む */}
-      <H2 text={`アクセス・${hoursWord(store)}時間`} wide={wide} />
+      {/* アクセスは見出しと略図を左の列に置き、表を右に組む */}
+      <div>
+        <H2 text={`アクセス・${hoursWord(store)}時間`} wide={wide} />
+        {wide && <RouteMap store={store} />}
+      </div>
       <dl className={cx('border-y-2 text-sm', RULE, !wide && 'mt-10')}>
         {infoRows(store).map(([k, v]) => (
           <div key={k} className={cx(LINE, 'grid grid-cols-[6em_minmax(0,1fr)] gap-4 border-b py-4 last:border-b-0', wide && 'px-2')}>
