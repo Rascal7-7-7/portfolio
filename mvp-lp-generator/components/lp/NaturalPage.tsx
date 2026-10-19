@@ -136,7 +136,8 @@ function Hero({ store, wide, roomy }: TemplateProps) {
         <h1
           className={cx(
             'font-mincho font-semibold leading-[1.7] tracking-[0.2em] [writing-mode:vertical-rl]',
-            wide ? 'max-h-[10em] text-[56px]' : 'max-h-[10em] text-[32px]',
+            // エディタのプレビュー枠（wide だが roomy でない幅）では一段小さくし、初期表示で列の下が切れないようにする
+            wide ? cx('max-h-[10em]', roomy ? 'text-[56px]' : 'text-[44px]') : 'max-h-[10em] text-[32px]',
           )}
         >
           {toLines(catchCopy(store)).map((line, i) => (

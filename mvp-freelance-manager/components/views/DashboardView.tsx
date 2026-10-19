@@ -164,8 +164,8 @@ export function DashboardView() {
 
 function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
   const s = dashboardSummary(data, today);
-  const paidDelta = useDelta(s.thisMonthPaid);
-  const outstandingDelta = useDelta(s.outstandingTotal);
+  const paidDelta = useDelta(s.thisMonthPaid, "hikae-delta-paid");
+  const outstandingDelta = useDelta(s.outstandingTotal, "hikae-delta-outstanding");
   const revenue = monthlyRevenue(data.invoices, today);
   const focusTasks = sortTasks(
     data.tasks.filter((t) => ["overdue", "today"].includes(taskGroup(t, today)) || (t.done && t.dueDate === today)),

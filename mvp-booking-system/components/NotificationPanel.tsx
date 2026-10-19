@@ -99,7 +99,7 @@ function Row({ label, sent, via, disabled, onSend, notApplicable = false }: {
       ) : (
         <button type="button" onClick={onSend} disabled={disabled}
           aria-label={`${label}を${via}で送る`}
-          className={btn('primary', 'sm')}>
+          className={btn('secondary', 'sm')}>
           {via}で送る
         </button>
       )}

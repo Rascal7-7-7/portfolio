@@ -56,11 +56,11 @@ export function InvoiceDetailView({ id }: { id: string }) {
             <button
               type="button"
               onClick={() => actions.setInvoicePaid(invoice.id, !invoice.paidOn)}
-              className={buttonStyles.secondary}
+              className={invoice.paidOn ? buttonStyles.secondary : buttonStyles.primary}
             >
               {invoice.paidOn ? "入金を取消" : "入金済にする"}
             </button>
-            <button type="button" onClick={() => window.print()} className={buttonStyles.primary}>
+            <button type="button" onClick={() => window.print()} className={invoice.paidOn ? buttonStyles.primary : buttonStyles.secondary}>
               <Printer size={16} aria-hidden />
               印刷
             </button>
