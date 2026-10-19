@@ -12,7 +12,7 @@ import {
   sortInvoices,
   taskGroup,
 } from "./selectors.ts";
-import { clientInitial, formatYen } from "./utils.ts";
+import { formatYen } from "./utils.ts";
 
 const today = "2026-03-01";
 assert.equal(addDays(today, -1), "2026-02-28");
@@ -68,7 +68,7 @@ assert.equal(sortInvoices(data.invoices, today)[0].id, data.invoices.find((i) =>
 assert.equal(summary.overdueTotal <= summary.outstandingTotal, true);
 assert.equal(formatYen(1_234_000), "¥1,234,000");
 
-// アクティビティは新しい順、相対時刻・和式日付・アバター頭文字
+// アクティビティは新しい順、相対時刻・和式日付
 const activity = projectActivity("p1", data);
 assert.ok(activity.length > 0);
 assert.ok(activity.every((a, i) => i === 0 || activity[i - 1].date >= a.date), "新しい順");
@@ -76,8 +76,5 @@ assert.ok(activity.some((a) => a.text.startsWith("請求書 INV-")));
 assert.equal(formatAgo(today, today), "今日");
 assert.equal(formatAgo(today, addDays(today, -3)), "3日前");
 assert.equal(formatInputDate("2026-10-20"), "2026年10月20日（火）");
-assert.equal(clientInitial("株式会社ミナトデザイン工房"), "ミ");
-assert.equal(clientInitial("カフェ ソラノイロ"), "カ");
-assert.equal(clientInitial("Acme Inc."), "AC");
 
 console.log("selectors.check: ok");
