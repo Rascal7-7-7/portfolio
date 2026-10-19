@@ -46,7 +46,7 @@ export default async function ProductDetailPage({ params }: Params) {
         <div>
           <p className="text-xs text-on-surface-variant">
             {product.category}
-            {product.badge && <span> ・ {product.badge}</span>}
+            {product.badge && <span>・{product.badge}</span>}
           </p>
           <h1 className="mt-2 font-headline text-3xl font-light leading-snug tracking-[-0.01em] text-on-background sm:text-4xl">
             <Phrases parts={product.nameParts} />
