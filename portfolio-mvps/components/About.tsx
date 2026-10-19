@@ -24,7 +24,7 @@ export function About() {
   return (
     <section id="about" className="py-8 sm:py-10" aria-labelledby="about-heading">
       <div className={container}>
-        <SectionHeader id="about-heading" title="自己紹介" />
+        <SectionHeader id="about-heading" title="自己紹介" className="mb-2" />
 
         <div className="space-y-4 leading-[1.8] text-ink-muted">
           {paragraphs.map((sentences) => (
