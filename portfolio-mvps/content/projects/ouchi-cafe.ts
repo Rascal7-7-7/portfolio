@@ -36,6 +36,23 @@ export const ouchiCafe: Project = {
   problem:
     "コーヒーや茶葉は種類が多く、詳しくない人ほど選べません。「何が自分に合うか分からない」状態のまま離脱してしまうのを、どうにかしたいと考えました。",
   goal: "味の好みを数値として扱い、選択肢を1〜3個に絞り込めるようにすること。",
+  diagram: {
+    description:
+      "おうちかふぇ の構成図。味覚診断の回答を12次元のベクトルに変換し、Python 側の推薦エンジン（FastAPI・LightGBM）が好みに近い商品を返す。推薦エンジンは PHP 側から HTTP で呼ぶ。PHP はフレームワークを使わず、ルーティング・DBアクセス・認証を自前で実装し、データは MySQL に置く。推薦エンジンが落ちても EC の主要機能は動く。",
+    steps: [
+      { label: "味覚診断の回答", note: "診断結果を保存する" },
+      { label: "12次元ベクトル", note: "味の好みを数値として扱う" },
+      { label: "推薦エンジン（Python）", note: "FastAPI・LightGBM。PHP 側から HTTP で呼ぶ" },
+      { label: "商品", note: "好みに近い商品を返す" },
+    ],
+    sidePath: {
+      steps: [
+        { label: "PHP（自前実装）", note: "ルーティング・DB・認証" },
+        { label: "MySQL 8.0", note: "101 テーブル" },
+      ],
+      note: "推薦エンジンが落ちても EC の主要機能は動く",
+    },
+  },
   features: [
     "味覚診断（12次元ベクトル化）と診断結果の保存",
     "LightGBM による Learning to Rank、協調フィルタリング、クラスタリング",
