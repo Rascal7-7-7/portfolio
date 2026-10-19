@@ -1,6 +1,6 @@
 // 金額計算はここに集約する（税込価格ベース）。
 // node --test で直接読めるよう、型以外の import は持たない。
-import type { Interval, Subscription, SubscriptionInterval, TaxRate, Totals } from './types';
+import type { Interval, Product, Subscription, SubscriptionInterval, TaxRate, Totals } from './types';
 
 export const SUBSCRIPTION_DISCOUNT_RATE = 0.1;
 export const SHIPPING_FEE = 660;
@@ -70,6 +70,18 @@ export function monthlyEquivalent(subs: ReadonlyArray<Pick<Subscription, 'interv
 /** 合計欄の「うち消費税」に並べる行。0 円の税率は出さない */
 export function taxLines(taxByRate: Record<TaxRate, number>): Array<{ rate: TaxRate; amount: number }> {
   return ([8, 10] as const).filter((rate) => taxByRate[rate] > 0).map((rate) => ({ rate, amount: taxByRate[rate] }));
+}
+
+/**
+ * 1杯・1包あたりの目安。内容量に「約20杯分」「15包」と回数が書かれた商品だけ返し、根拠のない商品は null。
+ * 1円未満は四捨五入（表示は「約」を付ける）
+ */
+export function perServing(price: number, specs: Product['specs']): { unit: '杯' | '包'; amount: number } | null {
+  const size = specs.find((s) => s.label === '内容量')?.value ?? '';
+  const match = size.match(/(\d+)(杯|包)/);
+  const count = match ? Number(match[1]) : 0;
+  if (!match || count <= 0) return null;
+  return { unit: match[2] as '杯' | '包', amount: Math.round(price / count) };
 }
 
 export function yen(amount: number): string {

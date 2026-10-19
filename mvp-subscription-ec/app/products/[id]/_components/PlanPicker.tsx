@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Interval, Product, SubscriptionInterval } from '@/lib/types';
 import { INTERVAL_LABEL, SUBSCRIPTION_INTERVALS } from '@/lib/catalog';
-import { unitPrice, yen } from '@/lib/pricing';
+import { perServing, unitPrice, yen } from '@/lib/pricing';
 import { useStore } from '@/components/StoreProvider';
 import { QuantityStepper } from '@/components/QuantityStepper';
 import { cn } from '@/lib/cn';
@@ -53,6 +53,7 @@ export function PlanPicker({ product }: { product: Product }) {
             note={`1回あたり ${yen(saving)} おトク。スキップ・解約はいつでも。`}
             price={unitPrice(product.price, 'monthly')}
             listPrice={product.price}
+            serving={perServing(unitPrice(product.price, 'monthly'), product.specs)}
           />
           <PlanOption
             checked={mode === 'once'}
@@ -60,6 +61,7 @@ export function PlanPicker({ product }: { product: Product }) {
             title="今回のみ購入"
             note="5,000円以上で送料無料（未満は660円）"
             price={product.price}
+            serving={perServing(product.price, product.specs)}
           />
         </div>
       </fieldset>
@@ -147,9 +149,10 @@ type PlanOptionProps = {
   note: string;
   price: number;
   listPrice?: number;
+  serving: ReturnType<typeof perServing>;
 };
 
-function PlanOption({ checked, onSelect, title, tag, note, price, listPrice }: PlanOptionProps) {
+function PlanOption({ checked, onSelect, title, tag, note, price, listPrice, serving }: PlanOptionProps) {
   return (
     <label
       className="flex cursor-pointer items-start gap-3 py-4 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary"
@@ -174,6 +177,11 @@ function PlanOption({ checked, onSelect, title, tag, note, price, listPrice }: P
       <span className="tnum text-right">
         <span className="block font-headline text-lg font-semibold text-on-surface">{yen(price)}</span>
         {listPrice && <span className="block text-xs text-on-surface-variant line-through">{yen(listPrice)}</span>}
+        {serving && (
+          <span className="block whitespace-nowrap text-xs text-on-surface-variant">
+            1{serving.unit} 約{yen(serving.amount)}
+          </span>
+        )}
       </span>
     </label>
   );
