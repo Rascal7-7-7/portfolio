@@ -14,6 +14,8 @@ import { Header } from "@/components/Header";
 import { EvidenceLog } from "@/components/EvidenceLog";
 import { FlowDiagram } from "@/components/FlowDiagram";
 import { MetaLine, periodLabel, teamLabel } from "@/components/ProjectMeta";
+import { RichText } from "@/components/RichText";
+import { boundaryTerms } from "@/lib/projectText";
 import { TextLink, textLink } from "@/components/ui/TextLink";
 import { container } from "@/components/ui/container";
 
@@ -75,18 +77,26 @@ function Paragraph({ children, className }: { children: React.ReactNode; classNa
   );
 }
 
-function List({ items }: { items: readonly string[] }) {
+function List({ items, terms }: { items: readonly string[]; terms: readonly string[] }) {
   return (
     <ul className="list-disc pl-5 space-y-2 leading-[1.8] text-ink-muted marker:text-ink-subtle">
       {items.map((item) => (
-        <li key={item}>{item}</li>
+        <li key={item}>
+          <RichText text={item} terms={terms} />
+        </li>
       ))}
     </ul>
   );
 }
 
 /** 「体制」「構成」などの項目と値の組。狭い画面では縦に積む。 */
-function Facts({ rows }: { rows: readonly (readonly [string, string | undefined])[] }) {
+function Facts({
+  rows,
+  terms,
+}: {
+  rows: readonly (readonly [string, string | undefined])[];
+  terms: readonly string[];
+}) {
   return (
     <dl className="space-y-3">
       {rows
@@ -94,11 +104,18 @@ function Facts({ rows }: { rows: readonly (readonly [string, string | undefined]
         .map(([label, value]) => (
           <div key={label} className="flex flex-col sm:flex-row sm:gap-4">
             <dt className="shrink-0 sm:w-28 text-sm leading-[1.8] text-ink-subtle">{label}</dt>
-            <dd className="leading-[1.8] text-ink-muted">{value}</dd>
+            <dd className="leading-[1.8] text-ink-muted">
+              <RichText text={value} terms={terms} />
+            </dd>
           </div>
         ))}
     </dl>
   );
+}
+
+/** テストしか書いていない作品に「運用」を名乗らせない。 */
+function qualityTitle(project: Project): string {
+  return project.deployment || project.cicd ? "テストと運用" : "テスト";
 }
 
 /** ページ内にどの節があるかは作品ごとに違うため、実在する節だけ目次に出す。 */
@@ -111,7 +128,7 @@ function buildToc(project: Project) {
   if (project.challenges?.length) toc.push({ id: "challenges", label: "詰まった点と解決" });
   if (project.security?.length) toc.push({ id: "security", label: "セキュリティ" });
   if (project.testing || project.deployment || project.cicd)
-    toc.push({ id: "quality", label: "テストと運用" });
+    toc.push({ id: "quality", label: qualityTitle(project) });
   if (project.learned?.length || project.futureWork?.length)
     toc.push({ id: "learned", label: "学んだこと" });
   return toc;
@@ -125,6 +142,9 @@ export default function ProjectDetail({ params }: { params: Params }) {
   const period = periodLabel(project);
   const team = teamLabel(project);
   const toc = buildToc(project);
+  // 図の信頼境界と同じ語を本文でも同じ色にする（境界を持つ図の作品だけ）
+  const terms = boundaryTerms(project);
+  const rich = (text: string) => <RichText text={text} terms={terms} />;
 
   return (
     <>
@@ -144,7 +164,7 @@ export default function ProjectDetail({ params }: { params: Params }) {
           <h1 className="text-[28px] leading-[1.4] sm:text-[34px] sm:leading-[1.35] font-semibold tracking-[-0.02em] text-ink mb-5">
             {project.headline}
           </h1>
-          <Paragraph className="text-[17px]">{project.summary}</Paragraph>
+          <Paragraph className="text-[17px]">{rich(project.summary)}</Paragraph>
 
           <MetaLine project={project} className="mt-5" />
 
@@ -199,11 +219,11 @@ export default function ProjectDetail({ params }: { params: Params }) {
           {/* 背景と目的。目的は色帯でなく、字の濃さと小見出しで区別する */}
           {(project.problem || project.goal) && (
             <Section id="problem" title="背景と目的">
-              {project.problem && <Paragraph>{project.problem}</Paragraph>}
+              {project.problem && <Paragraph>{rich(project.problem)}</Paragraph>}
               {project.goal && (
                 <div className="mt-5">
                   <p className="text-sm font-medium text-ink mb-1">目的</p>
-                  <p className="text-[17px] font-medium leading-[1.8] text-ink">{project.goal}</p>
+                  <p className="text-[17px] font-medium leading-[1.8] text-ink">{rich(project.goal)}</p>
                 </div>
               )}
             </Section>
@@ -215,6 +235,7 @@ export default function ProjectDetail({ params }: { params: Params }) {
               <FlowDiagram id={project.slug} diagram={project.diagram} className="mb-8" />
             )}
             <Facts
+              terms={terms}
               rows={[
                 ["体制", team],
                 ["担当範囲", project.team.kind === "team" ? project.team.myRole : undefined],
@@ -227,7 +248,7 @@ export default function ProjectDetail({ params }: { params: Params }) {
           {/* 主な機能 */}
           {project.features?.length ? (
             <Section id="features" title="主な機能">
-              <List items={project.features} />
+              <List items={project.features} terms={terms} />
             </Section>
           ) : null}
 
@@ -238,7 +259,7 @@ export default function ProjectDetail({ params }: { params: Params }) {
                 {project.decisions.map(({ question, answer }) => (
                   <div key={question}>
                     <h3 className="font-semibold text-ink mb-1">{question}</h3>
-                    <Paragraph>{answer}</Paragraph>
+                    <Paragraph>{rich(answer)}</Paragraph>
                   </div>
                 ))}
               </div>
@@ -260,7 +281,7 @@ export default function ProjectDetail({ params }: { params: Params }) {
                     ).map(([label, text]) => (
                       <div key={label}>
                         <dt className="text-sm font-medium text-ink mb-1">{label}</dt>
-                        <dd className="leading-[1.8] text-ink-muted">{text}</dd>
+                        <dd className="leading-[1.8] text-ink-muted">{rich(text)}</dd>
                       </div>
                     ))}
                   </dl>
@@ -272,14 +293,15 @@ export default function ProjectDetail({ params }: { params: Params }) {
           {/* セキュリティ */}
           {project.security?.length ? (
             <Section id="security" title="セキュリティ">
-              <List items={project.security} />
+              <List items={project.security} terms={terms} />
             </Section>
           ) : null}
 
-          {/* テストと運用 */}
+          {/* テスト（動作環境・CI/CD があれば「テストと運用」） */}
           {project.testing || project.deployment || project.cicd ? (
-            <Section id="quality" title="テストと運用">
+            <Section id="quality" title={qualityTitle(project)}>
               <Facts
+                terms={terms}
                 rows={[
                   ["テスト", project.testing],
                   ["動作環境", project.deployment],
@@ -292,11 +314,11 @@ export default function ProjectDetail({ params }: { params: Params }) {
           {/* 学んだこと */}
           {project.learned?.length || project.futureWork?.length ? (
             <Section id="learned" title="学んだこと">
-              {project.learned?.length ? <List items={project.learned} /> : null}
+              {project.learned?.length ? <List items={project.learned} terms={terms} /> : null}
               {project.futureWork?.length ? (
                 <>
-                  <h3 className="font-semibold text-ink mt-8 mb-2">今なら変えること</h3>
-                  <List items={project.futureWork} />
+                  <h3 className="font-semibold text-ink mt-8 mb-2">今後の課題</h3>
+                  <List items={project.futureWork} terms={terms} />
                 </>
               ) : null}
             </Section>

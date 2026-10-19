@@ -3,7 +3,8 @@ import { Arrow, ArrowMarker, COLOR } from "./FlowDiagram";
 
 /*
  * FlowDiagram（Case Study の縦の図）を、トップの代表作用に横1列へ並べ直したもの。
- * 説明（note）は省き、ラベルだけを置く。中身は Case Study と同じデータを使う。
+ * 本流の説明（note）は省き、ラベルだけを置く。下段は上段との関係が分かるよう、
+ * Case Study と同じ補足（状態を書く／1ファイル／読むだけ）を箱の中に添える。中身は Case Study と同じデータを使う。
  * viewBox の幅 640 は、本文の最大幅（max-w-2xl の内側）とほぼ等倍になる値。
  */
 const W = 640;
@@ -11,8 +12,15 @@ const PAD = 8;
 const ARROW_GAP = 24;
 const BOX_H = 56;
 const TOP = PAD + 18; // 箱の上に「信頼境界」を置く余白
-const SIDE_W = 112;
-const SIDE_H = 32;
+const MIN_SIDE_W = 112;
+
+/** 下段の補足（11px）が箱からはみ出さない幅。全角は 11、半角は 6.5 として見積もる。 */
+function sideWidth(notes: readonly string[]): number {
+  const textW = (s: string) =>
+    Array.from(s).reduce((w, c) => w + (c.charCodeAt(0) < 128 ? 6.5 : 11), 0);
+  return Math.max(MIN_SIDE_W, ...notes.map((n) => Math.ceil(textW(n)) + 16));
+}
+const SIDE_H = 46;
 
 /** 「ポリシー層（決定的）」のような括弧付きのラベルは、括弧の前で2行に分ける。 */
 function splitLabel(label: string): string[] {
@@ -32,6 +40,7 @@ export function FlowRow({
 }) {
   const { description, steps, sidePath } = diagram;
   const markerId = `${id}-arrow`;
+  const SIDE_W = sideWidth(sidePath?.steps.map((step) => step.note) ?? []);
   const boxW = (W - PAD * 2 - ARROW_GAP * (steps.length - 1)) / steps.length;
   const ruleY = TOP + BOX_H + 18;
   const sideY = ruleY + 14;
@@ -113,7 +122,7 @@ export function FlowRow({
               stroke={COLOR.line}
               strokeDasharray="4 4"
             />
-            {sidePath.steps.map(({ label }, i) => {
+            {sidePath.steps.map(({ label, note }, i) => {
               const x = PAD + i * (SIDE_W + ARROW_GAP);
               return (
                 <g key={`${label}-${i}`}>
@@ -129,13 +138,22 @@ export function FlowRow({
                   />
                   <text
                     x={x + SIDE_W / 2}
-                    y={sideY + SIDE_H / 2 + 4}
+                    y={sideY + 19}
                     fill={COLOR.label}
                     fontSize={12}
                     fontWeight={700}
                     textAnchor="middle"
                   >
                     {label}
+                  </text>
+                  <text
+                    x={x + SIDE_W / 2}
+                    y={sideY + 36}
+                    fill={COLOR.note}
+                    fontSize={11}
+                    textAnchor="middle"
+                  >
+                    {note}
                   </text>
                   {i < sidePath.steps.length - 1 && (
                     <Arrow
