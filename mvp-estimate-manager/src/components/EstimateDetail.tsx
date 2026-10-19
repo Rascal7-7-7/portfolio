@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Estimate, EstimateStatus } from "@/types";
 import { useEstimates } from "@/lib/store";
 import { calcTotals } from "@/lib/calc";
-import { estimateNumber, formatShortDate, formatYen, HIKAE_INVOICES_URL, hikaeInvoiceUrl } from "@/lib/utils";
+import { estimateNumber, formatShortDate, formatYen, HIKAE_INVOICES_URL, hikaeInvoiceNumber, hikaeInvoiceUrl } from "@/lib/utils";
 import EstimateDocument from "@/components/EstimateDocument";
 import Icon, { type IconName } from "@/components/Icon";
 import LoadingState from "@/components/LoadingState";
@@ -159,7 +159,8 @@ function CustomerLink({ id, className }: { id: number; className: string }) {
 /** 受注後の次の一手。請求は姉妹デモ Hikae で扱う。連携先があるのは EST-0014 だけなので、ほかは案内に留める */
 function HikaeLink({ id }: { id: number }) {
   const url = hikaeInvoiceUrl(id);
-  if (!url) {
+  const invoiceNumber = hikaeInvoiceNumber(id);
+  if (!url || !invoiceNumber) {
     return (
       <p className="self-center text-balance text-sm text-body">
         請求は{" "}
@@ -172,11 +173,19 @@ function HikaeLink({ id }: { id: number }) {
     );
   }
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className={`${BUTTON} ${TONE_CLASS.primary}`}>
-      <Icon name="file" />
-      Hikae で請求書を見る（デモ）
-      <span className="sr-only">（新しいタブで開きます）</span>
-    </a>
+    <div className="flex flex-col gap-1">
+      <a href={url} target="_blank" rel="noopener noreferrer" className={`${BUTTON} ${TONE_CLASS.primary}`}>
+        <Icon name="file" />
+        Hikae で請求書を見る（デモ）
+        <span className="sr-only">（新しいタブで開きます）</span>
+      </a>
+      <p className="text-xs text-muted">
+        <span className="inline-block">
+          請求書 <span className="tnum">{invoiceNumber}</span> を
+        </span>{" "}
+        <span className="inline-block">Hikae で発行済み（デモ）</span>
+      </p>
+    </div>
   );
 }
 
