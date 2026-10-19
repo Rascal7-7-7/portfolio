@@ -1,13 +1,19 @@
 'use client'
 
 import { useEffect, useRef, useState, type RefObject } from 'react'
-import { cx } from '@/lib/cx'
-import { THEMES } from '@/lib/themes'
-import type { LPDoc } from '@/lib/types'
-import Hero from './Hero'
-import { Access, Cta, Features, Footer, Menu, Nav, Voices } from './sections'
+import type { LPDoc, TemplateKey } from '@/lib/types'
+import ModernPage from './ModernPage'
+import NaturalPage from './NaturalPage'
+import PopPage from './PopPage'
+import type { TemplateProps } from './shared'
 
 const WIDE_MIN_PX = 760
+
+const PAGES: Record<TemplateKey, (p: TemplateProps) => React.ReactNode> = {
+  natural: NaturalPage,
+  modern: ModernPage,
+  pop: PopPage,
+}
 
 /**
  * ビューポートではなく「LP 自身の幅」でレイアウトを切り替える。
@@ -27,27 +33,14 @@ function useIsWide(ref: RefObject<HTMLDivElement | null>): boolean {
   return wide
 }
 
-interface Props {
-  doc: LPDoc
-}
-
-export default function LandingPage({ doc }: Props) {
+export default function LandingPage({ doc }: { doc: LPDoc }) {
   const ref = useRef<HTMLDivElement>(null)
   const wide = useIsWide(ref)
-  const t = THEMES[doc.template]
-  const { store, sections } = doc
-  const props = { store, t, wide }
-
+  const Page = PAGES[doc.template]
   return (
-    <div ref={ref} className={cx(t.root, 'font-gothic min-h-full antialiased [container-type:inline-size]')}>
-      <Nav {...props} />
-      <Hero {...props} />
-      {sections.features && <Features {...props} />}
-      {sections.menu && <Menu {...props} />}
-      {sections.voices && <Voices {...props} />}
-      {sections.access && <Access {...props} />}
-      {sections.cta && <Cta {...props} />}
-      <Footer {...props} />
+    // 本文は text-wrap: pretty で最終行の1文字落ち（「す。」だけの行）を避ける。見出しは Phrases で文節単位に改行
+    <div ref={ref} className="min-h-full font-gothic antialiased [container-type:inline-size] [&_:is(p,blockquote,dd)]:[text-wrap:pretty]">
+      <Page store={doc.store} sections={doc.sections} wide={wide} />
     </div>
   )
 }

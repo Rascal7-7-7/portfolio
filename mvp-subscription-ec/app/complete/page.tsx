@@ -1,6 +1,5 @@
 'use client';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, Truck } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
 import { ProductVisual } from '@/components/ProductVisual';
 import { PlanBadge } from '@/components/PlanBadge';
@@ -20,7 +19,7 @@ export default function CompletePage() {
     return (
       <main className="mx-auto max-w-lg px-4 py-24 text-center">
         <p className="text-on-surface-variant">表示できるご注文がありません</p>
-        <Link href="/products" className="mt-4 inline-block text-sm text-primary hover:underline">
+        <Link href="/products" className="mt-4 inline-block text-sm text-on-surface underline underline-offset-4">
           商品一覧へ
         </Link>
       </main>
@@ -34,8 +33,8 @@ export default function CompletePage() {
       <CheckoutSteps current={2} />
 
       <div className="text-center">
-        <CheckCircle2 className="mx-auto h-14 w-14 text-primary" strokeWidth={1.5} aria-hidden />
-        <h1 className="mt-4 font-headline text-3xl font-light text-on-background [word-break:auto-phrase]">ご注文ありがとうございます</h1>
+        <p className="text-xs tracking-[0.2em] text-on-surface-variant">ORDER CONFIRMED</p>
+        <h1 className="mt-3 font-headline text-3xl font-light text-on-background [word-break:auto-phrase]">ご注文ありがとうございます</h1>
         <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
           {DEMO_USER.name} 様のお申し込みを受け付けました。
           <br />
@@ -43,20 +42,21 @@ export default function CompletePage() {
         </p>
       </div>
 
-      <div className="mt-8 flex items-center gap-4 rounded-lg bg-primary p-5 text-on-primary shadow-elevation-3">
-        <Truck className="h-8 w-8 flex-shrink-0 text-primary-container" aria-hidden />
+      <div className="mt-8 border-y border-outline-variant/60 py-6 text-center">
         <div>
-          <p className="text-xs text-on-primary/90">初回お届け予定</p>
-          <p className="tnum font-headline text-xl font-semibold">{formatJaLong(order.firstDelivery)}</p>
+          <p className="text-xs text-on-surface-variant">初回お届け予定</p>
+          <p className="tnum mt-1 font-headline text-2xl font-light text-on-surface">{formatJaLong(order.firstDelivery)}</p>
           {subscriptionCount > 0 && (
-            <p className="mt-0.5 text-xs text-on-primary/90">
-              定期便 {subscriptionCount} 件を開始しました。2回目以降はマイページで確認できます。
+            <p className="mt-2 text-xs leading-relaxed text-on-surface-variant">
+              定期便 {subscriptionCount} 件を開始しました。
+              <br />
+              2回目以降はマイページで確認できます。
             </p>
           )}
         </div>
       </div>
 
-      <section className="mt-4 rounded-lg bg-surface-container-lowest p-5 shadow-elevation-1 ring-1 ring-outline-variant/40">
+      <section className="mt-8 bg-surface-container-low p-5">
         <h2 className="mb-4 text-sm font-semibold text-on-surface">ご注文内容</h2>
         <ul className="mb-4 space-y-3 border-b border-outline-variant/60 pb-4">
           {order.lines.map((l) => {
@@ -64,7 +64,7 @@ export default function CompletePage() {
             if (!product) return null;
             return (
               <li key={`${l.productId}-${l.interval}`} className="flex items-center gap-3">
-                <ProductVisual product={product} decorative className="h-14 w-12 flex-shrink-0 rounded" />
+                <ProductVisual product={product} decorative className="h-14 w-12 flex-shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm text-on-surface">
                     {product.name} <span className="tnum text-on-surface-variant">× {l.quantity}</span>
@@ -87,14 +87,13 @@ export default function CompletePage() {
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <Link
           href="/mypage"
-          className="flex items-center justify-center gap-2 rounded-md bg-primary py-3.5 font-medium text-on-primary hover:opacity-90"
+          className="flex items-center justify-center rounded-sm bg-primary py-3.5 font-medium text-on-primary hover:opacity-90"
         >
           マイページで定期便を見る
-          <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
         <Link
           href="/products"
-          className="flex items-center justify-center rounded-md py-3.5 font-medium text-primary ring-1 ring-primary/30 hover:bg-primary/5"
+          className="flex items-center justify-center rounded-sm py-3.5 font-medium text-on-surface ring-1 ring-outline hover:ring-on-surface"
         >
           ショップに戻る
         </Link>

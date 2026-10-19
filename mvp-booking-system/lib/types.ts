@@ -9,13 +9,13 @@ export const STATUS_LABEL: Record<ReservationStatus, string> = {
   canceled:  'キャンセル',
 };
 
-// 確定待ち=グレー / 確定=青 / 完了=緑 / キャンセル=赤
-export const STATUS_COLOR: Record<ReservationStatus, string> = {
-  pending:   'bg-[#e7e8e9] text-[#444653]',
-  confirmed: 'bg-[#dde1ff] text-[#173bab]',
-  completed: 'bg-[#98f994] text-[#005313]',
-  canceled:  'bg-[#ffdad6] text-[#93000a]',
-};
+/** 担当スタイリスト（デモ用の架空の2名）。スケジュールは担当ごとの列で見る */
+export const STAFF = ['山本', '石井'] as const;
+export type Staff = (typeof STAFF)[number];
+
+export function isStaff(v: unknown): v is Staff {
+  return (STAFF as readonly unknown[]).includes(v);
+}
 
 /** どこから受けた予約か。「紙・LINE・電話がバラバラ」を一元化した感を出すための項目 */
 export type Channel = 'line' | 'phone' | 'web' | 'walk_in';
@@ -27,14 +27,6 @@ export const CHANNEL_LABEL: Record<Channel, string> = {
   phone:   '電話',
   web:     'Web',
   walk_in: '店頭',
-};
-
-/** 確認通知をどの手段で送る想定か（モック表示用） */
-export const CHANNEL_NOTIFY_VIA: Record<Channel, string> = {
-  line:    'LINE',
-  phone:   'SMS',
-  web:     'メール',
-  walk_in: 'SMS',
 };
 
 export interface Menu {
@@ -63,7 +55,8 @@ export interface Reservation {
   service_name:      string;
   note:              string;
   channel:           Channel;
-  status:            ReservationStatus;
+  staff:             Staff;
+  status:           ReservationStatus;
   confirmation_sent: boolean;
   reminder_sent:     boolean;
   created_at:        string; // ISO
@@ -74,8 +67,29 @@ export interface Reservation {
 export type ReservationInput = Pick<
   Reservation,
   | 'customer_name' | 'customer_email' | 'customer_phone'
-  | 'reservation_date' | 'reservation_time' | 'service_name' | 'note' | 'channel'
+  | 'reservation_date' | 'reservation_time' | 'service_name' | 'note' | 'channel' | 'staff'
 >;
+
+export type NotifyVia = 'LINE' | 'メール' | 'SMS';
+
+/**
+ * 確認通知をどの手段で送る想定か（モック表示用）。
+ * LINE で受けた予約は LINE、それ以外はメールがあればメール、無ければ電話番号宛ての SMS。連絡先が無ければ null。
+ */
+export function notifyVia(r: Pick<Reservation, 'channel' | 'customer_email' | 'customer_phone'>): NotifyVia | null {
+  if (r.channel === 'line') return 'LINE';
+  if (r.customer_email) return 'メール';
+  if (r.customer_phone) return 'SMS';
+  return null;
+}
+
+export function isChannel(v: unknown): v is Channel {
+  return (CHANNELS as unknown[]).includes(v);
+}
+
+export function isStatus(v: unknown): v is ReservationStatus {
+  return (STATUSES as unknown[]).includes(v);
+}
 
 export function findMenu(name: string): Menu | undefined {
   return MENUS.find(m => m.name === name);

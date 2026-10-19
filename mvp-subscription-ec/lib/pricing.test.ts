@@ -1,7 +1,7 @@
 // 実行: npm test（node --test。Node 22.18+ / 24 の型ストリップで TS を直接実行する）
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { calcTotals, includedTax, monthlyEquivalent, remainingForFreeShipping, unitPrice } from './pricing.ts';
+import { calcTotals, includedTax, taxLines, monthlyEquivalent, remainingForFreeShipping, unitPrice } from './pricing.ts';
 import { addMonths, firstDelivery, formatJa, nextAfter } from './date.ts';
 
 test('定期便は10%OFF、単品は定価', () => {
@@ -62,4 +62,14 @@ test('マイページの月あたり目安：2ヶ月ごと便は半額換算し�
   );
   assert.equal(monthlyEquivalent([{ interval: 'bimonthly', unitPrice: 1463, quantity: 1 }]), 732); // 731.5 → 四捨五入
   assert.equal(monthlyEquivalent([]), 0);
+});
+
+test('内訳に出す消費税は 0 円の税率を省く（8% だけ・10% だけ・両方）', () => {
+  assert.deepEqual(taxLines({ 8: 165, 10: 0 }), [{ rate: 8, amount: 165 }]);
+  assert.deepEqual(taxLines({ 8: 0, 10: 360 }), [{ rate: 10, amount: 360 }]);
+  assert.deepEqual(taxLines({ 8: 240, 10: 60 }), [
+    { rate: 8, amount: 240 },
+    { rate: 10, amount: 60 },
+  ]);
+  assert.deepEqual(taxLines({ 8: 0, 10: 0 }), []);
 });

@@ -89,9 +89,10 @@ export const actions = {
     update((d) => ({ ...d, tasks: [...d.tasks, { ...input, id: newId("t"), done: false }] }));
   },
   toggleTask(id: string): void {
+    const today = getSnapshot().today;
     update((d) => ({
       ...d,
-      tasks: d.tasks.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
+      tasks: d.tasks.map((t) => (t.id === id ? { ...t, done: !t.done, doneOn: t.done ? null : today } : t)),
     }));
   },
   deleteTask(id: string): void {

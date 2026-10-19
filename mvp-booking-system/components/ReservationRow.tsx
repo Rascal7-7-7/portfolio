@@ -2,78 +2,82 @@ import Link from 'next/link';
 import { formatShortDate } from '@/lib/date';
 import type { Reservation } from '@/lib/types';
 import ChannelBadge from './ChannelBadge';
-import NotificationBadge from './NotificationBadge';
 import StatusBadge from './StatusBadge';
-
-interface Props {
-  r:       Reservation;
-  isToday: boolean;
-  muted?:  boolean;
-}
 
 export function needsAttention(r: Reservation): boolean {
   return !r.confirmation_sent && r.status === 'pending';
 }
 
+/** 一覧の列。見出し行と各行で同じ定義を使う */
+export const ROW_GRID = 'md:grid md:grid-cols-[8rem_minmax(0,1fr)_7rem_9rem_1.5rem] md:items-center';
+
 export function ReservationTableHeader() {
   return (
-    <div className="hidden md:grid grid-cols-12 px-4 py-2 text-[11px] font-bold text-[#444653] tracking-wider bg-[#f3f4f5] rounded-lg">
-      <div className="col-span-2">予約日時</div>
-      <div className="col-span-4">顧客名 / メニュー</div>
-      <div className="col-span-2 text-center">状態</div>
-      <div className="col-span-2 text-center">確認通知</div>
-      <div className="col-span-1 text-center">前日連絡</div>
-      <div className="col-span-1" />
+    <div className={`hidden ${ROW_GRID} px-4 py-2 text-xs text-dim border-b border-line`} aria-hidden="true">
+      <div>日時</div>
+      <div>お客様 / メニュー</div>
+      <div>状態</div>
+      <div>通知</div>
+      <div />
     </div>
   );
 }
 
-export default function ReservationRow({ r, isToday, muted = false }: Props) {
+/** 30分以内に入った予約。お客様の予約ページから来た予約を一覧で見つけやすくする */
+const NEW_WITHIN_MS = 30 * 60_000;
+function isNew(r: Reservation): boolean {
+  return Date.now() - new Date(r.created_at).getTime() < NEW_WITHIN_MS;
+}
+
+export default function ReservationRow({ r }: { r: Reservation }) {
   const attention = needsAttention(r);
-  const borderCls = attention
-    ? 'border-l-4 border-[#ba1a1a]'
-    : isToday ? 'border-l-4 border-[#00288e]' : 'border-l-4 border-transparent';
+  const canceled = r.status === 'canceled';
 
   return (
     <Link
       href={`/reservations/${r.id}`}
-      className={`flex md:grid md:grid-cols-12 items-center px-4 py-3 md:py-4 rounded-xl transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00288e] gap-3 md:gap-0 ${
-        // 透明度で薄くすると文字のコントラストが AA を割るため、背景色で「済んだ予約」を表す
-        r.status === 'canceled' || muted ? 'bg-[#f3f4f5] ring-1 ring-black/5' : 'bg-white shadow-sm'
-      } ${borderCls}`}
+      className={`flex gap-3 ${ROW_GRID} md:gap-0 px-4 py-3.5 hover:bg-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand`}
     >
-      <div className="shrink-0 w-14 md:w-auto md:col-span-2">
-        <p className={`text-base font-black ${isToday ? 'text-[#00288e]' : 'text-[#191c1d]'}`}>
-          {r.reservation_time}
-        </p>
-        <p className="text-[11px] font-bold text-[#444653] mt-0.5">{formatShortDate(r.reservation_date)}</p>
+      <div className="shrink-0 w-14 md:w-auto tabular-nums">
+        <p className="text-sm font-medium text-ink">{r.reservation_time}</p>
+        <p className="text-xs text-dim mt-0.5">{formatShortDate(r.reservation_date)}</p>
       </div>
 
-      <div className="flex-1 min-w-0 md:col-span-4">
-        <p className="text-sm font-bold text-[#191c1d] truncate flex items-center gap-1.5">
-          <span className="truncate">{r.customer_name} <span className="font-normal text-xs">様</span></span>
-          <ChannelBadge channel={r.channel} />
+      <div className="flex-1 min-w-0">
+        <p className={`text-sm font-medium text-ink truncate ${canceled ? 'line-through' : ''}`}>
+          {r.customer_name}<span className="font-normal text-xs text-dim ml-0.5">様</span>
+          {isNew(r) && (
+            <span className="ml-2 inline-block rounded-[4px] bg-accent-soft px-1 py-0.5 text-[11px] leading-none font-medium text-accent no-underline align-[1px]">新着</span>
+          )}
         </p>
-        <p className="text-xs text-[#444653] truncate mt-0.5">{r.service_name}</p>
-        {attention && (
-          <p className="md:hidden text-[11px] text-[#ba1a1a] font-bold mt-1">確認通知 未送信</p>
-        )}
+        <p className="text-xs text-dim truncate mt-0.5">
+          {r.service_name}<span aria-hidden="true"> · </span><ChannelBadge channel={r.channel} />
+          <span className="hidden md:inline"><span aria-hidden="true"> · </span>担当 {r.staff}</span>
+        </p>
+        {attention && <p className="md:hidden text-xs text-attn font-medium mt-1">確認通知 未送信</p>}
       </div>
 
-      <div className="shrink-0 md:col-span-2 md:flex md:justify-center">
+      <div className="shrink-0 self-start md:self-auto">
         <StatusBadge status={r.status} />
       </div>
 
-      <div className="hidden md:flex col-span-2 justify-center">
-        <NotificationBadge sent={r.confirmation_sent} label={r.confirmation_sent ? '送信済み' : '未送信'} />
-      </div>
-      <div className="hidden md:flex col-span-1 justify-center">
-        <NotificationBadge sent={r.reminder_sent} label={r.reminder_sent ? '送信済み' : '未送信'} />
-      </div>
+      <dl className="hidden md:block text-xs leading-5">
+        <NoticeLine label="確認" sent={r.confirmation_sent} alert={attention} />
+        <NoticeLine label="前日" sent={r.reminder_sent} />
+      </dl>
 
-      <div className="hidden md:flex shrink-0 md:col-span-1 md:justify-end">
-        <span className="material-symbols-outlined text-[#757684]" aria-hidden="true">chevron_right</span>
-      </div>
+      <span className="hidden md:block material-symbols-outlined text-dim" aria-hidden="true">chevron_right</span>
     </Link>
+  );
+}
+
+function NoticeLine({ label, sent, alert = false }: { label: string; sent: boolean; alert?: boolean }) {
+  return (
+    <div className="flex gap-2">
+      <dt className="text-dim">{label}</dt>
+      <dd className={sent ? 'text-body' : alert ? 'text-attn font-medium' : 'text-dim'}>
+        {sent ? '送信済み' : '未送信'}
+      </dd>
+    </div>
   );
 }

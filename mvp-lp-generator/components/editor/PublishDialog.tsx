@@ -60,52 +60,45 @@ export default function PublishDialog({ doc, open, onClose }: Props) {
       ref={ref}
       onClose={onClose}
       aria-labelledby="publish-title"
-      className="w-[min(440px,calc(100vw-32px))] rounded-3xl border border-white/10 bg-ed-panel p-0 text-white shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm"
+      className="w-[min(440px,calc(100vw-32px))] rounded-lg border border-ed-line bg-ed-panel p-0 text-ed-ink shadow-lg backdrop:bg-black/40"
     >
       <div className="p-6">
-        <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/15 text-accent">
-            <Icon name={published ? 'check' : 'rocket'} className="h-5 w-5" />
-          </span>
-          <div>
-            <h2 id="publish-title" className="text-base font-semibold">{published ? '公開しました' : 'LPを公開する'}</h2>
-            <p className="text-xs text-ed-muted">デモのため、実際にはインターネットへ公開されません</p>
-          </div>
-        </div>
+        <h2 id="publish-title" className="text-base font-semibold">{published ? '公開しました' : 'LPを公開する'}</h2>
+        <p className="mt-1 text-xs text-ed-muted">デモのため、実際にはインターネットへ公開されません</p>
 
         {!published ? (
           <div className="mt-6 space-y-2">
-            <label htmlFor="f-slug" className="text-xs font-medium text-white/80">公開URL</label>
-            {/* 390px でも入力欄が切れないよう、スマホでは縦積みにしてドメインは下に小さく出す */}
+            <label htmlFor="f-slug" className="text-[13px] font-medium">公開URL</label>
+            {/* 390px でも入力欄が切れないよう、スマホでは縦積みにしてドメインは下に小さく出す。sm 以上は1行の URL として並べる */}
             <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
               <span className="text-xs text-ed-muted sm:text-sm">https://</span>
               <input id="f-slug" value={slug} onChange={(e) => setSlug(sanitizeSlug(e.target.value))} className={`${inputCls} min-w-0`} />
+              <span className="shrink-0 text-xs text-ed-muted sm:text-sm">.{MOCK_DOMAIN}</span>
             </div>
-            <p className="text-xs text-ed-muted">.{MOCK_DOMAIN}</p>
           </div>
         ) : (
-          <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/10 p-4">
-            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/70">PUBLIC URL</p>
+          <div className="mt-6 rounded-md border border-ed-line bg-ed-bg p-4">
+            <p className="text-xs text-ed-muted">公開URL</p>
             <p className="mt-1 break-all text-sm font-semibold">{mockPublicUrl(slug)}</p>
-            <button type="button" onClick={copy} className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/80 hover:text-white">
+            <button type="button" onClick={copy} className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-accent hover:underline">
               <Icon name={copied ? 'check' : 'copy'} className="h-3.5 w-3.5" />
               {copied ? 'コピーしました' : 'URLをコピー'}
             </button>
           </div>
         )}
 
-        {error && <p role="alert" className="mt-3 text-xs text-[#ff8a80]">{error}</p>}
+        {error && <p role="alert" className="mt-3 text-xs text-[#b42318]">{error}</p>}
 
         <div className="mt-6 flex gap-2">
-          <button type="button" onClick={onClose} className="flex-1 rounded-full border border-white/10 py-2.5 text-sm text-white/80 hover:bg-white/5">
+          <button type="button" onClick={onClose} className="flex-1 rounded-md border border-ed-line py-2.5 text-sm font-medium hover:bg-ed-bg">
             閉じる
           </button>
           {!published ? (
-            <button type="button" onClick={publish} className="flex-1 rounded-full bg-accent py-2.5 text-sm font-semibold hover:brightness-110">
+            <button type="button" onClick={publish} className="flex-1 rounded-md bg-ed-ink py-2.5 text-sm font-semibold text-white hover:bg-[#33333a]">
               公開する
             </button>
           ) : (
-            <Link href={`/lp/${slug}`} className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-accent py-2.5 text-sm font-semibold hover:brightness-110">
+            <Link href={`/lp/${slug}`} className="flex flex-1 items-center justify-center gap-1.5 rounded-md bg-ed-ink py-2.5 text-sm font-semibold text-white hover:bg-[#33333a]">
               公開ページを開く
               <Icon name="external" className="h-3.5 w-3.5" />
             </Link>

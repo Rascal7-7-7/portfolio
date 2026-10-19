@@ -51,7 +51,7 @@ export function InvoiceList({ invoices, data, today, empty, withProject = true }
             </div>
             <div className="flex flex-1 items-center gap-3 sm:flex-none sm:flex-col sm:items-end sm:gap-1">
               <InvoiceStatusBadge status={status} />
-              <p className="num ml-auto text-sm font-semibold whitespace-nowrap text-ink sm:order-first sm:ml-0">
+              <p className="num ml-auto text-sm font-medium whitespace-nowrap text-ink sm:order-first sm:ml-0">
                 {formatYen(inv.amount)}
               </p>
             </div>
@@ -60,8 +60,8 @@ export function InvoiceList({ invoices, data, today, empty, withProject = true }
               onClick={() => actions.setInvoicePaid(inv.id, !inv.paidOn)}
               className={
                 inv.paidOn
-                  ? "w-24 shrink-0 rounded-md px-2 py-1.5 text-xs text-warm-500 hover:bg-black/5"
-                  : "w-24 shrink-0 rounded-md bg-black/5 px-2 py-1.5 text-xs font-semibold text-ink hover:bg-black/10"
+                  ? "w-24 shrink-0 rounded-md px-2 py-1.5 text-xs text-warm-500 hover:bg-black/[0.04] hover:text-ink"
+                  : "w-24 shrink-0 rounded-md border border-line bg-canvas px-2 py-1.5 text-xs font-medium text-ink hover:bg-warm-100"
               }
             >
               {inv.paidOn ? "入金を取消" : "入金済にする"}

@@ -1,61 +1,81 @@
 @import "tailwindcss";
 
+/*
+ * 配色は Cal.com のプロダクト UI（packages/config/theme/tokens.css のライトテーマ）に合わせた。
+ * 色の役割は最小限に分ける:
+ *   accent … サロンらしさ（ローズブラウン）。お客様の予約ページの主操作・選択と、管理画面の「新着」だけに使う
+ *   attn   … 状態色「要対応」（確定待ち・未送信）。accent と取り違えないよう黄土系にしている
+ *   now    … スケジュールの現在時刻の線だけ
+ */
 @theme {
-  /* Brand Colors */
-  --color-primary: #00288e;
-  --color-primary-dark: #001a6b;
-  --color-primary-container: #1e40af;
-  --color-primary-fixed: #dde1ff;
-  --color-on-primary-fixed-variant: #173bab;
+  --color-canvas: #ffffff;
+  --color-muted: #f5f7f9;      /* サイドバー・区切り行・ホバー */
+  --color-subtle: #eceef1;     /* 予定ブロック・入力欄の無効状態 */
+  --color-emphasis: #e5e7eb;   /* 選択中のナビ */
+  --color-line: #e5e7eb;       /* 枠線・区切り線 */
+  --color-line-strong: #d1d5db;/* 入力欄の枠 */
 
-  --color-secondary: #006e1c;
-  --color-secondary-fixed: #98f994;
-  --color-on-secondary-fixed-variant: #005313;
+  --color-ink: #0b0f14;        /* 見出し・主要テキスト */
+  --color-body: #3c3f44;       /* 本文 */
+  --color-dim: #5b6270;        /* 補足（muted 背景でも AA を満たす濃さ） */
 
-  --color-tertiary: #1a3844;
+  --color-brand: #1c2836;      /* 主ボタン */
+  --color-brand-hover: #3c3f44;
 
-  --color-error: #ba1a1a;
-  --color-error-container: #ffdad6;
-  --color-on-error-container: #93000a;
+  --color-accent: #9b4f45;     /* ローズブラウン。白地 5.8:1 */
+  --color-accent-hover: #823f37;
+  --color-accent-soft: #f8eeec;/* 選べる日・新着行のハイライト。accent の文字も 5.1:1 */
 
-  /* Surface Tiers */
-  --color-surface: #f8f9fa;
-  --color-surface-container-low: #f3f4f5;
-  --color-surface-container: #edeeef;
-  --color-surface-container-high: #e7e8e9;
-  --color-surface-container-highest: #e1e3e4;
-  --color-surface-container-lowest: #ffffff;
+  --color-attn: #854d0e;       /* 要対応（確定待ち・未送信）の文字 */
+  --color-attn-bg: #fef3c7;
+  --color-attn-soft: #fffbeb;
 
-  /* Text */
-  --color-on-surface: #191c1d;
-  --color-on-surface-variant: #444653;
-  --color-outline-variant: #c4c5d5;
-  --color-outline: #757684;
+  --color-now: #c8312a;        /* 現在時刻の線。白地 5.3:1 */
 
-  /* Font Families */
-  --font-headline: 'Manrope', 'Noto Sans JP', sans-serif;
-  --font-noto: 'Noto Sans JP', sans-serif;
+  /* 担当ごとのごく淡い色分け（スケジュールの列・予約ページのイニシャル） */
+  --color-staff1: #b9776d;
+  --color-staff1-soft: #fbf6f5;
+  --color-staff2: #7489a6;
+  --color-staff2-soft: #f5f7fb;
+
+  --color-chat: #8de055;       /* 送信文面の吹き出し（LINE のトーク画面の緑）。この用途以外には使わない */
+
+  --font-sans: 'Noto Sans JP', system-ui, sans-serif;
 }
 
-.material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
-  font-style: normal;
-  font-size: 20px;
-  display: inline-block;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  font-feature-settings: 'liga';
-  -webkit-font-smoothing: antialiased;
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  vertical-align: middle;
+/* base レイヤーに置き、hidden / md:block などのユーティリティで上書きできるようにする */
+@layer base {
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-style: normal;
+    font-size: 18px;
+    display: inline-block;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    vertical-align: middle;
+  }
 }
 
 body {
-  font-family: 'Noto Sans JP', 'Plus Jakarta Sans', sans-serif;
-  background-color: #f8f9fa;
-  color: #191c1d;
+  background-color: var(--color-canvas);
+  color: var(--color-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 予約ページから戻ったときの新着行。淡いアクセント色から元の地へ戻す（行のリンクに掛け、ホバー色より優先させる） */
+@keyframes arrive {
+  0%, 45% { background-color: var(--color-accent-soft); }
+  100%    { background-color: transparent; }
+}
+.arrive > a { animation: arrive 3.2s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  /* 動かさず、色だけで新着を示す */
+  .arrive > a { animation: none; background-color: var(--color-accent-soft); }
 }

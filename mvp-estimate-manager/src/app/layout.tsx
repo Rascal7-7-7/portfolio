@@ -24,7 +24,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <main className="pb-20 md:pb-0 print:pb-0">
                 {children}
                 <p className="px-4 pb-4 text-center text-xs text-muted md:hidden print:hidden">
-                  デモ版：データはこのブラウザ内にだけ保存されます（送信・外部通信なし）。
+                  デモ版：データはこのブラウザ内にだけ保存されます
+                  <span className="inline-block">（送信・外部通信なし）。</span>
                 </p>
               </main>
             </div>

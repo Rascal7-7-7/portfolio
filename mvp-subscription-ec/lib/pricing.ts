@@ -67,6 +67,11 @@ export function monthlyEquivalent(subs: ReadonlyArray<Pick<Subscription, 'interv
   return Math.round(subs.reduce((sum, s) => sum + (s.unitPrice * s.quantity) / MONTHS_PER_INTERVAL[s.interval], 0));
 }
 
+/** 合計欄の「うち消費税」に並べる行。0 円の税率は出さない */
+export function taxLines(taxByRate: Record<TaxRate, number>): Array<{ rate: TaxRate; amount: number }> {
+  return ([8, 10] as const).filter((rate) => taxByRate[rate] > 0).map((rate) => ({ rate, amount: taxByRate[rate] }));
+}
+
 export function yen(amount: number): string {
   return `¥${amount.toLocaleString('ja-JP')}`;
 }

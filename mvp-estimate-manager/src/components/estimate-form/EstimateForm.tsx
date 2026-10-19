@@ -73,77 +73,80 @@ export default function EstimateForm({ initial }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-      <div className="space-y-5">
+    <form onSubmit={handleSubmit} noValidate className="grid grid-cols-[minmax(0,1fr)] gap-8 pb-16 xl:pb-0 xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+      <div className="space-y-8">
         {!initial && (
           <button
             type="button"
             onClick={() => setDraft(sampleDraft())}
-            className="inline-flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary-soft px-3 py-1.5 text-sm font-semibold text-primary hover:bg-primary/10"
+            className={`${SECONDARY_BUTTON} gap-1.5`}
           >
-            <Icon name="bolt" />
+            <Icon name="bolt" className="h-4 w-4 text-primary" />
             サンプルを入力（デモ用）
           </button>
         )}
 
-        <fieldset className="grid gap-4 rounded-md bg-white p-4 shadow-card sm:grid-cols-2 sm:p-5">
-          <legend className="sr-only">基本情報</legend>
-          <TextInput label="取引先名" required value={draft.clientName} onChange={(v) => setField("clientName", v)} list="known-clients" placeholder="例：株式会社みなと不動産" />
-          <datalist id="known-clients">
-            {KNOWN_CLIENTS.map((c) => (
-              <option key={c} value={c} />
-            ))}
-          </datalist>
-          <TextInput label="ご担当者" value={draft.contactName} onChange={(v) => setField("contactName", v)} placeholder="例：佐藤 健一" />
-          <div className="sm:col-span-2">
-            <TextInput label="件名" required value={draft.subject} onChange={(v) => setField("subject", v)} placeholder="例：コーポレートサイト リニューアル" />
+        <fieldset>
+          <legend className={SECTION_TITLE}>基本情報</legend>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <TextInput label="取引先名" required value={draft.clientName} onChange={(v) => setField("clientName", v)} list="known-clients" placeholder="例：株式会社みなと不動産" />
+            <datalist id="known-clients">
+              {KNOWN_CLIENTS.map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+            <TextInput label="ご担当者" value={draft.contactName} onChange={(v) => setField("contactName", v)} placeholder="例：佐藤 健一" />
+            <div className="sm:col-span-2">
+              <TextInput label="件名" required value={draft.subject} onChange={(v) => setField("subject", v)} placeholder="例：コーポレートサイト リニューアル" />
+            </div>
+            <DateInput label="発行日" required value={draft.issuedAt} onChange={(v) => setField("issuedAt", v)} />
+            <DateInput label="有効期限" value={draft.validUntil} onChange={(v) => setField("validUntil", v)} />
           </div>
-          <DateInput label="発行日" required value={draft.issuedAt} onChange={(v) => setField("issuedAt", v)} />
-          <DateInput label="有効期限" value={draft.validUntil} onChange={(v) => setField("validUntil", v)} />
         </fieldset>
 
-        <fieldset className="space-y-4 rounded-md bg-white p-4 shadow-card sm:p-5">
-          <legend className="sr-only">明細</legend>
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-navy">明細</h2>
-            <button
-              type="button"
-              onClick={() => appendItem(emptyItem())}
-              className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary-hover"
-            >
-              <Icon name="plus" />
-              行を追加
-            </button>
-          </div>
+        <fieldset>
+          <legend className={SECTION_TITLE}>明細</legend>
           <ItemRows items={draft.items} amounts={amounts} onChange={changeItem} onRemove={removeItem} />
-          <div>
-            <p className="mb-2 text-xs font-medium text-muted">よく使う品目（クリックで追加）</p>
-            <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => appendItem(emptyItem())}
+            className="mt-2 inline-flex items-center gap-1 rounded py-1 text-sm font-semibold text-primary hover:text-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+          >
+            <Icon name="plus" />
+            行を追加
+          </button>
+
+          <div className="mt-4">
+            <p className="mb-2 text-xs text-muted">よく使う品目（クリックで追加）</p>
+            <div className="flex flex-wrap gap-1.5">
               {PRESET_ITEMS.map((preset) => (
                 <button
                   key={preset.name}
                   type="button"
                   onClick={() => appendItem(toDraftItem(preset))}
-                  className="rounded-full border border-line px-3 py-1 text-xs text-body hover:border-primary hover:text-primary"
+                  className="rounded border border-line bg-white px-2 py-1 text-xs text-body hover:border-slate-300 hover:bg-canvas hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                 >
                   + {preset.name}
                 </button>
               ))}
             </div>
           </div>
-        </fieldset>
 
-        <section aria-label="合計金額" aria-live="polite" className="tnum space-y-1 rounded-md bg-navy p-4 text-sm text-slate-300 sm:p-5">
-          <p className="flex justify-between"><span>小計</span><span className="text-white">{formatYen(totals.subtotal)}</span></p>
-          <p className="flex justify-between"><span>消費税（{TAX_RATE_PERCENT}%・端数切り捨て）</span><span className="text-white">{formatYen(totals.tax)}</span></p>
-          <p className="flex items-baseline justify-between border-t border-white/20 pt-2">
-            <span className="font-semibold text-white">合計（税込）</span>
-            <span className="text-2xl font-semibold text-white">{formatYen(totals.total)}</span>
-          </p>
-          <a href="#estimate-preview" className="block pt-1 text-right text-xs font-semibold text-white underline underline-offset-2 xl:hidden">
-            見積書の見た目を確認 ↓
-          </a>
-        </section>
+          <section aria-label="合計金額" aria-live="polite" className="tnum ml-auto mt-6 max-w-sm text-sm">
+            <p className="flex justify-between py-1">
+              <span className="text-body">小計</span>
+              <span className="text-navy">{formatYen(totals.subtotal)}</span>
+            </p>
+            <p className="flex justify-between py-1">
+              <span className="text-body">消費税（{TAX_RATE_PERCENT}%・端数切り捨て）</span>
+              <span className="text-navy">{formatYen(totals.tax)}</span>
+            </p>
+            <p className="mt-1 flex items-baseline justify-between border-t border-navy pt-2">
+              <span className="font-semibold text-navy">合計（税込）</span>
+              <span className="text-2xl font-semibold text-navy">{formatYen(totals.total)}</span>
+            </p>
+          </section>
+        </fieldset>
 
         <label className="block">
           <span className="mb-1 block text-xs font-medium text-body">備考</span>
@@ -151,33 +154,57 @@ export default function EstimateForm({ initial }: Props) {
         </label>
 
         {errors.length > 0 && (
-          <ul role="alert" className="space-y-1 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">
+          <ul role="alert" className="space-y-1 rounded border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">
             {errors.map((err) => (
               <li key={err}>{err}</li>
             ))}
           </ul>
         )}
 
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <button type="button" onClick={() => router.back()} className="rounded-md border border-line bg-white px-4 py-2 text-sm font-semibold text-body hover:bg-canvas">
+        <div className="flex flex-col-reverse gap-2 border-t border-line pt-6 sm:flex-row sm:justify-end">
+          <button type="button" onClick={() => router.back()} className={SECONDARY_BUTTON}>
             キャンセル
           </button>
-          <button type="submit" className="rounded-md bg-primary px-5 py-2 text-sm font-semibold text-white shadow-card hover:bg-primary-hover">
+          <button
+            type="submit"
+            className="rounded bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
             {initial ? "変更を保存" : "下書きとして保存"}
           </button>
         </div>
       </div>
 
-      <div id="estimate-preview" className="scroll-mt-4 xl:sticky xl:top-0 xl:self-start">
-        {/* xl では左列の「サンプルを入力」ボタンと同じ高さにして、帳票の上端をフォームの上端に揃える */}
-        <p className={`mb-2 text-xs font-medium text-muted ${initial ? "" : "xl:mb-5 xl:flex xl:h-[34px] xl:items-center"}`}>
-          見積書プレビュー（入力と同時に更新）
-        </p>
+      {/* Stripe の請求書エディタと同じく、右側にグレー地の上で帳票プレビューを並べる */}
+      <div id="estimate-preview" className="scroll-mt-4 rounded bg-canvas p-3 sm:p-6 xl:sticky xl:p-4 xl:top-4 xl:self-start">
+        <p className="mb-3 text-xs font-medium text-body">見積書プレビュー（入力と同時に更新）</p>
         <EstimateDocument estimate={preview} id={initial?.id} />
+      </div>
+
+      {/*
+        プレビューが横に並ばない幅では、入力中も合計が見えるよう画面下に固定する。
+        スマホは下部ナビ（罫線込みで高さ 61px）の上、md 以上はサイドバー（w-60）の右に置く
+      */}
+      <div className="fixed inset-x-0 bottom-[calc(3.8125rem+env(safe-area-inset-bottom))] z-30 flex items-center justify-between gap-3 border-t border-line bg-white px-4 py-2 md:bottom-0 md:left-60 md:pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:pl-8 md:pr-8 xl:hidden print:hidden">
+        <p className="tnum min-w-0">
+          <span className="block text-xs text-muted">合計（税込）</span>
+          <span className="block text-lg font-semibold leading-tight text-navy">{formatYen(totals.total)}</span>
+        </p>
+        <a
+          href="#estimate-preview"
+          className="inline-flex shrink-0 items-center gap-1 rounded border border-line px-3 py-2 text-sm font-semibold text-primary hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          見積書を確認
+          <span aria-hidden="true">↓</span>
+        </a>
       </div>
     </form>
   );
 }
+
+const SECTION_TITLE = "mb-4 text-base font-semibold text-navy";
+
+const SECONDARY_BUTTON =
+  "inline-flex items-center justify-center rounded border border-line bg-white px-4 py-2 text-sm font-semibold text-navy hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
 
 interface TextInputProps {
   label: string;

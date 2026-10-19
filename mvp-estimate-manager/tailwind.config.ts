@@ -24,10 +24,6 @@ const config: Config = {
           "sans-serif",
         ],
       },
-      boxShadow: {
-        card: "0 2px 5px -1px rgba(50,50,93,0.25), 0 1px 3px -1px rgba(0,0,0,0.3)",
-        float: "0 13px 27px -5px rgba(50,50,93,0.25), 0 8px 16px -8px rgba(0,0,0,0.3)",
-      },
     },
   },
   plugins: [],

@@ -1,5 +1,6 @@
 import { profile } from "@/content/profile";
 import { SectionHeader } from "./ui/SectionHeader";
+import { container } from "./ui/container";
 
 const blocks = [
   {
@@ -20,22 +21,22 @@ const blocks = [
   },
 ];
 
+/** カードにはせず、小見出し付きの文章として縦に並べる。 */
 export function About() {
   return (
-    <section id="about" className="py-16 sm:py-20 px-6 bg-surface-900/40" aria-labelledby="about-heading">
-      <div className="max-w-6xl mx-auto">
+    <section id="about" className="py-8 sm:py-10" aria-labelledby="about-heading">
+      <div className={container}>
         <SectionHeader
           id="about-heading"
-          label="ABOUT"
           title="自己紹介"
           description={`${profile.school} ${profile.department}。${profile.activity}。`}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6">
           {blocks.map(({ title, body }) => (
-            <div key={title} className="bg-surface-900 rounded-2xl p-6">
-              <h3 className="text-base font-bold text-surface-50 mb-2">{title}</h3>
-              <p className="text-sm text-surface-300 leading-relaxed">{body}</p>
+            <div key={title}>
+              <h3 className="font-semibold text-ink">{title}</h3>
+              <p className="mt-1 leading-[1.8] text-ink-muted">{body}</p>
             </div>
           ))}
         </div>

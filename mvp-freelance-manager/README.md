@@ -1,4 +1,4 @@
-# FreelanceHub（mvp-freelance-manager）
+# Hikae（mvp-freelance-manager）
 
 個人事業の「案件・タスク・請求と入金」をひとつのダッシュボードにまとめるモックアップです。
 

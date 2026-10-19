@@ -2,36 +2,32 @@ import { getProjectsByTier } from "@/content/projects";
 import { FeaturedProject } from "./FeaturedProject";
 import { ProjectRow } from "./ProjectRow";
 import { SectionHeader } from "./ui/SectionHeader";
+import { container } from "./ui/container";
 
 export function MVPGrid() {
   const featured = getProjectsByTier("featured");
   const standard = getProjectsByTier("standard");
 
   return (
-    <section id="projects" className="py-20 sm:py-32 px-6" aria-labelledby="projects-heading">
-      <div className="max-w-6xl mx-auto">
+    <section id="projects" className="py-8 sm:py-10" aria-labelledby="projects-heading">
+      <div className={container}>
         <SectionHeader
           id="projects-heading"
-          label="PROJECTS"
           title="作ったもの"
           description="関心のある領域で手を動かしたものと、個人で作った業務系Webアプリです。"
+          className="mb-2"
         />
 
-        {/* 代表作は全幅で1件ずつ見せる */}
-        <div className="space-y-6 mb-16 sm:mb-20">
+        {/* 代表作は一覧の行を少し大きくして見せる。罫線で区切り、カードにはしない */}
+        <div>
           {featured.map((project) => (
             <FeaturedProject key={project.slug} project={project} />
           ))}
         </div>
 
-        {/* 代表作との間に区切りを置き、ここからは一覧として流し読みできる密度にする */}
-        <div className="flex items-center gap-4 mb-2">
-          <h3 className="shrink-0 font-mono text-xs uppercase tracking-widest text-surface-400">
-            そのほかに作ったもの
-          </h3>
-          <span className="h-px flex-1 bg-white/10" aria-hidden="true" />
-        </div>
-        <ul className="divide-y divide-white/5">
+        {/* ここからは流し読みできる密度の一覧にする */}
+        <h3 className="mt-10 mb-1 text-base font-semibold text-ink">そのほかに作ったもの</h3>
+        <ul className="border-b border-rule">
           {standard.map((project) => (
             <li key={project.slug}>
               <ProjectRow project={project} />

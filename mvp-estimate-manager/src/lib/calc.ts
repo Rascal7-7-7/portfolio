@@ -55,3 +55,30 @@ export function summarize(estimates: readonly Summarizable[]): Summary {
   const winRatePercent = decided === 0 ? null : Math.round((count.won / decided) * 100);
   return { count, pendingAmount, wonAmount, winRatePercent };
 }
+
+export interface MonthlyAmount {
+  /** "YYYY-MM" */
+  month: string;
+  amount: number;
+}
+
+/**
+ * 直近 months ヶ月（today の月を含む）の受注額（税込）を古い順に返す。
+ * ponytail: 受注日を持たないので発行日の月で集計する。受注日を記録するようになったらそちらで集計する
+ */
+export function monthlyWon(
+  estimates: readonly (Summarizable & { issuedAt: string })[],
+  today: string,
+  months: number,
+): MonthlyAmount[] {
+  const [y, m] = today.split("-").map(Number);
+  const current = y * 12 + (m - 1);
+  return Array.from({ length: months }, (_, i) => {
+    const index = current - (months - 1 - i);
+    const month = `${Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, "0")}`;
+    const amount = estimates
+      .filter((e) => e.status === "won" && e.issuedAt.slice(0, 7) === month)
+      .reduce((sum, e) => sum + calcTotals(e.items).total, 0);
+    return { month, amount };
+  });
+}

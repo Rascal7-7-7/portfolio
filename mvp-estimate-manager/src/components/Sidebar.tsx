@@ -46,7 +46,7 @@ export default function Sidebar() {
     <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line bg-white px-4 py-6 md:flex print:hidden">
       <Link href="/estimates" className={cn("mb-8 rounded px-2", FOCUS_CLASS)}>
         <p className="text-lg font-bold tracking-tight text-navy">見積マネージャー</p>
-        <p className="text-xs text-muted">明細から自動計算・ステータス管理</p>
+        <p className="text-xs text-muted">見積作成から受注管理まで</p>
       </Link>
       <nav aria-label="メイン" className="space-y-1">
         {NAV_ITEMS.map((item) => (
@@ -69,7 +69,8 @@ export default function Sidebar() {
       </nav>
       <div className="mt-auto space-y-3 border-t border-line px-2 pt-4">
         <p className="text-xs leading-relaxed text-muted">
-          デモ版：データはこのブラウザ内にだけ保存されます（送信・外部通信なし）。
+          デモ版：データはこのブラウザ内にだけ保存されます
+          <span className="inline-block">（送信・外部通信なし）。</span>
         </p>
         <ResetDemoButton />
       </div>
@@ -82,7 +83,7 @@ export function MobileNav() {
   return (
     <nav
       aria-label="メイン"
-      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden print:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden print:hidden"
     >
       {NAV_ITEMS.map((item) => (
         <Link

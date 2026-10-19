@@ -22,20 +22,19 @@ export default function PublishedView({ slug }: { slug: string }) {
 
   if (state.status === 'missing') {
     return (
-      <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-ed-bg px-6 text-center text-white">
-        <p className="text-4xl" aria-hidden>🔍</p>
+      <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-ed-bg px-6 text-center">
         <h1 className="text-lg font-semibold">ページが見つかりません</h1>
         <p className="text-sm text-ed-muted">このURLのLPは、このブラウザではまだ公開されていません。</p>
-        <Link href="/editor/1" className="mt-3 rounded-full bg-accent px-5 py-2 text-sm font-semibold">エディタでLPを作る</Link>
+        <Link href="/editor/1" className="mt-3 rounded-md bg-ed-ink px-5 py-2.5 text-sm font-semibold text-white">エディタでLPを作る</Link>
       </main>
     )
   }
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3 bg-ed-bg px-4 py-2 text-[11px] text-white/80">
+      <div className="flex items-center justify-between gap-3 border-b border-ed-line bg-ed-bg px-4 py-2 text-xs text-ed-muted">
         <span className="truncate">
-          <span className="mr-2 rounded-full bg-accent px-2 py-0.5 font-semibold text-white">公開イメージ</span>
+          <span className="mr-2 font-semibold text-ed-ink">公開イメージ</span>
           {mockPublicUrl(state.doc.slug)}
         </span>
         <Link href={`/editor/${state.doc.id}`} className="shrink-0 underline-offset-2 hover:underline">← エディタに戻る</Link>

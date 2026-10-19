@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CalendarDays, CreditCard, Info, Lock, MapPin, Store } from 'lucide-react';
+import { CreditCard, Store } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
 import { TotalsTable } from '@/components/TotalsTable';
 import { PlanBadge } from '@/components/PlanBadge';
@@ -62,26 +62,32 @@ export default function CheckoutPage() {
       <h1 className="mb-6 font-headline text-2xl font-light text-on-background sm:text-3xl">ご購入手続き</h1>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        <div className="space-y-4">
-          <Section icon={MapPin} title="お届け先">
+        <div className="divide-y divide-outline-variant/60 self-start border-y border-outline-variant/60">
+          <Section title="お届け先">
             <div className="flex items-start justify-between gap-3">
               <div className="text-sm leading-relaxed">
                 <p className="font-medium text-on-surface">{DEMO_USER.name} 様</p>
-                <p className="text-on-surface-variant">{DEMO_USER.address}</p>
+                <p className="text-on-surface-variant">
+                  {/* 住所は空白の位置でだけ折り返す（「森の／ハイツ」のような語中改行を防ぐ） */}
+                  {DEMO_USER.address.split(' ').map((part, i) => (
+                    <span key={part}>
+                      {i > 0 && ' '}
+                      <span className="whitespace-nowrap">{part}</span>
+                    </span>
+                  ))}
+                </p>
                 <p className="text-on-surface-variant">{DEMO_USER.email}</p>
               </div>
-              <span className="flex-shrink-0 rounded bg-surface-container px-2 py-1 text-[11px] text-on-surface-variant">
-                デモユーザー
-              </span>
+              <span className="flex-shrink-0 text-xs text-on-surface-variant">デモユーザー</span>
             </div>
           </Section>
 
-          <Section icon={CalendarDays} title="初回お届け予定">
+          <Section title="初回お届け予定">
             <p className="tnum font-headline text-xl font-semibold text-on-surface">{formatJa(delivery)}</p>
             <p className="mt-1 text-xs text-on-surface-variant">定期便の2回目以降は、マイページでスキップ・お休みできます。</p>
           </Section>
 
-          <Section icon={Lock} title="お支払い方法">
+          <Section title="お支払い方法">
             <fieldset>
               <legend className="sr-only">お支払い方法を選ぶ</legend>
               <div className="grid gap-2 sm:grid-cols-2">
@@ -89,8 +95,8 @@ export default function CheckoutPage() {
                   <label
                     key={id}
                     className={cn(
-                      'flex cursor-pointer items-center gap-3 rounded-md p-3 ring-1 transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary',
-                      payment === id ? 'bg-primary/5 ring-2 ring-primary' : 'ring-outline-variant hover:ring-outline',
+                      'flex cursor-pointer items-center gap-3 rounded-sm p-3 ring-1 transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary',
+                      payment === id ? 'ring-2 ring-on-surface' : 'ring-outline-variant hover:ring-outline',
                     )}
                   >
                     <input
@@ -104,21 +110,20 @@ export default function CheckoutPage() {
                     <Icon className="h-5 w-5 text-on-surface-variant" aria-hidden />
                     <span>
                       <span className="block text-sm font-medium text-on-surface">{label}</span>
-                      <span className="block text-[11px] text-on-surface-variant">{note}</span>
+                      <span className="block text-xs text-on-surface-variant">{note}</span>
                     </span>
                   </label>
                 ))}
               </div>
             </fieldset>
-            <p className="mt-3 flex items-start gap-2 rounded-md bg-surface-container px-3 py-2.5 text-xs leading-relaxed text-on-surface-variant">
-              <Info className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" aria-hidden />
+            <p className="mt-3 text-xs leading-relaxed text-on-surface-variant">
               デモのため、カード番号などの入力は不要です。決済は行われず、情報もどこにも送信されません。
             </p>
           </Section>
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-lg bg-surface-container-lowest p-5 shadow-elevation-2 ring-1 ring-outline-variant/40">
+          <div className="bg-surface-container-low p-5">
             <h2 className="mb-4 text-sm font-semibold text-on-surface">ご注文内容</h2>
             <ul className="mb-4 space-y-3 border-b border-outline-variant/60 pb-4">
               {lines.map((l) => (
@@ -142,12 +147,11 @@ export default function CheckoutPage() {
             <button
               type="button"
               onClick={placeOrder}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3.5 font-medium text-on-primary transition-opacity hover:opacity-90"
+              className="mt-5 flex w-full items-center justify-center rounded-sm bg-primary py-3.5 font-medium text-on-primary transition-opacity hover:opacity-90"
             >
-              <Lock className="h-4 w-4" aria-hidden />
               申し込みを確定する
             </button>
-            <p className="mt-3 text-center text-[11px] text-on-surface-variant">※ デモのため実際の決済は発生しません</p>
+            <p className="mt-3 text-center text-xs text-on-surface-variant">※ デモのため実際の決済は発生しません</p>
           </div>
         </aside>
       </div>
@@ -155,15 +159,12 @@ export default function CheckoutPage() {
   );
 }
 
-type SectionProps = { icon: typeof MapPin; title: string; children: React.ReactNode };
+type SectionProps = { title: string; children: React.ReactNode };
 
-function Section({ icon: Icon, title, children }: SectionProps) {
+function Section({ title, children }: SectionProps) {
   return (
-    <section className="rounded-lg bg-surface-container-lowest p-5 shadow-elevation-1 ring-1 ring-outline-variant/40">
-      <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-on-surface">
-        <Icon className="h-4 w-4 text-primary" aria-hidden />
-        {title}
-      </h2>
+    <section className="py-6">
+      <h2 className="mb-3 text-sm font-semibold text-on-surface">{title}</h2>
       {children}
     </section>
   );

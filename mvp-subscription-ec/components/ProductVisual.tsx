@@ -1,5 +1,5 @@
 // 外部画像を使わず、商品ごとの配色とパッケージ形状をインライン SVG で描く。
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import type { PackageShape, Product, Visual } from '@/lib/types';
 import { cn } from '@/lib/cn';
 
@@ -14,10 +14,12 @@ type Props = {
 
 export function ProductVisual({ product, className, decorative = false }: Props) {
   const { visual } = product;
+  // 同じページに複数並ぶため、紙の質感フィルタの id はインスタンスごとに分ける
+  const paperId = `paper${useId().replace(/:/g, '')}`;
   return (
     <div
       className={cn('relative overflow-hidden', className)}
-      style={{ backgroundImage: `linear-gradient(150deg, ${visual.from} 0%, ${visual.to} 100%)` }}
+      style={{ backgroundColor: visual.from }}
     >
       <svg
         viewBox="0 0 240 300"
@@ -27,12 +29,18 @@ export function ProductVisual({ product, className, decorative = false }: Props)
         aria-hidden={decorative || undefined}
         aria-label={decorative ? undefined : `${product.name}のパッケージイメージ`}
       >
-        <circle cx="186" cy="66" r="58" fill={visual.accent} opacity="0.35" />
+        <defs>
+          <filter id={paperId} x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="7" />
+            <feColorMatrix values="0 0 0 0 0.35  0 0 0 0 0.28  0 0 0 0 0.2  0 0 0 0.1 0" />
+            <feComposite in2="SourceAlpha" operator="in" />
+          </filter>
+        </defs>
         <path d="M18 262 C 30 200, 80 180, 104 196 C 82 214, 52 238, 18 262 Z" fill={visual.ink} opacity="0.1" />
         <path d="M18 262 L 96 200" stroke={visual.ink} strokeOpacity="0.14" strokeWidth="1.5" fill="none" />
         <ellipse cx="120" cy="252" rx="66" ry="7" fill="#000" opacity="0.12" />
         {SHAPES[visual.shape](visual)}
-        <Label shape={visual.shape} visual={visual} nameEn={product.nameEn} />
+        <Label shape={visual.shape} visual={visual} nameEn={product.nameEn} paperId={paperId} />
       </svg>
     </div>
   );
@@ -111,14 +119,19 @@ const LABEL_BOX: Record<PackageShape, { x: number; y: number; w: number; h: numb
   box: { x: 80, y: 128, w: 80, h: 80 },
 };
 
-function Label({ shape, visual, nameEn }: { shape: PackageShape; visual: Visual; nameEn: string }) {
+type LabelProps = { shape: PackageShape; visual: Visual; nameEn: string; paperId: string };
+
+function Label({ shape, visual, nameEn, paperId }: LabelProps) {
   const box = LABEL_BOX[shape];
   const cx = box.x + box.w / 2;
   const words = nameEn.split(' ');
   const fontSize = box.w < 50 ? 7 : 9;
   return (
     <g fontFamily="var(--font-headline), sans-serif" textAnchor="middle" fill={visual.ink}>
+      {/* ラベルの下にごく淡い影を1段だけ敷き、紙の繊維感をノイズで重ねる */}
+      <rect x={box.x + 0.8} y={box.y + 1.4} width={box.w} height={box.h} rx="2" fill="#000" opacity="0.14" />
       <rect x={box.x} y={box.y} width={box.w} height={box.h} rx="2" fill={LABEL_BG} />
+      <rect x={box.x} y={box.y} width={box.w} height={box.h} rx="2" fill="#000" filter={`url(#${paperId})`} />
       <text x={cx} y={box.y + 14} fontSize="5.5" letterSpacing="2" opacity="0.7">
         MORI
       </text>

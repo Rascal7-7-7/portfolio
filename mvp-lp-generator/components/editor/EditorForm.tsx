@@ -2,7 +2,6 @@ import { CATEGORIES, CATEGORY_KEYS, SECTION_KEYS, SECTION_LABELS } from '@/lib/c
 import { cx } from '@/lib/cx'
 import { SAMPLES } from '@/lib/samples'
 import type { CategoryKey, LPDoc, MenuItem, SectionKey, StoreInfo } from '@/lib/types'
-import Icon from '../Icon'
 import { Field, Group, TextArea, TextInput, inputCls } from './fields'
 
 interface Props {
@@ -19,9 +18,8 @@ function GenerateButton({ onClick, className }: { onClick: () => void; className
     <button
       type="button"
       onClick={onClick}
-      className={cx(className, 'flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(10,114,224,0.5),0_10px_30px_-10px_rgba(10,114,224,0.8)] transition hover:brightness-110 active:scale-[0.99]')}
+      className={cx(className, 'w-full rounded-md bg-ed-ink py-3 text-sm font-semibold text-white transition-colors hover:bg-[#33333a]')}
     >
-      <Icon name="sparkle" />
       LPを生成する
     </button>
   )
@@ -30,32 +28,35 @@ function GenerateButton({ onClick, className }: { onClick: () => void; className
 export default function EditorForm({ doc, onStore, onMenu, onToggleSection, onSample, onGenerate }: Props) {
   const s = doc.store
   return (
-    <div className="space-y-4 p-5 lg:p-6">
-      <div>
-        <h1 className="text-[22px] font-semibold tracking-tight">お店の情報を入れるだけ。</h1>
-        <p className="mt-1 text-sm text-ed-muted">5項目でLPが完成します。入力はプレビューにその場で反映されます。</p>
-      </div>
+    <div className="pb-6">
+      <div className="space-y-5 px-5 py-6 lg:px-6">
+        <div>
+          <h1 className="text-lg font-semibold">お店の情報を入れるだけ。</h1>
+          <p className="mt-1 text-sm leading-relaxed text-ed-muted">5項目でLPが完成します。入力はプレビューにその場で反映されます。</p>
+        </div>
 
-      {/* スマホでは入力欄が長いので、上部にも生成ボタンを置く */}
-      <GenerateButton onClick={onGenerate} className="lg:hidden" />
+        {/* スマホでは入力欄が長いので、上部にも生成ボタンを置く */}
+        <GenerateButton onClick={onGenerate} className="lg:hidden" />
 
-      <div>
-        <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-ed-muted">サンプルから始める</p>
-        <div className="flex flex-wrap gap-2">
-          {SAMPLES.map((sample) => (
-            <button
-              key={sample.id}
-              type="button"
-              aria-pressed={doc.id === sample.id}
-              onClick={() => onSample(sample)}
-              className={cx(
-                'rounded-full border px-3.5 py-1.5 text-xs font-medium transition',
-                doc.id === sample.id ? 'border-accent bg-accent/15 text-white' : 'border-white/10 text-white/70 hover:border-white/30',
-              )}
-            >
-              {CATEGORIES[sample.store.category].emoji} {sample.store.storeName}
-            </button>
-          ))}
+        <div>
+          <p className="mb-2 text-xs font-medium text-ed-muted">サンプルから始める</p>
+          <div className="grid gap-1.5">
+            {SAMPLES.map((sample) => (
+              <button
+                key={sample.id}
+                type="button"
+                aria-pressed={doc.id === sample.id}
+                onClick={() => onSample(sample)}
+                className={cx(
+                  'flex items-baseline justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm transition-colors',
+                  doc.id === sample.id ? 'border-accent bg-accent/[0.06]' : 'border-ed-line hover:border-[#c9c9c4]',
+                )}
+              >
+                <span className="truncate font-medium">{sample.store.storeName}</span>
+                <span className="shrink-0 text-xs text-ed-muted">{CATEGORIES[sample.store.category].label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -66,8 +67,8 @@ export default function EditorForm({ doc, onStore, onMenu, onToggleSection, onSa
         <Field id="f-category" label="業種">
           <select id="f-category" value={s.category} onChange={(e) => onStore({ category: e.target.value as CategoryKey })} className={inputCls}>
             {CATEGORY_KEYS.map((k) => (
-              <option key={k} value={k} className="bg-ed-panel">
-                {CATEGORIES[k].emoji} {CATEGORIES[k].label}
+              <option key={k} value={k}>
+                {CATEGORIES[k].label}
               </option>
             ))}
           </select>
@@ -114,10 +115,10 @@ export default function EditorForm({ doc, onStore, onMenu, onToggleSection, onSa
         <ul className="space-y-1">
           {SECTION_KEYS.map((k) => (
             <li key={k}>
-              <label className="flex cursor-pointer items-center justify-between rounded-lg px-1 py-1.5 text-sm text-white/85">
+              <label className="flex cursor-pointer items-center justify-between py-1.5 text-sm">
                 {SECTION_LABELS[k]}
                 <input type="checkbox" checked={doc.sections[k]} onChange={() => onToggleSection(k)} className="peer sr-only" />
-                <span aria-hidden className="relative h-5 w-9 rounded-full bg-white/15 transition peer-checked:bg-accent peer-focus-visible:ring-2 peer-focus-visible:ring-accent/50 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition peer-checked:after:translate-x-4" />
+                <span aria-hidden className="relative h-5 w-9 rounded-full bg-[#8f8f89] transition-colors peer-checked:bg-accent peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-2 after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-transform peer-checked:after:translate-x-4" />
               </label>
             </li>
           ))}

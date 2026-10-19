@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { todayStr } from './date';
 import { createSeed } from './seed';
-import type { Reservation, ReservationInput } from './types';
+import { isChannel, isStaff, isStatus, type Reservation, type ReservationInput } from './types';
 
 /**
  * デモ用のクライアント側ストア。API・DB は使わない。
@@ -11,7 +11,8 @@ import type { Reservation, ReservationInput } from './types';
  * ponytail: 日付が変わったらダミーデータを作り直す。実運用ならここが DB になる。
  */
 
-const STORAGE_KEY = 'booking-demo-v1';
+// v2: 担当（staff）を追加。古い形のデータは読み込まずダミーデータを作り直す
+const STORAGE_KEY = 'booking-demo-v2';
 
 interface Saved {
   seededOn:     string;
@@ -34,12 +35,28 @@ interface Store {
 
 const StoreContext = createContext<Store | null>(null);
 
+const STRING_KEYS = [
+  'customer_name', 'customer_email', 'customer_phone', 'service_name', 'note', 'created_at', 'updated_at',
+] as const;
+
+/** localStorage の中身は信用しない。1件でも形が違えばダミーデータに戻す */
+function isReservation(v: unknown): v is Reservation {
+  if (typeof v !== 'object' || v === null) return false;
+  const r = v as Record<string, unknown>;
+  return Number.isInteger(r.id)
+    && STRING_KEYS.every(k => typeof r[k] === 'string')
+    && typeof r.reservation_date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.reservation_date)
+    && typeof r.reservation_time === 'string' && /^\d{2}:\d{2}$/.test(r.reservation_time)
+    && isStaff(r.staff) && isChannel(r.channel) && isStatus(r.status)
+    && typeof r.confirmation_sent === 'boolean' && typeof r.reminder_sent === 'boolean';
+}
+
 function load(today: string): Reservation[] {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const saved = JSON.parse(raw) as Partial<Saved>;
-      if (saved.seededOn === today && Array.isArray(saved.reservations)) {
+      if (saved.seededOn === today && Array.isArray(saved.reservations) && saved.reservations.every(isReservation)) {
         return saved.reservations;
       }
     }
@@ -78,6 +95,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setToast(message);
     toastTimer.current = setTimeout(() => setToast(null), 3500);
   }, []);
+
+  // 予約ページを別タブで開いてデモしたとき、管理画面のタブにも新しい予約がすぐ入るようにする
+  const latest = useRef(reservations);
+  useEffect(() => { latest.current = reservations; }, [reservations]);
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== STORAGE_KEY || !today) return;
+      const next = load(today);
+      const known = new Set((latest.current ?? []).map(r => r.id));
+      const added = next.filter(r => !known.has(r.id));
+      setReservations(next);
+      if (added.length > 0) notify(`新しい予約が入りました：${added.map(r => `${r.customer_name} 様`).join('、')}`);
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [today, notify]);
 
   const create = useCallback((input: ReservationInput) => {
     const list = reservations ?? [];
@@ -145,11 +178,9 @@ function Toast({ message }: { message: string | null }) {
       className="fixed z-[60] left-4 right-4 bottom-24 md:bottom-8 md:left-auto md:right-8 md:max-w-sm pointer-events-none"
     >
       {message && (
-        <div className="flex items-start gap-3 bg-[#1a3844] text-white rounded-xl px-4 py-3 shadow-lg">
-          <span className="material-symbols-outlined text-[#98f994] shrink-0" aria-hidden="true">
-            notifications_active
-          </span>
-          <p className="text-sm font-medium leading-relaxed">{message}</p>
+        <div className="flex items-start gap-2.5 bg-ink text-white rounded-md px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+          <span className="material-symbols-outlined shrink-0 mt-px" aria-hidden="true">check</span>
+          <p className="text-sm leading-relaxed">{message}</p>
         </div>
       )}
     </div>

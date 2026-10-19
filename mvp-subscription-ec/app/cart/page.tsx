@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { ArrowRight, ShoppingBag, Trash2, Truck } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
 import { ProductVisual } from '@/components/ProductVisual';
 import { QuantityStepper } from '@/components/QuantityStepper';
@@ -28,11 +28,11 @@ export default function CartPage() {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <section aria-label="カートの商品">
-          <ul className="divide-y divide-outline-variant/50 rounded-lg bg-surface-container-lowest shadow-elevation-1 ring-1 ring-outline-variant/40">
+          <ul className="divide-y divide-outline-variant/60 border-y border-outline-variant/60">
             {lines.map((line) => (
-              <li key={`${line.productId}-${line.interval}`} className="flex gap-4 p-4">
+              <li key={`${line.productId}-${line.interval}`} className="flex gap-4 py-5">
                 <Link href={`/products/${line.productId}`} className="flex-shrink-0">
-                  <ProductVisual product={line.product} decorative className="h-24 w-20 rounded-md sm:h-28 sm:w-24" />
+                  <ProductVisual product={line.product} decorative className="h-24 w-20 sm:h-28 sm:w-24" />
                 </Link>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
@@ -45,7 +45,7 @@ export default function CartPage() {
                     <button
                       type="button"
                       onClick={() => dispatch({ type: 'removeFromCart', productId: line.productId, interval: line.interval })}
-                      className="rounded p-1.5 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-error"
+                      className="p-1.5 text-on-surface-variant transition-colors hover:text-on-surface"
                       aria-label={`${line.product.name}をカートから削除`}
                     >
                       <Trash2 className="h-4 w-4" aria-hidden />
@@ -62,7 +62,7 @@ export default function CartPage() {
                     <div className="tnum text-right">
                       <p className="font-headline font-semibold text-on-surface">{yen(line.unitPrice * line.quantity)}</p>
                       {line.unitPrice < line.product.price && (
-                        <p className="text-[11px] text-on-surface-variant line-through">
+                        <p className="text-xs text-on-surface-variant line-through">
                           {yen(line.product.price * line.quantity)}
                         </p>
                       )}
@@ -72,15 +72,14 @@ export default function CartPage() {
               </li>
             ))}
           </ul>
-          <Link href="/products" className="mt-4 inline-block text-sm text-primary hover:underline">
+          <Link href="/products" className="mt-4 inline-block text-sm text-on-surface underline underline-offset-4 hover:text-primary">
             ← 買い物を続ける
           </Link>
         </section>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-lg bg-surface-container-lowest p-5 shadow-elevation-2 ring-1 ring-outline-variant/40">
-            <p className="mb-4 flex items-center gap-2 rounded-md bg-primary/5 px-3 py-2 text-xs text-primary">
-              <Truck className="h-4 w-4 flex-shrink-0" aria-hidden />
+          <div className="bg-surface-container-low p-5">
+            <p className="mb-4 text-xs text-on-surface-variant">
               {hasSubscription
                 ? '定期便を含むため送料無料です'
                 : remaining > 0
@@ -90,13 +89,12 @@ export default function CartPage() {
             <TotalsTable totals={totals} />
             <Link
               href="/checkout"
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3.5 font-medium text-on-primary transition-opacity hover:opacity-90"
+              className="mt-5 flex w-full items-center justify-center rounded-sm bg-primary py-3.5 font-medium text-on-primary transition-opacity hover:opacity-90"
             >
               ご購入手続きへ
-              <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
             {hasSubscription && (
-              <p className="mt-3 text-center text-[11px] leading-relaxed text-on-surface-variant">
+              <p className="mt-3 text-balance text-center text-xs leading-relaxed text-on-surface-variant">
                 定期便は2回目以降も同じ割引価格。スキップ・解約はマイページから。
               </p>
             )}
@@ -110,17 +108,13 @@ export default function CartPage() {
 function EmptyCart() {
   return (
     <main className="mx-auto max-w-lg px-4 py-24 text-center">
-      <span className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-full bg-surface-container">
-        <ShoppingBag className="h-7 w-7 text-outline" aria-hidden />
-      </span>
-      <h1 className="font-headline text-xl font-semibold text-on-surface">カートは空です</h1>
+      <h1 className="font-headline text-2xl font-light text-on-surface">カートは空です</h1>
       <p className="mt-2 text-sm text-on-surface-variant">気になる商品を、定期便か単品でカートに入れてください。</p>
       <Link
         href="/products"
-        className="mt-8 inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-on-primary hover:opacity-90"
+        className="mt-8 inline-flex items-center rounded-sm bg-primary px-6 py-3 text-sm font-medium text-on-primary hover:opacity-90"
       >
         商品を見る
-        <ArrowRight className="h-4 w-4" aria-hidden />
       </Link>
     </main>
   );

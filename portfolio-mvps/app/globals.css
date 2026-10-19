@@ -10,8 +10,9 @@
  */
 
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
+  /* tailwind.config.ts の paper / ink と同じ値 */
+  --background: #fcfbf8;
+  --foreground: #1c1b19;
 }
 
 * {
@@ -26,23 +27,43 @@ body {
   background: var(--background);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
+  /*
+   * 日本語を文節の切れ目で折り返す（「コー／ヒー」のような語中改行を防ぐ）。
+   * auto-phrase は lang="ja" の要素でだけ効き、未対応ブラウザでは通常の折り返しになる。
+   * 文節が1行に収まらないときに横へはみ出さないよう break-word を併用する。
+   */
+  word-break: auto-phrase;
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+}
+
+p,
+li,
+dd {
+  text-wrap: pretty;
 }
 
 /*
  * フォーカス表示。
- * ブラウザ既定の outline は rgb(0,95,204) で、surface-950(#09090b) の
- * 暗い背景に対してコントラストが足りず、キーボード操作時に位置を見失う。
+ * 明るい地（paper）に対して 7.1:1 のアクセント色を使う（WCAG 2.2 の非テキスト 3:1 を満たす）。
+ * 塗りのボタン（accent 地）の上でも見失わないよう、outline-offset で地から離して描く。
  * :focus-visible に限定しているため、マウス操作では表示されない。
  */
 :focus-visible {
-  outline: 2px solid #38bdf8;
+  outline: 2px solid #035a8c;
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 ::selection {
-  background: #0ea5e9;
-  color: #fff;
+  background: #cfe3f0;
+  color: #1c1b19;
 }
 
 /* モーションを減らす設定の利用者には、スムーススクロールとアニメーションを無効化する */

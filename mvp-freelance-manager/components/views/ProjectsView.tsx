@@ -6,8 +6,8 @@ import { ChevronRight, Plus } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { formatDate } from "@/lib/dates";
 import { dueLabel, projectProgress } from "@/lib/selectors";
-import { cn, formatYen } from "@/lib/utils";
-import { buttonStyles, Card, Page, PageHeader, PageSkeleton } from "@/components/ui";
+import { formatYen } from "@/lib/utils";
+import { buttonStyles, Card, MetricStrip, Page, PageHeader, PageSkeleton, SegmentButton } from "@/components/ui";
 import { ProjectStatusBadge } from "@/components/StatusBadge";
 import { PROJECT_STATUS_LABEL, PROJECT_STATUSES, type ProjectStatus } from "@/types";
 
@@ -31,7 +31,6 @@ export function ProjectsView() {
   return (
     <Page>
       <PageHeader
-        eyebrow="Projects"
         title="案件"
         description="受注から納品・入金まで、案件ごとの状況をひと目で。"
         action={
@@ -42,33 +41,20 @@ export function ProjectsView() {
         }
       />
 
-      <dl className="mb-5 grid grid-cols-3 gap-3">
-        {[
-          { label: "進行中の受注額", value: sum("in_progress") },
-          { label: "見積中（見込み）", value: sum("estimate") },
-          { label: "完了した案件", value: sum("completed") },
-        ].map((item) => (
-          <div key={item.label} className="min-w-0 rounded-xl border border-line bg-canvas p-3 shadow-card sm:p-4">
-            <dt className="text-[11px] font-semibold text-warm-500 sm:text-xs">{item.label}</dt>
-            <dd className="num mt-1 truncate text-sm font-bold text-ink sm:text-xl">{formatYen(item.value)}</dd>
-          </div>
-        ))}
-      </dl>
+      <MetricStrip
+        className="mb-6"
+        items={[
+          { label: "進行中の受注額", value: formatYen(sum("in_progress")), sub: `${count("in_progress")}件` },
+          { label: "見積中（見込み）", value: formatYen(sum("estimate")), sub: `${count("estimate")}件` },
+          { label: "完了した案件", value: formatYen(sum("completed")), sub: `${count("completed")}件` },
+        ]}
+      />
 
-      <div className="-mx-4 mb-3 flex gap-1.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0" role="group" aria-label="ステータスで絞り込み">
+      <div className="-mx-4 mb-2 flex gap-1 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0" role="group" aria-label="ステータスで絞り込み">
         {tabs.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            aria-pressed={filter === t.key}
-            onClick={() => setFilter(t.key)}
-            className={cn(
-              "shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
-              filter === t.key ? "bg-ink text-white" : "bg-black/5 text-warm-500 hover:bg-black/10",
-            )}
-          >
-            {t.label} <span className="num opacity-70">{t.n}</span>
-          </button>
+          <SegmentButton key={t.key} active={filter === t.key} onClick={() => setFilter(t.key)}>
+            {t.label} <span className="num ml-0.5 text-warm-500">{t.n}</span>
+          </SegmentButton>
         ))}
       </div>
 
@@ -81,24 +67,27 @@ export function ProjectsView() {
               const prog = projectProgress(p, data);
               return (
                 <li key={p.id}>
-                  <Link href={`/projects/${p.id}`} className="flex items-center gap-3 px-4 py-3.5 hover:bg-warm-50 sm:px-5">
+                  <Link href={`/projects/${p.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-warm-50 sm:gap-4 sm:px-5">
+                    <div className="hidden w-16 shrink-0 sm:block">
+                      <ProjectStatusBadge status={p.status} />
+                    </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="min-w-0 text-sm font-medium break-words text-ink">{p.name}</p>
+                      <p className="text-sm font-medium break-words text-ink">{p.name}</p>
+                      <div className="mt-0.5 sm:hidden">
                         <ProjectStatusBadge status={p.status} />
                       </div>
-                      {/* 区切りごとに折り返し、語の途中で改行しない */}
-                      <p className="mt-0.5 flex flex-wrap gap-x-1 text-xs text-warm-500">
+                      {/* 区切りごとに折り返し、語の途中で改行しない。行頭に「・」が来ないよう記号ではなく余白で区切る */}
+                      <p className="mt-0.5 flex flex-wrap gap-x-2.5 text-xs text-warm-500">
                         <span className="min-w-0 break-words">{p.client}</span>
-                        <span className="num whitespace-nowrap">・ {dueLabel(p)} {formatDate(p.dueDate)}</span>
-                        <span className="num whitespace-nowrap">・ タスク {prog.done}/{prog.total}</span>
+                        <span className="num whitespace-nowrap">{dueLabel(p)} {formatDate(p.dueDate)}</span>
+                        <span className="num whitespace-nowrap">タスク {prog.done}/{prog.total}</span>
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="num text-sm font-semibold text-ink">{formatYen(p.amount)}</p>
-                      <p className="num text-[11px] text-warm-500">入金 {formatYen(prog.paid)}</p>
+                      <p className="num text-sm font-medium text-ink">{formatYen(p.amount)}</p>
+                      <p className="num text-xs text-warm-500">入金 {formatYen(prog.paid)}</p>
                     </div>
-                    <ChevronRight size={16} className="shrink-0 text-warm-300" aria-hidden />
+                    <ChevronRight size={16} className="hidden shrink-0 text-warm-300 sm:block" aria-hidden />
                   </Link>
                 </li>
               );

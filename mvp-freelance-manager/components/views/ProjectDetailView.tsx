@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowLeft, ListChecks, Receipt } from "lucide-react";
+import { ArrowLeft, CircleCheck, FileText, Landmark } from "lucide-react";
 import { actions, useAppStore } from "@/lib/store";
-import { formatDate, formatRelative } from "@/lib/dates";
-import { dueLabel, projectProgress, sortTasks, sortInvoices } from "@/lib/selectors";
+import { formatAgo, formatDate, formatRelative } from "@/lib/dates";
+import { dueLabel, projectActivity, projectProgress, sortTasks, sortInvoices, type ActivityItem } from "@/lib/selectors";
 import { formatYen } from "@/lib/utils";
 import { buttonStyles, Card, Page, PageSkeleton } from "@/components/ui";
 import { TaskRow } from "@/components/TaskRow";
@@ -13,6 +13,36 @@ import { TaskQuickAdd } from "@/components/TaskQuickAdd";
 import { InvoiceList } from "@/components/InvoiceList";
 import { InvoiceForm } from "@/components/InvoiceForm";
 import { PROJECT_STATUS_LABEL, PROJECT_STATUSES, type ProjectStatus } from "@/types";
+
+const ACTIVITY_ICON: Record<ActivityItem["kind"], typeof FileText> = {
+  issued: FileText,
+  paid: Landmark,
+  task: CircleCheck,
+};
+
+/** Linear の案件アクティビティに倣い、何をしたかを相対時刻つきで新しい順に並べる */
+function ActivityFeed({ items, today }: { items: readonly ActivityItem[]; today: string }) {
+  if (items.length === 0) {
+    return <p className="px-5 py-6 text-center text-sm text-warm-500">まだ記録はありません</p>;
+  }
+  return (
+    <ol className="px-4 py-3 sm:px-5">
+      {items.map((a, i) => {
+        const Icon = ACTIVITY_ICON[a.kind];
+        return (
+          <li key={a.key} className="relative flex gap-3 py-2">
+            {i < items.length - 1 && <span aria-hidden className="absolute top-[30px] -bottom-2 left-[9px] w-px bg-black/15" />}
+            <Icon size={19} aria-hidden className={a.kind === "paid" ? "shrink-0 text-blue" : "shrink-0 text-warm-500"} />
+            <p className="min-w-0 flex-1 text-sm break-words text-ink">{a.text}</p>
+            <time dateTime={a.date} title={formatDate(a.date)} className="num shrink-0 text-xs text-warm-500">
+              {formatAgo(today, a.date)}
+            </time>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
 
 export function ProjectDetailView({ id }: { id: string }) {
   const store = useAppStore();
@@ -23,7 +53,7 @@ export function ProjectDetailView({ id }: { id: string }) {
   const project = data.projects.find((p) => p.id === id);
   if (!project) {
     return (
-      <Page narrow>
+      <Page>
         <p className="py-16 text-center text-sm text-warm-500">
           案件が見つかりません。
           <Link href="/projects" className="ml-1 text-blue hover:underline">
@@ -46,19 +76,19 @@ export function ProjectDetailView({ id }: { id: string }) {
   ];
 
   return (
-    <Page narrow>
+    <Page>
       <Link href="/projects" className="mb-4 inline-flex items-center gap-1 text-xs text-warm-500 hover:text-ink">
         <ArrowLeft size={14} aria-hidden />
         案件一覧
       </Link>
 
-      <section className="mb-5 rounded-xl border border-line bg-canvas p-5 shadow-card">
+      <section className="mb-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p className="text-sm text-warm-500">{project.client}</p>
-            <h1 className="mt-0.5 text-xl font-bold tracking-tight text-ink sm:text-2xl">{project.name}</h1>
+            <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-ink sm:text-2xl">{project.name}</h1>
           </div>
-          <label className="flex shrink-0 flex-col text-xs font-semibold text-warm-500">
+          <label className="flex shrink-0 flex-col text-xs font-medium text-warm-900">
             ステータス
             <select
               value={project.status}
@@ -73,20 +103,19 @@ export function ProjectDetailView({ id }: { id: string }) {
             </select>
           </label>
         </div>
-        <dl className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-y border-line py-4 sm:grid-cols-4">
           {meta.map((m) => (
             <div key={m.label} className="min-w-0">
               <dt className="text-xs text-warm-500">{m.label}</dt>
-              <dd className="num mt-0.5 truncate text-sm font-semibold text-ink">{m.value}</dd>
+              <dd className="num mt-0.5 truncate text-sm font-medium text-ink">{m.value}</dd>
             </div>
           ))}
         </dl>
       </section>
 
-      <div className="grid gap-5">
+      <div className="grid gap-4">
         <Card
           title="タスク"
-          icon={<ListChecks size={16} />}
           action={<span className="num text-xs text-warm-500">完了 {prog.done}/{prog.total}</span>}
         >
           {tasks.length === 0 ? (
@@ -103,13 +132,12 @@ export function ProjectDetailView({ id }: { id: string }) {
 
         <Card
           title="請求・入金"
-          icon={<Receipt size={16} />}
           action={
             <button
               type="button"
               onClick={() => setShowInvoiceForm((v) => !v)}
               aria-expanded={showInvoiceForm}
-              className="text-xs font-semibold text-blue hover:underline"
+              className="rounded text-xs font-medium text-ink hover:underline"
             >
               {showInvoiceForm ? "閉じる" : "＋ 請求書を作成"}
             </button>
@@ -133,6 +161,10 @@ export function ProjectDetailView({ id }: { id: string }) {
               未請求の残額 {formatYen(uninvoiced)}
             </p>
           )}
+        </Card>
+
+        <Card title="アクティビティ">
+          <ActivityFeed items={projectActivity(project.id, data)} today={today} />
         </Card>
       </div>
     </Page>
