@@ -177,10 +177,7 @@ export default function ModernPage(props: TemplateProps) {
         </section>
       )}
 
-      <footer className={cx(LINE, MUTED, 'flex flex-wrap justify-between gap-2 border-t text-xs', wide ? 'px-14 py-8' : 'px-6 py-8')}>
-        <span>{storeName(store)}</span>
-        <span>© {storeName(store)}</span>
-      </footer>
+      <footer className={cx(LINE, MUTED, 'border-t text-xs', wide ? 'px-14 py-8' : 'px-6 py-8')}>© {storeName(store)}</footer>
       {!wide && (
         <MobileBar
           store={store}
