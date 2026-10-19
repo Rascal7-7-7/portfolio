@@ -1,6 +1,6 @@
 export type CategoryKey = 'cafe' | 'salon' | 'seitai' | 'other'
 export type TemplateKey = 'natural' | 'modern' | 'pop'
-export type SectionKey = 'features' | 'menu' | 'voices' | 'access' | 'cta'
+export type SectionKey = 'features' | 'greeting' | 'menu' | 'voices' | 'access' | 'cta'
 
 export interface MenuItem {
   readonly emoji: string
@@ -20,6 +20,13 @@ export interface Voice {
   readonly text: string
 }
 
+/** 施術者・店主のあいさつ。写真は持たないので、名前の1文字目を文字組みで見せる */
+export interface Owner {
+  readonly role: string
+  readonly name: string
+  readonly message: string
+}
+
 export interface StoreInfo {
   readonly storeName: string
   readonly category: CategoryKey
@@ -33,6 +40,8 @@ export interface StoreInfo {
   readonly features: readonly Feature[]
   readonly menu: readonly MenuItem[]
   readonly voices: readonly Voice[]
+  /** 旧バージョンで公開（localStorage 保存）したデータには無い */
+  readonly owner?: Owner
 }
 
 export interface LPDoc {

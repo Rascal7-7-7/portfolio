@@ -58,3 +58,12 @@ export function formatDateWithWeekday(iso: string): string {
 export function estimateNumber(id: number): string {
   return `EST-${String(id).padStart(4, "0")}`;
 }
+
+/** 受注後の請求は姉妹デモ「Hikae」で管理する。デモで連携しているのは EST-0014 だけ */
+export const HIKAE_INVOICES_URL = "https://mvp-freelance-manager.vercel.app/invoices";
+const HIKAE_LINKED_IDS: readonly number[] = [14];
+
+/** 連携済みの見積なら Hikae の請求書 URL、それ以外は null */
+export function hikaeInvoiceUrl(id: number): string | null {
+  return HIKAE_LINKED_IDS.includes(id) ? `${HIKAE_INVOICES_URL}/${estimateNumber(id).toLowerCase()}` : null;
+}

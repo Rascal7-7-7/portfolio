@@ -49,8 +49,13 @@ export function infoRows(s: StoreInfo): [string, string][] {
   return rows.filter(([, v]) => v)
 }
 
-const ORDER: readonly SectionKey[] = ['features', 'menu', 'voices', 'access', 'cta']
+const ORDER: readonly SectionKey[] = ['features', 'greeting', 'menu', 'voices', 'access', 'cta']
 
-/** 実際に描画されるセクションだけを順に並べる（番号付きの見出しで使う）。品目0件のメニューは描画されないので除く */
+/** あいさつ文があるときだけ返す（旧データ・空欄では描画しない） */
+export const ownerOf = (s: StoreInfo) => (s.owner?.message ? s.owner : null)
+/** 写真の代わりに出す名前の1文字目（姓の頭文字） */
+export const initialOf = (name: string) => Array.from(name.trim())[0] ?? ''
+
+/** 実際に描画されるセクションだけを順に並べる（番号付きの見出しで使う）。品目0件のメニュー・文の無いあいさつは描画されないので除く */
 export const visibleSections = (sections: LPDoc['sections'], store: StoreInfo) =>
-  ORDER.filter((k) => sections[k] && (k !== 'menu' || menuItems(store).length > 0))
+  ORDER.filter((k) => sections[k] && (k !== 'menu' || menuItems(store).length > 0) && (k !== 'greeting' || ownerOf(store) !== null))

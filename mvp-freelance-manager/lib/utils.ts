@@ -24,3 +24,15 @@ export function toDigits(value: string): string {
     .replace(/^0+/, "")
     .slice(0, 12);
 }
+
+export const TAX_RATE = 10;
+
+/** 請求額は税込で持っているため、内税として消費税を割り戻す（1円未満切り捨て） */
+export function taxIncluded(amount: number): number {
+  return Math.floor((amount * TAX_RATE) / (100 + TAX_RATE));
+}
+
+/** 見積マネージャー（別 MVP）の該当見積ページ。"EST-0014" → /estimates/14 */
+export function estimateUrl(estimateNo: string): string {
+  return `https://mvp-estimate-manager.vercel.app/estimates/${Number(estimateNo.replace(/\D/g, ""))}`;
+}

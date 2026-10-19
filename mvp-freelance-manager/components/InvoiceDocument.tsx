@@ -1,11 +1,11 @@
 import { formatFullDate } from "@/lib/dates";
-import { formatYen } from "@/lib/utils";
+import { formatYen, TAX_RATE, taxIncluded } from "@/lib/utils";
 import type { Invoice, Project } from "@/types";
 
 /** 発行者・振込先はデモ用の架空の値。実在の口座と取り違えないよう名前でデモと分かるようにする */
 const ISSUER = {
   name: "デモ 花子",
-  trade: "Hikae デモ制作室",
+  trade: "デモワークス",
   email: "hello@example.com",
   registration: "T0000000000000",
 } as const;
@@ -13,16 +13,10 @@ const ISSUER = {
 const BANK = [
   ["銀行", "デモ銀行 サンプル支店（000）"],
   ["口座", "普通 0000000"],
-  ["名義", "デモ ハナコ"],
+  ["名義", "デモワークス デモ ハナコ"],
 ] as const;
 
-const TAX_RATE = 10;
 const CELL = "px-2 py-2";
-
-/** 請求額は税込で持っているため、内税として消費税を割り戻す（1円未満切り捨て） */
-function taxIncluded(amount: number): number {
-  return Math.floor((amount * TAX_RATE) / (100 + TAX_RATE));
-}
 
 /**
  * 和文の請求書。組版は見積管理の見積書にそろえる：
@@ -32,6 +26,7 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
   const tax = taxIncluded(invoice.amount);
   const subtotal = invoice.amount - tax;
   const subject = project?.name ?? "（削除された案件）";
+  const items = invoice.items ?? [{ name: subject, qty: "1 式", amount: subtotal }];
 
   return (
     <article
@@ -43,6 +38,12 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
         <dd className="text-right">{invoice.number}</dd>
         <dt>発行日</dt>
         <dd className="text-right">{formatFullDate(invoice.issuedOn)}</dd>
+        {invoice.estimateNo && (
+          <>
+            <dt>見積番号</dt>
+            <dd className="text-right">{invoice.estimateNo}</dd>
+          </>
+        )}
       </dl>
 
       {/* 和文帳票の表題は字間を空けて中央に置くのが通例 */}
@@ -100,11 +101,13 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b border-line align-top">
-              <td className={CELL}>{subject}</td>
-              <td className={`${CELL} num text-right whitespace-nowrap`}>1 式</td>
-              <td className={`${CELL} num text-right whitespace-nowrap`}>{formatYen(subtotal)}</td>
-            </tr>
+            {items.map((item, i) => (
+              <tr key={i} className="border-b border-line align-top">
+                <td className={CELL}>{item.name}</td>
+                <td className={`${CELL} num text-right whitespace-nowrap`}>{item.qty}</td>
+                <td className={`${CELL} num text-right whitespace-nowrap`}>{formatYen(item.amount)}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

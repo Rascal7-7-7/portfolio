@@ -1,6 +1,7 @@
 import { CATEGORIES } from '@/lib/categories'
 import { cx } from '@/lib/cx'
-import { catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, Phrases, storeName, type TemplateProps } from './shared'
+import MobileBar, { HERO_CTA } from './MobileBar'
+import { catchCopy, ctaLabel, hoursWord, infoRows, initialOf, menuItems, menuTitle, ownerOf, Phrases, storeName, type TemplateProps } from './shared'
 
 /*
  * ポップ: 街の整体院・教室のサイト（STUDIO「ぬくもり鍼灸・整骨院」の白い箱に載せた見出し・
@@ -8,6 +9,7 @@ import { catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, Phrases
  * 英字の小見出しと大きな通し番号は「AI 製 LP の型」に見えるため使わず、和文の見出しだけにする。
  * 写真の代わりに珊瑚色の大きな色面を置き、見出しだけを白い箱で切り抜く。
  * カードは使わず、線と色面（白／クリーム）の切り替えで区切る。影・グラデーションは使わない。
+ * 見出しは左揃え・飾りなし（中央寄せ＋短い下線はテンプレートの型に見える）。締めの色面だけ中央に組む。
  */
 const NAVY = 'text-[#1f2a37]'
 const MUTED = 'text-[#1f2a37]/75' // 白・クリーム地で約 5:1 以上
@@ -20,19 +22,15 @@ const BTN =
   'inline-flex items-center justify-center rounded-lg bg-[#1f2a37] px-7 py-4 text-sm font-bold text-white transition-colors hover:bg-[#33435a]'
 
 const pad = (wide: boolean) => (wide ? 'px-14 py-24' : 'px-5 py-16')
+/** 見出しと本文の左端をそろえる共通の幅 */
+const WRAP = 'mx-auto max-w-4xl'
 
-/**
- * 和文の見出しだけ。英字の小見出し（FEATURES 等）は「AI 製 LP の型」に見えるので置かない。
- * 下に珊瑚色の短い太線を敷いて、色面と同じ色で全体をつなぐ
- */
-function H2({ text, lead, wide, onColor }: { text: string; lead?: string; wide: boolean; onColor?: boolean }) {
+/** 和文の見出しだけ。英字の小見出し（FEATURES 等）・下線などの飾りは置かず、左揃えの太字で組む */
+function H2({ text, lead, wide }: { text: string; lead?: string; wide: boolean }) {
   return (
-    <div className="text-center">
-      <h2 className={cx('font-extrabold leading-snug', wide ? 'text-[32px]' : 'text-[24px]')}>
-        <Phrases text={text} lead={lead} />
-      </h2>
-      <span aria-hidden className={cx('mx-auto mt-4 block h-1.5 w-12 rounded-full', onColor ? 'bg-[#1f2a37]' : CORAL)} />
-    </div>
+    <h2 className={cx('font-extrabold leading-snug', wide ? 'text-[32px]' : 'text-[24px]')}>
+      <Phrases text={text} lead={lead} />
+    </h2>
   )
 }
 
@@ -97,7 +95,7 @@ function Hero(props: TemplateProps) {
             </h1>
             {store.description && <p className="mt-8 max-w-[30em] text-[15px] font-medium leading-[1.9]">{store.description}</p>}
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
-              <a href="#reserve" className={BTN}>{ctaLabel(store)}</a>
+              <a href="#reserve" className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
               <a href="#menu" className={cx('border-b-2 pb-0.5 text-sm font-bold', RULE)}>料金を見る</a>
             </div>
           </div>
@@ -111,18 +109,19 @@ function Hero(props: TemplateProps) {
 function Features({ store, wide }: TemplateProps) {
   return (
     <section className={pad(wide)}>
+      <div className={WRAP}>
       <H2 lead={`${storeName(store)}が`} text="選ばれる理由" wide={wide} />
       {/*
         「3列の特長カード」はテンプレートの型に見えるので使わない。PC では見出しと本文を横に組んだ段を
-        左右交互にずらして置き、読む順に視線が蛇行するようにする（手本の整骨院サイトの「理由」の組み方）
+        左端をそろえて縦に積む（左右交互のずらしは配置のずれに見えるのでやめた）
       */}
-      <ul className={cx('mx-auto mt-12 max-w-5xl', wide ? 'space-y-12' : 'border-b', LINE)}>
-        {store.features.map((f, i) => (
+      <ul className={cx('mt-12', wide ? 'space-y-12' : 'border-b', LINE)}>
+        {store.features.map((f) => (
           <li
             key={f.title}
             className={cx(
               wide
-                ? cx('grid w-[78%] grid-cols-[minmax(0,15em)_minmax(0,1fr)] items-baseline gap-10 border-t-2 pt-6', RULE, i % 2 === 1 && 'ml-auto')
+                ? cx('grid grid-cols-[minmax(0,15em)_minmax(0,1fr)] items-baseline gap-10 border-t-2 pt-6', RULE)
                 : cx('border-t py-7', LINE),
             )}
           >
@@ -131,6 +130,34 @@ function Features({ store, wide }: TemplateProps) {
           </li>
         ))}
       </ul>
+      </div>
+    </section>
+  )
+}
+
+/**
+ * 院長のあいさつ。写真の代わりに姓の1文字目をクリームの角の面に大きく組む（丸い枠のアイコンにはしない）
+ */
+function Greeting({ store, wide }: TemplateProps) {
+  const owner = ownerOf(store)
+  if (!owner) return null
+  return (
+    <section className={cx(pad(wide), '!pt-0')}>
+      <div className={WRAP}>
+      <div className={cx('border-t-2 pt-12', RULE, wide && 'grid grid-cols-[180px_minmax(0,1fr)] gap-12')}>
+        <p aria-hidden className={cx(CREAM, ACCENT, 'flex aspect-square items-center justify-center rounded-lg font-extrabold leading-none', wide ? 'text-[88px]' : 'w-24 text-[48px]')}>
+          {initialOf(owner.name)}
+        </p>
+        <div className={cx(!wide && 'mt-8')}>
+          <H2 text={`${owner.role}からのご挨拶`} wide={wide} />
+          <p className="mt-6 max-w-[36em] text-[15px] font-medium leading-[1.95]">{owner.message}</p>
+          <p className="mt-6 text-sm font-extrabold">
+            <span className={cx(MUTED, 'mr-3')}>{owner.role}</span>
+            {owner.name}
+          </p>
+        </div>
+      </div>
+      </div>
     </section>
   )
 }
@@ -140,8 +167,9 @@ function Menu({ store, wide }: TemplateProps) {
   if (items.length === 0) return null
   return (
     <section id="menu" className={cx(CREAM, pad(wide))}>
+      <div className={WRAP}>
       <H2 text={menuTitle(store)} wide={wide} />
-      <ul className={cx('mx-auto mt-12 max-w-3xl divide-y divide-[#1f2a37]/15 border-y-2', RULE)}>
+      <ul className={cx('mt-10 divide-y divide-[#1f2a37]/15 border-y-2', RULE)}>
         {items.map((m) => (
           <li key={m.name} className={cx('flex items-center justify-between gap-4', wide ? 'px-2 py-6' : 'py-5')}>
             <div className="min-w-0">
@@ -152,6 +180,7 @@ function Menu({ store, wide }: TemplateProps) {
           </li>
         ))}
       </ul>
+      </div>
     </section>
   )
 }
@@ -159,8 +188,9 @@ function Menu({ store, wide }: TemplateProps) {
 function Voices({ store, wide }: TemplateProps) {
   return (
     <section className={pad(wide)}>
+      <div className={WRAP}>
       <H2 text="お客様の声" wide={wide} />
-      <div className={cx('mx-auto mt-12 grid max-w-4xl', wide ? 'grid-cols-2 gap-12' : 'gap-10')}>
+      <div className={cx('mt-12 grid', wide ? 'grid-cols-2 gap-12' : 'gap-10')}>
         {store.voices.map((v) => (
           <figure key={v.name} className={cx('border-t-2 pt-6', RULE)}>
             <span aria-hidden className={cx(ACCENT, 'block text-[44px] font-extrabold leading-[0.6]')}>“</span>
@@ -169,6 +199,7 @@ function Voices({ store, wide }: TemplateProps) {
           </figure>
         ))}
       </div>
+      </div>
     </section>
   )
 }
@@ -176,8 +207,10 @@ function Voices({ store, wide }: TemplateProps) {
 function Access({ store, wide }: TemplateProps) {
   return (
     <section id="access" className={cx(CREAM, pad(wide))}>
+      <div className={cx(WRAP, wide && 'grid grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] items-start gap-12')}>
+      {/* アクセスは見出しを左の列に置き、表を右に組む */}
       <H2 text={`アクセス・${hoursWord(store)}時間`} wide={wide} />
-      <dl className={cx('mx-auto mt-12 max-w-2xl border-y-2 text-sm', RULE)}>
+      <dl className={cx('border-y-2 text-sm', RULE, !wide && 'mt-10')}>
         {infoRows(store).map(([k, v]) => (
           <div key={k} className={cx(LINE, 'grid grid-cols-[6em_minmax(0,1fr)] gap-4 border-b py-4 last:border-b-0', wide && 'px-2')}>
             <dt className="font-extrabold">{k}</dt>
@@ -185,6 +218,7 @@ function Access({ store, wide }: TemplateProps) {
           </div>
         ))}
       </dl>
+      </div>
     </section>
   )
 }
@@ -193,7 +227,9 @@ function Cta({ store, wide }: TemplateProps) {
   return (
     <section id="reserve" className={wide ? 'p-6' : 'p-3'}>
       <div className={cx('rounded-lg text-center', CORAL, wide ? 'px-14 py-20' : 'px-5 py-14')}>
-        <H2 text="まずはお気軽にご予約ください" wide={wide} onColor />
+        <h2 className={cx('font-extrabold leading-snug', wide ? 'text-[36px]' : 'text-[26px]')}>
+          <Phrases text="まずはお気軽にご予約ください" />
+        </h2>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
           <a href="#reserve" className={BTN}>{ctaLabel(store)}</a>
           {store.phone && (
@@ -215,11 +251,18 @@ export default function PopPage(props: TemplateProps) {
       <Nav {...props} />
       <Hero {...props} />
       {sections.features && <Features {...props} />}
+      {sections.greeting && <Greeting {...props} />}
       {sections.menu && <Menu {...props} />}
       {sections.voices && <Voices {...props} />}
       {sections.access && <Access {...props} />}
       {sections.cta && <Cta {...props} />}
       <footer className={cx(MUTED, 'px-6 py-10 text-center text-xs font-bold')}>© {storeName(store)}</footer>
+      {!props.wide && (
+        <MobileBar
+          store={store}
+          tone={{ bar: 'border-[#1f2a37]/15 bg-white', tel: 'border-[#1f2a37] bg-white text-[#1f2a37]', web: cx(CORAL, 'text-[#1f2a37]') }}
+        />
+      )}
     </div>
   )
 }

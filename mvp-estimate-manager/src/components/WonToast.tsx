@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useEstimates } from "@/lib/store";
-import { estimateNumber, formatYen } from "@/lib/utils";
+import { estimateNumber, formatYen, hikaeInvoiceUrl } from "@/lib/utils";
 import Icon from "@/components/Icon";
 
 const SHOW_MS = 6000;
+const TOAST_LINK =
+  "mt-1 inline-block text-xs font-semibold underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
 /**
  * お客様が承認したあと、管理画面に戻った時点で「受注しました」を知らせる。
@@ -17,6 +19,7 @@ export default function WonToast() {
   const { wonToast, clearWonToast } = useEstimates();
   const pathname = usePathname();
   const visible = wonToast !== null && !pathname.endsWith("/customer");
+  const invoiceUrl = wonToast ? hikaeInvoiceUrl(wonToast.id) : null;
 
   useEffect(() => {
     if (!visible) return;
@@ -42,8 +45,14 @@ export default function WonToast() {
               <span className="inline-block">「{wonToast.subject}」</span>
               <span className="inline-block">をお客様が承認しました</span>
             </p>
-            {pathname !== "/estimates" && (
-              <Link href="/estimates" className="mt-1 inline-block text-xs font-semibold underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+            {/* 次の一手は1つだけ。Hikae と連携済みの見積なら請求書へ、それ以外は一覧の受注金額へ */}
+            {invoiceUrl ? (
+              <a href={invoiceUrl} target="_blank" rel="noopener noreferrer" className={TOAST_LINK}>
+                Hikae で請求書を見る（デモ）
+                <span className="sr-only">（新しいタブで開きます）</span>
+              </a>
+            ) : pathname !== "/estimates" && (
+              <Link href="/estimates" className={TOAST_LINK}>
                 一覧で受注金額を見る
               </Link>
             )}

@@ -24,6 +24,11 @@ export function PaidToast() {
     return () => window.clearTimeout(timer);
   }, [key]);
 
+  // 別の画面へ移ったら消す（請求書画面まで付いてきて、スマホで明細を隠さないように）
+  useEffect(() => {
+    actions.clearPaidToast();
+  }, [pathname]);
+
   const href = toast ? `/invoices/${toast.invoiceId}` : "";
 
   return (

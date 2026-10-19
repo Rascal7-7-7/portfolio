@@ -11,7 +11,8 @@ import Icon from "@/components/Icon";
 import LoadingState from "@/components/LoadingState";
 import NotFoundState from "@/components/NotFoundState";
 
-/** 明細の要約で見せる行数。超えた分は「ほか N 件」にまとめる */
+/** 明細の要約で全部見せる上限。超えたときだけ先頭 SUMMARY_ROWS 行＋「ほか N 件」にまとめる */
+const SUMMARY_MAX = 4;
 const SUMMARY_ROWS = 3;
 
 const FOCUS = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
@@ -28,14 +29,15 @@ export default function CustomerView({ id }: { id: number }) {
   if (!estimate) return <NotFoundState />;
 
   const items = estimate.items.filter((item) => item.name.trim() !== "");
-  const { subtotal, tax, total } = calcTotals(items);
-  const shown = items.slice(0, SUMMARY_ROWS);
-  const rest = items.slice(SUMMARY_ROWS);
+  const { tax, total } = calcTotals(items);
+  const shown = items.length <= SUMMARY_MAX ? items : items.slice(0, SUMMARY_ROWS);
+  const rest = items.slice(shown.length);
 
   return (
-    // 管理画面のサイドバー・下部ナビを隠して、お客様が見る画面だけを全面に出す
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-canvas">
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-navy px-4 py-2 text-xs text-white">
+    // 管理画面のサイドバー・下部ナビを隠して、お客様が見る画面だけを全面に出す。
+    // 印刷（Cmd+P）では要約・操作を外し、正式な見積書だけを紙に出す
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-canvas print:static print:overflow-visible print:bg-white">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-navy px-4 py-2 text-xs text-white print:hidden">
         <p className="text-balance">デモ：お客様が送付メールのリンクから開く画面です（実際の送信はしていません）</p>
         <Link href={`/estimates/${estimate.id}`} className={`inline-flex items-center gap-1 font-semibold underline underline-offset-2 ${FOCUS}`}>
           <Icon name="back" className="h-3.5 w-3.5" />
@@ -43,13 +45,14 @@ export default function CustomerView({ id }: { id: number }) {
         </Link>
       </div>
 
-      <div className="mx-auto max-w-lg px-4 pt-8 sm:pt-12">
+      <div className="mx-auto max-w-lg px-4 pt-8 sm:pt-12 print:hidden">
         <p className="text-sm font-semibold text-navy">{ISSUER.name}</p>
 
         <section aria-label="お見積り" className="mt-4 rounded-lg border border-line bg-white shadow-sm">
           <div className="p-6">
             <p className="text-sm text-body">お見積り金額（税込）</p>
             <p className="tnum mt-1 text-4xl font-semibold tracking-tight text-navy">{formatYen(total)}</p>
+            <p className="tnum mt-1 text-xs text-muted">うち消費税（{TAX_RATE_PERCENT}%）{formatYen(tax)}</p>
             <ExpiryNote validUntil={estimate.validUntil} />
 
             <dl className="mt-6 grid grid-cols-[5.5em_minmax(0,1fr)] gap-y-2 text-sm">
@@ -92,20 +95,6 @@ export default function CustomerView({ id }: { id: number }) {
                 </li>
               )}
             </ul>
-            <dl className="tnum mt-4 space-y-1 border-t border-line pt-3 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-body">小計</dt>
-                <dd className="text-navy">{formatYen(subtotal)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-body">消費税（{TAX_RATE_PERCENT}%）</dt>
-                <dd className="text-navy">{formatYen(tax)}</dd>
-              </div>
-              <div className="flex justify-between pt-1 font-semibold text-navy">
-                <dt>合計（税込）</dt>
-                <dd>{formatYen(total)}</dd>
-              </div>
-            </dl>
           </div>
         </section>
       </div>
@@ -114,7 +103,7 @@ export default function CustomerView({ id }: { id: number }) {
         管理側と同じ紙面（角印つき）。承認の前に正式な見積書を確かめられるよう、折りたたみで添える。
         閉じた状態は上のカードと同じ幅、開くと帳票が読める幅（max-w-3xl）まで広げる
       */}
-      <details className="group mx-auto mt-4 max-w-3xl px-4">
+      <details className="group mx-auto mt-4 max-w-3xl px-4 print:hidden">
         <summary
           className={`mx-auto flex max-w-[calc(32rem-2rem)] cursor-pointer list-none items-center justify-between gap-2 rounded-lg border border-line bg-white px-6 py-4 text-sm font-semibold text-navy shadow-sm hover:bg-canvas [&::-webkit-details-marker]:hidden ${FOCUS}`}
         >
@@ -129,10 +118,15 @@ export default function CustomerView({ id }: { id: number }) {
         </div>
       </details>
 
-      <div className="mx-auto max-w-lg px-4 pb-12">
+      <div className="mx-auto max-w-lg px-4 pb-12 print:hidden">
         <p className="mt-6 text-balance text-center text-xs text-muted">
           ご不明な点は {ISSUER.name}<span className="whitespace-nowrap">（TEL {ISSUER.tel}）</span>までお問い合わせください。
         </p>
+      </div>
+
+      {/* 折りたたみの中身は閉じていると印刷されないため、印刷用に見積書をもう1つ置く */}
+      <div className="hidden print:block">
+        <EstimateDocument estimate={estimate} id={estimate.id} />
       </div>
     </div>
   );

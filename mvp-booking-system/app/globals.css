@@ -38,16 +38,17 @@
   --color-staff2: #7489a6;
   --color-staff2-soft: #f5f7fb;
 
-  /* 週表示のメニュー種別。状態色（attn）・accent・担当色と取り違えないよう、彩度を落とした淡色にしている。
-     地はごく淡く、左の線だけ少し濃くして区別する（文字はいつもの ink / dim のまま） */
-  --color-menu-cut: #e9f2f3;
-  --color-menu-cut-line: #6f9aa0;
-  --color-menu-color: #f1eff7;
-  --color-menu-color-line: #9a8fb8;
-  --color-menu-perm: #eff3ea;
-  --color-menu-perm-line: #8ea07a;
-  --color-menu-care: #f3f1ee;
-  --color-menu-care-line: #a49b8f;
+  /* 週表示のメニュー種別。状態色（attn）・accent・担当色と取り違えないよう、彩度は低いまま。
+     色相だけだと見分けにくいので、カット→カラー→パーマ→ケアの順に地の明度を一段ずつ下げている。
+     左の線は地に対して 3:1 以上。文字はいつもの ink / dim で、いちばん濃い care の地でも dim が 4.5:1 を超える */
+  --color-menu-cut: #e3eff1;
+  --color-menu-cut-line: #4e8088;
+  --color-menu-color: #e8e3f2;
+  --color-menu-color-line: #7566a3;
+  --color-menu-perm: #d9e4cd;
+  --color-menu-perm-line: #617b4b;
+  --color-menu-care: #e4ddd3;
+  --color-menu-care-line: #7f7262;
 
   --color-chat: #8de055;       /* 送信文面の吹き出し（LINE のトーク画面の緑）。この用途以外には使わない */
 

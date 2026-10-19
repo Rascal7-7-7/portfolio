@@ -2,7 +2,8 @@ import type { ReactNode } from 'react'
 import { CATEGORIES } from '@/lib/categories'
 import { cx } from '@/lib/cx'
 import type { SectionKey } from '@/lib/types'
-import { catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, num, Phrases, storeName, visibleSections, type TemplateProps } from './shared'
+import MobileBar, { HERO_CTA } from './MobileBar'
+import { catchCopy, ctaLabel, hoursWord, infoRows, initialOf, menuItems, menuTitle, num, ownerOf, Phrases, storeName, visibleSections, type TemplateProps } from './shared'
 
 /*
  * モダン: 美容室のエディトリアルなサイト（STUDIO「muku」の「02 — ABOUT」番号付き見出し）を手本にした構成。
@@ -60,7 +61,7 @@ function Hero({ store, wide }: TemplateProps) {
             </ul>
           )}
           <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-4">
-            <a href="#reserve" className={BTN}>{ctaLabel(store)}</a>
+            <a href="#reserve" className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
             <a href="#menu" className="border-b border-white/40 pb-0.5 text-sm hover:border-white">{menuTitle(store)}</a>
           </div>
         </div>
@@ -87,6 +88,7 @@ export default function ModernPage(props: TemplateProps) {
   const order = visibleSections(sections, store)
   const idx = (k: SectionKey) => order.indexOf(k)
   const items = menuItems(store)
+  const owner = ownerOf(store)
   return (
     <div className="min-h-full bg-[#0e0e0e] text-[#f2f0eb]">
       <Nav {...props} />
@@ -102,6 +104,22 @@ export default function ModernPage(props: TemplateProps) {
               </li>
             ))}
           </ol>
+        </Block>
+      )}
+
+      {sections.greeting && owner && (
+        <Block index={idx('greeting')} title={<Phrases text={`${owner.role}からのご挨拶`} />} wide={wide}>
+          {/* 写真の代わりに姓の1文字目を金で大きく組む。枠や丸では囲まない */}
+          <div className={cx(wide && 'grid grid-cols-[auto_minmax(0,1fr)] gap-10')}>
+            <p aria-hidden className={cx(ACCENT, 'font-mincho font-semibold leading-none', wide ? 'text-[88px]' : 'text-[56px]')}>{initialOf(owner.name)}</p>
+            <div className={cx(!wide && 'mt-6')}>
+              <p className={cx('leading-[1.9]', wide ? 'text-[19px]' : 'text-base')}>{owner.message}</p>
+              <p className="mt-6 text-sm">
+                <span className={cx(MUTED, 'mr-3 text-xs')}>{owner.role}</span>
+                {owner.name}
+              </p>
+            </div>
+          </div>
         </Block>
       )}
 
@@ -163,6 +181,12 @@ export default function ModernPage(props: TemplateProps) {
         <span>{storeName(store)}</span>
         <span>© {storeName(store)}</span>
       </footer>
+      {!wide && (
+        <MobileBar
+          store={store}
+          tone={{ bar: 'border-white/15 bg-[#0e0e0e]', tel: 'border-[#f2f0eb]/60 text-[#f2f0eb]', web: 'bg-[#f2f0eb] text-[#0e0e0e]' }}
+        />
+      )}
     </div>
   )
 }

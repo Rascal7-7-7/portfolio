@@ -29,8 +29,13 @@ test.describe("トップページ", () => {
       await img.scrollIntoViewIfNeeded();
       await expect(img).toBeVisible();
       await expect(img).toHaveAttribute("alt", /.+/);
-      // 画像が実際に読み込めている（404 で壊れた画像になっていない）
-      expect(await img.evaluate((el) => (el as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+      // 画像が実際に読み込めている（404 で壊れた画像になっていない）。
+      // 遅延読み込みのため、スクロール直後はまだ読み込み中のことがある。読み込み終わりを待つ
+      await expect
+        .poll(() => img.evaluate((el) => (el as HTMLImageElement).naturalWidth), {
+          message: `${project.slug} の画像が読み込めない`,
+        })
+        .toBeGreaterThan(0);
     }
   });
 

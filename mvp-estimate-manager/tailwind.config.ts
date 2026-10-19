@@ -6,7 +6,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: { DEFAULT: "#533afd", hover: "#4434d4", soft: "#eeebff" },
+        // 主色は帳票・業務ツールらしい深い藍（白地 9.4:1）。アクセントはこの1色だけ
+        primary: { DEFAULT: "#24467a", hover: "#1b365f", soft: "#e9eef5" },
         navy: "#061b31",
         body: "#425466",
         muted: "#5f6f87",

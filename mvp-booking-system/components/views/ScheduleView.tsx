@@ -137,7 +137,11 @@ function DaySection({ date, offset, today, reservations, now, nowMin, staff, onS
 }) {
   const list = sortByDateTime(reservations.filter(r => r.reservation_date === date));
   // 「予約件数」と重ならない指標として、まだ予約を受けられる枠を出す（本日は過ぎた時刻を除く）
-  const open = date < today ? 0 : availableSlots(reservations, date, SHORTEST.minutes, date === today ? now : 0).length;
+  const notBefore = date === today ? now : 0;
+  const open = date < today ? 0 : availableSlots(reservations, date, SHORTEST.minutes, notBefore).length;
+  // 予約が無くても枠が残らない＝営業時間が終わっている。満席の「0枠」と見分けられるよう言葉で出す
+  const closed = date < today || availableSlots([], date, SHORTEST.minutes, notBefore).length === 0;
+  const beforeOpen = date === today && now < OPEN_MIN;
   const unnotified = list.filter(needsAttention);
   const byStaff = (s: Staff) => list.filter(r => r.staff === s);
 
@@ -161,7 +165,9 @@ function DaySection({ date, offset, today, reservations, now, nowMin, staff, onS
 
       <StatStrip items={[
         { label: '予約件数', value: list.length },
-        { label: '空き枠', value: open, unit: '枠', note: `${SHORTEST.minutes}分メニューで予約できる開始時刻` },
+        closed
+          ? { label: '空き枠', value: '受付終了', note: date < today ? '過ぎた日です' : `本日の営業は${toTime(CLOSE_MIN)}まで` }
+          : { label: '空き枠', value: open, unit: '枠', note: `${beforeOpen ? `開店前（${toTime(OPEN_MIN)}〜）・` : ''}${SHORTEST.minutes}分メニューで予約できる開始時刻` },
         { label: '未通知', value: unnotified.length, alert: unnotified.length > 0 },
       ]} />
 

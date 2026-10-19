@@ -12,6 +12,7 @@ import { TaskRow } from "@/components/TaskRow";
 import { TaskQuickAdd } from "@/components/TaskQuickAdd";
 import { InvoiceList } from "@/components/InvoiceList";
 import { InvoiceForm } from "@/components/InvoiceForm";
+import { EstimateSource, ExternalLink } from "@/components/ExternalLink";
 import { PROJECT_STATUS_LABEL, PROJECT_STATUSES, type ProjectStatus } from "@/types";
 
 const ACTIVITY_ICON: Record<ActivityItem["kind"], typeof FileText> = {
@@ -87,6 +88,17 @@ export function ProjectDetailView({ id }: { id: string }) {
           <div className="min-w-0">
             <p className="text-sm text-warm-500">{project.client}</p>
             <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-ink sm:text-2xl">{project.name}</h1>
+            {(project.estimateNo || project.deliverableUrl) && (
+              <div className="mt-2 flex flex-col gap-1 text-xs">
+                {project.estimateNo && <EstimateSource estimateNo={project.estimateNo} />}
+                {project.deliverableUrl && (
+                  <span className="inline-flex flex-wrap items-center gap-x-2">
+                    <span className="text-warm-500">納品物（デモ）</span>
+                    <ExternalLink href={project.deliverableUrl}>{project.deliverableUrl.replace(/^https:\/\//, "")}</ExternalLink>
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           <label className="flex shrink-0 flex-col text-xs font-medium text-warm-900">
             ステータス

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Estimate, EstimateStatus } from "@/types";
 import { useEstimates } from "@/lib/store";
 import { calcTotals } from "@/lib/calc";
-import { estimateNumber, formatShortDate, formatYen } from "@/lib/utils";
+import { estimateNumber, formatShortDate, formatYen, HIKAE_INVOICES_URL, hikaeInvoiceUrl } from "@/lib/utils";
 import EstimateDocument from "@/components/EstimateDocument";
 import Icon, { type IconName } from "@/components/Icon";
 import LoadingState from "@/components/LoadingState";
@@ -54,7 +54,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
   const estimate = estimates.find((e) => e.id === id);
   if (!estimate) return <NotFoundState />;
 
-  // 主ボタンは1つだけ。下書きは「送付済みにする」、送付後は承認の流れを見せる「お客様の画面」
+  // 主ボタンは1つだけ。下書きは「送付済みにする」、送付後は承認の流れを見せる「お客様の画面」、受注後は Hikae の請求書
   const actions = ACTIONS[estimate.status];
   const primary = estimate.status === "draft" ? actions[0] : null;
   const others = primary ? actions.slice(1) : actions;
@@ -100,11 +100,10 @@ export default function EstimateDetail({ id, justSaved }: Props) {
                 <Icon name={primary.icon} />
                 {primary.label}
               </button>
+            ) : estimate.status === "won" ? (
+              <HikaeLink id={estimate.id} />
             ) : (
-              <Link href={`/estimates/${estimate.id}/customer`} className={`${BUTTON} ${TONE_CLASS.primary}`}>
-                <Icon name="eye" />
-                お客様の画面を見る（デモ）
-              </Link>
+              <CustomerLink id={estimate.id} className={`${BUTTON} ${TONE_CLASS.primary}`} />
             )}
             <MoreMenu>
               {(close) => (
@@ -115,6 +114,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
                       {action.label}
                     </button>
                   ))}
+                  {estimate.status === "won" && <CustomerLink id={estimate.id} className={MENU_ITEM} />}
                   <Link href={`/estimates/${estimate.id}/edit`} className={MENU_ITEM}>
                     <Icon name="edit" />
                     編集
@@ -144,6 +144,39 @@ export default function EstimateDetail({ id, justSaved }: Props) {
       </div>
       </div>
     </div>
+  );
+}
+
+function CustomerLink({ id, className }: { id: number; className: string }) {
+  return (
+    <Link href={`/estimates/${id}/customer`} className={className}>
+      <Icon name="eye" />
+      お客様の画面を見る（デモ）
+    </Link>
+  );
+}
+
+/** 受注後の次の一手。請求は姉妹デモ Hikae で扱う。連携先があるのは EST-0014 だけなので、ほかは案内に留める */
+function HikaeLink({ id }: { id: number }) {
+  const url = hikaeInvoiceUrl(id);
+  if (!url) {
+    return (
+      <p className="self-center text-balance text-sm text-body">
+        請求は{" "}
+        <a href={HIKAE_INVOICES_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline underline-offset-2 hover:text-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
+          Hikae
+          <span className="sr-only">（新しいタブで開きます）</span>
+        </a>{" "}
+        で管理します<span className="inline-block">（デモでは EST-0014 のみ連携）</span>
+      </p>
+    );
+  }
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" className={`${BUTTON} ${TONE_CLASS.primary}`}>
+      <Icon name="file" />
+      Hikae で請求書を見る（デモ）
+      <span className="sr-only">（新しいタブで開きます）</span>
+    </a>
   );
 }
 
