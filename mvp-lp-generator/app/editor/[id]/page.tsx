@@ -1,10 +1,16 @@
 import { notFound } from 'next/navigation'
-import LPForm from '@/components/LPForm'
-import { getLandingPageById } from '@/lib/queries'
+import Editor from '@/components/editor/Editor'
+import { findSampleById, SAMPLES } from '@/lib/samples'
 
-export default async function EditorEditPage({ params }: { params: Promise<{ id: string }> }) {
+export const dynamicParams = false
+
+export function generateStaticParams() {
+  return SAMPLES.map((s) => ({ id: s.id }))
+}
+
+export default async function EditorPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const lp = await getLandingPageById(Number(id))
-  if (!lp) notFound()
-  return <LPForm initial={lp} />
+  const sample = findSampleById(id)
+  if (!sample) notFound()
+  return <Editor initial={sample} />
 }
