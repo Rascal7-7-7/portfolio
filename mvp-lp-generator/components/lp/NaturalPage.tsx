@@ -32,7 +32,7 @@ function H2({ text, lead, wide }: { text: string; lead?: string; wide: boolean }
 
 function Nav({ store, wide }: TemplateProps) {
   return (
-    <nav className={cx('sticky top-0 z-10 flex items-center justify-between bg-[#f7f3ec]/95', wide ? 'px-16 py-6' : 'px-6 py-4')}>
+    <nav className={cx('sticky top-0 z-10 flex items-center justify-between bg-[#f7f3ec]', wide ? 'px-16 py-6' : 'px-6 py-4')}>
       <span className="truncate font-mincho text-lg font-semibold tracking-[0.14em]">{storeName(store)}</span>
       <div className="flex shrink-0 items-center gap-8 text-[13px] tracking-[0.12em]">
         {wide && (

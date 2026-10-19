@@ -84,7 +84,7 @@ function Block({ id, index, title, wide, children }: { id?: string; index: numbe
 
 export default function ModernPage(props: TemplateProps) {
   const { store, sections, wide } = props
-  const order = visibleSections(sections)
+  const order = visibleSections(sections, store)
   const idx = (k: SectionKey) => order.indexOf(k)
   const items = menuItems(store)
   return (

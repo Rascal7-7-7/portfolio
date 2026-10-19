@@ -18,7 +18,7 @@ function GenerateButton({ onClick, className }: { onClick: () => void; className
     <button
       type="button"
       onClick={onClick}
-      className={cx(className, 'w-full rounded-md bg-accent py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0862c4]')}
+      className={cx(className, 'w-full rounded-md bg-ed-ink py-3 text-sm font-semibold text-white transition-colors hover:bg-[#33333a]')}
     >
       LPを生成する
     </button>

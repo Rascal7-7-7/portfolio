@@ -25,7 +25,7 @@ export default function PublishedView({ slug }: { slug: string }) {
       <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-ed-bg px-6 text-center">
         <h1 className="text-lg font-semibold">ページが見つかりません</h1>
         <p className="text-sm text-ed-muted">このURLのLPは、このブラウザではまだ公開されていません。</p>
-        <Link href="/editor/1" className="mt-3 rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-white">エディタでLPを作る</Link>
+        <Link href="/editor/1" className="mt-3 rounded-md bg-ed-ink px-5 py-2.5 text-sm font-semibold text-white">エディタでLPを作る</Link>
       </main>
     )
   }
