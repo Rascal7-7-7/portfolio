@@ -1,7 +1,7 @@
 // 実行: npm test（node --test。Node 22.18+ / 24 の型ストリップで TS を直接実行する）
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { calcTotals, includedTax, taxLines, monthlyEquivalent, remainingForFreeShipping, unitPrice } from './pricing.ts';
+import { calcTotals, includedTax, perServing, taxLines, monthlyEquivalent, remainingForFreeShipping, unitPrice } from './pricing.ts';
 import { addMonths, firstDelivery, formatJa, nextAfter } from './date.ts';
 
 test('定期便は10%OFF、単品は定価', () => {
@@ -72,4 +72,15 @@ test('内訳に出す消費税は 0 円の税率を省く（8% だけ・10% だ�
     { rate: 10, amount: 60 },
   ]);
   assert.deepEqual(taxLines({ 8: 0, 10: 0 }), []);
+});
+
+test('1回あたりの目安：内容量に杯数・包数がある商品だけ、1円未満は四捨五入', () => {
+  const size = (value: string) => [{ label: '内容量', value }];
+  assert.deepEqual(perServing(2232, size('200g（約20杯分）')), { unit: '杯', amount: 112 }); // 111.6 → 112
+  assert.deepEqual(perServing(1782, size('15包（ティーバッグ）')), { unit: '包', amount: 119 }); // 118.8 → 119
+  assert.deepEqual(perServing(2250, size('約20杯分')), { unit: '杯', amount: 113 }); // 112.5 → 113
+  assert.equal(perServing(3240, size('50g（缶入り）')), null);
+  assert.equal(perServing(2200, size('250ml')), null);
+  assert.equal(perServing(2200, [{ label: '産地', value: '20杯' }]), null);
+  assert.equal(perServing(2200, size('0杯分')), null);
 });

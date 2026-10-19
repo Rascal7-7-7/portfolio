@@ -6,6 +6,7 @@ import { BRAND, PRODUCTS, findProduct } from '@/lib/catalog';
 import { ProductVisual } from '@/components/ProductVisual';
 import { Phrases } from '@/components/Phrases';
 import { PlanPicker } from './_components/PlanPicker';
+import { unitPrice, yen } from '@/lib/pricing';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -15,7 +16,12 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const product = findProduct((await params).id);
-  return { title: product ? `${product.name} — ${BRAND.en}` : BRAND.en };
+  if (!product) return { title: BRAND.en };
+  const tagline = product.taglineParts.join('');
+  const size = product.specs.find((s) => s.label === '内容量')?.value;
+  const description = `${tagline}${size ? `内容量${size}。` : ''}定期便は${yen(unitPrice(product.price, 'monthly'))}（税込・10%OFF・送料無料）。`;
+  const title = `${product.name}の定期便 — ${BRAND.en}`;
+  return { title, description, openGraph: { title, description } };
 }
 
 export default async function ProductDetailPage({ params }: Params) {

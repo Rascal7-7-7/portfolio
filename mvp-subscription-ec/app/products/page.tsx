@@ -10,9 +10,24 @@ const PERKS = [
   { title: ['縛りなし、', 'いつでも解約'], body: 'スキップ・お休み・解約はマイページから。' },
 ];
 
+const FAQS = [
+  {
+    q: 'スキップはいつまでにすればいいですか？',
+    a: 'お届け予定日の5日前までに、マイページの「次回をスキップ」を押してください。お届けが1回ぶん先に延びます。初回分は発送準備に入るため、スキップは2回目からです。',
+  },
+  {
+    q: '解約はどうすればいいですか？',
+    a: 'マイページの「解約」から手続きできます。回数の縛りや解約金はありません。しばらく不要なときは「お休みする」も選べます。',
+  },
+  {
+    q: 'どんな形で届きますか？',
+    a: 'コーヒー豆やティーバッグなど薄い袋・箱の商品は、原則ポスト投函です。瓶入りのグラノーラやボトル入りのハンドソープ・化粧水は宅配便でお届けします。ご注文の組み合わせによっては、まとめて宅配便にすることがあります。',
+  },
+];
+
 const STEPS = [
   { n: '1', title: '商品とお届け間隔を選ぶ', body: '毎月、または2ヶ月ごと。暮らしのペースに合わせて。' },
-  { n: '2', title: '3日後に初回お届け', body: '焙煎・製造したてを、ポストに入るサイズでお届けします。' },
+  { n: '2', title: '3日後に初回お届け', body: '焙煎・製造したてを、商品の形に合わせてポスト投函か宅配便でお届けします。' },
   { n: '3', title: 'マイページで調整', body: '在庫が余ったらスキップ。お休みも解約もワンタップ。' },
 ];
 
@@ -103,6 +118,21 @@ export default function ProductsPage() {
               </li>
             ))}
           </ol>
+
+          <h3 className="mt-10 text-sm font-semibold text-on-surface sm:mt-12">よくあるご質問</h3>
+          <div className="mt-3 divide-y divide-outline-variant/60 border-y border-outline-variant/60">
+            {FAQS.map(({ q, a }) => (
+              <details key={q} className="group">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-sm text-on-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden">
+                  <span className="[word-break:auto-phrase]">{q}</span>
+                  <span aria-hidden className="text-on-surface-variant transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="max-w-2xl pb-4 text-sm leading-relaxed text-on-surface-variant [word-break:auto-phrase]">{a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
     </main>

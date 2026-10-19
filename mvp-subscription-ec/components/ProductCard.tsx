@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Product } from '@/lib/types';
-import { unitPrice, yen } from '@/lib/pricing';
+import { perServing, unitPrice, yen } from '@/lib/pricing';
 import { ProductVisual } from '@/components/ProductVisual';
 import { Phrases } from '@/components/Phrases';
 
@@ -8,6 +8,7 @@ import { Phrases } from '@/components/Phrases';
 export function ProductCard({ product }: { product: Product }) {
   const subPrice = unitPrice(product.price, 'monthly');
   const size = product.specs.find((s) => s.label === '内容量')?.value;
+  const serving = perServing(subPrice, product.specs);
   return (
     <Link href={`/products/${product.id}`} className="group flex flex-col">
       <ProductVisual product={product} decorative className="aspect-[4/5]" />
@@ -23,6 +24,11 @@ export function ProductCard({ product }: { product: Product }) {
           <Phrases parts={product.taglineParts} />
         </p>
         {size && <p className="mt-2 text-xs text-on-surface-variant">{size}</p>}
+        {serving && (
+          <p className="tnum mt-0.5 text-xs text-on-surface-variant">
+            定期便で1{serving.unit}あたり約{yen(serving.amount)}
+          </p>
+        )}
         <p className="tnum mt-2 text-sm text-on-surface">
           <span className="whitespace-nowrap">
             定期便 <span className="font-semibold">{yen(subPrice)}</span>
