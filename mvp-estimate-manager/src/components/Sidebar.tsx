@@ -2,102 +2,91 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Icon, { type IconName } from "@/components/Icon";
+import { useEstimates } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { href: "/estimates", icon: "description", label: "見積一覧" },
-  { href: "/estimates/new", icon: "add_circle", label: "新規見積作成" },
-  { href: "/projects/new", icon: "groups", label: "顧客・案件登録" },
+const NAV_ITEMS: { href: string; icon: IconName; label: string }[] = [
+  { href: "/estimates", icon: "file", label: "見積一覧" },
+  { href: "/estimates/new", icon: "plus", label: "新規見積" },
 ];
 
-export default function Sidebar() {
+function useIsActive() {
   const pathname = usePathname();
+  return (href: string) =>
+    href === "/estimates"
+      ? pathname === "/estimates" || /^\/estimates\/\d+/.test(pathname)
+      : pathname.startsWith(href);
+}
 
-  const isActive = (href: string) => {
-    if (href === "/estimates") return pathname === "/estimates";
-    return pathname.startsWith(href);
+export default function Sidebar() {
+  const isActive = useIsActive();
+  const { reset } = useEstimates();
+
+  const handleReset = () => {
+    if (window.confirm("デモデータを初期状態に戻しますか？作成・変更した見積は消えます。")) reset();
   };
 
   return (
-    <aside className="hidden md:flex flex-col h-screen w-64 bg-slate-50 py-6 px-4 shrink-0">
-      {/* ロゴ */}
-      <div className="mb-8 px-2">
-        <h1 className="text-xl font-bold text-slate-900 tracking-tight font-headline">
-          見積管理
-        </h1>
-        <p className="text-xs text-slate-500 font-medium">営業自動化ツール</p>
-      </div>
-
-      {/* ナビゲーション */}
-      <nav className="flex-1 space-y-1">
-        {navItems.map((item) => (
+    <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-white px-4 py-6 md:flex print:hidden">
+      <Link href="/estimates" className="mb-8 px-2">
+        <p className="text-lg font-bold tracking-tight text-navy">見積マネージャー</p>
+        <p className="text-xs text-muted">明細から自動計算・ステータス管理</p>
+      </Link>
+      <nav aria-label="メイン" className="space-y-1">
+        {NAV_ITEMS.map((item) => (
           <Link
             key={item.href}
             href={item.href}
+            aria-current={isActive(item.href) ? "page" : undefined}
             className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors duration-150",
+              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               isActive(item.href)
-                ? "text-slate-900 font-bold border-r-4 border-slate-900 bg-slate-200/50"
-                : "text-slate-500 font-medium hover:bg-slate-200/50"
+                ? "bg-primary-soft text-primary"
+                : "text-body hover:bg-canvas hover:text-navy",
             )}
           >
-            <span className="material-symbols-outlined text-xl shrink-0">{item.icon}</span>
-            <span className="whitespace-nowrap">{item.label}</span>
+            <Icon name={item.icon} />
+            {item.label}
           </Link>
         ))}
       </nav>
-
-      {/* フッター */}
-      <div className="mt-auto pt-6 border-t border-slate-200 px-2">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-sm text-on-primary-container">
-              person
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-slate-900 truncate">管理者</p>
-            <p className="text-[10px] text-slate-500 truncate">admin@curator.jp</p>
-          </div>
-        </div>
+      <div className="mt-auto space-y-3 border-t border-line px-2 pt-4">
+        <p className="text-xs leading-relaxed text-muted">
+          デモ版：データはこのブラウザ内にだけ保存されます（送信・外部通信なし）。
+        </p>
+        <button
+          type="button"
+          onClick={handleReset}
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted hover:text-navy"
+        >
+          <Icon name="reset" className="h-3.5 w-3.5" />
+          デモデータに戻す
+        </button>
       </div>
     </aside>
   );
 }
 
-export function MobileBottomNav() {
-  const pathname = usePathname();
-
-  const isActive = (href: string) => {
-    if (href === "/estimates") return pathname === "/estimates";
-    return pathname.startsWith(href);
-  };
-
+export function MobileNav() {
+  const isActive = useIsActive();
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-slate-200 flex items-center justify-around px-2 pb-safe">
-      {navItems.map((item) => (
+    <nav
+      aria-label="メイン"
+      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden print:hidden"
+    >
+      {NAV_ITEMS.map((item) => (
         <Link
           key={item.href}
           href={item.href}
+          aria-current={isActive(item.href) ? "page" : undefined}
           className={cn(
-            "flex flex-col items-center gap-0.5 py-2 px-4 min-w-0 flex-1 transition-colors duration-150",
-            isActive(item.href)
-              ? "text-slate-900"
-              : "text-slate-400"
+            "flex flex-1 flex-col items-center gap-1 py-2.5 text-xs font-semibold",
+            isActive(item.href) ? "text-primary" : "text-muted",
           )}
         >
-          <span className={cn(
-            "material-symbols-outlined text-2xl",
-            isActive(item.href) && "text-primary"
-          )}>
-            {item.icon}
-          </span>
-          <span className={cn(
-            "text-[10px] font-bold truncate w-full text-center",
-            isActive(item.href) ? "text-primary" : "text-slate-400"
-          )}>
-            {item.label}
-          </span>
+          <Icon name={item.icon} className="h-5 w-5" />
+          {item.label}
         </Link>
       ))}
     </nav>

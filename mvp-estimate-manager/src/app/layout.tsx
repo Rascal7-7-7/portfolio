@@ -1,57 +1,30 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Sidebar, { MobileBottomNav } from "@/components/Sidebar";
+import Sidebar, { MobileNav } from "@/components/Sidebar";
+import { EstimatesProvider } from "@/lib/store";
 
 export const metadata: Metadata = {
-  title: "見積管理",
-  description: "顧客・案件に紐づいた見積を一覧で管理できる業務アプリ",
+  title: "見積マネージャー",
+  description: "品目・数量・単価から小計・消費税・合計を自動計算し、見積のステータスを管理するデモアプリ",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="bg-surface text-on-surface">
-        <div className="flex h-screen overflow-hidden">
-          <Sidebar />
-          <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-            {/* トップバー */}
-            <header className="sticky top-0 z-40 flex justify-between items-center w-full px-4 md:px-8 h-14 md:h-16 bg-white/80 backdrop-blur-xl shadow-sm shrink-0">
-              <h2 className="text-sm md:text-base font-bold text-slate-900 tracking-tight font-headline">
-                見積管理システム
-              </h2>
-              <div className="flex items-center gap-3">
-                <div className="hidden md:flex items-center bg-surface-container px-3 py-1.5 rounded-full">
-                  <span className="material-symbols-outlined text-slate-400 text-sm mr-2">
-                    search
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="見積を検索..."
-                    className="bg-transparent border-none focus:ring-0 text-sm w-40 font-body"
-                  />
-                </div>
-              </div>
-            </header>
-
-            {/* メインコンテンツ */}
-            <main className="flex-1 overflow-y-auto custom-scrollbar pb-20 md:pb-0">
-              {children}
-            </main>
+      <body className="font-sans">
+        <EstimatesProvider>
+          <div className="flex min-h-screen">
+            <Sidebar />
+            <div className="min-w-0 flex-1">
+              <header className="flex h-12 items-center border-b border-line bg-white px-4 md:hidden print:hidden">
+                <p className="text-sm font-bold text-navy">見積マネージャー</p>
+                <span className="ml-2 rounded bg-canvas px-1.5 py-0.5 text-[10px] text-muted">デモ</span>
+              </header>
+              <main className="pb-20 md:pb-0 print:pb-0">{children}</main>
+            </div>
           </div>
-        </div>
-        <MobileBottomNav />
+          <MobileNav />
+        </EstimatesProvider>
       </body>
     </html>
   );

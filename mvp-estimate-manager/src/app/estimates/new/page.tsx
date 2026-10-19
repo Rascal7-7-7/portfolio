@@ -1,35 +1,17 @@
-import { redirect } from "next/navigation";
-import { getProjects } from "@/lib/actions";
-import EstimateForm from "./EstimateForm";
+import EstimateForm from "@/components/estimate-form/EstimateForm";
 
-export const metadata = { title: "新規見積作成 | 見積管理" };
+export const metadata = { title: "新規見積 | 見積マネージャー" };
 
-interface Props {
-  searchParams: Promise<{ project_id?: string }>;
-}
-
-export default async function NewEstimatePage({ searchParams }: Props) {
-  const params = await searchParams;
-  const projects = await getProjects();
-
-  if (projects.length === 0) {
-    redirect("/projects/new");
-  }
-
-  const selectedProjectId = params.project_id
-    ? parseInt(params.project_id, 10)
-    : projects[0].id;
-
+export default function NewEstimatePage() {
   return (
-    <div className="flex flex-col h-full">
-      {/* サブヘッダー */}
-      <div className="px-8 py-4 border-b border-surface-container bg-surface-container-lowest shrink-0">
-        <p className="text-xs text-on-surface-variant">
-          <span className="font-bold text-primary">STEP 02</span>
-          　—　見積項目を入力して、右のプレビューで内容を確認してください。
+    <div className="mx-auto max-w-7xl space-y-5 p-4 sm:p-8">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight text-navy">新規見積</h1>
+        <p className="mt-1 text-sm text-body">
+          品目・数量・単価を入れると、小計・消費税・合計と見積書が自動で更新されます。
         </p>
       </div>
-      <EstimateForm projects={projects} defaultProjectId={selectedProjectId} />
+      <EstimateForm />
     </div>
   );
 }
