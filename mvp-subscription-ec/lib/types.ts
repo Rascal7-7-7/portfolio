@@ -34,8 +34,12 @@ export type Product = {
   taxRate: TaxRate;
   badge?: string;
   specs: ReadonlyArray<{ label: string; value: string }>;
+  /** 味・使い心地の目安。value は low 側を 1 とした 5 段階 */
+  taste: ReadonlyArray<TasteAxis>;
   visual: Visual;
 };
+
+export type TasteAxis = { label: string; low: string; high: string; value: 1 | 2 | 3 | 4 | 5 };
 
 export type CartItem = {
   productId: string;

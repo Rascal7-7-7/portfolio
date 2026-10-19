@@ -39,6 +39,11 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '焙煎度', value: '深煎り' },
       { label: '産地', value: 'エチオピア / グアテマラ' },
     ],
+    taste: [
+      { label: '焙煎度', low: '浅', high: '深', value: 4 },
+      { label: '酸味', low: '弱', high: '強', value: 2 },
+      { label: '苦味', low: '弱', high: '強', value: 4 },
+    ],
     visual: { shape: 'bag', motif: 'bean', from: '#efe6d6', to: '#d9c6a5', ink: '#3d2c22', accent: '#c9925a' },
   },
   {
@@ -57,6 +62,11 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '内容量', value: '50g（缶入り）' },
       { label: '産地', value: '京都府宇治市' },
       { label: '淹れ方', value: '60℃・2分' },
+    ],
+    taste: [
+      { label: '旨み', low: '弱', high: '強', value: 5 },
+      { label: '渋み', low: '弱', high: '強', value: 2 },
+      { label: '香り', low: '弱', high: '強', value: 3 },
     ],
     visual: { shape: 'tin', motif: 'tea', from: '#e4ecd9', to: '#c3d5ad', ink: '#2f4a2f', accent: '#b8cf8f' },
   },
@@ -77,6 +87,10 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '原材料', value: 'オーツ麦、はちみつ、くるみ ほか' },
       { label: '賞味期限', value: '製造から60日' },
     ],
+    taste: [
+      { label: '甘さ', low: '弱', high: '強', value: 2 },
+      { label: '食感', low: '軽', high: '硬', value: 4 },
+    ],
     visual: { shape: 'jar', motif: 'wheat', from: '#f5e9d2', to: '#e8cf9f', ink: '#6b4a2b', accent: '#d9a556' },
   },
   {
@@ -95,6 +109,10 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '内容量', value: '250ml' },
       { label: '香り', value: 'ひのき・柚子' },
       { label: '生産', value: '長野県木曽町' },
+    ],
+    taste: [
+      { label: '香り', low: '弱', high: '強', value: 3 },
+      { label: '洗い上がり', low: 'さっぱり', high: 'しっとり', value: 4 },
     ],
     visual: { shape: 'pump', motif: 'hinoki', from: '#e7eee8', to: '#c9d8cd', ink: '#4c6a5a', accent: '#a7c4b0' },
   },
@@ -115,6 +133,10 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '使用目安', value: '約1.5ヶ月' },
       { label: '無添加', value: '香料・着色料・アルコール' },
     ],
+    taste: [
+      { label: '香り', low: '弱', high: '強', value: 1 },
+      { label: '使用感', low: 'さっぱり', high: 'しっとり', value: 3 },
+    ],
     visual: { shape: 'bottle', motif: 'petal', from: '#efe5e7', to: '#d9c3c9', ink: '#7a5562', accent: '#e3b9c3' },
   },
   {
@@ -134,6 +156,11 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '内容量', value: '15包（ティーバッグ）' },
       { label: 'カフェイン', value: 'なし' },
       { label: '産地', value: '鳥取県 / 高知県' },
+    ],
+    taste: [
+      { label: '香り', low: '弱', high: '強', value: 4 },
+      { label: '酸味', low: '弱', high: '強', value: 2 },
+      { label: '渋み', low: '弱', high: '強', value: 1 },
     ],
     visual: { shape: 'box', motif: 'herb', from: '#f0ead8', to: '#dccfa6', ink: '#8a6b33', accent: '#e9c77b' },
   },
