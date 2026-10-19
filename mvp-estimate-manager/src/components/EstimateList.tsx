@@ -60,7 +60,7 @@ export default function EstimateList() {
 
       <section aria-label="見積一覧" className="overflow-hidden rounded-md bg-white shadow-card">
         <div className="flex flex-col gap-3 border-b border-line p-3 sm:flex-row sm:items-center sm:justify-between">
-          <div role="group" aria-label="ステータスで絞り込み" className="flex gap-1 overflow-x-auto">
+          <div role="group" aria-label="ステータスで絞り込み" className="flex gap-0.5 overflow-x-auto sm:gap-1">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -68,12 +68,12 @@ export default function EstimateList() {
                 aria-pressed={filter === tab.key}
                 onClick={() => setFilter(tab.key)}
                 className={cn(
-                  "whitespace-nowrap rounded px-3 py-1.5 text-sm font-medium",
+                  "whitespace-nowrap rounded px-1.5 py-1.5 text-sm font-medium sm:px-3",
                   filter === tab.key ? "bg-primary-soft text-primary" : "text-body hover:bg-canvas",
                 )}
               >
                 {tab.label}
-                <span className="tnum ml-1 text-xs opacity-70">{tab.count}</span>
+                <span className="tnum ml-0.5 text-xs sm:ml-1">{tab.count}</span>
               </button>
             ))}
           </div>
@@ -98,7 +98,7 @@ export default function EstimateList() {
               <li key={e.id}>
                 <Link
                   href={`/estimates/${e.id}`}
-                  className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 px-4 py-3 hover:bg-canvas focus-visible:bg-canvas focus-visible:outline-none sm:grid-cols-[120px_1fr_100px_140px]"
+                  className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 px-4 py-3 hover:bg-canvas focus-visible:bg-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:grid-cols-[120px_1fr_100px_140px]"
                 >
                   <span className="order-3 col-span-2 text-xs text-muted sm:order-none sm:col-span-1">
                     <span className="tnum">{estimateNumber(e.id)}</span>

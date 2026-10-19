@@ -6,7 +6,7 @@ import type { Estimate } from "@/types";
 import { KNOWN_CLIENTS, PRESET_ITEMS } from "@/data/seed";
 import { useEstimates } from "@/lib/store";
 import { calcTotals, lineAmount, TAX_RATE_PERCENT } from "@/lib/calc";
-import { formatYen } from "@/lib/utils";
+import { formatDateWithWeekday, formatYen } from "@/lib/utils";
 import EstimateDocument from "@/components/EstimateDocument";
 import Icon from "@/components/Icon";
 import ItemRows, { INPUT_CLASS } from "./ItemRows";
@@ -93,8 +93,8 @@ export default function EstimateForm({ initial }: Props) {
           <div className="sm:col-span-2">
             <TextInput label="件名" required value={draft.subject} onChange={(v) => setField("subject", v)} placeholder="例：コーポレートサイト リニューアル" />
           </div>
-          <TextInput label="発行日" type="date" required value={draft.issuedAt} onChange={(v) => setField("issuedAt", v)} />
-          <TextInput label="有効期限" type="date" value={draft.validUntil} onChange={(v) => setField("validUntil", v)} />
+          <DateInput label="発行日" required value={draft.issuedAt} onChange={(v) => setField("issuedAt", v)} />
+          <DateInput label="有効期限" value={draft.validUntil} onChange={(v) => setField("validUntil", v)} />
         </fieldset>
 
         <fieldset className="space-y-4 rounded-md bg-white p-4 shadow-card sm:p-5">
@@ -135,6 +135,9 @@ export default function EstimateForm({ initial }: Props) {
             <span className="font-semibold text-white">合計（税込）</span>
             <span className="text-2xl font-semibold text-white">{formatYen(totals.total)}</span>
           </p>
+          <a href="#estimate-preview" className="block pt-1 text-right text-xs font-semibold text-white underline underline-offset-2 xl:hidden">
+            見積書の見た目を確認 ↓
+          </a>
         </section>
 
         <label className="block">
@@ -160,8 +163,11 @@ export default function EstimateForm({ initial }: Props) {
         </div>
       </div>
 
-      <div className="xl:sticky xl:top-6 xl:self-start">
-        <p className="mb-2 text-xs font-medium text-muted">見積書プレビュー（入力と同時に更新）</p>
+      <div id="estimate-preview" className="scroll-mt-4 xl:sticky xl:top-0 xl:self-start">
+        {/* xl では左列の「サンプルを入力」ボタンと同じ高さにして、帳票の上端をフォームの上端に揃える */}
+        <p className={`mb-2 text-xs font-medium text-muted ${initial ? "" : "xl:mb-5 xl:flex xl:h-[34px] xl:items-center"}`}>
+          見積書プレビュー（入力と同時に更新）
+        </p>
         <EstimateDocument estimate={preview} id={initial?.id} />
       </div>
     </form>
@@ -172,21 +178,25 @@ interface TextInputProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  type?: "text" | "date";
   required?: boolean;
   placeholder?: string;
   list?: string;
 }
 
-function TextInput({ label, value, onChange, type = "text", required, placeholder, list }: TextInputProps) {
+function FieldLabel({ label, required }: { label: string; required?: boolean }) {
+  return (
+    <span className="mb-1 block text-xs font-medium text-body">
+      {label}
+      {required && <span className="ml-1 text-rose-600" aria-hidden="true">*</span>}
+    </span>
+  );
+}
+
+function TextInput({ label, value, onChange, required, placeholder, list }: TextInputProps) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-medium text-body">
-        {label}
-        {required && <span className="ml-1 text-rose-600" aria-hidden="true">*</span>}
-      </span>
+      <FieldLabel label={label} required={required} />
       <input
-        type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
@@ -195,6 +205,43 @@ function TextInput({ label, value, onChange, type = "text", required, placeholde
         list={list}
         className={INPUT_CLASS}
       />
+    </label>
+  );
+}
+
+/**
+ * ネイティブの日付ピッカーを使いつつ、表示はブラウザのロケールに関係なく「2026年10月19日（月）」にする。
+ * 透明な input を下に敷き、上に和暦風の表示を重ねる（クリック・キーボード操作は input が受ける）。
+ */
+function DateInput({ label, value, onChange, required }: Omit<TextInputProps, "placeholder" | "list">) {
+  const openPicker = (e: React.MouseEvent<HTMLInputElement>) => {
+    try {
+      e.currentTarget.showPicker();
+    } catch {
+      // showPicker 非対応ブラウザでは通常の input 操作にまかせる
+    }
+  };
+  return (
+    <label className="block">
+      <FieldLabel label={label} required={required} />
+      <span className="relative block">
+        <input
+          type="date"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onClick={openPicker}
+          required={required}
+          aria-required={required}
+          className="peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        />
+        <span
+          aria-hidden="true"
+          className={`${INPUT_CLASS} pointer-events-none flex items-center justify-between peer-focus-visible:border-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary/20`}
+        >
+          <span className={value ? "tnum" : "text-muted"}>{value ? formatDateWithWeekday(value) : "日付を選択"}</span>
+          <Icon name="calendar" className="h-4 w-4 text-muted" />
+        </span>
+      </span>
     </label>
   );
 }

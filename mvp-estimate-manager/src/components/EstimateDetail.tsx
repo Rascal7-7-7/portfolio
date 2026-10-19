@@ -78,7 +78,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
               <h1 className="mt-1 text-xl font-semibold tracking-tight text-navy">{estimate.subject}</h1>
               <p className="text-sm text-body">{estimate.clientName}</p>
             </div>
-            <p className="text-right">
+            <p className="sm:text-right">
               <span className="block text-xs text-muted">合計（税込）</span>
               <span className="tnum text-2xl font-semibold text-navy">{formatYen(calcTotals(estimate.items).total)}</span>
             </p>
