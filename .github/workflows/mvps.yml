@@ -1,7 +1,8 @@
 name: mvps
 
 # 5つの MVP がビルドできることを、マージ前に確認する。
-# lint は 3 つの MVP で未設定のため、ビルドのみ。
+# lint は booking-system に script が無く、estimate-manager・lp-generator に
+# ESLint の設定が無いため、ビルドのみ。
 
 on:
   push:
@@ -15,13 +16,17 @@ on:
       - ".github/workflows/mvps.yml"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: ビルド (${{ matrix.mvp }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      # ponytail: 1つの変更でも全 MVP をビルドする。遅くなったら変更検出を入れる
+      # 意図的な簡略化: 1つの変更でも全 MVP をビルドする。
+      # 遅くなったら、変更のあった MVP だけをビルドするようにする
       matrix:
         mvp:
           - mvp-booking-system
@@ -45,7 +50,5 @@ jobs:
         run: npm ci
 
       - name: ビルド
-        # ビルド時に DB へは接続しないが、未設定だと例外を投げる MVP がある
+        # DB を使うページは動的レンダリングのため、ビルド時に DATABASE_URL は不要
         run: npm run build
-        env:
-          DATABASE_URL: postgresql://dummy:dummy@localhost/dummy
