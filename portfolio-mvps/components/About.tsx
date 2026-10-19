@@ -22,7 +22,7 @@ const blocks = [
 
 export function About() {
   return (
-    <section id="about" className="py-20 px-6 bg-surface-900/40" aria-labelledby="about-heading">
+    <section id="about" className="py-16 sm:py-20 px-6 bg-surface-900/40" aria-labelledby="about-heading">
       <div className="max-w-6xl mx-auto">
         <SectionHeader
           id="about-heading"
