@@ -3,7 +3,7 @@ import { dayParts, formatShortDate, toMinutes } from '@/lib/date';
 import { CLOSE_MIN, OPEN_MIN, durationMin, endTime, placeInLanes } from '@/lib/slots';
 import { sortByDateTime } from '@/lib/store';
 import { STATUS_LABEL, type Reservation } from '@/lib/types';
-import { needsAttention } from '@/components/ReservationRow';
+import { isNew, needsAttention } from '@/components/ReservationRow';
 
 const HOUR_H = 72;
 const HOURS = Array.from({ length: (CLOSE_MIN - OPEN_MIN) / 60 }, (_, i) => OPEN_MIN / 60 + i);
@@ -13,11 +13,11 @@ const TALL_H = 64;
 type MenuKind = 'cut' | 'color' | 'perm' | 'care';
 
 /** 週表示はメニュー種別で色分けする（Airリザーブの週表示と同じ考え方）。クラスは Tailwind が拾えるよう文字列のまま書く */
-const KIND: Record<MenuKind, { label: string; block: string; swatch: string }> = {
-  cut:   { label: 'カット',     block: 'bg-menu-cut border-l-menu-cut-line',     swatch: 'bg-menu-cut border-menu-cut-line' },
-  color: { label: 'カラー',     block: 'bg-menu-color border-l-menu-color-line', swatch: 'bg-menu-color border-menu-color-line' },
-  perm:  { label: 'パーマ',     block: 'bg-menu-perm border-l-menu-perm-line',   swatch: 'bg-menu-perm border-menu-perm-line' },
-  care:  { label: 'スパ・ケア', block: 'bg-menu-care border-l-menu-care-line',   swatch: 'bg-menu-care border-menu-care-line' },
+const KIND: Record<MenuKind, { label: string; block: string }> = {
+  cut:   { label: 'カット',     block: 'bg-menu-cut border-menu-cut-line' },
+  color: { label: 'カラー',     block: 'bg-menu-color border-menu-color-line' },
+  perm:  { label: 'パーマ',     block: 'bg-menu-perm border-menu-perm-line' },
+  care:  { label: 'スパ・ケア', block: 'bg-menu-care border-menu-care-line' },
 };
 
 function menuKind(service: string): MenuKind {
@@ -32,7 +32,7 @@ export function WeekLegend() {
     <ul aria-label="色の見方" className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-dim">
       {(Object.keys(KIND) as MenuKind[]).map(k => (
         <li key={k} className="flex items-center gap-1.5">
-          <span aria-hidden="true" className={`size-3 rounded-[3px] border-l-[3px] ${KIND[k].swatch}`} />{KIND[k].label}
+          <span aria-hidden="true" className={`size-3 rounded-[3px] border ${KIND[k].block}`} />{KIND[k].label}
         </li>
       ))}
       <li className="flex items-center gap-1.5"><span aria-hidden="true" className="size-2 rounded-full bg-attn" />確定待ち</li>
@@ -61,7 +61,7 @@ export default function WeekGrid({ days, reservations, today, nowMin, onPickDay 
               className="border-l border-line px-2 py-2 text-left hover:bg-subtle focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand">
               <span className="block text-xs text-dim">{weekday}</span>
               <span className="flex items-center gap-1.5 mt-0.5">
-                <span className={`inline-flex items-center justify-center size-7 rounded-full text-sm font-bold tabular-nums ${isToday ? 'bg-brand text-white' : 'text-ink'}`}>{day}</span>
+                <span className={`inline-flex items-center justify-center h-7 min-w-7 px-1 rounded-md text-sm font-bold tabular-nums ${isToday ? 'bg-brand text-white' : 'text-ink'}`}>{day}</span>
                 <span className="text-xs text-dim tabular-nums">{count > 0 ? `${count}件` : ''}</span>
               </span>
             </button>
@@ -112,7 +112,8 @@ function WeekBlock({ r, tall, narrow }: { r: Reservation; tall: boolean; narrow:
   const kind = KIND[menuKind(r.service_name)];
   const look = canceled
     ? 'bg-canvas border border-dashed border-line-strong text-dim'
-    : `border-l-[3px] ${kind.block}`;
+    : `border ${kind.block}`;
+  // 新着はメニュー色の地でも 4.5:1 を保てるよう accent より一段濃い色（text-accent-hover）にする
   // 横に並んで幅が狭いときは姓だけにする（全文は aria-label と詳細画面で）
   const name = (
     <span className={`font-medium text-ink truncate ${canceled ? 'line-through' : ''}`}>
@@ -121,7 +122,7 @@ function WeekBlock({ r, tall, narrow }: { r: Reservation; tall: boolean; narrow:
   );
   return (
     <Link href={`/reservations/${r.id}`}
-      aria-label={`${r.reservation_time}–${endTime(r)} ${r.customer_name}様 ${r.service_name} 担当${r.staff} ${STATUS_LABEL[r.status]}${needsAttention(r) ? ' 確認通知未送信' : ''}`}
+      aria-label={`${r.reservation_time}–${endTime(r)} ${r.customer_name}様 ${r.service_name} 担当${r.staff} ${STATUS_LABEL[r.status]}${needsAttention(r) ? ' 確認通知未送信' : ''}${isNew(r) ? ' 新着' : ''}`}
       className={`block h-full overflow-hidden rounded-[5px] px-1.5 py-1 text-[11px] leading-[15px] hover:brightness-[0.97] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${look}`}>
       <p className="flex items-center gap-1 min-w-0">
         <span className="tabular-nums text-body shrink-0">{r.reservation_time}</span>
@@ -129,7 +130,7 @@ function WeekBlock({ r, tall, narrow }: { r: Reservation; tall: boolean; narrow:
         {r.status === 'pending' && <span aria-hidden="true" className="ml-auto size-2 shrink-0 rounded-full bg-attn" />}
       </p>
       {narrow && <p className="flex min-w-0">{name}</p>}
-      <p className="text-dim truncate">{r.staff}{tall && !narrow && <><span aria-hidden="true"> · </span>{r.service_name}</>}</p>
+      <p className="text-dim truncate">{isNew(r) && <span className="mr-1 font-medium text-accent-hover">新着</span>}{r.staff}{tall && !narrow && <><span aria-hidden="true"> · </span>{r.service_name}</>}</p>
     </Link>
   );
 }

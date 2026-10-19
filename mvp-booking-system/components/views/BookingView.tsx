@@ -10,7 +10,7 @@ import { MENUS, STAFF, type Menu } from '@/lib/types';
 import LoadingState from '@/components/LoadingState';
 import MonthCalendar from '@/components/MonthCalendar';
 import { inputCls } from '@/components/ReservationForm';
-import { STAFF_TONE, btn } from '@/components/ui';
+import { btn } from '@/components/ui';
 import Icon, { type IconName } from '@/components/Icon';
 
 /** 予約を受け付ける期間（今日から何日先まで） */
@@ -107,16 +107,7 @@ export default function BookingView() {
               <p className="font-serif text-2xl leading-none text-accent tracking-tight">{SHOP.name}</p>
               <p className="text-xs text-dim mt-1.5">{SHOP.branch}</p>
               <h1 id="book-title" className="text-xl font-bold text-ink mt-5">ご予約</h1>
-              <div className="mt-3 flex items-center gap-3">
-                <ul className="flex -space-x-1.5" aria-hidden="true">
-                  {STAFF.map(s => (
-                    <li key={s} className={`size-8 rounded-full ring-2 ring-canvas flex items-center justify-center text-xs font-medium text-ink ${STAFF_TONE[s].soft} border border-line`}>
-                      {s.slice(0, 1)}
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-xs text-dim">スタイリスト {STAFF.join('・')}</p>
-              </div>
+              <p className="mt-3 text-xs text-dim">スタイリスト {STAFF.join('・')}</p>
 
               <fieldset className="mt-5">
                 <legend className="text-sm font-medium text-ink mb-2">メニュー</legend>
@@ -204,7 +195,7 @@ export default function BookingView() {
                   {slots.length === 0 ? (
                     <p className="mt-3 text-sm text-dim">この日は空きがありません</p>
                   ) : (
-                    <ul className="mt-3 grid grid-cols-3 md:grid-cols-1 gap-2 md:max-h-[36rem] md:overflow-y-auto md:pr-1">
+                    <ul className="mt-3 grid grid-cols-3 md:grid-cols-2 gap-2">
                       {slots.map(s => (
                         <li key={s.time}>
                           <button type="button" onClick={() => { setTime(s.time); setError(null); }}
@@ -278,7 +269,7 @@ function Confirmed({ done, onAgain, onAdmin }: { done: Done; onAgain: () => void
   const end = toTime(toMinutes(done.time) + done.menu.minutes);
   return (
     <section aria-labelledby="done-title" className="mx-auto max-w-lg bg-canvas border border-line rounded-xl p-6 md:p-8 text-center">
-      <Icon name="check_circle" size={32} className="text-accent" />
+      <Icon name="check" size={32} className="mx-auto text-accent" />
       <h1 id="done-title" className="text-xl font-bold text-ink mt-2">ご予約を受け付けました</h1>
       <p className="text-sm text-dim mt-1 text-balance">お店で確認したあと、確定のご連絡をお送りします。</p>
       <dl className="mt-6 text-left text-sm border-y border-line divide-y divide-line">
@@ -288,7 +279,7 @@ function Confirmed({ done, onAgain, onAdmin }: { done: Done; onAgain: () => void
         <Row label="受付番号"><span className="tabular-nums">#{String(done.id).padStart(4, '0')}</span></Row>
       </dl>
       <div className="mt-6 flex flex-col gap-2">
-        <Link href={`/reservations?new=${done.id}`} onClick={onAdmin} className={btn('accent', 'lg')}>
+        <Link href={`/schedule?date=${done.date}`} onClick={onAdmin} className={btn('accent', 'lg')}>
           お店側の画面で確認する
         </Link>
         <button type="button" onClick={onAgain} className={btn('secondary', 'lg')}>別の予約をする</button>
