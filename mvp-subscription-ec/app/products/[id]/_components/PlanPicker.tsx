@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Interval, Product, SubscriptionInterval } from '@/lib/types';
 import { INTERVAL_LABEL, SUBSCRIPTION_INTERVALS } from '@/lib/catalog';
@@ -16,10 +16,24 @@ export function PlanPicker({ product }: { product: Product }) {
   const [mode, setMode] = useState<Mode>('subscription');
   const [frequency, setFrequency] = useState<SubscriptionInterval>('monthly');
   const [quantity, setQuantity] = useState(1);
+  // スマホで元のボタンが画面外にある間だけ、下部の固定バーを出す
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [buttonVisible, setButtonVisible] = useState(true);
+
+  useEffect(() => {
+    const el = buttonRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => setButtonVisible(entry.isIntersecting));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const interval: Interval = mode === 'once' ? 'once' : frequency;
   const price = unitPrice(product.price, interval);
   const saving = product.price - unitPrice(product.price, 'monthly');
+
+  const buttonLabel = mode === 'subscription' ? '定期便をカートに入れる' : 'カートに入れる';
+  const priceLabel = mode === 'subscription' ? `${INTERVAL_LABEL[frequency]}・1回のお支払い` : 'お支払い';
 
   const addToCart = () => {
     dispatch({ type: 'addToCart', item: { productId: product.id, interval, quantity } });
@@ -87,9 +101,7 @@ export function PlanPicker({ product }: { product: Product }) {
       </div>
 
       <div className="mt-4 flex items-baseline justify-between border-t border-outline-variant/50 pt-4">
-        <span className="text-sm text-on-surface-variant">
-          {mode === 'subscription' ? `${INTERVAL_LABEL[frequency]}・1回のお支払い` : 'お支払い'}
-        </span>
+        <span className="text-sm text-on-surface-variant">{priceLabel}</span>
         <span className="tnum font-headline text-2xl font-semibold text-on-surface">
           {yen(price * quantity)}
           <span className="ml-1 text-xs font-normal text-on-surface-variant">税込</span>
@@ -97,12 +109,32 @@ export function PlanPicker({ product }: { product: Product }) {
       </div>
 
       <button
+        ref={buttonRef}
         type="button"
         onClick={addToCart}
         className="mt-4 flex w-full items-center justify-center rounded-sm bg-primary py-3.5 text-base font-medium text-on-primary transition-opacity hover:opacity-90"
       >
-        {mode === 'subscription' ? '定期便をカートに入れる' : 'カートに入れる'}
+        {buttonLabel}
       </button>
+
+      {!buttonVisible && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant/60 bg-background/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:hidden">
+          <div className="mx-auto flex max-w-xl items-center gap-3">
+            <p className="min-w-0 flex-1 leading-tight">
+              <span className="block truncate text-xs text-on-surface-variant">{priceLabel}</span>
+              <span className="tnum font-headline text-lg font-semibold text-on-surface">{yen(price * quantity)}</span>
+              <span className="ml-1 text-xs text-on-surface-variant">税込</span>
+            </p>
+            <button
+              type="button"
+              onClick={addToCart}
+              className="flex-shrink-0 whitespace-nowrap rounded-sm bg-primary px-5 py-3 text-sm font-medium text-on-primary transition-opacity hover:opacity-90"
+            >
+              {buttonLabel}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -137,7 +169,7 @@ function PlanOption({ checked, onSelect, title, tag, note, price, listPrice }: P
           <span className="font-semibold text-on-surface">{title}</span>
           {tag && <span className="text-xs text-on-surface-variant">{tag}</span>}
         </span>
-        <span className="mt-1 block text-xs leading-relaxed text-on-surface-variant">{note}</span>
+        <span className="mt-1 block text-xs leading-relaxed text-on-surface-variant [word-break:auto-phrase]">{note}</span>
       </span>
       <span className="tnum text-right">
         <span className="block font-headline text-lg font-semibold text-on-surface">{yen(price)}</span>

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Pause, Play, SkipForward, X } from 'lucide-react';
 import type { Subscription, SubscriptionStatus } from '@/lib/types';
 import { INTERVAL_LABEL, findProduct } from '@/lib/catalog';
-import { formatJa, formatJaLong } from '@/lib/date';
+import { formatJa } from '@/lib/date';
 import { yen } from '@/lib/pricing';
 import { ProductVisual } from '@/components/ProductVisual';
 import { Phrases } from '@/components/Phrases';
@@ -52,11 +52,12 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
             </h3>
             <span className="flex-shrink-0 text-xs text-on-surface-variant">{STATUS_LABEL[sub.status]}</span>
           </div>
+          {/* 区切り「·」でだけ折り返す。税込・送料無料の注記は一覧の見出しに1回だけ置く */}
           <p className="tnum mt-1 text-xs text-on-surface-variant">
-            {INTERVAL_LABEL[sub.interval]} · {sub.quantity}点 · 1回 {yen(sub.unitPrice * sub.quantity)}（税込・送料無料）
+            <Meta items={[INTERVAL_LABEL[sub.interval], `${sub.quantity}点`, `1回 ${yen(sub.unitPrice * sub.quantity)}`]} />
           </p>
           <p className="tnum mt-0.5 text-xs text-on-surface-variant">
-            {sub.id} · {formatJaLong(sub.startedAt)}開始 · お届け済み {sub.deliveredCount}回
+            <Meta items={[`${formatJa(sub.startedAt)}開始`, `お届け済み ${sub.deliveredCount}回`]} />
           </p>
 
           <div className="mt-3">
@@ -113,6 +114,15 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
       )}
     </article>
   );
+}
+
+function Meta({ items }: { items: ReadonlyArray<string> }) {
+  return items.map((text, i) => (
+    <span key={text}>
+      {i > 0 && ' · '}
+      <span className="whitespace-nowrap">{text}</span>
+    </span>
+  ));
 }
 
 type ActionButtonProps = {

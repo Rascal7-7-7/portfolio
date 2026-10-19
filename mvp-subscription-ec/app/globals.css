@@ -4,6 +4,8 @@
 
 @layer base {
   html {
+    /* 日本語を文節で折り返す（「朝い／ちばん」のような語中改行を防ぐ。非対応ブラウザは通常の折り返し） */
+    word-break: auto-phrase;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

@@ -51,7 +51,10 @@ export default function MyPage() {
         {message}
       </p>
 
-      <h2 className="mb-3 mt-2 text-sm font-semibold text-on-surface">定期便の管理</h2>
+      <div className="mb-3 mt-2 flex flex-wrap items-baseline justify-between gap-x-4">
+        <h2 className="text-sm font-semibold text-on-surface">定期便の管理</h2>
+        <p className="text-xs text-on-surface-variant">金額は税込・送料無料</p>
+      </div>
       {subs.length === 0 ? (
         <p className="border-y border-outline-variant/60 py-6 text-center text-sm text-on-surface-variant">
           定期便はまだありません。
