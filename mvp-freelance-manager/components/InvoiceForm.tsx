@@ -47,6 +47,9 @@ export function InvoiceForm({ projects, invoices, today, defaultProjectId, onCre
     if (!projectId) return setError("案件を選んでください");
     if (fullyBilled) return setError("この案件は受注額まで請求済みです");
     if (!Number.isInteger(value) || value <= 0) return setError("金額は1円以上の整数で入力してください");
+    if (remaining !== null && value > remaining) {
+      return setError(`残り請求可能額 ${formatYen(remaining)} 以下にしてください`);
+    }
     if (!dueOn || dueOn < today) return setError("支払期日は今日以降の日付にしてください");
     actions.addInvoice({ projectId, amount: value, dueOn });
     setError(null);
