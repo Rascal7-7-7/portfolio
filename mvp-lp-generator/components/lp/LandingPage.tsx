@@ -38,8 +38,9 @@ export default function LandingPage({ doc }: { doc: LPDoc }) {
   const wide = useIsWide(ref)
   const Page = PAGES[doc.template]
   return (
-    // 本文は text-wrap: pretty で最終行の1文字落ち（「す。」だけの行）を避ける。見出しは Phrases で文節単位に改行
-    <div ref={ref} className="min-h-full font-gothic antialiased [container-type:inline-size] [&_:is(p,blockquote,dd)]:[text-wrap:pretty]">
+    // 本文は text-wrap: pretty で最終行の1文字落ち（「す。」だけの行）を避け、word-break: auto-phrase で文節の途中で改行しない
+    // （auto-phrase は Chromium のみ。Safari では通常の改行に戻るだけ）。見出しは Phrases で文節単位に改行（Safari でも有効）
+    <div ref={ref} className="min-h-full font-gothic antialiased [container-type:inline-size] [&_:is(p,blockquote,dd)]:[text-wrap:pretty] [&_:is(p,blockquote,dd)]:[word-break:auto-phrase]">
       <Page store={doc.store} sections={doc.sections} wide={wide} />
     </div>
   )

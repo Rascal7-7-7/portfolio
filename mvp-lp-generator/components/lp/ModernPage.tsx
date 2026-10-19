@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { CATEGORIES } from '@/lib/categories'
 import { cx } from '@/lib/cx'
 import type { SectionKey } from '@/lib/types'
-import { catchCopy, ctaLabel, infoRows, menuItems, num, Phrases, storeName, visibleSections, type TemplateProps } from './shared'
+import { catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, num, Phrases, storeName, visibleSections, type TemplateProps } from './shared'
 
 /*
  * モダン: 美容室のエディトリアルなサイト（STUDIO「muku」の「02 — ABOUT」番号付き見出し）を手本にした構成。
@@ -33,7 +33,7 @@ function Nav({ store, wide }: TemplateProps) {
 }
 
 function Hero({ store, wide }: TemplateProps) {
-  const rows = [store.hours && `営業 ${store.hours}`, store.closed && `定休 ${store.closed}`, store.address].filter(Boolean)
+  const rows = [store.hours && `${hoursWord(store)} ${store.hours}`, store.closed && `定休 ${store.closed}`, store.address].filter(Boolean)
   return (
     <section className={wide ? 'px-14 pb-20 pt-24' : 'px-6 pb-14 pt-14'}>
       <p className={cx(MUTED, 'text-xs tracking-[0.08em]')}>
@@ -106,7 +106,7 @@ export default function ModernPage(props: TemplateProps) {
       )}
 
       {sections.menu && items.length > 0 && (
-        <Block id="menu" index={idx('menu')} title="メニュー・料金" wide={wide}>
+        <Block id="menu" index={idx('menu')} title={menuTitle(store)} wide={wide}>
           <ul className="divide-y divide-white/15">
             {items.map((m) => (
               <li key={m.name} className="flex items-baseline justify-between gap-6 py-5 first:pt-0 last:pb-0">

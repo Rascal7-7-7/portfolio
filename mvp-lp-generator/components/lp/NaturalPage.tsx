@@ -1,6 +1,6 @@
 import { CATEGORIES } from '@/lib/categories'
 import { cx } from '@/lib/cx'
-import { catchCopy, ctaLabel, infoRows, menuItems, Phrases, storeName, type TemplateProps } from './shared'
+import { catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, Phrases, storeName, type TemplateProps } from './shared'
 
 /*
  * ナチュラル: 個人経営のカフェ・和の店のサイト（STUDIO「Cafe Flat」の細い額縁線、
@@ -48,7 +48,7 @@ function Nav({ store, wide }: TemplateProps) {
 }
 
 function Hero({ store, wide }: TemplateProps) {
-  const rows = [store.hours && `営業 ${store.hours}`, store.closed && `定休 ${store.closed}`, store.address].filter(Boolean)
+  const rows = [store.hours && `${hoursWord(store)} ${store.hours}`, store.closed && `定休 ${store.closed}`, store.address].filter(Boolean)
   return (
     <section className={cx('grid items-end', wide ? 'min-h-[600px] grid-cols-[minmax(0,1fr)_auto] gap-16 px-16 pb-24 pt-16' : 'gap-12 px-6 pb-16 pt-10')}>
       <div className={cx(wide ? 'max-w-[30em]' : 'order-2')}>
@@ -105,7 +105,7 @@ function Menu({ store, wide }: TemplateProps) {
   if (items.length === 0) return null
   return (
     <section id="menu" className={pad(wide)}>
-      <H2 text="お品書き" wide={wide} />
+      <H2 text={menuTitle(store)} wide={wide} />
       <ul className="mx-auto mt-12 max-w-2xl">
         {items.map((m) => (
           <li key={m.name} className={cx(LINE, 'border-b py-6')}>
