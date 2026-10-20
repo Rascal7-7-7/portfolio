@@ -15,6 +15,10 @@ import Icon, { type IconName } from '@/components/Icon';
 
 /** 予約を受け付ける期間（今日から何日先まで） */
 const BOOK_DAYS = 30;
+/** 再読み込みで入力が消えないよう、申し込み前の選択と入力はこのタブの間だけ残す */
+const DRAFT_KEY = 'booking-draft';
+
+type Fields = Record<string, string>;
 
 interface Done { id: number; name: string; menu: Menu; date: string; time: string; staff: Staff }
 
@@ -46,7 +50,30 @@ export default function BookingView() {
   const [month, setMonth] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fields, setFields] = useState<Fields>({});
+  const [restored, setRestored] = useState(false);
   const formHeading = useRef<HTMLHeadingElement>(null);
+
+  // 中身は信用しない。形が違うものは捨てる（時間が埋まっていれば申し込み時に弾かれる）
+  useEffect(() => {
+    try {
+      const d = JSON.parse(window.sessionStorage.getItem(DRAFT_KEY) ?? 'null');
+      const str = (v: unknown) => (typeof v === 'string' ? v : null);
+      const m = MENUS.find(x => x.name === d?.menu);
+      if (m) setMenu(m);
+      setDate(str(d?.date));
+      setTime(str(d?.time));
+      if (d?.fields && typeof d.fields === 'object') setFields(Object.fromEntries(Object.entries(d.fields).filter(([, v]) => typeof v === 'string')) as Fields);
+    } catch { /* 使えない環境では残さない */ }
+    setRestored(true);
+  }, []);
+
+  useEffect(() => {
+    if (!restored || done) return;
+    try {
+      window.sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ menu: menu.name, date, time, fields }));
+    } catch { /* 使えない環境では残さない */ }
+  }, [restored, done, menu, date, time, fields]);
 
   // 時間を選んだら入力欄の見出しへ移る（スマホでは下にあるため）
   useEffect(() => {
@@ -86,6 +113,8 @@ export default function BookingView() {
       reservation_date: selectedDate, reservation_time: time, service_name: menu.name,
       note: get('note'), channel: 'web', staff: slot.staff,
     });
+    try { window.sessionStorage.removeItem(DRAFT_KEY); } catch { /* 使えない環境では残していない */ }
+    setFields({});
     setDone({ id, name, menu, date: selectedDate, time, staff: slot.staff });
   };
 
@@ -150,15 +179,17 @@ export default function BookingView() {
                 </h2>
                 <p className="text-sm text-dim mt-1 tabular-nums">{formatFullDate(selectedDate)} {time}–{end}<span className="hidden md:inline" aria-hidden="true"> · </span><br className="md:hidden" /><span className="whitespace-nowrap">{menu.name}</span></p>
                 <p className="mt-2 md:hidden"><DurationChip minutes={menu.minutes} /></p>
-                <form onSubmit={handleSubmit} className="mt-5 space-y-4 max-w-md">
-                  <TextField id="book-name" name="name" label="お名前" required autoComplete="name" placeholder="山田 花子" />
-                  <TextField id="book-phone" name="phone" label="電話番号" type="tel" required autoComplete="tel" placeholder="090-0000-0000" />
-                  <TextField id="book-email" name="email" label="メールアドレス" type="email" autoComplete="email" placeholder="hanako@example.jp" />
+                <form onSubmit={handleSubmit}
+                  onChange={e => setFields(Object.fromEntries(new FormData(e.currentTarget)) as Fields)}
+                  className="mt-5 space-y-4 max-w-md">
+                  <TextField id="book-name" name="name" defaultValue={fields.name} label="お名前" required autoComplete="name" placeholder="山田 花子" />
+                  <TextField id="book-phone" name="phone" defaultValue={fields.phone} label="電話番号" type="tel" required autoComplete="tel" placeholder="090-0000-0000" />
+                  <TextField id="book-email" name="email" defaultValue={fields.email} label="メールアドレス" type="email" autoComplete="email" placeholder="hanako@example.jp" />
                   <div>
                     <label htmlFor="book-note" className="block text-sm font-medium text-ink mb-1.5">
                       ご要望<span className="ml-1.5 text-xs font-normal text-dim">任意</span>
                     </label>
-                    <textarea id="book-note" name="note" rows={3} placeholder="髪の長さのご希望、アレルギーの有無など"
+                    <textarea id="book-note" name="note" defaultValue={fields.note} rows={3} placeholder="髪の長さのご希望、アレルギーの有無など"
                       className={`${inputCls} resize-none`} />
                   </div>
                   <p className="text-xs text-dim leading-relaxed">
@@ -223,7 +254,7 @@ function DemoBar() {
     <div className="bg-canvas border-b border-line">
       <div className="mx-auto max-w-5xl px-4 h-11 flex items-center justify-between gap-3 text-xs">
         <p className="text-dim truncate">お客様が見る予約ページ（デモ）</p>
-        <Link href="/reservations" className="shrink-0 inline-flex items-center gap-1 text-ink font-medium underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-brand rounded">
+        <Link href="/reservations" className="shrink-0 self-stretch inline-flex items-center gap-1 text-ink font-medium underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-brand rounded">
           <Icon name="arrow_back" size={16} />
           管理画面に戻る
         </Link>
@@ -252,7 +283,7 @@ function DurationChip({ minutes }: { minutes: number }) {
 }
 
 function TextField({ id, label, required = false, ...input }: {
-  id: string; name: string; label: string; required?: boolean; type?: string; autoComplete?: string; placeholder?: string;
+  id: string; name: string; label: string; required?: boolean; type?: string; autoComplete?: string; placeholder?: string; defaultValue?: string;
 }) {
   return (
     <div>

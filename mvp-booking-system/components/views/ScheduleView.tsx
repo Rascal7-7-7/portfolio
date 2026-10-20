@@ -219,7 +219,7 @@ function DaySection({ date, offset, today, reservations, now, nowMin, staff, onS
 function DayButton({ label, icon, onClick }: { label: string; icon: IconName; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} aria-label={label}
-      className="h-8 w-9 flex items-center justify-center bg-canvas text-body hover:bg-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand">
+      className="size-11 md:h-8 md:w-9 flex items-center justify-center bg-canvas text-body hover:bg-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand">
       <Icon name={icon} />
     </button>
   );
