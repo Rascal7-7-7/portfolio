@@ -154,7 +154,12 @@ describe("検証できない表現が含まれていない", () => {
 describe("リンク", () => {
   it("すべて https の絶対URLである", () => {
     for (const project of projects) {
-      for (const [key, url] of Object.entries(project.links)) {
+      const { docs = [], ...single } = project.links;
+      const entries = [
+        ...Object.entries(single),
+        ...docs.map(({ label, href }) => [`docs: ${label}`, href] as const),
+      ];
+      for (const [key, url] of entries) {
         if (!url) continue;
         expect(url, `${project.slug}: ${key}`).toMatch(/^https:\/\//);
       }

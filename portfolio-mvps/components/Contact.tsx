@@ -11,7 +11,7 @@ export function Contact() {
         <SectionHeader
           id="contact-heading"
           title="連絡先"
-          description="作品やコードについてのご質問は、こちらからお願いします。"
+          description="インターン・選考のご連絡、作品やコードについてのご質問は、メールでお願いします。"
         />
 
         <div className="flex flex-col items-start sm:flex-row sm:gap-6">
