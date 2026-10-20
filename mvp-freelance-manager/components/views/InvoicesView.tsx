@@ -42,9 +42,19 @@ export function InvoicesView() {
         title="請求・入金"
         description="案件に紐づけて請求書を作成し、入金を記録します（デモのため実際の送付はしません）。"
         action={
-          <button type="button" onClick={() => setShowForm((v) => !v)} aria-expanded={showForm} className={buttonStyles.primary}>
-            <Plus size={16} aria-hidden />
-            請求書を作成
+          // 開いている間はフォーム内の「この内容で作成」を主ボタンにし、こちらは閉じる操作に下げる
+          <button
+            type="button"
+            onClick={() => setShowForm((v) => !v)}
+            aria-expanded={showForm}
+            className={showForm ? buttonStyles.secondary : buttonStyles.primary}
+          >
+            {showForm ? "閉じる" : (
+              <>
+                <Plus size={16} aria-hidden />
+                請求書を作成
+              </>
+            )}
           </button>
         }
       />

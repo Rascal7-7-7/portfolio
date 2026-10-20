@@ -1,4 +1,5 @@
 import EstimateDetail from "@/components/EstimateDetail";
+import { estimateNumber } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -7,7 +8,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params;
-  return { title: `見積 #${id} | 見積マネージャー` };
+  return { title: `${estimateNumber(Number(id))} | 見積マネージャー` };
 }
 
 export default async function EstimateDetailPage({ params, searchParams }: Props) {

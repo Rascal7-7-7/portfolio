@@ -65,10 +65,11 @@ export function useAppStore(): Snapshot | null {
   return useSyncExternalStore(subscribe, getSnapshot, () => null);
 }
 
-/** 入金を記録した直後に出すトースト。保存はしない（再読み込みで消えてよい） */
+/** 入金を記録した直後・請求書を作成した直後に出すトースト。保存はしない（再読み込みで消えてよい） */
 export interface PaidToast {
   /** 同じ請求を続けて記録しても表示タイマーを掛け直せるよう、毎回変わる番号 */
   readonly key: number;
+  readonly kind: "paid" | "created";
   readonly invoiceId: string;
   readonly number: string;
   readonly amount: number;
@@ -136,6 +137,13 @@ export const actions = {
         },
       ],
     }));
+    const { data } = getSnapshot();
+    const created = data.invoices.find((inv) => inv.id === id);
+    if (created) {
+      const client = data.projects.find((p) => p.id === created.projectId)?.client ?? "";
+      toastSeq += 1;
+      setPaidToast({ key: toastSeq, kind: "created", invoiceId: id, number: created.number, amount: created.amount, client });
+    }
     return id;
   },
   setInvoicePaid(id: string, paid: boolean): void {
@@ -150,7 +158,7 @@ export const actions = {
     if (paid && invoice) {
       const client = data.projects.find((p) => p.id === invoice.projectId)?.client ?? "";
       toastSeq += 1;
-      setPaidToast({ key: toastSeq, invoiceId: id, number: invoice.number, amount: invoice.amount, client });
+      setPaidToast({ key: toastSeq, kind: "paid", invoiceId: id, number: invoice.number, amount: invoice.amount, client });
     } else if (paidToast?.invoiceId === id) {
       setPaidToast(null);
     }
