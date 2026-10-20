@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Estimate } from "@/types";
 import { KNOWN_CLIENTS, PRESET_ITEMS } from "@/data/seed";
 import { useEstimates } from "@/lib/store";
@@ -19,6 +19,7 @@ import {
   parseItem,
   sampleDraft,
   toDraftItem,
+  todayDates,
   toPreview,
   validateDraft,
 } from "./draft";
@@ -35,6 +36,11 @@ export default function EstimateForm({ initial }: Props) {
   const { create, update } = useEstimates();
   const [draft, setDraft] = useState<Draft>(() => (initial ? draftFromEstimate(initial) : emptyDraft()));
   const [errors, setErrors] = useState<string[]>([]);
+
+  // 新規作成の発行日・有効期限はクライアントの「今日」で入れる（プリレンダー時の日付と食い違うと hydration エラーになる）
+  useEffect(() => {
+    if (!initial) setDraft((d) => (d.issuedAt ? d : { ...d, ...todayDates() }));
+  }, [initial]);
 
   const preview = toPreview(draft);
   // 行ごとの金額。数量・単価が不正な行は null（行内に赤字で理由を出し、合計には入れない）

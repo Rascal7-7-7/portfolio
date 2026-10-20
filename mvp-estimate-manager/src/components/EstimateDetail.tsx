@@ -37,6 +37,8 @@ const TONE_CLASS: Record<"primary" | "neutral", string> = {
   neutral: "border border-line bg-white text-navy hover:bg-canvas",
 };
 
+const SAVED_NOTICE = "保存しました。";
+
 const BUTTON =
   "inline-flex items-center justify-center gap-1.5 rounded px-3.5 py-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
 
@@ -47,7 +49,7 @@ interface Props {
 
 export default function EstimateDetail({ id, justSaved }: Props) {
   const { estimates, setStatus } = useEstimates();
-  const [notice, setNotice] = useState(justSaved ? "保存しました。内容を確認して「送付済みにする」で送付できます" : "");
+  const [notice, setNotice] = useState(justSaved ? SAVED_NOTICE : "");
 
   if (!estimates) return <LoadingState />;
   const estimate = estimates.find((e) => e.id === id);
@@ -55,6 +57,8 @@ export default function EstimateDetail({ id, justSaved }: Props) {
 
   // 主ボタンは1つだけ。下書きは「送付済みにする」、送付後は承認の流れを見せる「お客様の画面」、受注後は Hikae の請求書
   const actions = ACTIONS[estimate.status];
+  // 「送付済みにする」があるのは下書きだけ。送付後に保存したときは案内を付けない
+  const shownNotice = notice === SAVED_NOTICE && estimate.status === "draft" ? `${SAVED_NOTICE}内容を確認して「送付済みにする」で送付できます` : notice;
   const primary = estimate.status === "draft" ? actions[0] : null;
   const others = primary ? actions.slice(1) : actions;
 
@@ -98,7 +102,11 @@ export default function EstimateDetail({ id, justSaved }: Props) {
             ) : estimate.status === "won" ? (
               <HikaeLink id={estimate.id} />
             ) : (
-              <CustomerLink id={estimate.id} className={`${BUTTON} ${TONE_CLASS.primary}`} />
+              // 受注は「その他」に入れてあるので、ふだんの流れ（先方の承認）を一言添える
+              <div className="flex flex-col gap-1">
+                <CustomerLink id={estimate.id} className={`${BUTTON} ${TONE_CLASS.primary}`} />
+                {estimate.status === "sent" && <p className="text-xs text-muted">お客様が承認すると受注になります（手動なら「その他」から）</p>}
+              </div>
             )}
             <MoreMenu>
               {(close) => (
@@ -126,10 +134,10 @@ export default function EstimateDetail({ id, justSaved }: Props) {
           <p
             role="status"
             aria-live="polite"
-            className={notice ? "text-balance flex items-start gap-2 rounded border border-line bg-canvas px-3 py-2 text-sm text-navy" : "sr-only"}
+            className={shownNotice ? "text-balance flex items-start gap-2 rounded border border-line bg-canvas px-3 py-2 text-sm text-navy" : "sr-only"}
           >
-            {notice && <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-primary" />}
-            {notice}
+            {shownNotice && <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-primary" />}
+            {shownNotice}
           </p>
         </section>
       </div>

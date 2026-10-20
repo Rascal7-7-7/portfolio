@@ -34,14 +34,20 @@ export function emptyItem(): DraftItem {
   return { id: newItemId(), name: "", unit: "", unitPrice: "", quantity: "1" };
 }
 
-export function emptyDraft(): Draft {
+/** 今日を発行日にした日付欄。静的プリレンダーにビルド日が焼き込まれないよう、クライアントでだけ呼ぶ */
+export function todayDates(): Pick<Draft, "issuedAt" | "validUntil"> {
   const issuedAt = todayISO();
+  return { issuedAt, validUntil: addDays(issuedAt, VALID_DAYS) };
+}
+
+/** 日付は空のまま。作成フォームがマウント後に todayDates() で埋める */
+export function emptyDraft(): Draft {
   return {
     clientName: "",
     contactName: "",
     subject: "",
-    issuedAt,
-    validUntil: addDays(issuedAt, VALID_DAYS),
+    issuedAt: "",
+    validUntil: "",
     note: "お支払い条件：納品月末締め翌月末払い",
     items: [emptyItem()],
   };
@@ -50,6 +56,7 @@ export function emptyDraft(): Draft {
 export function sampleDraft(): Draft {
   return {
     ...emptyDraft(),
+    ...todayDates(),
     clientName: "株式会社ミライ食品",
     contactName: "山本 彩",
     subject: "新商品 特設サイト制作",
