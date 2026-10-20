@@ -35,10 +35,7 @@ export function MVPGrid() {
           小さな事業者向けの業務モックアップ（{standard.length}本の連作）
         </h3>
         <p className="mt-1 leading-[1.8] text-ink-muted">
-          {`集客・予約・見積・販売・請求の業務を、1本ずつ画面にしたモックアップです。${standard.length}本とも API やデータベースを使わずブラウザ内のダミーデータで動き、公開デモで操作できます。見積から受注・請求までがつながっていて、見積管理ツールの `}
-          {/* 見積番号はハイフンで折り返さない */}
-          <span className="whitespace-nowrap">EST-0014</span>
-          {` からフリーランス管理ツール（Hikae）の請求書へリンクで移れます。予約管理システムの店は Hikae の取引先でもあります。`}
+          {`集客・予約・見積・販売・請求の業務を、1本ずつ画面にしたモックアップです。${standard.length}本とも API やデータベースを使わずブラウザ内のダミーデータで動き、公開デモで操作できます。見積から受注・請求までがつながっていて、見積管理ツールで受注した見積から、フリーランス管理ツールの請求書へリンクで移れます（デモでは1件のみ連携）。予約管理システムは、フリーランス管理ツールの中では取引先から受けた開発案件として登場します。`}
         </p>
         <MetaItems items={sharedMetaItems(standard)} className="mt-2 mb-3" />
         <ul className="border-b border-rule">

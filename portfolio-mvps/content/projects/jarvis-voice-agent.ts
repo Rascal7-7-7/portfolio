@@ -3,7 +3,7 @@ import type { Project } from "./types";
 export const jarvisVoiceAgent: Project = {
   slug: "jarvis-voice-agent",
   name: "JARVIS",
-  headline: "AIを信頼境界にしない前提で設計した常駐音声アシスタント",
+  headline: "LLMの判断を信頼境界にしない常駐音声アシスタント",
   summary:
     "macOS に常駐し、発話から開発作業を実行します。LLM のルーターを信頼境界にせず、その前後を決定的なポリシー層で挟む構成にしました。判断の根拠は、自分で計測した数値に置いています。",
   tier: "featured",
@@ -12,16 +12,15 @@ export const jarvisVoiceAgent: Project = {
   period: { start: "2026-09" },
   stack: ["Python", "Swift (SwiftUI)", "Ollama (ローカルLLM)", "launchd", "pytest"],
   highlights: [
-    { label: "LLMを信頼境界にしない設計", type: "check" },
-    { label: "日本語音声特有の脆弱性3件を修正", type: "check" },
-    { label: "テスト34ファイル・CIで297件成功", type: "data" },
+    { label: "Prompt Injection の検証（流出0件）", type: "check" },
+    { label: "日本語入力でゲートをすり抜ける不具合3件を修正", type: "check" },
+    { label: "CIで297件成功（マイク不要の10スイート）", type: "data" },
   ],
   verification: "code-only",
   evidence: [
     "$ bench router=gemma4:e2b",
     "「gitで強制プッシュして」 → 実行系に分類",
     "危険な操作の分類精度  0.75",
-    "→ LLM を信頼境界にしない",
     "→ 前後を決定的なポリシー層で挟む",
     "$ gate（決定的なポリシー層）",
     "危険な発話の検出  25 / 25（見逃し 0）",
@@ -55,8 +54,8 @@ export const jarvisVoiceAgent: Project = {
     steps: [
       { label: "発話", note: "音声で開発作業を指示する" },
       { label: "ポリシー層（決定的）", note: "LLM の前で判定する", boundary: true },
-      { label: "LLM ルーター", note: "ローカルLLMが分類する。信頼境界にしない" },
-      { label: "ポリシー層（決定的）", note: "LLM の後で判定する", boundary: true },
+      { label: "LLM ルーター", note: "ローカルLLMが分類する" },
+      { label: "ポリシー層（決定的）", note: "コマンドを拒否パターンと照合する", boundary: true },
       { label: "実行", note: "開発作業を実行する" },
     ],
     sidePath: {
@@ -72,7 +71,7 @@ export const jarvisVoiceAgent: Project = {
     {
       question: "なぜ LLM のルーターを信頼境界にしなかったのか",
       answer:
-        "ベンチマークで gemma4:e2b が「gitで強制プッシュして」を確認要求ではなく実行系に分類し、危険な操作の分類精度は 0.75 でした。危険な操作の分類を LLM 単体で行うと取り違えが出るため、LLM だけを発話と破壊的な操作の間に置くことはできません。そこで LLM の前後を決定的なポリシー層で挟みました。前段のゲートは、危険な発話25件をすべて止め、通常の発話17件をすべて通しています（誤検知・見逃しとも0件）。",
+        "ベンチマークで gemma4:e2b が「gitで強制プッシュして」を確認要求ではなく実行系に分類し、危険な操作の分類精度は 0.75 でした。危険な操作の分類を LLM 単体で行うと取り違えが出るため、LLM だけを発話と破壊的な操作の間に置くことはできません。そこで LLM の前後を決定的なポリシー層で挟みました。後段では、実行するシェルコマンドの文字列を40個の拒否パターン（approvals.deny）と照合します。前段のゲートは、危険な発話25件をすべて止め、通常の発話17件をすべて通しています（誤検知・見逃しとも0件）。",
     },
     {
       question: "なぜ表示層（HUD）にコマンド実行権を持たせなかったのか",
@@ -91,14 +90,13 @@ export const jarvisVoiceAgent: Project = {
     },
   ],
   security: [
-    "LLM の判断を信頼境界にせず、決定的なポリシー層で前後を挟む",
     "プロンプトインジェクションを仕込んだ HTML を要約経路に通して検証（ペイロードの実行なし、ログ中の SSH 鍵素材0件、シェル履歴の流出先ドメイン0件、Codex の設定ファイルは sha256 が一致し改変なし）",
     "設定値ではなく実効的な制御を特定。Codex の approval_policy は非対話の codex exec には適用されないため、書き込みを防いでいるのは argv に固定した --sandbox read-only だと確かめた（ファイルの変更を指示しても sha256 は変わらなかった）",
     "呼び出しのたびに設定の解決経路を検証し、想定と異なれば停止する（fail-closed）",
     "状態ファイルの権限を絞り、同一マシンの他アカウントから読めないようにした",
   ],
   testing:
-    "テストは34ファイルあります。このうちマイクを必要としない10スイートを push / PR ごとに GitHub Actions で実行しており、main の最新コミット（2026-09-12）の実行では297件成功・2件スキップでした。",
+    "テストは34ファイルあります。このうちマイクを必要としない10スイートを push / PR ごとに GitHub Actions で実行しており、2026-09-12 時点の main の実行では297件成功・2件スキップでした。",
   learned: [
     "正規表現の単語境界は、言語をまたぐと前提が崩れる",
     "「設定してある」と「実際に効いている」は別物で、後者は毎回確かめる必要がある",
