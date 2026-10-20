@@ -54,7 +54,7 @@ export function Hero() {
           */}
           <span className="whitespace-nowrap">関心を持つように</span>
           <wbr />
-          なり、自作の音声エージェントで実際に{" "}
+          なり、AI と作った音声エージェントで実際に{" "}
           <span className="whitespace-nowrap">Prompt Injection を</span>流して防御を検証しました。小さな作品は公開デモで、代表作はソースコードで確認できます。
         </p>
 
