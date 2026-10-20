@@ -50,7 +50,7 @@ export default function CustomerView({ id }: { id: number }) {
 
         <section aria-label="お見積り" className="mt-4 rounded-lg border border-line bg-white shadow-sm">
           <div className="p-6">
-            <p className="text-sm text-body">お見積り金額（税込）</p>
+            <h1 className="text-sm font-normal text-body">お見積り金額（税込）</h1>
             <p className="tnum mt-1 text-4xl font-semibold tracking-tight text-navy">{formatYen(total)}</p>
             <p className="tnum mt-1 text-xs text-muted">うち消費税（{TAX_RATE_PERCENT}%）{formatYen(tax)}</p>
             <ExpiryNote validUntil={estimate.validUntil} />
