@@ -11,7 +11,7 @@ export const profile = {
   department: "デザイン・コンピューター学科 IT・情報処理専攻",
   status: "学生",
   graduation: "2028年3月卒業予定",
-  activity: "NPO法人タダカヨでエンジニアとして活動中",
+  activity: "NPO法人タダカヨでエンジニアとして活動中（2026年4月〜）",
   /** 興味の優先順位。上ほど強い。 */
   interests: [
     { label: "AI × セキュリティ", primary: true },
