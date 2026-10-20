@@ -34,7 +34,7 @@ export default function ReservationsView() {
         title="予約一覧"
         description={<span className="tabular-nums">{formatFullDate(today)}</span>}
         action={
-          <Link href="/reservations/new" className={btn('primary')}>
+          <Link href="/reservations/new" className={`${btn('primary')} max-md:min-h-11`}>
             <Icon name="add" />
             新規予約
           </Link>
@@ -53,7 +53,7 @@ export default function ReservationsView() {
         <p className="text-sm text-body text-pretty">
           お客様がスマホから予約すると、<span className="font-medium text-ink">受付経路「Web」・確定待ち</span>でこの一覧に入ってきます。
         </p>
-        <Link href="/book" className={`${btn('secondary', 'sm')} self-start sm:self-auto`}>
+        <Link href="/book" className={`${btn('secondary', 'sm')} max-md:min-h-11 self-start sm:self-auto`}>
           <Icon name="storefront" />
           お客様の予約ページを開く
         </Link>
@@ -73,7 +73,7 @@ export default function ReservationsView() {
         <button
           type="button"
           onClick={handleReset}
-          className="underline underline-offset-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-brand rounded"
+          className="max-md:min-h-11 max-md:px-3 underline underline-offset-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-brand rounded"
         >
           デモデータに戻す
         </button>

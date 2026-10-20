@@ -19,7 +19,7 @@ interface Props {
 }
 
 export const inputCls =
-  'w-full bg-canvas border border-line-strong rounded-md px-3 py-2 text-sm text-ink ' +
+  'w-full max-md:min-h-11 bg-canvas border border-line-strong rounded-md px-3 py-2 text-sm text-ink ' +
   'focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none aria-[invalid=true]:border-attn ' +
   'placeholder:text-dim';
 

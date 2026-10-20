@@ -36,7 +36,7 @@ export default function MonthCalendar({ month, today, selected, isAvailable, can
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center" role="group" aria-label="日付を選ぶ">
+      <div className="grid grid-cols-7 gap-0.5 sm:gap-1 text-center" role="group" aria-label="日付を選ぶ">
         {WEEKDAYS.map(w => <span key={w} className="text-xs text-dim pb-1" aria-hidden="true">{w}</span>)}
         {Array.from({ length: first.getDay() }, (_, i) => <span key={`pad-${i}`} />)}
         {days.map(d => {

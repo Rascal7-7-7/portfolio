@@ -233,7 +233,7 @@ function StaffSwitcher({ current, counts, onChange }: { current: Staff; counts: 
         const active = s === current;
         return (
           <button key={s} type="button" aria-pressed={active} onClick={() => onChange(s)}
-            className={`h-9 rounded-[5px] text-sm focus-visible:outline-2 focus-visible:outline-brand ${
+            className={`h-11 rounded-[5px] text-sm focus-visible:outline-2 focus-visible:outline-brand ${
               active ? 'bg-canvas text-ink font-medium shadow-[0_0_0_1px_var(--color-line),0_1px_2px_rgba(0,0,0,0.06)]' : 'text-dim hover:text-ink'
             }`}>
             <span className={`inline-block size-2 rounded-full mr-1.5 align-[1px] ${STAFF_TONE[s].dot}`} aria-hidden="true" />
