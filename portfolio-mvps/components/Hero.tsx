@@ -31,6 +31,8 @@ export function Hero() {
           <span className="inline-block">{profile.school}</span>{" "}
           <span className="inline-block">{profile.department}</span>{" "}
           <span className="inline-block">{profile.graduation}</span>
+          <br />
+          <span className="inline-block">{profile.aim}</span>
         </p>
 
         {/* 何をする人か。語の途中で折り返さないよう、意味の切れ目ごとに inline-block で区切る */}
@@ -77,6 +79,11 @@ export function Hero() {
         <div className="space-y-1">
           <Interests />
           <p className="text-[15px] text-ink-subtle">{profile.activity}</p>
+          <p className="text-[15px] text-ink-subtle">
+            {profile.certifications.map((part) => (
+              <span key={part} className="inline-block">{part}</span>
+            ))}
+          </p>
         </div>
       </div>
     </section>

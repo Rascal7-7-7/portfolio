@@ -8,11 +8,10 @@ export const ouchiCafe: Project = {
     "2025年度の卒業・進級制作。4人チームで開発しました。味覚診断の回答を12次元のベクトルに変換し、Python側の推薦エンジンが好みに近い商品を返します。フレームワークを使わない PHP で、ルーティング・DBアクセス・認証を自前で実装しました。",
   tier: "featured",
   categories: ["ai", "web"],
-  // TODO: チーム内での担当範囲を、本人の言葉で具体化する
   team: {
     kind: "team",
     members: 4,
-    myRole: "全 610 コミット中 556 件（main ブランチ、2026-10 時点）",
+    myRole: "バックエンド（PHP・SQL）を担当。全 610 コミット中 556 件（main ブランチ、2026-10 時点）",
   },
   period: { start: "2025-10", end: "2026-02" },
   stack: ["PHP 8.2", "MySQL 8.0", "FastAPI", "LightGBM", "Stripe"],
