@@ -43,3 +43,31 @@ test('デモ定期便の開始日は、お届け回数と次回日から逆算�
 test('商品名の文節（nameParts）をつなぐと商品名に一致する', () => {
   for (const p of PRODUCTS) assert.equal(p.nameParts.join(''), p.name);
 });
+
+test('スキップは1回だけで、取り消すと元の日付に戻る', () => {
+  const state = seedState(TODAY);
+  const sub = state.subscriptions[0];
+  const skipped = storeReducer(state, { type: 'skip', id: sub.id });
+  assert.equal(canSkip(skipped.subscriptions[0]), false);
+  assert.deepEqual(storeReducer(skipped, { type: 'skip', id: sub.id }), skipped);
+  const undone = storeReducer(skipped, { type: 'unskip', id: sub.id }).subscriptions[0];
+  assert.equal(undone.nextDelivery, sub.nextDelivery);
+  assert.equal(canSkip(undone), true);
+});
+
+test('お届け間隔を変えると前回お届け日から数え直し、戻すと元の次回日になる', () => {
+  const state = seedState(TODAY);
+  const sub = state.subscriptions[0];
+  const bi = storeReducer(state, { type: 'changeInterval', id: sub.id, interval: 'bimonthly', today: TODAY });
+  assert.equal(bi.subscriptions[0].interval, 'bimonthly');
+  assert.equal(bi.subscriptions[0].nextDelivery, addMonths(sub.nextDelivery!, 1));
+  const back = storeReducer(bi, { type: 'changeInterval', id: sub.id, interval: 'monthly', today: TODAY });
+  assert.equal(back.subscriptions[0].nextDelivery, sub.nextDelivery);
+});
+
+test('初回前の間隔変更では、約束済みの初回日を動かさない', () => {
+  const state = orderedState();
+  const sub = state.subscriptions[0];
+  const after = storeReducer(state, { type: 'changeInterval', id: sub.id, interval: 'bimonthly', today: TODAY });
+  assert.equal(after.subscriptions[0].nextDelivery, firstDelivery(TODAY));
+});

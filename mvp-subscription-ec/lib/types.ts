@@ -61,6 +61,8 @@ export type Subscription = {
   nextDelivery: string | null;
   startedAt: string;
   deliveredCount: number;
+  /** 次回をスキップしたときの元の日付（取り消しで戻す）。古い保存データには無い */
+  skippedFrom?: string | null;
 };
 
 export type Totals = {
