@@ -44,7 +44,7 @@ export default function MyPage() {
     const next = withInterval(sub, interval, today).nextDelivery;
     const dates = sub.nextDelivery && next && next !== sub.nextDelivery ? ['、次回', `${formatJa(sub.nextDelivery)} → ${formatJa(next)}`] : [];
     dispatch({ type: 'changeInterval', id: sub.id, interval, today });
-    setMessage([`${name}の`, 'お届け間隔を', '変更しました：', `${INTERVAL_LABEL[sub.interval]} → ${INTERVAL_LABEL[interval]}`, ...dates]);
+    setMessage([`${name}の`, 'お届け間隔を', '変更しました：', `${INTERVAL_LABEL[sub.interval]} → ${INTERVAL_LABEL[interval]}`, ...dates, ...(sub.skippedFrom ? ['（スキップは解除されました）'] : [])]);
   };
 
   return (
