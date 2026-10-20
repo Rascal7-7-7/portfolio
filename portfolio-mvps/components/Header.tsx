@@ -27,7 +27,7 @@ export function Header() {
       </a>
       <header id="top">
         {/* 幅と余白は本文と同じ container を使い、名前の左端を本文に揃える */}
-        <div className={cn(container, "h-16 flex items-center justify-between gap-4")}>
+        <div className={cn(container, "h-16 flex items-center justify-between gap-3")}>
           <a
             href="/#top"
             className="font-semibold text-ink whitespace-nowrap"
@@ -37,7 +37,7 @@ export function Header() {
           </a>
 
           <nav aria-label="サイト内ナビゲーション">
-            <ul className="flex items-center gap-4 sm:gap-5 text-[15px]">
+            <ul className="flex items-center gap-3 sm:gap-5 text-[14px] sm:text-[15px]">
               {navItems.map(({ href, label }) => (
                 <li key={href}>
                   <a href={href} className={navLink}>

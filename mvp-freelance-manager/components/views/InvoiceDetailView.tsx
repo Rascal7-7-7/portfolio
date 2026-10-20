@@ -25,12 +25,12 @@ export function InvoiceDetailView({ id }: { id: string }) {
   if (!invoice) {
     return (
       <Page>
-        <p className="py-16 text-center text-sm text-warm-500">
+        <h1 className="py-16 text-center text-sm font-normal text-warm-500">
           請求書が見つかりません。
-          <Link href="/invoices" className="ml-1 text-blue hover:underline">
+          <Link href="/invoices" className="ml-1 text-blue underline">
             請求一覧へ
           </Link>
-        </p>
+        </h1>
       </Page>
     );
   }
