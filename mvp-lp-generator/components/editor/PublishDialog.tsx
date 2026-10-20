@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { isValidSlug, mockPublicUrl, MOCK_DOMAIN, sanitizeSlug, savePublished } from '@/lib/storage'
+import { isValidSlug, mockPublicUrl, MOCK_DOMAIN, sanitizeSlug, savePublished, slugFor } from '@/lib/storage'
 import type { LPDoc } from '@/lib/types'
 import Icon from '../Icon'
 import { inputCls } from './fields'
@@ -11,11 +11,13 @@ interface Props {
   doc: LPDoc
   open: boolean
   onClose: () => void
+  /** 公開に使った URL をエディタ側の doc に残し、次に開いたときの初期値とプレビューの URL 欄にする */
+  onPublished: (slug: string) => void
 }
 
-export default function PublishDialog({ doc, open, onClose }: Props) {
+export default function PublishDialog({ doc, open, onClose, onPublished }: Props) {
   const ref = useRef<HTMLDialogElement>(null)
-  const [slug, setSlug] = useState(doc.slug)
+  const [slug, setSlug] = useState(() => slugFor(doc))
   const [published, setPublished] = useState(false)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
@@ -24,14 +26,14 @@ export default function PublishDialog({ doc, open, onClose }: Props) {
     const el = ref.current
     if (!el) return
     if (open && !el.open) {
-      setSlug(doc.slug)
+      setSlug(slugFor(doc))
       setPublished(false)
       setError('')
       setCopied(false)
       el.showModal()
     }
     if (!open && el.open) el.close()
-  }, [open, doc.slug])
+  }, [open, doc])
 
   function publish() {
     if (!isValidSlug(slug)) {
@@ -44,6 +46,7 @@ export default function PublishDialog({ doc, open, onClose }: Props) {
     }
     setError('')
     setPublished(true)
+    onPublished(slug)
   }
 
   async function copy() {

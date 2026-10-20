@@ -96,7 +96,7 @@ function Nav({ store, wide }: TemplateProps) {
   )
 }
 
-function Hero({ store, wide, roomy }: TemplateProps) {
+function Hero({ store, wide, roomy, headline: H }: TemplateProps) {
   const rows = [store.hours && `${hoursWord(store)} ${store.hours}`, store.closed && `定休 ${store.closed}`, store.address].filter(Boolean)
   const { concept, rest } = splitDescription(store.description)
   return (
@@ -133,7 +133,7 @@ function Hero({ store, wide, roomy }: TemplateProps) {
             {LINE_ART[store.category]}
           </svg>
         )}
-        <h1
+        <H
           className={cx(
             'font-mincho font-semibold leading-[1.7] tracking-[0.2em] [writing-mode:vertical-rl]',
             // エディタのプレビュー枠（wide だが roomy でない幅）では一段小さくし、初期表示で列の下が切れないようにする
@@ -145,7 +145,7 @@ function Hero({ store, wide, roomy }: TemplateProps) {
               <Phrases text={line} />
             </span>
           ))}
-        </h1>
+        </H>
       </div>
     </section>
   )

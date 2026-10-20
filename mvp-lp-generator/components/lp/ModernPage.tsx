@@ -33,7 +33,7 @@ function Nav({ store, wide }: TemplateProps) {
   )
 }
 
-function Hero({ store, wide }: TemplateProps) {
+function Hero({ store, wide, headline: H }: TemplateProps) {
   const rows = [store.hours && `${hoursWord(store)} ${store.hours}`, store.closed && `定休 ${store.closed}`, store.address].filter(Boolean)
   return (
     <section className={wide ? 'px-14 pb-20 pt-24' : 'px-6 pb-14 pt-14'}>
@@ -42,14 +42,14 @@ function Hero({ store, wide }: TemplateProps) {
         <span className="mx-2">/</span>
         {CATEGORIES[store.category].en}
       </p>
-      <h1
+      <H
         className={cx(
           'mt-8 font-bold tracking-[-0.01em]',
           wide ? 'text-[clamp(44px,7cqw,84px)] leading-[1.18]' : 'text-[34px] leading-[1.35]',
         )}
       >
         <Phrases text={catchCopy(store)} />
-      </h1>
+      </H>
       <div className={cx(LINE, 'border-t', wide ? 'mt-20 grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-16 pt-10' : 'mt-12 space-y-8 pt-8')}>
         {store.description && <p className={cx(MUTED, 'max-w-[34em] text-[15px] leading-[2]')}>{store.description}</p>}
         <div>
