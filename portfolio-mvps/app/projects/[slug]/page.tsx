@@ -195,6 +195,19 @@ export default function ProjectDetail({ params }: { params: Params }) {
                 コードを見る
               </TextLink>
             )}
+            {project.links.docs?.map(({ label, href }) => (
+              <TextLink
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                tone="accent"
+                aria-label={`${label}を見る（新しいタブで開く）`}
+              >
+                {label}
+                <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+              </TextLink>
+            ))}
           </div>
 
           {/* 一覧の代表作と同じ根拠を、ここでも最初に見せる（画像の代わり） */}
