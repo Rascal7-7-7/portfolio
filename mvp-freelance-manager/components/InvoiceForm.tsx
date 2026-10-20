@@ -29,7 +29,10 @@ export function InvoiceForm({ projects, invoices, today, defaultProjectId, onCre
     const rest = remainingOf(id);
     return rest !== null && rest > 0 ? String(rest) : "";
   };
-  const [projectId, setProjectId] = useState(defaultProjectId ?? selectable[0]?.id ?? "");
+  const [projectId, setProjectId] = useState(
+    // 受注額まで請求済みの案件を初期選択にすると作成ボタンが押せない状態で開くため、残額のある案件を先に選ぶ
+    () => defaultProjectId ?? (selectable.find((p) => remainingBillable(p, invoices) > 0) ?? selectable[0])?.id ?? "",
+  );
   const [amount, setAmount] = useState(() => initialAmount(projectId));
   const [dueOn, setDueOn] = useState(addDays(today, 30));
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +102,7 @@ export function InvoiceForm({ projects, invoices, today, defaultProjectId, onCre
         <DateInput min={today} value={dueOn} onChange={setDueOn} className="mt-1" />
       </label>
       <button type="submit" disabled={fullyBilled} className={`${buttonStyles.primary} disabled:cursor-not-allowed disabled:opacity-50`}>
-        請求書を作成
+        この内容で作成
       </button>
       {remaining !== null && (
         <p
