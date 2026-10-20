@@ -15,7 +15,7 @@ export function Header() {
   // 現在地は色だけでなく下線と太さでも示す（色覚に依存しない）
   const navClass = (href: string) =>
     cn(
-      'inline-flex items-center gap-1.5 px-3 py-2 text-sm text-on-surface-variant underline-offset-[6px] transition-colors hover:text-on-surface hover:underline',
+      'inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 px-3 py-2 text-sm text-on-surface-variant underline-offset-[6px] transition-colors hover:text-on-surface hover:underline',
       isCurrent(href) && 'font-semibold text-on-surface underline decoration-1',
     );
   const current = (href: string) => (isCurrent(href) ? ('page' as const) : undefined);
