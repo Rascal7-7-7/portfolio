@@ -38,7 +38,14 @@ function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null
 }
 
-/** localStorage の中身は信用しない。最低限の形を確かめてから使う。 */
+const STORE_TEXT = ['storeName', 'catchCopy', 'description', 'address', 'hours', 'closed', 'phone', 'ctaLabel'] as const
+
+/** 配列の要素がすべて、指定した文字列項目を持つ object か */
+function isListOf(v: unknown, keys: readonly string[]): boolean {
+  return Array.isArray(v) && v.every((item) => isObject(item) && keys.every((k) => typeof item[k] === 'string'))
+}
+
+/** localStorage の中身は信用しない。描画で触る項目の形を確かめてから使う（壊れた下書きでエディタが開けなくならないように）。 */
 export function parseDoc(raw: string | null): LPDoc | null {
   if (!raw) return null
   try {
@@ -49,12 +56,14 @@ export function parseDoc(raw: string | null): LPDoc | null {
       typeof v.slug === 'string' &&
       typeof v.template === 'string' &&
       v.template in THEMES &&
-      typeof store.storeName === 'string' &&
+      typeof v.id === 'string' &&
+      STORE_TEXT.every((k) => typeof store[k] === 'string') &&
       typeof store.category === 'string' &&
       store.category in CATEGORIES &&
-      Array.isArray(store.menu) &&
-      Array.isArray(store.features) &&
-      Array.isArray(store.voices)
+      isListOf(store.menu, ['emoji', 'name', 'description', 'price']) &&
+      isListOf(store.features, ['emoji', 'title', 'text']) &&
+      isListOf(store.voices, ['name', 'text']) &&
+      (store.owner === undefined || isListOf([store.owner], ['role', 'name', 'message']))
     return ok ? (v as unknown as LPDoc) : null
   } catch {
     return null

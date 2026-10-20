@@ -46,7 +46,7 @@ export default function BookingView() {
   const { reservations, today, create, notify } = useStore();
   const [menu, setMenu] = useState<Menu>(MENUS[0]);
   const [date, setDate] = useState<string | null>(null);
-  const [time, setTime] = useState<string | null>(null);
+  const [rawTime, setTime] = useState<string | null>(null);
   const [month, setMonth] = useState<string | null>(null);
   const [done, setDone] = useState<Done | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -71,14 +71,14 @@ export default function BookingView() {
   useEffect(() => {
     if (!restored || done) return;
     try {
-      window.sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ menu: menu.name, date, time, fields }));
+      window.sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ menu: menu.name, date, time: rawTime, fields }));
     } catch { /* 使えない環境では残さない */ }
-  }, [restored, done, menu, date, time, fields]);
+  }, [restored, done, menu, date, rawTime, fields]);
 
   // 時間を選んだら入力欄の見出しへ移る（スマホでは下にあるため）
   useEffect(() => {
-    if (time) formHeading.current?.focus();
-  }, [time]);
+    if (rawTime) formHeading.current?.focus();
+  }, [rawTime]);
 
   if (!reservations) return <LoadingState />;
 
@@ -90,6 +90,8 @@ export default function BookingView() {
   const selectedDate = date && slotsOf(date).length > 0 ? date : firstOpen;
   const shownMonth = month ?? monthOf(selectedDate);
   const slots = slotsOf(selectedDate);
+  // 復元した時刻は、選んだ日のまま空いているときだけ使う（日付が別の日に切り替わったら選び直し）
+  const time = rawTime && (date === null || date === selectedDate) && slots.some(s => s.time === rawTime) ? rawTime : null;
 
   // メニューを変えると空きのある日も変わるので、表示する月も選択中の日の月へ戻す
   const chooseMenu = (m: Menu) => { setMenu(m); setTime(null); setMonth(null); setError(null); };

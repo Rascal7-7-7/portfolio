@@ -7,7 +7,7 @@ import { DEMO_USER, INTERVAL_LABEL } from '@/lib/catalog';
 import { formatJa, nextAfter, todayIso } from '@/lib/date';
 import { monthlyEquivalent, yen } from '@/lib/pricing';
 import type { Subscription, SubscriptionInterval } from '@/lib/types';
-import { withInterval } from '@/lib/store';
+import { notBefore, withInterval } from '@/lib/store';
 import { Phrases } from '@/components/Phrases';
 import { SubscriptionCard, type SubscriptionCommand } from './_components/SubscriptionCard';
 
@@ -29,13 +29,13 @@ export default function MyPage() {
       command === 'skip' && sub.nextDelivery
         ? ['次回のお届けを', '変更しました：', `${formatJa(sub.nextDelivery)} → ${formatJa(nextAfter(sub.nextDelivery, sub.interval))}`]
         : command === 'unskip' && sub.nextDelivery && sub.skippedFrom
-          ? ['スキップを', '取り消しました：', `${formatJa(sub.nextDelivery)} → ${formatJa(sub.skippedFrom)}`]
+          ? ['スキップを', '取り消しました：', `${formatJa(sub.nextDelivery)} → ${formatJa(notBefore(sub.skippedFrom, today))}`]
         : command === 'pause'
           ? [`${name}の定期便を`, 'お休みにしました']
           : command === 'resume'
             ? [`${name}の定期便を`, '再開しました']
             : [`${name}の定期便を`, '解約しました'];
-    dispatch(command === 'resume' ? { type: 'resume', id: sub.id, today } : { type: command, id: sub.id });
+    dispatch(command === 'resume' || command === 'unskip' ? { type: command, id: sub.id, today } : { type: command, id: sub.id });
     setMessage(after);
   };
 

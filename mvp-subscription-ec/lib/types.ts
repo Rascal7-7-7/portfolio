@@ -63,6 +63,8 @@ export type Subscription = {
   deliveredCount: number;
   /** 次回をスキップしたときの元の日付（取り消しで戻す）。古い保存データには無い */
   skippedFrom?: string | null;
+  /** 間隔を変える前の次回日と間隔。月末の丸めで往復すると日付がずれないよう、ここから数え直す。古い保存データには無い */
+  intervalFrom?: { date: string; interval: SubscriptionInterval } | null;
 };
 
 export type Totals = {

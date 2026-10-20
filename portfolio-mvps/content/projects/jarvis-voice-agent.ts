@@ -24,8 +24,8 @@ export const jarvisVoiceAgent: Project = {
     "→ LLM を信頼境界にしない",
     "→ 前後を決定的なポリシー層で挟む",
     "$ gate（決定的なポリシー層）",
-    "危険な発話の検出  25 / 25",
-    "通常の発話の通過  17 / 17（誤検知 0・見逃し 0）",
+    "危険な発話の検出  25 / 25（見逃し 0）",
+    "通常の発話の通過  17 / 17（誤検知 0）",
   ],
   links: {
     github: "https://github.com/Rascal7-7-7/jarvis-voice-agent",

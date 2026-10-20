@@ -19,7 +19,7 @@ export type StoreAction =
   | { type: 'removeFromCart'; productId: string; interval: Interval }
   | { type: 'placeOrder'; today: string; orderId: string }
   | { type: 'skip'; id: string }
-  | { type: 'unskip'; id: string }
+  | { type: 'unskip'; id: string; today: string }
   | { type: 'changeInterval'; id: string; interval: SubscriptionInterval; today: string }
   | { type: 'pause'; id: string }
   | { type: 'resume'; id: string; today: string }
@@ -46,14 +46,23 @@ export function withInterval(sub: Subscription, interval: SubscriptionInterval, 
     ...sub,
     interval,
     unitPrice: unitPrice(findProduct(sub.productId)?.price ?? 0, interval),
-    skippedFrom: null,
+    ...CLEARED,
   };
   const base = sub.skippedFrom ?? sub.nextDelivery;
   if (sub.status !== 'active' || !base || sub.deliveredCount === 0) return { ...changed, nextDelivery: base };
-  const next = nextAfter(prevBefore(base, sub.interval), interval);
-  const earliest = firstDelivery(today);
-  return { ...changed, nextDelivery: next < earliest ? earliest : next };
+  const from = sub.intervalFrom ?? { date: base, interval: sub.interval };
+  const next = interval === from.interval ? from.date : nextAfter(prevBefore(from.date, from.interval), interval);
+  return { ...changed, intervalFrom: from, nextDelivery: notBefore(next, today) };
 }
+
+/** スキップ・間隔変更の記録を消す（ほかの操作をしたら元に戻す基準が変わるため） */
+const CLEARED = { skippedFrom: null, intervalFrom: null };
+
+/** 近すぎる日付は最短のお届け日に寄せる */
+export const notBefore = (iso: string, today: string) => {
+  const earliest = firstDelivery(today);
+  return iso < earliest ? earliest : iso;
+};
 
 const SEED_DELIVERED = 4;
 
@@ -152,22 +161,22 @@ export function storeReducer(state: StoreState, action: StoreAction): StoreState
       return placeOrder(state, action.today, action.orderId);
     case 'skip':
       return updateSub(state, action.id, (s) =>
-        canSkip(s) && s.nextDelivery ? { ...s, skippedFrom: s.nextDelivery, nextDelivery: nextAfter(s.nextDelivery, s.interval) } : s,
+        canSkip(s) && s.nextDelivery ? { ...s, ...CLEARED, skippedFrom: s.nextDelivery, nextDelivery: nextAfter(s.nextDelivery, s.interval) } : s,
       );
     case 'unskip':
       return updateSub(state, action.id, (s) =>
-        s.status === 'active' && s.skippedFrom ? { ...s, nextDelivery: s.skippedFrom, skippedFrom: null } : s,
+        s.status === 'active' && s.skippedFrom ? { ...s, ...CLEARED, nextDelivery: notBefore(s.skippedFrom, action.today) } : s,
       );
     case 'changeInterval':
       return updateSub(state, action.id, (s) => withInterval(s, action.interval, action.today));
     case 'pause':
-      return updateSub(state, action.id, (s) => (s.status === 'active' ? { ...s, status: 'paused', nextDelivery: null, skippedFrom: null } : s));
+      return updateSub(state, action.id, (s) => (s.status === 'active' ? { ...s, status: 'paused', nextDelivery: null, ...CLEARED } : s));
     case 'resume':
       return updateSub(state, action.id, (s) =>
-        s.status === 'paused' ? { ...s, status: 'active', nextDelivery: firstDelivery(action.today), skippedFrom: null } : s,
+        s.status === 'paused' ? { ...s, status: 'active', nextDelivery: firstDelivery(action.today), ...CLEARED } : s,
       );
     case 'cancel':
-      return updateSub(state, action.id, (s) => ({ ...s, status: 'canceled', nextDelivery: null, skippedFrom: null }));
+      return updateSub(state, action.id, (s) => ({ ...s, status: 'canceled', nextDelivery: null, ...CLEARED }));
     case 'reset':
       return seedState(action.today);
   }

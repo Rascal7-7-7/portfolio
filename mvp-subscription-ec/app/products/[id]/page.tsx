@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Params, parent: ResolvingMeta
   return {
     title: { absolute: title },
     description,
-    openGraph: { title, description, images: openGraph?.images },
+    openGraph: { title, description, images: openGraph?.images, siteName: openGraph?.siteName, locale: openGraph?.locale },
     twitter: { card: 'summary_large_image', title, description, images: twitter?.images },
   };
 }

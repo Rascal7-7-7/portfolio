@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { canSkip, seedState, storeReducer } from './store.ts';
 import { PRODUCTS } from './catalog.ts';
-import { addMonths, firstDelivery } from './date.ts';
+import { addDays, addMonths, firstDelivery } from './date.ts';
 
 const TODAY = '2026-10-19';
 
@@ -50,7 +50,7 @@ test('スキップは1回だけで、取り消すと元の日付に戻る', () =
   const skipped = storeReducer(state, { type: 'skip', id: sub.id });
   assert.equal(canSkip(skipped.subscriptions[0]), false);
   assert.deepEqual(storeReducer(skipped, { type: 'skip', id: sub.id }), skipped);
-  const undone = storeReducer(skipped, { type: 'unskip', id: sub.id }).subscriptions[0];
+  const undone = storeReducer(skipped, { type: 'unskip', id: sub.id, today: TODAY }).subscriptions[0];
   assert.equal(undone.nextDelivery, sub.nextDelivery);
   assert.equal(canSkip(undone), true);
 });
@@ -70,4 +70,23 @@ test('初回前の間隔変更では、約束済みの初回日を動かさな�
   const sub = state.subscriptions[0];
   const after = storeReducer(state, { type: 'changeInterval', id: sub.id, interval: 'bimonthly', today: TODAY });
   assert.equal(after.subscriptions[0].nextDelivery, firstDelivery(TODAY));
+});
+
+test('月末の次回日でも、間隔を往復すると元の次回日に戻る', () => {
+  const today = '2027-03-25';
+  const state = seedState(today);
+  const sub = state.subscriptions[0];
+  assert.equal(sub.nextDelivery, '2027-03-31');
+  const bi = storeReducer(state, { type: 'changeInterval', id: sub.id, interval: 'bimonthly', today });
+  const back = storeReducer(bi, { type: 'changeInterval', id: sub.id, interval: 'monthly', today });
+  assert.equal(back.subscriptions[0].nextDelivery, '2027-03-31');
+});
+
+test('スキップの取り消しで、過ぎた日付には戻さない', () => {
+  const state = seedState(TODAY);
+  const sub = state.subscriptions[0];
+  const skipped = storeReducer(state, { type: 'skip', id: sub.id });
+  const later = addDays(sub.nextDelivery!, 2);
+  const undone = storeReducer(skipped, { type: 'unskip', id: sub.id, today: later }).subscriptions[0];
+  assert.equal(undone.nextDelivery, firstDelivery(later));
 });

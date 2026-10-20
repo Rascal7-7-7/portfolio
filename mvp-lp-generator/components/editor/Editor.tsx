@@ -54,7 +54,8 @@ export default function Editor({ initial }: { initial: LPDoc }) {
   const loadSample = (sample: LPDoc) => {
     // URL だけ揃える（再マウントすると生成演出が消えるため、ルーター遷移はしない）
     window.history.replaceState(null, '', `/editor/${sample.id}`)
-    generate(sample)
+    // 別のサンプルに切り替えるときは、そのサンプルの下書きがあればそれを開く（素のサンプルで上書きしない）
+    generate(sample.id === doc.id ? sample : (loadDraft(sample.id) ?? sample))
   }
   const updateStore = (patch: Partial<StoreInfo>) => setDoc((d) => ({ ...d, store: { ...d.store, ...patch } }))
   const updateMenu = (index: number, patch: Partial<MenuItem>) =>
