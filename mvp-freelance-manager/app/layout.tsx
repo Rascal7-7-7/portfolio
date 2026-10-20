@@ -11,9 +11,16 @@ const notoSansJP = Noto_Sans_JP({
   display: "swap",
 });
 
+const TITLE = "Hikae — 個人事業の業務をまとめて管理";
+const DESCRIPTION = "案件・タスク・請求と入金をひとつの画面で。フリーランス向けバックオフィスのデモ";
+
+// og:image は app/opengraph-image.png（ファイル規約）から自動で付く
 export const metadata: Metadata = {
-  title: { default: "Hikae — 個人事業の業務をまとめて管理", template: "%s | Hikae" },
-  description: "案件・タスク・請求と入金をひとつの画面で。フリーランス向けバックオフィスのデモ",
+  metadataBase: new URL("https://mvp-freelance-manager.vercel.app"),
+  title: { default: TITLE, template: "%s | Hikae" },
+  description: DESCRIPTION,
+  openGraph: { type: "website", siteName: "Hikae", title: TITLE, description: DESCRIPTION, locale: "ja_JP" },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION, images: "/opengraph-image.png" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

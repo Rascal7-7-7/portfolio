@@ -45,7 +45,7 @@ export default function CartPage() {
                     <button
                       type="button"
                       onClick={() => dispatch({ type: 'removeFromCart', productId: line.productId, interval: line.interval })}
-                      className="p-1.5 text-on-surface-variant transition-colors hover:text-on-surface"
+                      className="-m-2 p-3.5 text-on-surface-variant transition-colors hover:text-on-surface"
                       aria-label={`${line.product.name}をカートから削除`}
                     >
                       <Trash2 className="h-4 w-4" aria-hidden />

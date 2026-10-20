@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PRODUCTS } from '@/lib/catalog';
 import { ProductCard } from '@/components/ProductCard';
@@ -30,6 +31,8 @@ const STEPS = [
   { n: '2', title: '3日後に初回お届け', body: '焙煎・製造したてを、商品の形に合わせてポスト投函か宅配便でお届けします。' },
   { n: '3', title: 'マイページで調整', body: '在庫が余ったらスキップ。お休みも解約もワンタップ。' },
 ];
+
+export const metadata: Metadata = { title: '商品一覧' };
 
 export default function ProductsPage() {
   const hero = PRODUCTS[0];

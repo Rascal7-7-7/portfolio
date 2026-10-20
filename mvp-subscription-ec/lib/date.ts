@@ -39,6 +39,10 @@ export function nextAfter(iso: string, interval: SubscriptionInterval): string {
   return addMonths(iso, MONTHS_PER_INTERVAL[interval]);
 }
 
+export function prevBefore(iso: string, interval: SubscriptionInterval): string {
+  return addMonths(iso, -MONTHS_PER_INTERVAL[interval]);
+}
+
 export function firstDelivery(today: string): string {
   return addDays(today, FIRST_DELIVERY_LEAD_DAYS);
 }

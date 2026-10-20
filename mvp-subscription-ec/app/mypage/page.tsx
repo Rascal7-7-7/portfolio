@@ -3,10 +3,11 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
-import { DEMO_USER } from '@/lib/catalog';
+import { DEMO_USER, INTERVAL_LABEL } from '@/lib/catalog';
 import { formatJa, nextAfter, todayIso } from '@/lib/date';
 import { monthlyEquivalent, yen } from '@/lib/pricing';
-import type { Subscription } from '@/lib/types';
+import type { Subscription, SubscriptionInterval } from '@/lib/types';
+import { notBefore, withInterval } from '@/lib/store';
 import { Phrases } from '@/components/Phrases';
 import { SubscriptionCard, type SubscriptionCommand } from './_components/SubscriptionCard';
 
@@ -27,13 +28,23 @@ export default function MyPage() {
     const after =
       command === 'skip' && sub.nextDelivery
         ? ['次回のお届けを', '変更しました：', `${formatJa(sub.nextDelivery)} → ${formatJa(nextAfter(sub.nextDelivery, sub.interval))}`]
+        : command === 'unskip' && sub.nextDelivery && sub.skippedFrom
+          ? ['スキップを', '取り消しました：', `${formatJa(sub.nextDelivery)} → ${formatJa(notBefore(sub.skippedFrom, today))}`]
         : command === 'pause'
           ? [`${name}の定期便を`, 'お休みにしました']
           : command === 'resume'
             ? [`${name}の定期便を`, '再開しました']
             : [`${name}の定期便を`, '解約しました'];
-    dispatch(command === 'resume' ? { type: 'resume', id: sub.id, today } : { type: command, id: sub.id });
+    dispatch(command === 'resume' || command === 'unskip' ? { type: command, id: sub.id, today } : { type: command, id: sub.id });
     setMessage(after);
+  };
+
+  const changeInterval = (sub: Subscription, interval: SubscriptionInterval, name: string) => {
+    const today = todayIso();
+    const next = withInterval(sub, interval, today).nextDelivery;
+    const dates = sub.nextDelivery && next && next !== sub.nextDelivery ? ['、次回', `${formatJa(sub.nextDelivery)} → ${formatJa(next)}`] : [];
+    dispatch({ type: 'changeInterval', id: sub.id, interval, today });
+    setMessage([`${name}の`, 'お届け間隔を', '変更しました：', `${INTERVAL_LABEL[sub.interval]} → ${INTERVAL_LABEL[interval]}`, ...dates]);
   };
 
   return (
@@ -69,7 +80,11 @@ export default function MyPage() {
           <ul className="divide-y divide-outline-variant/60 border-y border-outline-variant/60">
             {subs.map((sub) => (
               <li key={sub.id}>
-                <SubscriptionCard subscription={sub} onCommand={(cmd, name) => run(sub, cmd, name)} />
+                <SubscriptionCard
+                  subscription={sub}
+                  onCommand={(cmd, name) => run(sub, cmd, name)}
+                  onChangeInterval={(interval, name) => changeInterval(sub, interval, name)}
+                />
               </li>
             ))}
           </ul>
@@ -82,7 +97,7 @@ export default function MyPage() {
               dispatch({ type: 'reset', today: todayIso() });
               setMessage(['デモデータを', '初期状態に', '戻しました']);
             }}
-            className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-on-surface"
+            className="inline-flex min-h-11 items-center gap-1.5 text-xs text-on-surface-variant hover:text-on-surface"
           >
             <RotateCcw className="h-3.5 w-3.5" aria-hidden />
             デモデータをリセット

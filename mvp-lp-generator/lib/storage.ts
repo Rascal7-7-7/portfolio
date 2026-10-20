@@ -1,9 +1,12 @@
 import { CATEGORIES } from './categories'
+import { findSampleById } from './samples'
 import { THEMES } from './themes'
 import type { LPDoc } from './types'
 
 // 「公開」はこのブラウザの localStorage に保存するだけのモック。サーバーには送らない。
 const KEY_PREFIX = 'lp-concierge:published:'
+// 編集中の内容（公開ページから戻ったり再読み込みしたりしても消えないように）。エディタの id ごとに1件
+const DRAFT_PREFIX = 'lp-concierge:draft:'
 const SLUG_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/
 
 export const MOCK_DOMAIN = 'lp-concierge.jp'
@@ -20,11 +23,29 @@ export function isValidSlug(slug: string): boolean {
   return SLUG_PATTERN.test(slug)
 }
 
+/**
+ * プレビューの URL 欄と公開ダイアログの初期値。店名がサンプルのままか、公開時に URL を決めた後は doc.slug。
+ * 店名を変えたら英数字の店名から作り、和文の店名など作れないときは仮の your-shop にする
+ */
+export function slugFor(doc: LPDoc): string {
+  const sample = findSampleById(doc.id)
+  if (!sample || doc.slug !== sample.slug || doc.store.storeName === sample.store.storeName) return doc.slug
+  const fromName = sanitizeSlug(doc.store.storeName.trim().replace(/\s+/g, '-'))
+  return isValidSlug(fromName) ? fromName : 'your-shop'
+}
+
 function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null
 }
 
-/** localStorage の中身は信用しない。最低限の形を確かめてから使う。 */
+const STORE_TEXT = ['storeName', 'catchCopy', 'description', 'address', 'hours', 'closed', 'phone', 'ctaLabel'] as const
+
+/** 配列の要素がすべて、指定した文字列項目を持つ object か */
+function isListOf(v: unknown, keys: readonly string[]): boolean {
+  return Array.isArray(v) && v.every((item) => isObject(item) && keys.every((k) => typeof item[k] === 'string'))
+}
+
+/** localStorage の中身は信用しない。描画で触る項目の形を確かめてから使う（壊れた下書きでエディタが開けなくならないように）。 */
 export function parseDoc(raw: string | null): LPDoc | null {
   if (!raw) return null
   try {
@@ -35,12 +56,14 @@ export function parseDoc(raw: string | null): LPDoc | null {
       typeof v.slug === 'string' &&
       typeof v.template === 'string' &&
       v.template in THEMES &&
-      typeof store.storeName === 'string' &&
+      typeof v.id === 'string' &&
+      STORE_TEXT.every((k) => typeof store[k] === 'string') &&
       typeof store.category === 'string' &&
       store.category in CATEGORIES &&
-      Array.isArray(store.menu) &&
-      Array.isArray(store.features) &&
-      Array.isArray(store.voices)
+      isListOf(store.menu, ['emoji', 'name', 'description', 'price']) &&
+      isListOf(store.features, ['emoji', 'title', 'text']) &&
+      isListOf(store.voices, ['name', 'text']) &&
+      (store.owner === undefined || isListOf([store.owner], ['role', 'name', 'message']))
     return ok ? (v as unknown as LPDoc) : null
   } catch {
     return null
@@ -59,6 +82,23 @@ export function savePublished(doc: LPDoc): boolean {
 export function loadPublished(slug: string): LPDoc | null {
   try {
     return parseDoc(window.localStorage.getItem(KEY_PREFIX + slug))
+  } catch {
+    return null
+  }
+}
+
+export function saveDraft(doc: LPDoc): void {
+  try {
+    window.localStorage.setItem(DRAFT_PREFIX + doc.id, JSON.stringify(doc))
+  } catch {
+    // 保存できない環境（プライベートモード等）では、再読み込みで編集が消えるだけにする
+  }
+}
+
+export function loadDraft(id: string): LPDoc | null {
+  try {
+    const doc = parseDoc(window.localStorage.getItem(DRAFT_PREFIX + id))
+    return doc?.id === id ? doc : null
   } catch {
     return null
   }

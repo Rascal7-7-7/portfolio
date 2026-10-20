@@ -61,7 +61,8 @@ export default function EstimateDocument({ estimate, id, annotate = false }: Pro
             <span className="flex items-center whitespace-nowrap border-r border-navy bg-canvas px-3 text-xs font-semibold sm:text-sm">
               御見積金額
             </span>
-            <span className="flex flex-1 items-baseline justify-end gap-2 px-3 py-2">
+            {/* 320px 幅では（税込）を金額の下へ折り返し、ページを横にはみ出させない */}
+            <span className="flex min-w-0 flex-1 flex-wrap items-baseline justify-end gap-x-2 px-3 py-2">
               <span className="tnum text-xl font-bold sm:text-2xl">{formatYen(total)}</span>
               <span className="whitespace-nowrap text-xs text-body">（税込）</span>
             </span>

@@ -1,7 +1,7 @@
 // デモの状態遷移（カート・注文・定期便）。すべて新しいオブジェクトを返す純粋関数。
-import type { CartItem, Interval, Order, Subscription } from './types';
+import type { CartItem, Interval, Order, Subscription, SubscriptionInterval } from './types';
 import { findProduct } from './catalog.ts';
-import { FIRST_DELIVERY_LEAD_DAYS, addDays, addMonths, firstDelivery, nextAfter } from './date.ts';
+import { FIRST_DELIVERY_LEAD_DAYS, addDays, addMonths, firstDelivery, nextAfter, prevBefore } from './date.ts';
 import { calcTotals, unitPrice } from './pricing.ts';
 
 export const MAX_QUANTITY = 9;
@@ -19,6 +19,8 @@ export type StoreAction =
   | { type: 'removeFromCart'; productId: string; interval: Interval }
   | { type: 'placeOrder'; today: string; orderId: string }
   | { type: 'skip'; id: string }
+  | { type: 'unskip'; id: string; today: string }
+  | { type: 'changeInterval'; id: string; interval: SubscriptionInterval; today: string }
   | { type: 'pause'; id: string }
   | { type: 'resume'; id: string; today: string }
   | { type: 'cancel'; id: string }
@@ -31,8 +33,36 @@ const clampQty = (n: number) => Math.min(MAX_QUANTITY, Math.max(1, Math.floor(n)
 
 /** 初回（支払い済み・完了画面で日付を約束済み）はスキップさせない */
 export function canSkip(sub: Subscription): boolean {
-  return sub.status === 'active' && sub.nextDelivery !== null && sub.deliveredCount > 0;
+  return sub.status === 'active' && sub.nextDelivery !== null && sub.deliveredCount > 0 && !sub.skippedFrom;
 }
+
+/**
+ * お届け間隔の変更。前回お届け日から新しい間隔で次回を数え直す（スキップ中なら元の日付から数え、スキップは解除）。
+ * 初回前は約束済みの初回日のまま。数え直した日が近すぎる場合は最短のお届け日に寄せる
+ */
+export function withInterval(sub: Subscription, interval: SubscriptionInterval, today: string): Subscription {
+  if (sub.status === 'canceled' || sub.interval === interval) return sub;
+  const changed: Subscription = {
+    ...sub,
+    interval,
+    unitPrice: unitPrice(findProduct(sub.productId)?.price ?? 0, interval),
+    ...CLEARED,
+  };
+  const base = sub.skippedFrom ?? sub.nextDelivery;
+  if (sub.status !== 'active' || !base || sub.deliveredCount === 0) return { ...changed, nextDelivery: base };
+  const from = sub.intervalFrom ?? { date: base, interval: sub.interval };
+  const next = interval === from.interval ? from.date : nextAfter(prevBefore(from.date, from.interval), interval);
+  return { ...changed, intervalFrom: from, nextDelivery: notBefore(next, today) };
+}
+
+/** スキップ・間隔変更の記録を消す（ほかの操作をしたら元に戻す基準が変わるため） */
+const CLEARED = { skippedFrom: null, intervalFrom: null };
+
+/** 近すぎる日付は最短のお届け日に寄せる */
+export const notBefore = (iso: string, today: string) => {
+  const earliest = firstDelivery(today);
+  return iso < earliest ? earliest : iso;
+};
 
 const SEED_DELIVERED = 4;
 
@@ -131,16 +161,22 @@ export function storeReducer(state: StoreState, action: StoreAction): StoreState
       return placeOrder(state, action.today, action.orderId);
     case 'skip':
       return updateSub(state, action.id, (s) =>
-        canSkip(s) && s.nextDelivery ? { ...s, nextDelivery: nextAfter(s.nextDelivery, s.interval) } : s,
+        canSkip(s) && s.nextDelivery ? { ...s, ...CLEARED, skippedFrom: s.nextDelivery, nextDelivery: nextAfter(s.nextDelivery, s.interval) } : s,
       );
+    case 'unskip':
+      return updateSub(state, action.id, (s) =>
+        s.status === 'active' && s.skippedFrom ? { ...s, ...CLEARED, nextDelivery: notBefore(s.skippedFrom, action.today) } : s,
+      );
+    case 'changeInterval':
+      return updateSub(state, action.id, (s) => withInterval(s, action.interval, action.today));
     case 'pause':
-      return updateSub(state, action.id, (s) => (s.status === 'active' ? { ...s, status: 'paused', nextDelivery: null } : s));
+      return updateSub(state, action.id, (s) => (s.status === 'active' ? { ...s, status: 'paused', nextDelivery: null, ...CLEARED } : s));
     case 'resume':
       return updateSub(state, action.id, (s) =>
-        s.status === 'paused' ? { ...s, status: 'active', nextDelivery: firstDelivery(action.today) } : s,
+        s.status === 'paused' ? { ...s, status: 'active', nextDelivery: firstDelivery(action.today), ...CLEARED } : s,
       );
     case 'cancel':
-      return updateSub(state, action.id, (s) => ({ ...s, status: 'canceled', nextDelivery: null }));
+      return updateSub(state, action.id, (s) => ({ ...s, status: 'canceled', nextDelivery: null, ...CLEARED }));
     case 'reset':
       return seedState(action.today);
   }

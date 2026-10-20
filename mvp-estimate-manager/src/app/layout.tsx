@@ -4,9 +4,15 @@ import Sidebar, { MobileNav, ResetDemoButton } from "@/components/Sidebar";
 import { EstimatesProvider } from "@/lib/store";
 import WonToast from "@/components/WonToast";
 
+const DESCRIPTION = "品目・数量・単価から小計・消費税・合計を自動計算し、見積のステータスを管理するデモアプリ";
+
+// og:image は app/opengraph-image.png から Next.js が自動で付ける。X 用にも同じ画像を指す
 export const metadata: Metadata = {
+  metadataBase: new URL("https://mvp-estimate-manager.vercel.app"),
   title: "見積マネージャー",
-  description: "品目・数量・単価から小計・消費税・合計を自動計算し、見積のステータスを管理するデモアプリ",
+  description: DESCRIPTION,
+  openGraph: { title: "見積マネージャー", description: DESCRIPTION, type: "website", locale: "ja_JP" },
+  twitter: { card: "summary_large_image", title: "見積マネージャー", description: DESCRIPTION, images: ["/opengraph-image.png"] },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

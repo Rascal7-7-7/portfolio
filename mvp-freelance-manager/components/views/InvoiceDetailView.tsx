@@ -46,12 +46,15 @@ export function InvoiceDetailView({ id }: { id: string }) {
         </div>
 
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
-          <p className="flex items-center gap-3 text-sm">
-            <InvoiceStatusBadge status={invoiceStatus(invoice, today)} />
-            <span className="num text-xs text-warm-500">
-              {invoice.paidOn ? `${formatDate(invoice.paidOn)} に入金` : `期日 ${formatDate(invoice.dueOn)}`}
-            </span>
-          </p>
+          <div className="min-w-0">
+            <h1 className="num text-xl font-semibold tracking-tight text-ink">請求書 {invoice.number}</h1>
+            <p className="mt-1 flex items-center gap-3 text-sm">
+              <InvoiceStatusBadge status={invoiceStatus(invoice, today)} />
+              <span className="num text-xs text-warm-500">
+                {invoice.paidOn ? `${formatDate(invoice.paidOn)} に入金` : `期日 ${formatDate(invoice.dueOn)}`}
+              </span>
+            </p>
+          </div>
           <div className="flex gap-2">
             <button
               type="button"

@@ -13,7 +13,8 @@
   --color-warm-900: #31302e;
   --color-line: rgba(0, 0, 0, 0.1);
 
-  --color-blue: #0075de;
+  /* Notion の #0075de は warm-50 地で 4.4:1 のため、白・warm-50・warm-100 のどれでも 4.5:1 以上になるまで濃くしている */
+  --color-blue: #006dd0;
   --color-blue-active: #005bab;
   --color-blue-tint: #cfe5fa;
 

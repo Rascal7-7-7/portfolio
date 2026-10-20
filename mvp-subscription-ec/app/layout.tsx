@@ -26,9 +26,16 @@ const label = Be_Vietnam_Pro({
   weight: ['400', '500', '600'],
 });
 
+const SITE_TITLE = 'MORI ATELIER — 森の定期便';
+const SITE_DESCRIPTION = '森が育てた素材を、暮らしの定期便に。架空ブランドによる D2C 定期購入 EC のデモサイトです。';
+
+// OG 画像は app/opengraph-image.png（ファイル規約）から入る
 export const metadata: Metadata = {
-  title: 'MORI ATELIER — 森の定期便',
-  description: '森が育てた素材を、暮らしの定期便に。架空ブランドによる D2C 定期購入 EC のデモサイトです。',
+  metadataBase: new URL('https://mvp-subscription-ec.vercel.app'),
+  title: { default: SITE_TITLE, template: '%s — MORI ATELIER' },
+  description: SITE_DESCRIPTION,
+  openGraph: { title: SITE_TITLE, description: SITE_DESCRIPTION, siteName: 'MORI ATELIER', locale: 'ja_JP', type: 'website' },
+  twitter: { card: 'summary_large_image', title: SITE_TITLE, description: SITE_DESCRIPTION },
 };
 
 // 固定バーで env(safe-area-inset-bottom) を効かせるため

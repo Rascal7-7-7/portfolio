@@ -38,6 +38,8 @@ export type ProjectLinks = {
   readonly demo?: string;
   readonly github?: string;
   readonly article?: string;
+  /** Case Study の根拠になる設計資料や CI の実行結果。リンク先で数値を確かめられるものだけを置く。 */
+  readonly docs?: readonly { readonly label: string; readonly href: string }[];
 };
 
 export type Screenshot = {

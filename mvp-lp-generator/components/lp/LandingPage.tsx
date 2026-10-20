@@ -41,7 +41,7 @@ function useIsWide(ref: RefObject<HTMLDivElement | null>) {
   return size
 }
 
-export default function LandingPage({ doc }: { doc: LPDoc }) {
+export default function LandingPage({ doc, headline = 'h1' }: { doc: LPDoc; headline?: 'h1' | 'h2' }) {
   const ref = useRef<HTMLDivElement>(null)
   const { wide, roomy } = useIsWide(ref)
   const Page = PAGES[doc.template]
@@ -49,7 +49,7 @@ export default function LandingPage({ doc }: { doc: LPDoc }) {
     // 本文は text-wrap: pretty で最終行の1文字落ち（「す。」だけの行）を避け、word-break: auto-phrase で文節の途中で改行しない
     // （auto-phrase は Chromium のみ。Safari では通常の改行に戻るだけ）。見出しは Phrases で文節単位に改行（Safari でも有効）
     <div ref={ref} data-lp-root className="min-h-full font-gothic antialiased [container-type:inline-size] [&_:is(p,blockquote,dd)]:[text-wrap:pretty] [&_:is(p,blockquote,dd)]:[word-break:auto-phrase]">
-      <Page store={doc.store} sections={doc.sections} wide={wide} roomy={roomy} />
+      <Page store={doc.store} sections={doc.sections} wide={wide} roomy={roomy} headline={headline} />
     </div>
   )
 }

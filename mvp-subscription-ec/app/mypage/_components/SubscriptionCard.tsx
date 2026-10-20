@@ -1,16 +1,15 @@
 'use client';
 import { useState } from 'react';
-import { Pause, Play, SkipForward, X } from 'lucide-react';
-import type { Subscription, SubscriptionStatus } from '@/lib/types';
-import { INTERVAL_LABEL, findProduct } from '@/lib/catalog';
+import { Pause, Play, SkipForward, Undo2, X } from 'lucide-react';
+import type { Subscription, SubscriptionInterval, SubscriptionStatus } from '@/lib/types';
+import { INTERVAL_LABEL, SUBSCRIPTION_INTERVALS, findProduct } from '@/lib/catalog';
 import { formatJa } from '@/lib/date';
 import { yen } from '@/lib/pricing';
 import { ProductVisual } from '@/components/ProductVisual';
 import { Phrases } from '@/components/Phrases';
 import { cn } from '@/lib/cn';
-import { canSkip } from '@/lib/store';
 
-export type SubscriptionCommand = 'skip' | 'pause' | 'resume' | 'cancel';
+export type SubscriptionCommand = 'skip' | 'unskip' | 'pause' | 'resume' | 'cancel';
 
 const STATUS_LABEL: Record<SubscriptionStatus, string> = {
   active: '継続中',
@@ -21,18 +20,24 @@ const STATUS_LABEL: Record<SubscriptionStatus, string> = {
 type Props = {
   subscription: Subscription;
   onCommand: (command: SubscriptionCommand, productName: string) => void;
+  onChangeInterval: (interval: SubscriptionInterval, productName: string) => void;
 };
 
-export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
+export function SubscriptionCard({ subscription: sub, onCommand, onChangeInterval }: Props) {
   const [confirming, setConfirming] = useState(false);
+  const [editing, setEditing] = useState(false);
   const product = findProduct(sub.productId);
   if (!product) return null;
 
   const canceled = sub.status === 'canceled';
-  const firstPending = sub.status === 'active' && !canSkip(sub);
+  const firstPending = sub.status === 'active' && sub.deliveredCount === 0;
   const run = (cmd: SubscriptionCommand) => {
     setConfirming(false);
     onCommand(cmd, product.name);
+  };
+  const changeInterval = (interval: SubscriptionInterval) => {
+    setEditing(false);
+    if (interval !== sub.interval) onChangeInterval(interval, product.name);
   };
 
   return (
@@ -67,6 +72,9 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
                 <span className="tnum font-headline text-lg font-semibold text-on-surface">{formatJa(sub.nextDelivery)}</span>
               </p>
             )}
+            {sub.status === 'active' && sub.skippedFrom && (
+              <p className="tnum text-xs text-on-surface-variant">{formatJa(sub.skippedFrom)}のお届けはスキップ済み</p>
+            )}
             {sub.status === 'paused' && <p className="text-sm text-on-surface-variant">お休み中です。再開すると3日後にお届けします。</p>}
             {canceled && <p className="text-sm text-on-surface-variant">この定期便は解約済みです。</p>}
           </div>
@@ -75,7 +83,26 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
 
       {!canceled && (
         <div className="mt-4">
-          {confirming ? (
+          {editing ? (
+            <fieldset>
+              <legend className="mb-2 text-sm font-semibold text-on-surface">お届け間隔を変更</legend>
+              <div className="grid grid-cols-3 gap-2 sm:flex">
+                {SUBSCRIPTION_INTERVALS.map((value) => (
+                  <ActionButton
+                    key={value}
+                    onClick={() => changeInterval(value)}
+                    tone={value === sub.interval ? 'primary' : 'neutral'}
+                    pressed={value === sub.interval}
+                  >
+                    {INTERVAL_LABEL[value]}
+                  </ActionButton>
+                ))}
+                <ActionButton onClick={() => setEditing(false)} className="sm:ml-auto">
+                  やめる
+                </ActionButton>
+              </div>
+            </fieldset>
+          ) : confirming ? (
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between" role="alertdialog" aria-label="解約の確認">
               <p className="text-sm text-on-surface">本当に解約しますか？ スキップやお休みもできます。</p>
               <div className="flex gap-2">
@@ -89,11 +116,18 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
             <div className="grid grid-cols-3 gap-2 sm:flex">
               {sub.status === 'active' ? (
                 <>
-                  {!firstPending && (
-                    <ActionButton onClick={() => run('skip')} tone="primary">
-                      <SkipForward className="h-4 w-4" aria-hidden />
-                      次回をスキップ
+                  {sub.skippedFrom ? (
+                    <ActionButton onClick={() => run('unskip')} tone="primary">
+                      <Undo2 className="h-4 w-4" aria-hidden />
+                      スキップを取り消す
                     </ActionButton>
+                  ) : (
+                    !firstPending && (
+                      <ActionButton onClick={() => run('skip')} tone="primary">
+                        <SkipForward className="h-4 w-4" aria-hidden />
+                        次回をスキップ
+                      </ActionButton>
+                    )
                   )}
                   {/* スキップ枠が空いても、スマホの3列では他のカードと同じ列に置く */}
                   <ActionButton onClick={() => run('pause')} className={cn(firstPending && 'col-start-2')}>
@@ -113,7 +147,16 @@ export function SubscriptionCard({ subscription: sub, onCommand }: Props) {
               </ActionButton>
             </div>
           )}
-          {firstPending && !confirming && (
+          {sub.status === 'active' && !confirming && !editing && (
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="mt-1 inline-flex min-h-11 items-center text-sm text-primary underline-offset-4 hover:underline"
+            >
+              お届け間隔を変更
+            </button>
+          )}
+          {firstPending && !confirming && !editing && (
             // 押せないものはボタンの形にせず、ボタン列の下に状態と理由を文字で示す
             <p className="mt-2 text-xs text-on-surface-variant">
               <span className="inline-block font-medium text-on-surface">初回発送準備中</span>
@@ -139,14 +182,16 @@ type ActionButtonProps = {
   onClick: () => void;
   children: React.ReactNode;
   tone?: 'neutral' | 'primary' | 'danger';
+  pressed?: boolean;
   className?: string;
 };
 
-function ActionButton({ onClick, children, tone = 'neutral', className }: ActionButtonProps) {
+function ActionButton({ onClick, children, tone = 'neutral', pressed, className }: ActionButtonProps) {
   return (
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={pressed}
       className={cn(
         // スマホは3列グリッドに収めるため、アイコンを上に積む
         'inline-flex flex-col items-center justify-center gap-1 whitespace-nowrap rounded-sm px-1 py-2 text-xs font-medium transition-colors sm:flex-row sm:gap-1.5 sm:px-3 sm:text-sm',

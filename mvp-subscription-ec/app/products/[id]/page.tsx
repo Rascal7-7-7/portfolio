@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
@@ -16,14 +16,21 @@ export function generateStaticParams() {
   return PRODUCTS.map((p) => ({ id: p.id }));
 }
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
+export async function generateMetadata({ params }: Params, parent: ResolvingMetadata): Promise<Metadata> {
   const product = findProduct((await params).id);
   if (!product) return { title: BRAND.en };
   const tagline = product.taglineParts.join('');
   const size = product.specs.find((s) => s.label === '内容量')?.value;
   const description = `${tagline}${size ? `内容量${size}。` : ''}定期便は${yen(unitPrice(product.price, 'monthly'))}（税込・10%OFF・送料無料）。`;
   const title = `${product.name}の定期便 — ${BRAND.en}`;
-  return { title, description, openGraph: { title, description } };
+  // openGraph / twitter は親を丸ごと上書きするため、ルートの OG 画像を引き継ぐ
+  const { openGraph, twitter } = await parent;
+  return {
+    title: { absolute: title },
+    description,
+    openGraph: { title, description, images: openGraph?.images, siteName: openGraph?.siteName, locale: openGraph?.locale },
+    twitter: { card: 'summary_large_image', title, description, images: twitter?.images },
+  };
 }
 
 export default async function ProductDetailPage({ params }: Params) {

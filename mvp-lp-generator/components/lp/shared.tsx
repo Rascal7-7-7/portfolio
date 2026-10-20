@@ -10,6 +10,8 @@ export interface TemplateProps {
   wide: boolean
   /** PC レイアウトの中でも横幅に余裕があるか（1100px 以上）。エディタのプレビュー枠では false */
   roomy: boolean
+  /** ヒーロー見出しの要素。公開ページは h1、エディタのプレビューはエディタ側の h1 と重ならないよう h2 */
+  headline: 'h1' | 'h2'
 }
 
 /** 見出し用。文節単位で包んで語の途中の改行を防ぐ（Safari でも有効）。lead は分割しない先頭部分（店名など） */
