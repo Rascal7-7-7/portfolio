@@ -9,7 +9,7 @@ import { container } from "./ui/container";
  */
 const navItems = [
   { href: "/#projects", label: "作品" },
-  { href: "/#about", label: "About" },
+  { href: "/#about", label: "自己紹介" },
   { href: "/#contact", label: "連絡先" },
 ];
 

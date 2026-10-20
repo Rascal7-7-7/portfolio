@@ -44,7 +44,7 @@ export function Hero() {
         </h1>
 
         <p className="text-[17px] leading-[1.8] text-ink-muted mb-6">
-          生成AIをアプリに組み込むなかで、Prompt Injection や Jailbreak といった
+          生成AIをアプリに組み込むなかで、<span className="whitespace-nowrap">Prompt Injection</span> や Jailbreak といった
           AI特有のセキュリティ問題に
           {/*
             390px 幅で「関心を／持つように」と折り返さないよう文節をまとめる。
@@ -52,7 +52,8 @@ export function Hero() {
           */}
           <span className="whitespace-nowrap">関心を持つように</span>
           <wbr />
-          なり、自作の音声エージェントで実際に Prompt Injection を流して防御を検証しました。小さな作品は公開デモで、代表作はソースコードで確認できます。
+          なり、自作の音声エージェントで実際に{" "}
+          <span className="whitespace-nowrap">Prompt Injection を</span>流して防御を検証しました。小さな作品は公開デモで、代表作はソースコードで確認できます。
         </p>
 
         {/* 導線。390px 幅でも最初の画面に収まるよう、説明文の直後に置く */}

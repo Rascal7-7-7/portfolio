@@ -19,7 +19,7 @@ export const ouchiCafe: Project = {
   highlights: [
     { label: "味覚診断12次元ベクトル", type: "check" },
     { label: "LightGBMによる推薦", type: "check" },
-    { label: "商品692件・101テーブル", type: "data" },
+    { label: "商品692件", type: "data" },
   ],
   verification: "code-only",
   evidence: [
@@ -63,7 +63,7 @@ export const ouchiCafe: Project = {
   ],
   decisions: [
     {
-      question: "なぜ Laravel を除去して素の PHP にしたのか",
+      question: "なぜ Laravel をやめて素の PHP で書き直したのか",
       answer:
         "当初 Laravel で作り始めましたが、フレームワークが何を自動でやっているのかが分からないまま進んでいました。学習と保守の両面で、ルーティング・DBアクセス・認証を自分で書いた方が説明できる状態になると判断し、移行しました。",
     },

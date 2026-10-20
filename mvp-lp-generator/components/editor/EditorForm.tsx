@@ -14,7 +14,7 @@ interface Props {
 }
 
 /** 内容（店舗情報・テンプレート・表示セクション）がサンプルから変わったか */
-const isEdited = (doc: LPDoc, sample: LPDoc) =>
+export const isEdited = (doc: LPDoc, sample: LPDoc) =>
   JSON.stringify([doc.store, doc.template, doc.sections]) !== JSON.stringify([sample.store, sample.template, sample.sections])
 
 function GenerateButton({ onClick, className }: { onClick: () => void; className?: string }) {
@@ -54,7 +54,11 @@ export default function EditorForm({ doc, onStore, onMenu, onToggleSection, onSa
                   key={sample.id}
                   type="button"
                   aria-pressed={selected}
-                  onClick={() => onSample(sample)}
+                  onClick={() => {
+                    // 1クリックで編集内容が消えないよう、元に戻す前に確かめる
+                    if (current && !selected && !window.confirm('編集した内容を破棄して、サンプルの内容に戻しますか？')) return
+                    onSample(sample)
+                  }}
                   className={cx(
                     'flex items-baseline justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm transition-colors',
                     selected ? 'border-accent bg-accent/[0.06]' : 'border-ed-line hover:border-[#c9c9c4]',

@@ -10,7 +10,7 @@ import { formatYen } from "@/lib/utils";
 const SHOW_MS = 6000;
 
 /**
- * 「入金済にする」を押した直後の知らせ。見積管理の受注トーストと同じ文法（右下・数秒で消える・閉じるボタン）。
+ * 「入金済にする」「この内容で作成」を押した直後の知らせ。見積管理の受注トーストと同じ文法（右下・数秒で消える・閉じるボタン）。
  * 読み上げのため role="status" の枠は常に置いておく
  */
 export function PaidToast() {
@@ -48,11 +48,18 @@ export function PaidToast() {
         >
           <CircleCheck size={16} aria-hidden className="mt-0.5 shrink-0" />
           <div className="min-w-0 flex-1">
-            <p className="font-semibold">
-              入金を記録しました <span className="num ml-1 font-normal">+{formatYen(toast.amount)}</span>
-            </p>
+            {toast.kind === "created" ? (
+              <p className="font-semibold">
+                <span className="num">{toast.number}</span> を作成しました
+                <span className="num ml-1 font-normal">{formatYen(toast.amount)}</span>
+              </p>
+            ) : (
+              <p className="font-semibold">
+                入金を記録しました <span className="num ml-1 font-normal">+{formatYen(toast.amount)}</span>
+              </p>
+            )}
             <p className="mt-0.5 text-xs text-white/80">
-              <span className="num">{toast.number}</span>
+              {toast.kind === "paid" && <span className="num">{toast.number}</span>}
               {toast.client && <span className="ml-1.5 inline-block">{toast.client}</span>}
             </p>
             <Link

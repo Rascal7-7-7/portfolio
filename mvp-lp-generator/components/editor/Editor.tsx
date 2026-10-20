@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cx } from '@/lib/cx'
-import { loadDraft, saveDraft } from '@/lib/storage'
+import { findSampleById } from '@/lib/samples'
+import { loadDraft, loadPublished, saveDraft } from '@/lib/storage'
 import type { LPDoc, MenuItem, SectionKey, StoreInfo, TemplateKey } from '@/lib/types'
-import EditorForm from './EditorForm'
+import EditorForm, { isEdited } from './EditorForm'
 import { GENERATE_MS } from './GeneratingOverlay'
 import PreviewPane from './PreviewPane'
 import PublishDialog from './PublishDialog'
@@ -33,7 +34,13 @@ export default function Editor({ initial }: { initial: LPDoc }) {
   // localStorage はサーバー描画に無いので、マウント後に読む（ハイドレーションの不一致を避ける）
   useEffect(() => {
     const draft = loadDraft(initial.id)
-    if (draft) setDoc(draft)
+    if (draft) {
+      setDoc(draft)
+      // 進み具合は保存せず、下書きから決める（公開済みなら 3、サンプルから変えていれば 2）
+      const sample = findSampleById(draft.id)
+      if (loadPublished(draft.slug)) setStep(3)
+      else if (!sample || isEdited(draft, sample)) setStep(2)
+    }
     setRestored(true)
   }, [initial.id])
   useEffect(() => {

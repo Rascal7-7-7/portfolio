@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { ArrowLeft, Printer } from "lucide-react";
 import { actions, useAppStore } from "@/lib/store";
 import { formatDate } from "@/lib/dates";
@@ -12,6 +13,11 @@ import { EstimateSource } from "@/components/ExternalLink";
 
 export function InvoiceDetailView({ id }: { id: string }) {
   const store = useAppStore();
+  const number = store?.data.invoices.find((inv) => inv.id === id)?.number;
+  // 請求はブラウザ内にしかないため metadata では番号を出せない。読み込めたらタブ名に番号を入れる
+  useEffect(() => {
+    if (number) document.title = `${number} | Hikae`;
+  }, [number]);
   if (!store) return <PageSkeleton />;
   const { data, today } = store;
 

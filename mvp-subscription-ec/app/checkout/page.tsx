@@ -39,7 +39,7 @@ export default function CheckoutPage() {
   if (lines.length === 0) {
     return (
       <main className="mx-auto max-w-lg px-4 py-24 text-center">
-        <p className="text-on-surface-variant">カートに商品がありません</p>
+        <h1 className="text-on-surface-variant">カートに商品がありません</h1>
         <Link href="/products" className="mt-4 inline-block text-sm text-primary hover:underline">
           商品一覧へ
         </Link>

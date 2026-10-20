@@ -206,7 +206,7 @@ export default function BookingView() {
             ) : (
               <>
                 {/* 中央: カレンダー */}
-                <section aria-label="日付" className="p-5 md:p-6 border-b md:border-b-0 border-line">
+                <section aria-label="日付" className="px-4 py-5 md:p-6 border-b md:border-b-0 border-line">
                   <MonthCalendar
                     month={shownMonth} today={today} selected={selectedDate}
                     isAvailable={d => slotsOf(d).length > 0}
