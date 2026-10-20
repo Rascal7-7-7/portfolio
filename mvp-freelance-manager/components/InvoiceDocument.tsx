@@ -115,7 +115,8 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
           <tbody>
             {items.map((item, i) => (
               <tr key={i} className="border-b border-line align-top">
-                <td className={CELL}>{item.name}</td>
+                {/* 320px 幅では文節単位の折り返しだと品名列が縮まず表がはみ出すため、必要なときだけ文節の途中でも折る */}
+                <td className={`${CELL} [overflow-wrap:anywhere]`}>{item.name}</td>
                 <td className={`${CELL} num text-right whitespace-nowrap`}>{item.qty}</td>
                 <td className={`${CELL} num text-right whitespace-nowrap`}>{formatYen(item.amount)}</td>
               </tr>

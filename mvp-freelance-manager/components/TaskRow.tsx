@@ -51,13 +51,16 @@ export function TaskRow({ task, today, project, deletable }: TaskRowProps) {
         completing && "opacity-60",
       )}
     >
-      <input
-        type="checkbox"
-        checked={done}
-        onChange={toggle}
-        aria-label={`${task.title}（完了にする）`}
-        className="h-[18px] w-[18px] shrink-0 cursor-pointer accent-blue"
-      />
+      {/* 見た目は 18px のまま、押せる範囲だけ 44px に広げる（負のマージンで行の高さは変えない） */}
+      <label className="-m-[13px] flex shrink-0 cursor-pointer p-[13px]">
+        <input
+          type="checkbox"
+          checked={done}
+          onChange={toggle}
+          aria-label={done ? `${task.title}を未完了に戻す` : `${task.title}を完了にする`}
+          className="h-[18px] w-[18px] cursor-pointer accent-blue"
+        />
+      </label>
       <div className="min-w-0 flex-1">
         <p className={cn("line-clamp-2 text-sm break-words", done ? "text-warm-300 line-through" : "text-ink")}>
           {task.title}
