@@ -55,12 +55,12 @@ export function ProjectDetailView({ id }: { id: string }) {
   if (!project) {
     return (
       <Page>
-        <p className="py-16 text-center text-sm text-warm-500">
+        <h1 className="py-16 text-center text-sm font-normal text-warm-500">
           案件が見つかりません。
-          <Link href="/projects" className="ml-1 text-blue hover:underline">
+          <Link href="/projects" className="ml-1 text-blue underline">
             案件一覧へ
           </Link>
-        </p>
+        </h1>
       </Page>
     );
   }

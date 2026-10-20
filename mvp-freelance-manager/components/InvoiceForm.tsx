@@ -90,9 +90,13 @@ export function InvoiceForm({ projects, invoices, today, defaultProjectId, onCre
           inputMode="numeric"
           autoComplete="off"
           value={editingAmount || !amount ? amount : Number(amount).toLocaleString("ja-JP")}
-          onFocus={() => setEditingAmount(true)}
+          // フォーカスした時点で表示を変えると Tab で入ったときの全選択が外れ、打った数字が後ろに足される。
+          // そのため打ち始めてからカンマなしの表示に切り替える
           onBlur={() => setEditingAmount(false)}
-          onChange={(e) => setAmount(toDigits(e.target.value))}
+          onChange={(e) => {
+            setEditingAmount(true);
+            setAmount(toDigits(e.target.value));
+          }}
           aria-describedby="invoice-remaining"
           className={`${buttonStyles.input} num mt-1`}
         />
