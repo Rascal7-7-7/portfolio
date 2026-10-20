@@ -72,7 +72,7 @@ export default function ReservationDetailView({ id }: { id: number }) {
   return (
     <div className="px-4 md:px-10 py-6 md:py-10 max-w-5xl">
       <nav aria-label="パンくず" className="flex items-center gap-1 text-xs text-dim mb-4">
-        <Link href="/reservations" className="hover:text-ink underline-offset-2 hover:underline">予約一覧</Link>
+        <Link href="/reservations" className="py-3.5 -my-3.5 md:py-0 md:my-0 hover:text-ink underline-offset-2 hover:underline">予約一覧</Link>
         <Icon name="chevron_right" size={14} />
         <span className="text-body tabular-nums" aria-current="page">予約 #{String(r.id).padStart(4, '0')}</span>
       </nav>
@@ -141,7 +141,7 @@ function StatusSwitcher({ current, onChange }: { current: ReservationStatus; onC
         const active = s === current;
         return (
           <button key={s} type="button" aria-pressed={active} onClick={() => onChange(s)}
-            className={`h-8 min-w-0 px-1 sm:px-4 rounded-[5px] text-xs sm:text-sm whitespace-nowrap focus-visible:outline-2 focus-visible:outline-brand ${
+            className={`h-11 sm:h-8 min-w-0 px-1 sm:px-4 rounded-[5px] text-xs sm:text-sm whitespace-nowrap focus-visible:outline-2 focus-visible:outline-brand ${
               active ? 'bg-canvas text-ink font-medium shadow-[0_0_0_1px_var(--color-line),0_1px_2px_rgba(0,0,0,0.06)]' : 'text-dim hover:text-ink'
             }`}>
             {STATUS_LABEL[s]}
