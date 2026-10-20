@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://portfolio-mvps.vercel.app"),
   title: `${profile.name} | ポートフォリオ`,
   description:
-    "AI × セキュリティに関心があるIT系専門学生のポートフォリオ。生成AIをアプリへ組み込むなかで、Prompt Injection などAI特有のセキュリティ問題に関心を持つようになりました。作ったものは公開URLで触れる状態にしています。",
+    "AI × セキュリティに関心があるIT系専門学生のポートフォリオ。生成AIをアプリへ組み込むなかで、Prompt Injection などAI特有のセキュリティ問題に関心を持つようになりました。小さな作品は公開デモで、代表作はソースコードで確認できます。",
   alternates: {
     canonical: "/",
   },
