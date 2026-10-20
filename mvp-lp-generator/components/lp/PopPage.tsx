@@ -78,7 +78,7 @@ function LeadMenu({ store, wide }: TemplateProps) {
 }
 
 function Hero(props: TemplateProps) {
-  const { store, wide } = props
+  const { store, wide, headline: H } = props
   return (
     <section className={wide ? 'px-6 pt-6' : 'px-3 pt-3'}>
       {/* 写真の代わりの大きな色面。装飾は置かず、白い見出し箱と太線で区切った価格だけで組む */}
@@ -91,11 +91,11 @@ function Hero(props: TemplateProps) {
             {/* 1行ずつ白い箱で切り抜く。折り返した行にも箱が付くよう box-decoration-break: clone。
                 palt で「。」「、」の字幅を詰め、行末の句点の後ろに空きが残って箱の右側だけ広く見えるのを防ぐ（詰まりすぎないよう字間を少し足す）。
                 text-spacing-trim は文節の inline-block 内では効かなかったので使わない */}
-            <h1 className={cx('font-extrabold tracking-[0.04em] [font-feature-settings:"palt"]', wide ? 'text-[clamp(30px,4.4cqw,46px)] leading-[1.9]' : 'text-[24px] leading-[1.95]')}>
+            <H className={cx('font-extrabold tracking-[0.04em] [font-feature-settings:"palt"]', wide ? 'text-[clamp(30px,4.4cqw,46px)] leading-[1.9]' : 'text-[24px] leading-[1.95]')}>
               <span className="rounded-md bg-white px-3 py-1 [-webkit-box-decoration-break:clone] [box-decoration-break:clone]">
                 <Phrases text={catchCopy(store)} />
               </span>
-            </h1>
+            </H>
             {store.description && <p className="mt-8 max-w-[30em] text-[15px] font-medium leading-[1.9]">{store.description}</p>}
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
               <a href="#reserve" className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>

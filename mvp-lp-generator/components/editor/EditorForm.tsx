@@ -13,6 +13,10 @@ interface Props {
   onGenerate: () => void
 }
 
+/** 内容（店舗情報・テンプレート・表示セクション）がサンプルから変わったか */
+const isEdited = (doc: LPDoc, sample: LPDoc) =>
+  JSON.stringify([doc.store, doc.template, doc.sections]) !== JSON.stringify([sample.store, sample.template, sample.sections])
+
 function GenerateButton({ onClick, className }: { onClick: () => void; className?: string }) {
   return (
     <button
@@ -41,21 +45,28 @@ export default function EditorForm({ doc, onStore, onMenu, onToggleSection, onSa
         <div>
           <p className="mb-2 text-xs font-medium text-ed-muted">サンプルから始める</p>
           <div className="grid gap-1.5">
-            {SAMPLES.map((sample) => (
-              <button
-                key={sample.id}
-                type="button"
-                aria-pressed={doc.id === sample.id}
-                onClick={() => onSample(sample)}
-                className={cx(
-                  'flex items-baseline justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm transition-colors',
-                  doc.id === sample.id ? 'border-accent bg-accent/[0.06]' : 'border-ed-line hover:border-[#c9c9c4]',
-                )}
-              >
-                <span className="truncate font-medium">{sample.store.storeName}</span>
-                <span className="shrink-0 text-xs text-ed-muted">{CATEGORIES[sample.store.category].label}</span>
-              </button>
-            ))}
+            {SAMPLES.map((sample) => {
+              const current = doc.id === sample.id
+              // 編集した後は選択中に見せない。押すとサンプルの内容に戻る
+              const selected = current && !isEdited(doc, sample)
+              return (
+                <button
+                  key={sample.id}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => onSample(sample)}
+                  className={cx(
+                    'flex items-baseline justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm transition-colors',
+                    selected ? 'border-accent bg-accent/[0.06]' : 'border-ed-line hover:border-[#c9c9c4]',
+                  )}
+                >
+                  <span className="truncate font-medium">{sample.store.storeName}</span>
+                  <span className="shrink-0 text-xs text-ed-muted">
+                    {current && !selected ? '編集中・押すと元に戻す' : CATEGORIES[sample.store.category].label}
+                  </span>
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
