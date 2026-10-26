@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Sidebar, { MobileNav, ResetDemoButton } from "@/components/Sidebar";
+import Sidebar, { BrandMark, MobileNav, ResetDemoButton } from "@/components/Sidebar";
 import { EstimatesProvider } from "@/lib/store";
 import WonToast from "@/components/WonToast";
 
@@ -24,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Sidebar />
             <div className="min-w-0 flex-1">
               <header className="flex h-12 items-center border-b border-line bg-white px-4 md:hidden print:hidden">
+                <BrandMark className="mr-2 h-6 w-6 shrink-0" />
                 <p className="text-sm font-bold text-navy">見積マネージャー</p>
                 <span className="ml-2 rounded bg-canvas px-1.5 py-0.5 text-[11px] text-muted">デモ</span>
                 <ResetDemoButton className="ml-auto -mr-2 min-h-11 px-2" />

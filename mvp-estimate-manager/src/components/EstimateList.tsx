@@ -20,7 +20,10 @@ const SPARK_MONTHS = 6;
 const DELTA_SHOW_MS = 5000;
 
 /** 一覧の列。見出し行と各行で同じ grid を使い、列をそろえる */
-const ROW_GRID = "sm:grid-cols-[88px_minmax(0,1fr)_96px_120px_128px]";
+const ROW_GRID = "sm:grid-cols-[84px_minmax(0,1fr)_104px_120px_136px]";
+
+/** 一覧・KPI のパネルに共通の影（ごく薄い接地影＋広くぼかした影） */
+const PANEL = "overflow-hidden rounded-xl border border-line bg-white shadow-[0_1px_2px_rgba(6,27,49,0.04),0_8px_24px_-12px_rgba(6,27,49,0.12)]";
 
 /** 期限が近い送付済みの見積に、バッジではなく注記の文字で知らせる */
 function DueNote({ estimate }: { estimate: Estimate }) {
@@ -115,12 +118,13 @@ export default function EstimateList() {
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="取引先・件名で検索"
-              className="w-full rounded border border-line py-2.5 pl-8 pr-2 text-base sm:py-1.5 sm:text-sm text-navy placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-8 shadow-[0_1px_1px_rgba(6,27,49,0.04)] pr-2 text-base sm:py-1.5 sm:text-sm text-navy placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </label>
         </div>
 
-        <div aria-hidden="true" className={cn("hidden gap-x-4 border-b border-line py-2 text-xs text-muted sm:grid", ROW_GRID)}>
+        <div className={cn("mt-4", PANEL)}>
+        <div aria-hidden="true" className={cn("hidden gap-x-4 border-b border-line bg-canvas px-5 py-2.5 text-xs font-medium text-muted sm:grid", ROW_GRID)}>
           <span>番号</span>
           <span>取引先 / 件名</span>
           <span>ステータス</span>
@@ -129,7 +133,7 @@ export default function EstimateList() {
         </div>
 
         {visible.length === 0 ? (
-          <div className="border-b border-line py-12 text-center text-sm">
+          <div className="py-14 text-center text-sm">
             <p className="font-semibold text-navy">該当する見積がありません</p>
             <p className="mt-1 text-muted">
               {q ? `「${q}」に一致する取引先・件名はありません。` : "このステータスの見積はまだありません。"}
@@ -146,31 +150,32 @@ export default function EstimateList() {
             </button>
           </div>
         ) : (
-          <ul className="divide-y divide-line border-b border-line">
+          <ul className="divide-y divide-line">
             {visible.map((e) => (
               <li key={e.id}>
                 <Link
                   href={`/estimates/${e.id}`}
                   className={cn(
-                    "-mx-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-4 py-3 hover:bg-canvas sm:mx-0 sm:px-0",
+                    "group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-4 py-3.5 hover:bg-canvas sm:px-5",
                     "focus-visible:bg-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary",
                     ROW_GRID,
                   )}
                 >
-                  <span className="tnum order-3 text-xs text-muted sm:order-none sm:text-sm">
+                  <span className="tnum order-3 text-xs text-muted sm:order-none sm:text-[13px]">
                     {estimateNumber(e.id)}
                     <span className="sm:hidden"> ・ {formatDate(e.issuedAt)}</span>
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold text-navy">{e.clientName}</span>
-                    <span className="block truncate text-xs text-body">{e.subject}</span>
+                    <span className="block truncate text-sm font-semibold text-navy group-hover:text-primary">{e.clientName}</span>
+                    <span className="mt-0.5 block truncate text-xs text-body">{e.subject}</span>
                   </span>
                   <span className="order-4 justify-self-end sm:order-none sm:justify-self-start">
                     <StatusBadge status={e.status} />
                   </span>
-                  <span className="tnum hidden text-sm text-body sm:block">{formatDate(e.issuedAt)}</span>
+                  <span className="tnum hidden text-[13px] text-body sm:block">{formatDate(e.issuedAt)}</span>
                   <span className="text-right">
-                    <span className="tnum block text-sm font-semibold text-navy">
+                    {/* 失注は金額を薄くして、生きている案件の金額に目が行くようにする */}
+                    <span className={cn("tnum block text-[15px] font-semibold tracking-tight", e.status === "lost" ? "text-slate-400" : "text-navy")}>
                       {formatYen(calcTotals(e.items).total)}
                     </span>
                     <DueNote estimate={e} />
@@ -180,6 +185,7 @@ export default function EstimateList() {
             ))}
           </ul>
         )}
+        </div>
       </section>
     </div>
   );

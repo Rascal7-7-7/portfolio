@@ -46,6 +46,10 @@ h3,
   .num-tick {
     animation: num-tick 220ms ease-out;
   }
+  /* 作成画面のプレビューで、追加した明細の行が書類に差し込まれる動き */
+  .row-in {
+    animation: row-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
   /* ホバー・押下の色の変化を一瞬だけなめらかにする */
   a,
   button,
@@ -67,6 +71,14 @@ h3,
   from {
     opacity: 0;
     transform: translateY(6px);
+  }
+}
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+    background-color: #e9eef5;
   }
 }
 

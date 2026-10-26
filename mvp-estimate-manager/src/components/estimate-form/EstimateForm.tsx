@@ -9,6 +9,7 @@ import { calcTotals, lineAmount, TAX_RATE_PERCENT } from "@/lib/calc";
 import { formatDateWithWeekday, formatYen } from "@/lib/utils";
 import EstimateDocument from "@/components/EstimateDocument";
 import Icon from "@/components/Icon";
+import Money from "@/components/Money";
 import ItemRows, { INPUT_CLASS } from "./ItemRows";
 import {
   type Draft,
@@ -93,7 +94,7 @@ export default function EstimateForm({ initial }: Props) {
         )}
 
         <fieldset>
-          <legend className={SECTION_TITLE}>基本情報</legend>
+          <legend className={SECTION_TITLE}><StepNo n={1} />基本情報</legend>
           <div className="grid gap-4 sm:grid-cols-2">
             <TextInput label="取引先名" required value={draft.clientName} onChange={(v) => setField("clientName", v)} list="known-clients" placeholder="例：株式会社みなと不動産" />
             <datalist id="known-clients">
@@ -111,7 +112,7 @@ export default function EstimateForm({ initial }: Props) {
         </fieldset>
 
         <fieldset>
-          <legend className={SECTION_TITLE}>明細</legend>
+          <legend className={SECTION_TITLE}><StepNo n={2} />明細</legend>
           <ItemRows items={draft.items} amounts={amounts} onChange={changeItem} onRemove={removeItem} />
           <button
             type="button"
@@ -130,7 +131,7 @@ export default function EstimateForm({ initial }: Props) {
                   key={preset.name}
                   type="button"
                   onClick={() => appendItem(toDraftItem(preset))}
-                  className="min-h-11 rounded border border-line bg-white px-2.5 py-1 text-xs text-body sm:min-h-0 hover:border-slate-300 hover:bg-canvas hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                  className="min-h-11 rounded-full border border-line bg-white px-3 py-1 text-xs text-body shadow-[0_1px_1px_rgba(6,27,49,0.04)] sm:min-h-0 hover:border-primary/40 hover:bg-primary-soft hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                 >
                   + {preset.name}
                 </button>
@@ -138,7 +139,7 @@ export default function EstimateForm({ initial }: Props) {
             </div>
           </div>
 
-          <section aria-label="合計金額" aria-live="polite" className="tnum ml-auto mt-6 max-w-sm text-sm">
+          <section aria-label="合計金額" aria-live="polite" className="tnum ml-auto mt-6 max-w-sm rounded-xl border border-line bg-canvas px-4 py-3 text-sm">
             <p className="flex justify-between py-1">
               <span className="text-body">小計</span>
               <span className="text-navy">{formatYen(totals.subtotal)}</span>
@@ -147,9 +148,9 @@ export default function EstimateForm({ initial }: Props) {
               <span className="text-body">消費税（{TAX_RATE_PERCENT}%・端数切り捨て）</span>
               <span className="text-navy">{formatYen(totals.tax)}</span>
             </p>
-            <p className="mt-1 flex items-baseline justify-between border-t border-navy pt-2">
+            <p className="mt-2 flex items-baseline justify-between border-t border-line pt-3">
               <span className="font-semibold text-navy">合計（税込）</span>
-              <span key={totals.total} className="num-tick text-2xl font-semibold text-navy">{formatYen(totals.total)}</span>
+              <span key={totals.total} className="num-tick text-[28px] font-semibold leading-none tracking-tight text-navy"><Money amount={totals.total} /></span>
             </p>
           </section>
         </fieldset>
@@ -173,7 +174,7 @@ export default function EstimateForm({ initial }: Props) {
           </button>
           <button
             type="submit"
-            className="rounded bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(6,27,49,0.2)] hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             {initial ? "変更を保存" : "下書きとして保存"}
           </button>
@@ -181,8 +182,12 @@ export default function EstimateForm({ initial }: Props) {
       </div>
 
       {/* Stripe の請求書エディタと同じく、右側にグレー地の上で帳票プレビューを並べる */}
-      <div id="estimate-preview" className="scroll-mt-4 rounded bg-canvas p-3 sm:p-6 xl:sticky xl:p-4 xl:top-4 xl:self-start">
-        <p className="mb-3 text-xs font-medium text-body">見積書プレビュー（入力と同時に更新）</p>
+      <div id="estimate-preview" className="scroll-mt-4 rounded-xl border border-line bg-canvas p-3 sm:p-6 xl:sticky xl:top-4 xl:self-start">
+        <p className="mb-3 flex items-center gap-2 text-xs font-medium text-body sm:mb-4">
+          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          見積書プレビュー
+          <span className="text-muted">入力と同時に更新</span>
+        </p>
         <EstimateDocument estimate={preview} id={initial?.id} annotate />
       </div>
 
@@ -190,10 +195,10 @@ export default function EstimateForm({ initial }: Props) {
         プレビューが横に並ばない幅では、入力中も合計が見えるよう画面下に固定する。
         スマホは下部ナビ（罫線込みで高さ 61px）の上、md 以上はサイドバー（w-60）の右に置く
       */}
-      <div className="fixed inset-x-0 bottom-[calc(3.8125rem+env(safe-area-inset-bottom))] z-30 flex items-center justify-between gap-3 border-t border-line bg-white px-4 py-2 md:bottom-0 md:left-60 md:pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:pl-8 md:pr-8 xl:hidden print:hidden">
+      <div className="fixed inset-x-0 bottom-[calc(3.8125rem+env(safe-area-inset-bottom))] z-30 flex items-center justify-between gap-3 border-t border-line bg-white px-4 py-2 md:bottom-0 md:left-[200px] md:pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:pl-8 md:pr-8 xl:hidden print:hidden">
         <p className="tnum min-w-0">
           <span className="block text-xs text-muted">合計（税込）</span>
-          <span key={totals.total} className="num-tick block text-lg font-semibold leading-tight text-navy">{formatYen(totals.total)}</span>
+          <span key={totals.total} className="num-tick block text-xl font-semibold leading-tight tracking-tight text-navy"><Money amount={totals.total} /></span>
         </p>
         <a
           href="#estimate-preview"
@@ -207,10 +212,15 @@ export default function EstimateForm({ initial }: Props) {
   );
 }
 
-const SECTION_TITLE = "mb-4 text-base font-semibold text-navy";
+const SECTION_TITLE = "mb-4 flex items-baseline text-base font-semibold text-navy";
+
+/** 入力の順番を示す控えめな番号（丸で囲まず、数字だけを薄く置く） */
+function StepNo({ n }: { n: number }) {
+  return <span aria-hidden="true" className="tnum mr-2 text-sm font-semibold text-primary/60">{String(n).padStart(2, "0")}</span>;
+}
 
 const SECONDARY_BUTTON =
-  "inline-flex items-center justify-center rounded border border-line bg-white px-4 py-2 text-sm font-semibold text-navy hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
+  "inline-flex items-center justify-center rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold text-navy shadow-[0_1px_1px_rgba(6,27,49,0.04)] hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
 
 interface TextInputProps {
   label: string;

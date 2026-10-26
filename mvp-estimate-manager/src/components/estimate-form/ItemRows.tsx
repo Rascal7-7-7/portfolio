@@ -6,7 +6,7 @@ import { cn, formatYen } from "@/lib/utils";
 import Icon from "@/components/Icon";
 
 export const INPUT_CLASS =
-  "w-full rounded border border-line bg-white px-2.5 py-2.5 text-base text-navy sm:py-2 sm:text-sm placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
+  "w-full rounded-md border border-slate-200 bg-white px-2.5 shadow-[0_1px_1px_rgba(6,27,49,0.04)] py-2.5 text-base text-navy sm:py-2 sm:text-sm placeholder:text-slate-400 hover:border-slate-300 focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15";
 
 const INVALID_CLASS = "border-rose-500 focus:border-rose-500 focus:ring-rose-500/20";
 
