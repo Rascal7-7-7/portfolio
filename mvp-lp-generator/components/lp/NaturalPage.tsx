@@ -3,7 +3,7 @@ import type { CategoryKey } from '@/lib/types'
 import { cx } from '@/lib/cx'
 import MobileBar, { HERO_CTA } from './MobileBar'
 import Photo, { usePhotoLoaded } from './Photo'
-import { areaOf, catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, ownerOf, Phrases, reserveLink, storeName, type TemplateProps } from './shared'
+import { areaOf, catchCopy, featuresHavePhoto, galleryOf, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, ownerOf, Phrases, reserveLink, storeName, type TemplateProps } from './shared'
 
 /*
  * ナチュラル: 個人経営のカフェ・和の店のサイト（STUDIO「Cafe Flat」の細い額縁線、
@@ -150,20 +150,53 @@ function Hero({ store, wide, roomy, headline: H }: TemplateProps) {
   )
 }
 
-function Features({ store, wide }: TemplateProps) {
+function Features({ store, wide, roomy }: TemplateProps) {
+  const withPhoto = featuresHavePhoto(store)
   return (
     <section className={cx('bg-[#efe8dc]', pad(wide))}>
       <H2 lead={`${storeName(store)}の`} text="こだわり" wide={wide} />
-      <ol className={cx('mx-auto mt-14 grid max-w-5xl', wide ? 'grid-cols-3 divide-x' : 'divide-y', 'divide-[#2e2620]/15')}>
+      {/*
+        写真があれば、縦長の写真を3枚並べ、中央の1枚だけ少し下げる（雑誌の見開きの段ずらし）。
+        写真が無ければ、細い縦線で区切った3列の文字だけで組む
+      */}
+      <ol
+        className={cx(
+          'mx-auto mt-14 grid max-w-5xl',
+          withPhoto
+            ? wide ? cx('grid-cols-3 items-start', roomy ? 'gap-12' : 'gap-8') : 'gap-14'
+            : cx(wide ? 'grid-cols-3 divide-x' : 'divide-y', 'divide-[#2e2620]/15'),
+        )}
+      >
         {store.features.map((f, i) => (
-          <li key={f.title} className={wide ? 'px-8 first:pl-0 last:pr-0' : 'py-8 first:pt-0 last:pb-0'}>
-            <p aria-hidden className={cx(ACCENT, 'font-mincho text-2xl')}>{KANJI_NUM[i] ?? i + 1}</p>
-            <h3 className="mt-4 font-mincho text-lg font-semibold tracking-[0.08em]"><Phrases text={f.title} /></h3>
+          <li
+            key={f.title}
+            className={cx(
+              withPhoto ? wide && i % 3 === 1 && 'mt-16' : wide ? 'px-8 first:pl-0 last:pr-0' : 'py-8 first:pt-0 last:pb-0',
+            )}
+          >
+            {withPhoto && <Photo src={f.photo} alt={f.title} className={cx('mb-7 block w-full', wide ? 'aspect-[4/5]' : 'aspect-[4/3]')} />}
+            <div className={cx(withPhoto && 'flex items-baseline gap-4')}>
+              <p aria-hidden className={cx(ACCENT, 'font-mincho text-2xl')}>{KANJI_NUM[i] ?? i + 1}</p>
+              <h3 className={cx('font-mincho text-lg font-semibold tracking-[0.08em]', !withPhoto && 'mt-4')}><Phrases text={f.title} /></h3>
+            </div>
             <p className={cx(MUTED, 'mt-3 text-sm leading-[2] tracking-[0.04em]')}>{f.text}</p>
           </li>
         ))}
       </ol>
     </section>
+  )
+}
+
+/** 写真だけの帯。額縁の内側いっぱいに、大小2枚を並べる（文字は載せない） */
+function Gallery({ store, wide, roomy }: TemplateProps) {
+  const photos = galleryOf(store).slice(0, 2)
+  if (photos.length === 0) return null
+  return (
+    <div className={cx('grid', photos.length > 1 && 'grid-cols-[3fr_2fr]', wide ? 'gap-4' : 'gap-2.5')}>
+      {photos.map((src) => (
+        <Photo key={src} src={src} alt="" className={cx('block w-full', wide ? (roomy ? 'h-[480px]' : 'h-[360px]') : 'h-[220px]')} />
+      ))}
+    </div>
   )
 }
 
@@ -179,7 +212,7 @@ function Greeting({ store, wide }: TemplateProps) {
         <H2 text={`${owner.role}より`} wide={wide} />
         {/* 写真があるときだけ、縦長の写真を添える（無ければ今までどおり文と署名だけ） */}
         <Photo src={owner.photo} alt={`${owner.role} ${owner.name}`} className="mx-auto mt-12 block aspect-[3/4] w-40" />
-        <p className={cx('mt-12 font-mincho leading-[2.2] tracking-[0.08em]', wide ? 'text-[17px]' : 'text-base')}>{owner.message}</p>
+        <p className={cx('mt-12 font-mincho leading-[2.3] tracking-[0.08em]', wide ? 'text-[19px]' : 'text-base')}>{owner.message}</p>
         <p className="mt-8 text-right font-mincho text-sm tracking-[0.14em]">
           <span className={cx(MUTED, 'mr-3 text-xs')}>{owner.role}</span>
           {owner.name}
@@ -197,13 +230,13 @@ function Menu({ store, wide }: TemplateProps) {
       <H2 text={menuTitle(store)} wide={wide} />
       <ul className="mx-auto mt-12 max-w-2xl">
         {items.map((m) => (
-          <li key={m.name} className={cx(LINE, 'border-b py-6')}>
+          <li key={m.name} className={cx(LINE, 'border-b', wide ? 'py-8' : 'py-6')}>
             <div className="flex items-baseline gap-4">
-              <h3 className="font-mincho text-[17px] font-semibold tracking-[0.08em]"><Phrases text={m.name} /></h3>
+              <h3 className={cx('font-mincho font-semibold tracking-[0.1em]', wide ? 'text-xl' : 'text-[17px]')}><Phrases text={m.name} /></h3>
               <span aria-hidden className="flex-1 border-b border-dotted border-[#2e2620]/35" />
-              <p className="shrink-0 font-mincho text-[17px] tabular-nums tracking-[0.04em]">{m.price}</p>
+              <p className={cx('shrink-0 font-mincho tabular-nums tracking-[0.04em]', wide ? 'text-xl' : 'text-[17px]')}>{m.price}</p>
             </div>
-            {m.description && <p className={cx(MUTED, 'mt-1.5 text-[13px] tracking-[0.04em]')}>{m.description}</p>}
+            {m.description && <p className={cx(MUTED, 'mt-2 text-[13px] tracking-[0.06em]')}>{m.description}</p>}
           </li>
         ))}
       </ul>
@@ -263,12 +296,15 @@ export default function NaturalPage(props: TemplateProps) {
         <Hero {...props} />
         {sections.features && <Features {...props} />}
         {sections.greeting && <Greeting {...props} />}
+        <Gallery {...props} />
         {sections.menu && <Menu {...props} />}
         {sections.voices && <Voices {...props} />}
         {sections.access && <Access {...props} />}
         {sections.cta && <Cta {...props} />}
-        <footer className={cx(LINE, MUTED, 'border-t px-6 py-10 text-center text-xs tracking-[0.12em]')}>
-          © {storeName(store)}
+        <footer className={cx(LINE, 'border-t px-6 py-14 text-center')}>
+          <p className="font-mincho text-xl font-semibold tracking-[0.2em]">{storeName(store)}</p>
+          {store.address && <p className={cx(MUTED, 'mt-4 text-xs tracking-[0.1em]')}>{store.address}</p>}
+          <p className={cx(MUTED, 'mt-8 text-[11px] tracking-[0.12em]')}>© {storeName(store)}</p>
         </footer>
         {!wide && (
           <MobileBar

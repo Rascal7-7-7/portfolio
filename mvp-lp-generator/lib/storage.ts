@@ -46,6 +46,9 @@ function isListOf(v: unknown, keys: readonly string[]): boolean {
   return Array.isArray(v) && v.every((item) => isObject(item) && keys.every((k) => typeof item[k] === 'string'))
 }
 
+/** ギャラリーに並べる写真の上限（下書きの中身は信用しないので数も絞る） */
+const MAX_GALLERY = 6
+
 const optional = (v: unknown, ok: (x: unknown) => boolean) => v === undefined || ok(v)
 
 /** 予約ボタンの外部リンクは https の URL だけ通す（javascript: などをリンクにしない） */
@@ -75,6 +78,8 @@ export function parseDoc(raw: string | null): LPDoc | null {
       store.category in CATEGORIES &&
       isListOf(store.menu, ['emoji', 'name', 'description', 'price']) &&
       isListOf(store.features, ['emoji', 'title', 'text']) &&
+      (store.features as Record<string, unknown>[]).every((f) => optional(f.photo, isSamplePhotoPath)) &&
+      optional(store.gallery, (g) => Array.isArray(g) && g.length <= MAX_GALLERY && g.every(isSamplePhotoPath)) &&
       isListOf(store.voices, ['name', 'text']) &&
       optional(store.area, (x) => typeof x === 'string') &&
       optional(store.photo, isSamplePhotoPath) &&

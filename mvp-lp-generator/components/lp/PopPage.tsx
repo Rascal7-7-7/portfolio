@@ -1,7 +1,7 @@
 import { cx } from '@/lib/cx'
 import MobileBar, { HERO_CTA } from './MobileBar'
 import Photo, { usePhotoLoaded } from './Photo'
-import { areaOf, catchCopy, ctaLabel, hoursWord, infoRows, isLowPrice, menuItems, menuTitle, ownerOf, Phrases, reserveLink, storeName, type TemplateProps } from './shared'
+import { areaOf, catchCopy, featuresHavePhoto, galleryOf, ctaLabel, hoursWord, infoRows, isLowPrice, menuItems, menuTitle, ownerOf, Phrases, reserveLink, storeName, type TemplateProps } from './shared'
 
 /*
  * ポップ: 街の整体院・教室のサイト（STUDIO「ぬくもり鍼灸・整骨院」の白い箱に載せた見出し・
@@ -125,13 +125,14 @@ function Hero(props: TemplateProps) {
 }
 
 function Features({ store, wide }: TemplateProps) {
+  const withPhoto = featuresHavePhoto(store)
   return (
     <section className={pad(wide)}>
       <div className={WRAP}>
       <H2 lead={`${storeName(store)}が`} text="選ばれる理由" wide={wide} />
       {/*
-        「3列の特長カード」はテンプレートの型に見えるので使わない。PC では見出しと本文を横に組んだ段を
-        左端をそろえて縦に積む（左右交互のずらしは配置のずれに見えるのでやめた）
+        「3列の特長カード」はテンプレートの型に見えるので使わない。PC では左に写真（無ければ見出し）、右に見出しと本文の段を
+        左端をそろえて縦に積む（左右交互のずらしは配置のずれに見えるのでやめた）。スマホは写真の下に見出しと本文
       */}
       {/* 下端の線は置かない（直後のあいさつの太線と二重になる） */}
       <ul className={cx('mt-12', wide && 'space-y-12')}>
@@ -140,17 +141,35 @@ function Features({ store, wide }: TemplateProps) {
             key={f.title}
             className={cx(
               wide
-                ? cx('grid grid-cols-[minmax(0,15em)_minmax(0,1fr)] items-baseline gap-10 border-t-2 pt-6', RULE)
-                : cx('border-t py-7', LINE),
+                ? cx('grid items-center gap-10 border-t-2 pt-8', withPhoto ? 'grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]' : 'grid-cols-[minmax(0,15em)_minmax(0,1fr)] items-baseline', RULE)
+                : cx('border-t py-8', LINE),
             )}
           >
-            <h3 className={cx('font-extrabold leading-snug', wide ? 'text-2xl' : 'text-xl')}><Phrases text={f.title} /></h3>
-            <p className={cx(MUTED, 'text-[15px] leading-[1.9]', !wide && 'mt-2')}>{f.text}</p>
+            {withPhoto && <Photo src={f.photo} alt={f.title} className={cx('block w-full rounded-lg', wide ? 'aspect-[3/2]' : 'mb-6 aspect-[16/10]')} />}
+            <div className={cx(!withPhoto && wide && 'contents')}>
+              <h3 className={cx('font-extrabold leading-snug', wide ? 'text-2xl' : 'text-xl')}><Phrases text={f.title} /></h3>
+              <p className={cx(MUTED, 'text-[15px] leading-[1.9]', (withPhoto || !wide) && (wide ? 'mt-4' : 'mt-2'))}>{f.text}</p>
+            </div>
           </li>
         ))}
       </ul>
       </div>
     </section>
+  )
+}
+
+/** 院内の写真。白地に角を少し丸めた2枚を並べる（文字は載せない） */
+function Gallery({ store, wide }: TemplateProps) {
+  const photos = galleryOf(store).slice(0, 2)
+  if (photos.length === 0) return null
+  return (
+    <div className={wide ? 'px-14 pb-24' : 'px-5 pb-16'}>
+      <div className={cx(WRAP, 'grid grid-cols-2', wide ? 'gap-6' : 'gap-3')}>
+        {photos.map((src) => (
+          <Photo key={src} src={src} alt="" className={cx('block w-full rounded-lg', wide ? 'aspect-[4/3]' : 'aspect-square')} />
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -315,6 +334,7 @@ export default function PopPage(props: TemplateProps) {
       {sections.greeting && <Greeting {...props} />}
       {sections.menu && <Menu {...props} />}
       {sections.voices && <Voices {...props} />}
+      <Gallery {...props} />
       {sections.access && <Access {...props} />}
       {sections.cta && <Cta {...props} />}
       <footer className={cx(MUTED, 'px-6 py-10 text-center text-xs font-bold')}>© {storeName(store)}</footer>
