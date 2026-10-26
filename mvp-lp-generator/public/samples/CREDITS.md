@@ -23,3 +23,4 @@ https://www.pexels.com/license/
 | hidamari-room.webp | https://www.pexels.com/photo/massage-table-in-the-room-6628473/ |
 | hidamari-back.webp | https://www.pexels.com/photo/hands-massaging-the-person-s-back-6187653/ （Tima Miroshnichenko） |
 | hidamari-bed.webp | https://www.pexels.com/photo/blue-and-white-clinic-bed-7789603/ （Ivan Babydov） |
+| hidamari-owner.webp | https://www.pexels.com/photo/crop-chiropractor-massaging-hand-of-patient-5473223/ |
