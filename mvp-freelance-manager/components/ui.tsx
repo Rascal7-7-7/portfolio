@@ -26,7 +26,7 @@ export function Card({ title, action, className, children }: CardProps) {
 
 export function MoreLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <Link href={href} className="rounded text-xs text-warm-500 hover:text-ink hover:underline">
+    <Link href={href} className="hit rounded text-xs text-warm-500 hover:text-ink hover:underline">
       {children}
     </Link>
   );
@@ -122,7 +122,7 @@ export function SegmentButton({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "shrink-0 rounded-md px-2.5 py-1.5 text-xs transition-colors",
+        "hit shrink-0 rounded-md px-2.5 py-1.5 text-xs transition-colors",
         active ? "bg-black/[0.07] font-semibold text-ink" : "text-warm-500 hover:bg-black/[0.04] hover:text-ink",
       )}
     >
@@ -131,13 +131,17 @@ export function SegmentButton({
   );
 }
 
+/** 押した瞬間だけわずかに沈める。動きを減らす設定では色の変化だけにする */
+const PRESS = "transition-[background-color,transform] duration-100 motion-safe:active:scale-[0.98]";
+
 export const buttonStyles = {
-  primary:
-    "inline-flex items-center justify-center gap-1.5 rounded-md bg-blue px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-active disabled:opacity-50",
-  secondary:
-    "inline-flex items-center justify-center gap-1.5 rounded-md border border-line bg-canvas px-3.5 py-2 text-sm font-medium text-ink transition-colors hover:bg-warm-100",
+  primary: `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-md bg-blue px-3.5 py-2 text-sm font-medium text-white hover:bg-blue-active active:bg-blue-active disabled:opacity-50 disabled:active:scale-100 sm:min-h-0 ${PRESS}`,
+  secondary: `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-md border border-line bg-canvas px-3.5 py-2 text-sm font-medium text-ink hover:bg-warm-100 active:bg-warm-200 sm:min-h-0 ${PRESS}`,
+  /** 一覧の行の中に置く小さなボタン（入金済にする 等）。スマホでは高さ 44px にする */
+  rowAction: `min-h-11 w-24 shrink-0 rounded-md border border-line bg-canvas px-2 py-1.5 text-xs font-medium text-ink hover:bg-warm-100 active:bg-warm-200 sm:min-h-0 ${PRESS}`,
+  rowActionQuiet: `min-h-11 w-24 shrink-0 rounded-md px-2 py-1.5 text-xs text-warm-500 hover:bg-black/[0.04] hover:text-ink active:bg-black/[0.07] sm:min-h-0 ${PRESS}`,
   input:
-    "w-full rounded-md border border-[#d9d7d4] bg-canvas px-3 py-2 text-sm text-ink placeholder:text-warm-300 focus:border-blue focus:outline-none focus:ring-2 focus:ring-blue-tint",
+    "min-h-11 sm:min-h-0 w-full rounded-md border border-[#d9d7d4] bg-canvas px-3 py-2 text-sm text-ink placeholder:text-warm-300 focus:border-blue focus:outline-none focus:ring-2 focus:ring-blue-tint",
 } as const;
 
 export function PageSkeleton() {

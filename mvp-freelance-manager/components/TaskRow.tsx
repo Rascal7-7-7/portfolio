@@ -18,7 +18,7 @@ interface TaskRowProps {
 }
 
 const DUE_STYLE = {
-  overdue: "font-semibold text-ink",
+  overdue: "font-semibold text-orange",
   today: "font-medium text-ink",
   week: "text-warm-500",
   later: "text-warm-300",
@@ -66,7 +66,7 @@ export function TaskRow({ task, today, project, deletable }: TaskRowProps) {
           {task.title}
         </p>
         {project && (
-          <Link href={`/projects/${project.id}`} className="block truncate text-xs text-warm-500 hover:underline">
+          <Link href={`/projects/${project.id}`} className="hit block truncate text-xs text-warm-500 hover:underline">
             {project.name}
           </Link>
         )}
@@ -79,7 +79,7 @@ export function TaskRow({ task, today, project, deletable }: TaskRowProps) {
           type="button"
           onClick={() => actions.deleteTask(task.id)}
           aria-label={`${task.title}を削除`}
-          className="shrink-0 rounded p-1 text-warm-300 hover:bg-black/5 hover:text-ink"
+          className="hit shrink-0 rounded p-1 text-warm-300 hover:bg-black/5 hover:text-ink"
         >
           <Trash2 size={14} aria-hidden />
         </button>

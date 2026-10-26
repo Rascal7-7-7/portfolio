@@ -194,10 +194,9 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
           <RevenueChart
             data={revenue}
             growFrom={paidDelta > 0 ? (s.thisMonthPaid - paidDelta) / s.thisMonthPaid : null}
-            ceiling={s.thisMonthPaid + s.outstandingTotal}
           />
           <details className="mt-4">
-            <summary className="cursor-pointer text-xs text-warm-500 hover:text-ink">数値で見る</summary>
+            <summary className="hit cursor-pointer text-xs text-warm-500 hover:text-ink">数値で見る</summary>
             <MonthlyTable rows={revenue} />
           </details>
         </div>

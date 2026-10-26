@@ -9,7 +9,7 @@ export function ExternalLink({ href, children }: { href: string; children: React
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-0.5 rounded font-medium text-blue hover:underline"
+      className="hit inline-flex items-center gap-0.5 rounded font-medium text-blue hover:underline"
     >
       {children}
       <ArrowUpRight size={14} aria-hidden />
