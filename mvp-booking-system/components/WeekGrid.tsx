@@ -90,8 +90,12 @@ function DayColumn({ list, nowMin, past }: { list: Reservation[]; nowMin: number
   const y = (min: number) => ((min - OPEN_MIN) / 60) * HOUR_H + 3;
   return (
     <div className={`relative border-l border-line ${past ? 'bg-muted/60' : ''}`} style={{ height: HOUR_H * HOURS.length }}>
+      {/* 正時は実線、30分は点線（Notion Calendar と同じ）。いちばん上の正時は見出しの罫線と二重になるので引かない */}
       {HOURS.map((h, i) => (
-        <div key={h} className="absolute left-0 right-0 border-t border-line" style={{ top: i * HOUR_H + 3 }} />
+        <div key={h}>
+          {i > 0 && <div className="absolute left-0 right-0 border-t border-line" style={{ top: i * HOUR_H + 3 }} />}
+          <div className="absolute left-0 right-0 border-t border-dotted border-line" style={{ top: i * HOUR_H + HOUR_H / 2 + 3 }} />
+        </div>
       ))}
       {placeInLanes(list).map(({ r, lane, lanes }) => {
         const width = `calc((100% - 6px - ${(lanes - 1) * 3}px) / ${lanes})`;

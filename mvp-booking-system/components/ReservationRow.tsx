@@ -37,7 +37,7 @@ export default function ReservationRow({ r }: { r: Reservation }) {
   return (
     <Link
       href={`/reservations/${r.id}`}
-      className={`flex gap-3 ${ROW_GRID} md:gap-0 px-4 py-3.5 hover:bg-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand`}
+      className={`group flex gap-3 ${ROW_GRID} md:gap-0 px-4 py-3.5 hover:bg-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand`}
     >
       <div className="shrink-0 w-14 md:w-auto tabular-nums">
         <p className="text-sm font-medium text-ink">{r.reservation_time}</p>
@@ -67,7 +67,7 @@ export default function ReservationRow({ r }: { r: Reservation }) {
         <NoticeLine label="前日" sent={r.reminder_sent} />
       </dl>
 
-      <Icon name="chevron_right" className="hidden md:block text-dim" />
+      <Icon name="chevron_right" className="hidden md:block text-line-strong group-hover:text-ink transition-colors" />
     </Link>
   );
 }

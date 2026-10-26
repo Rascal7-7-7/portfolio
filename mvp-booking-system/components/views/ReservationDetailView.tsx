@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { formatDateTime, formatFullDate } from '@/lib/date';
@@ -27,6 +28,13 @@ const NEXT_STEP: Partial<Record<ReservationStatus, { to: ReservationStatus; labe
 export default function ReservationDetailView({ id }: { id: number }) {
   const { reservations, today, update, remove, notify } = useStore();
   const router = useRouter();
+  // 保存ボタンをその場で「保存しました」に変える（トーストに目を移さなくても保存できたと分かる）
+  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    if (!saved) return;
+    const t = setTimeout(() => setSaved(false), 2000);
+    return () => clearTimeout(t);
+  }, [saved]);
   if (!reservations) return <LoadingState />;
 
   const r = reservations.find(x => x.id === id);
@@ -56,6 +64,7 @@ export default function ReservationDetailView({ id }: { id: number }) {
 
   const save = (input: ReservationInput) => {
     update(r.id, input);
+    setSaved(true);
     notify('予約内容を保存しました');
   };
 
@@ -107,11 +116,13 @@ export default function ReservationDetailView({ id }: { id: number }) {
           <ReservationForm key={r.id} id={FORM_ID} defaults={toInput(r)} onSubmit={save}
             findConflict={input => (r.status === 'canceled' ? undefined : findConflict(reservations, input, r.id))} />
           <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 mt-5">
-            <button type="button" onClick={handleDelete} className={btn('ghost')}>
+            <button type="button" onClick={handleDelete} className={btn('danger')}>
               この予約を削除
             </button>
-            <button type="submit" form={FORM_ID} className={btn('secondary')}>
-              変更を保存する
+            <button type="submit" form={FORM_ID} className={`${btn('secondary')} sm:min-w-36`}>
+              {saved
+                ? <span key="saved" className="animate-rise-in inline-flex items-center gap-1"><Icon name="check" size={16} />保存しました</span>
+                : '変更を保存する'}
             </button>
           </div>
         </div>
