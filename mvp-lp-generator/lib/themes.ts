@@ -10,7 +10,7 @@ export interface Theme {
 
 export const THEMES: Record<TemplateKey, Theme> = {
   natural: { label: 'ナチュラル', note: '縦書きの明朝と生成り色。カフェ・和の店に', swatch: '#f7f3ec' },
-  modern: { label: 'モダン', note: '黒地に大きな見出し。美容室・バーに', swatch: '#0e0e0e' },
+  modern: { label: 'モダン', note: '白地に大きな見出しと写真。美容室・サロンに', swatch: '#1c1b19' },
   pop: { label: 'ポップ', note: '明るい色面と大きな料金表示。整体・教室に', swatch: '#ff6b4a' },
 }
 

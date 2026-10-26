@@ -58,6 +58,11 @@ const ORDER: readonly SectionKey[] = ['features', 'greeting', 'menu', 'voices', 
 /** あいさつ文があるときだけ返す（旧データ・空欄では描画しない） */
 export const ownerOf = (s: StoreInfo) => (s.owner?.message ? s.owner : null)
 
+/** ギャラリーの写真（サンプルだけが持つ。無ければ空） */
+export const galleryOf = (s: StoreInfo): readonly string[] => s.gallery ?? []
+/** こだわりの欄に写真が1枚でもあるか（写真の有無で組み方を変える） */
+export const featuresHavePhoto = (s: StoreInfo) => s.features.some((f) => f.photo)
+
 /** エリア・ジャンル（任意入力）。業種の選択値は内部の分類なので LP には出さない */
 export const areaOf = (s: StoreInfo) => s.area?.trim() ?? ''
 
