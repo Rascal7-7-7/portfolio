@@ -13,7 +13,7 @@ export function FeaturedProject({ project }: { project: Project }) {
   const { slug, headline, summary, highlights, evidence, diagram } = project;
 
   return (
-    <article className="py-8 border-t border-rule">
+    <article className="reveal py-8 border-t border-rule">
       <ProjectTitle project={project} as="h3" className="text-xl sm:text-2xl" />
       <p className="mt-1 text-[17px] font-medium leading-relaxed text-ink">{headline}</p>
 

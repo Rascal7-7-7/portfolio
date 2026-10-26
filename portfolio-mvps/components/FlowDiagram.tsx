@@ -2,7 +2,7 @@ import type { FlowDiagram as FlowDiagramData } from "@/content/projects";
 
 /*
  * 座標は viewBox 上の値。幅を 360 に抑え、390px 幅の画面でも文字が縮みすぎないようにする。
- * 色は tailwind.config.ts のトークンと同じ値。明るい地（paper）で AA を満たすものだけを文字に使う。
+ * 色は tailwind.config.ts のトークンと同じ値。黒い地（paper）で AA を満たすものだけを文字に使う。
  */
 const W = 360;
 const PAD = 8;
@@ -18,11 +18,11 @@ const SIZE = {
 };
 
 export const COLOR = {
-  box: "#fcfbf8", // paper
-  line: "#8f8b82", // 枠線のみ（paper に対し 3.3:1。非テキストの 3:1 を満たす）。文字には使わない
-  boundary: "#035a8c", // accent（7.1:1）
-  label: "#1c1b19", // ink（16.6:1）
-  note: "#52504b", // ink.muted（7.8:1）
+  box: "#111318", // code（地より一段明るくして箱を浮かせる）
+  line: "#5f636b", // 枠線のみ（box に対し 3.1:1。非テキストの 3:1 を満たす）。文字には使わない
+  boundary: "#5ccbff", // accent（10.1:1）
+  label: "#ededeb", // ink（15.9:1）
+  note: "#a6a7aa", // ink.muted（7.7:1）
 };
 
 export function Arrow({

@@ -11,8 +11,8 @@
 
 :root {
   /* tailwind.config.ts の paper / ink と同じ値 */
-  --background: #fcfbf8;
-  --foreground: #1c1b19;
+  --background: #08090b;
+  --foreground: #ededeb;
 }
 
 * {
@@ -21,6 +21,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* 上に固定したヘッダー（h-16）の下に、移動先の見出しが隠れないようにする */
+  scroll-padding-top: 4.5rem;
 }
 
 body {
@@ -51,19 +53,66 @@ dd {
 
 /*
  * フォーカス表示。
- * 明るい地（paper）に対して 7.1:1 のアクセント色を使う（WCAG 2.2 の非テキスト 3:1 を満たす）。
+ * 黒い地（paper）に対して 10.9:1 のアクセント色を使う（WCAG 2.2 の非テキスト 3:1 を満たす）。
  * 塗りのボタン（accent 地）の上でも見失わないよう、outline-offset で地から離して描く。
  * :focus-visible に限定しているため、マウス操作では表示されない。
  */
 :focus-visible {
-  outline: 2px solid #035a8c;
+  outline: 2px solid #5ccbff;
   outline-offset: 3px;
   border-radius: 2px;
 }
 
 ::selection {
-  background: #cfe3f0;
-  color: #1c1b19;
+  background: #1d4a63;
+  color: #ededeb;
+}
+
+/*
+ * トップの 3D の背後に敷く光。3D の読み込み前と、WebGL が使えない環境ではこれだけが見える。
+ * 中心を核の位置（舞台の中央）に合わせ、下端は地の色へ溶かして見出しと地続きにする。
+ */
+.hero-glow {
+  background:
+    radial-gradient(closest-side at 50% 50%, rgb(92 203 255 / 0.16), transparent 70%),
+    linear-gradient(to bottom, transparent 70%, var(--background));
+}
+
+.hero-fade {
+  mask-image: linear-gradient(to bottom, #000 62%, transparent 92%);
+}
+
+/* ファーストビューの文字を、上から順に短く浮かび上がらせる */
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.hero-in {
+  animation: hero-in 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/*
+ * スクロールで節が浮かび上がる。対応ブラウザだけ CSS のスクロール連動で動かし、JS は使わない。
+ * 未対応ブラウザや、動きを減らす設定では最初から表示されたまま。
+ */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
 }
 
 /* モーションを減らす設定の利用者には、スムーススクロールとアニメーションを無効化する */

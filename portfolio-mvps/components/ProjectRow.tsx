@@ -12,7 +12,7 @@ export function ProjectRow({ project }: { project: Project }) {
 
   return (
     // モバイルは本文の幅を削らないよう画像を上に、sm 以上は行の右側に置く
-    <article className="py-4 border-t border-rule flex flex-col-reverse gap-3 sm:flex-row sm:items-start sm:gap-6">
+    <article className="reveal py-4 border-t border-rule flex flex-col-reverse gap-3 sm:flex-row sm:items-start sm:gap-6">
       <div className="min-w-0 flex-1">
         <ProjectTitle project={project} as="h4" className="text-base" showPeriod={false} />
         <p className="mt-0.5 text-ink-muted">{headline}</p>

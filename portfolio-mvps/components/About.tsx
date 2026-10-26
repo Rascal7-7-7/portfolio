@@ -26,7 +26,7 @@ export function About() {
       <div className={container}>
         <SectionHeader id="about-heading" title="自己紹介" className="mb-2" />
 
-        <div className="space-y-4 leading-[1.8] text-ink-muted">
+        <div className="reveal space-y-4 leading-[1.8] text-ink-muted">
           {paragraphs.map((sentences) => (
             <p key={sentences[0]}>{sentences.join("")}</p>
           ))}

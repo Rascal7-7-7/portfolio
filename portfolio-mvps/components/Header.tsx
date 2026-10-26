@@ -21,11 +21,11 @@ export function Header() {
     <>
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-3 focus:left-3 focus:px-4 focus:py-2 focus:rounded-md focus:bg-accent focus:text-white"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-3 focus:left-3 focus:px-4 focus:py-2 focus:rounded-md focus:bg-accent focus:text-paper"
       >
         メインコンテンツへスキップ
       </a>
-      <header id="top">
+      <header id="top" className="sticky top-0 z-30 border-b border-rule/60 bg-paper/70 backdrop-blur-md">
         {/* 幅と余白は本文と同じ container を使い、名前の左端を本文に揃える */}
         <div className={cn(container, "h-16 flex items-center justify-between gap-3")}>
           <a
