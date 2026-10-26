@@ -111,7 +111,7 @@ export function InvoiceForm({ projects, invoices, today, defaultProjectId, onCre
       {remaining !== null && (
         <p
           id="invoice-remaining"
-          className={`num text-xs sm:col-span-4 ${fullyBilled ? "font-semibold text-orange" : "text-warm-500"}`}
+          className={`num text-xs sm:col-span-4 ${fullyBilled ? "font-semibold text-shu" : "text-warm-500"}`}
         >
           {fullyBilled
             ? "この案件は受注額まで請求済みのため、新しい請求書は作成できません（受注額の変更は案件側で行います）。"
@@ -119,7 +119,7 @@ export function InvoiceForm({ projects, invoices, today, defaultProjectId, onCre
         </p>
       )}
       {error && (
-        <p role="alert" className="text-xs font-semibold text-orange sm:col-span-4">
+        <p role="alert" className="text-xs font-semibold text-shu sm:col-span-4">
           {error}
         </p>
       )}

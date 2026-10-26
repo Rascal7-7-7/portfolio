@@ -1,30 +1,40 @@
 @import "tailwindcss";
 
-/* ── warm neutral + 単一アクセント（青）。橙は「期限超過」の警告専用 ── */
+/*
+ * 帳面の配色。地は生成り、文字は墨。意味を持つ色は 2 つだけ：
+ * 緑（moss）＝入金済み・順調、朱（shu）＝期限超過・要対応。それ以外は墨と灰で組む。
+ * コントラスト（WCAG 相対輝度で計算）:
+ *   文字  ink 14.1 / warm-900 10.7 / warm-500 6.4 / warm-300 5.2 / moss 5.7 / shu 5.9（いずれも paper 地）
+ *         moss・shu は各自の淡い地（tint）の上でも 4.8 / 5.1
+ *   非文字 rule（入力欄・ボタンの枠）3.6 / bar（グラフの過去月）3.2 / moss 5.7 / shu 5.9（paper 地）
+ *   line は行の区切りの罫（装飾。操作の境界には使わない）
+ */
 @theme {
-  --color-canvas: #ffffff;
-  --color-ink: rgba(0, 0, 0, 0.95);
-  --color-warm-50: #fbfaf9;
-  --color-warm-100: #f6f5f4;
-  --color-warm-200: #ebe9e7;
-  /* Notion の #a39e98 は白地で 2.7:1 のため、本文に使える AA（4.5:1）まで濃くしている */
-  --color-warm-300: #74706b;
-  --color-warm-500: #615d59;
-  --color-warm-900: #31302e;
-  --color-line: rgba(0, 0, 0, 0.1);
+  --color-paper: #f5f0e4;
+  --color-canvas: #fbf8f1; /* 入力欄・請求書の紙面など、地より一段明るい紙 */
+  --color-ink: #24211c;
+  --color-warm-50: #f5f0e4;
+  --color-warm-100: #ece5d5;
+  --color-warm-200: #e3dccb;
+  --color-warm-300: #6b6457;
+  --color-warm-500: #5d564a;
+  --color-warm-900: #3a352d;
+  --color-line: #d8cfbc;
+  --color-rule: #857c6a;
+  --color-bar: #8e8574;
 
-  /* Notion の #0075de は warm-50 地で 4.4:1 のため、白・warm-50・warm-100 のどれでも 4.5:1 以上になるまで濃くしている */
-  --color-blue: #006dd0;
-  --color-blue-active: #005bab;
-  --color-blue-tint: #cfe5fa;
-
-  --color-orange: #b34a00; /* 白・warm-100 地で 4.5:1 以上 */
+  --color-moss: #2f6a45;
+  --color-moss-tint: #dde0d1;
+  --color-shu: #a83218;
+  --color-shu-tint: #edddd0;
+  --color-shu-face: #e9d2c3;
 
   --font-sans: var(--font-noto-jp), Inter, -apple-system, system-ui, sans-serif;
+  --font-serif: var(--font-noto-serif-jp), "Hiragino Mincho ProN", "Yu Mincho", serif;
 }
 
 body {
-  background-color: var(--color-warm-50);
+  background-color: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
   /* 日本語を文節で折り返し、語の途中での改行と行末1文字だけの行を避ける（lang="ja" 前提、非対応ブラウザは通常の折り返し） */
@@ -91,6 +101,6 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid #097fe8;
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }

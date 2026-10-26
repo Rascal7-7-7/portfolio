@@ -81,7 +81,7 @@ function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; del
               key={m.value}
               className={cn(
                 "mt-1 flex h-7 items-center text-[17px] font-semibold tracking-[-0.025em] sm:h-11 sm:text-[32px]",
-                m.warn ? "text-orange" : "text-ink",
+                m.warn ? "text-shu" : "text-ink",
                 m.delta && "anim-rise",
               )}
             >
@@ -91,7 +91,7 @@ function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; del
             <dd
               className={cn(
                 "num mt-0.5 min-h-[2lh] text-[11px] sm:min-h-0 sm:text-xs",
-                m.warn ? "font-semibold text-orange" : "text-warm-500",
+                m.warn ? "font-semibold text-shu" : "text-warm-500",
               )}
             >
               {m.sub}
@@ -101,7 +101,7 @@ function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; del
       </dl>
       <div className="mx-3 mb-5 flex items-center gap-3 sm:mx-6">
       <div
-        className="h-2 flex-1 overflow-hidden rounded-full bg-warm-100"
+        className="h-2 flex-1 overflow-hidden bg-warm-200"
         role="progressbar"
         aria-label="今月期日の請求のうち入金済の割合"
         aria-valuemin={0}
@@ -109,7 +109,7 @@ function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; del
         aria-valuenow={Math.round(ratio * 100)}
       >
         <div
-          className="h-full rounded-full bg-blue transition-[width] duration-500 motion-reduce:transition-none"
+          className="h-full bg-moss transition-[width] duration-500 motion-reduce:transition-none"
           style={{ width: `${ratio * 100}%` }}
         />
       </div>
@@ -117,7 +117,7 @@ function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; del
           <span className="font-semibold text-ink">{Math.round(ratio * 100)}%</span> 回収
         </span>
       </div>
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 border-t border-line bg-warm-50/60 px-3 py-3 sm:px-6">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 border-t border-line px-3 py-3 sm:px-6">
         <p className="flex items-center gap-2 text-xs text-warm-500">
           今後の入金予定
           <span className="num">来月以降が期日・{s.laterDueCount}件</span>
@@ -134,7 +134,7 @@ function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; del
 function DeltaBadge({ delta }: { delta?: number }) {
   if (!delta) return null;
   return (
-    <span className="num anim-rise rounded bg-blue-tint/60 px-1 text-[11px] font-semibold text-blue-active">
+    <span className="num anim-rise rounded-[2px] bg-moss-tint px-1 text-[11px] font-semibold text-moss">
       {signedYen(delta)}
     </span>
   );
@@ -168,7 +168,7 @@ function MonthlyTableToggle({ rows }: { rows: readonly MonthlyRevenue[] }) {
   );
 }
 
-/** グラフの数値を確かめるための月別の表（Linear の小さな表に倣い、罫線は行の区切りだけ） */
+/** グラフの数値を確かめるための月別の表（帳簿の小さな表。罫線は行の区切りだけ） */
 function MonthlyTable({ rows }: { rows: readonly MonthlyRevenue[] }) {
   const th = "px-2 py-1.5 font-medium";
   return (
@@ -237,7 +237,7 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
       <Card className="mb-5">
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1 px-4 pt-5 sm:px-6">
           <div>
-            <h2 className="text-sm font-semibold tracking-[-0.01em] text-ink">入金の推移</h2>
+            <h2 className="font-serif text-[15px] font-semibold text-ink">入金の推移</h2>
             <p className="num mt-0.5 text-xs text-warm-500">
               {firstMonth}から{lastMonth}の入金
             </p>

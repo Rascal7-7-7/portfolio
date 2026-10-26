@@ -9,16 +9,16 @@ interface CardProps {
   children: ReactNode;
 }
 
-/** パネルの縁。1px の罫線に、Notion の「ささやく影」程度の浮きだけを足す */
-export const SURFACE = "rounded-xl border border-line bg-canvas shadow-[0_1px_2px_rgba(15,15,15,0.04),0_4px_12px_-6px_rgba(15,15,15,0.06)]";
+/** 帳面の一区画。箱で囲まず、上を墨の太罫、下を細罫で区切る（帳簿の見出し罫と締めの罫） */
+export const SURFACE = "border-t-2 border-b border-t-ink border-b-line";
 
-/** 罫線で区切るパネル。アイコンや色帯で飾らない（Linear / Stripe のリスト面と同じ扱い） */
+/** 罫線で区切るパネル。角丸の箱・影・アイコンで飾らない */
 export function Card({ title, action, className, children }: CardProps) {
   return (
     <section className={cn("min-w-0", SURFACE, className)} aria-label={title}>
       {title && (
         <header className="flex min-h-12 items-center justify-between gap-2 border-b border-line px-4 py-3 sm:px-5">
-          <h2 className="text-sm font-semibold tracking-[-0.01em] text-ink">{title}</h2>
+          <h2 className="font-serif text-[15px] font-semibold text-ink">{title}</h2>
           {action}
         </header>
       )}
@@ -48,7 +48,7 @@ export function PageHeader({ eyebrow, title, description, action }: PageHeaderPr
     <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
         {eyebrow && <p className="num mb-1 text-xs text-warm-500">{eyebrow}</p>}
-        <h1 className="text-[22px] font-bold tracking-[-0.025em] text-ink sm:text-[28px]">{title}</h1>
+        <h1 className="font-serif text-[24px] font-semibold tracking-[0.01em] text-ink sm:text-[30px]">{title}</h1>
         {description && <p className="mt-1.5 text-sm text-warm-500">{description}</p>}
       </div>
       {action}
@@ -88,7 +88,7 @@ export interface Metric {
   href?: string;
 }
 
-/** 集計値の横並び。タイルを並べず、1枚のパネルを縦罫で区切る（Stripe の概要表示に倣う） */
+/** 集計値の横並び。タイルを並べず、帳簿の欄のように縦罫で区切る */
 export function MetricStrip({ items, className }: { items: readonly Metric[]; className?: string }) {
   return (
     <dl
@@ -115,7 +115,7 @@ export function MetricStrip({ items, className }: { items: readonly Metric[]; cl
           </>
         );
         return m.href ? (
-          <Link key={m.label} href={m.href} className="block min-w-0 px-4 py-4 hover:bg-warm-50 sm:px-6 sm:py-5">
+          <Link key={m.label} href={m.href} className="block min-w-0 px-4 py-4 hover:bg-warm-100/70 sm:px-6 sm:py-5">
             {body}
           </Link>
         ) : (
@@ -128,7 +128,7 @@ export function MetricStrip({ items, className }: { items: readonly Metric[]; cl
   );
 }
 
-/** 絞り込みの切り替え。サイドバーの選択状態と同じ見た目にそろえる */
+/** 絞り込みの切り替え。選んだものだけ墨で塗る（主ボタンと同じ扱い） */
 export function SegmentButton({
   active,
   onClick,
@@ -144,8 +144,8 @@ export function SegmentButton({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "hit shrink-0 rounded-md px-3 py-1.5 text-xs transition-colors",
-        active ? "bg-canvas font-semibold text-ink shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.05)]" : "text-warm-500 hover:bg-black/[0.04] hover:text-ink",
+        "hit shrink-0 rounded-[3px] px-3 py-1.5 text-xs transition-colors",
+        active ? "bg-ink font-semibold text-canvas" : "text-warm-500 hover:bg-warm-100 hover:text-ink",
       )}
     >
       {children}
@@ -157,13 +157,13 @@ export function SegmentButton({
 const PRESS = "transition-[background-color,transform] duration-100 motion-safe:active:scale-[0.98]";
 
 export const buttonStyles = {
-  primary: `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-md bg-blue px-3.5 py-2 text-sm font-medium text-white hover:bg-blue-active active:bg-blue-active disabled:opacity-50 disabled:active:scale-100 sm:min-h-0 ${PRESS}`,
-  secondary: `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-md border border-line bg-canvas px-3.5 py-2 text-sm font-medium text-ink hover:bg-warm-100 active:bg-warm-200 sm:min-h-0 ${PRESS}`,
+  primary: `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[3px] bg-ink px-3.5 py-2 text-sm font-medium text-canvas hover:bg-warm-900 active:bg-warm-900 disabled:opacity-50 disabled:active:scale-100 sm:min-h-0 ${PRESS}`,
+  secondary: `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[3px] border border-rule bg-canvas px-3.5 py-2 text-sm font-medium text-ink hover:bg-warm-100 active:bg-warm-200 sm:min-h-0 ${PRESS}`,
   /** 一覧の行の中に置く小さなボタン（入金済にする 等）。スマホでは高さ 44px にする */
-  rowAction: `min-h-11 w-24 shrink-0 rounded-md border border-line bg-canvas px-2 py-1.5 text-xs font-medium text-ink hover:bg-warm-100 active:bg-warm-200 sm:min-h-0 ${PRESS}`,
-  rowActionQuiet: `min-h-11 w-24 shrink-0 rounded-md px-2 py-1.5 text-xs text-warm-500 hover:bg-black/[0.04] hover:text-ink active:bg-black/[0.07] sm:min-h-0 ${PRESS}`,
+  rowAction: `min-h-11 w-24 shrink-0 rounded-[3px] border border-rule bg-canvas px-2 py-1.5 text-xs font-medium text-ink hover:bg-warm-100 active:bg-warm-200 sm:min-h-0 ${PRESS}`,
+  rowActionQuiet: `min-h-11 w-24 shrink-0 rounded-[3px] px-2 py-1.5 text-xs text-warm-500 hover:bg-warm-100 hover:text-ink active:bg-warm-200 sm:min-h-0 ${PRESS}`,
   input:
-    "min-h-11 sm:min-h-0 w-full rounded-md border border-[#d9d7d4] bg-canvas px-3 py-2 text-sm text-ink placeholder:text-warm-300 focus:border-blue focus:outline-none focus:ring-2 focus:ring-blue-tint",
+    "min-h-11 sm:min-h-0 w-full rounded-[3px] border border-rule bg-canvas px-3 py-2 text-sm text-ink placeholder:text-warm-300 focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/15",
 } as const;
 
 export function PageSkeleton() {
@@ -171,8 +171,8 @@ export function PageSkeleton() {
     <Page>
       <div className="animate-pulse space-y-4" aria-busy="true" aria-label="読み込み中">
         <div className="h-8 w-48 rounded bg-warm-200" />
-        <div className="h-20 rounded-lg bg-warm-100" />
-        <div className="h-64 rounded-lg bg-warm-100" />
+        <div className="h-20 bg-warm-100" />
+        <div className="h-64 bg-warm-100" />
       </div>
     </Page>
   );

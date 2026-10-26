@@ -53,7 +53,7 @@ export function ProjectsView() {
       <div className="-mx-4 mb-2 flex gap-1 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0" role="group" aria-label="ステータスで絞り込み">
         {tabs.map((t) => (
           <SegmentButton key={t.key} active={filter === t.key} onClick={() => setFilter(t.key)}>
-            {t.label} <span className="num ml-0.5 text-warm-500">{t.n}</span>
+            {t.label} <span className="num ml-0.5 font-normal">{t.n}</span>
           </SegmentButton>
         ))}
       </div>
@@ -67,7 +67,7 @@ export function ProjectsView() {
               const prog = projectProgress(p, data);
               return (
                 <li key={p.id}>
-                  <Link href={`/projects/${p.id}`} className="group flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-warm-50/70 sm:gap-4 sm:px-5">
+                  <Link href={`/projects/${p.id}`} className="group flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-warm-100/70 sm:gap-4 sm:px-5">
                     <div className="hidden w-[4.5rem] shrink-0 sm:block">
                       <ProjectStatusBadge status={p.status} />
                     </div>

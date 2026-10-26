@@ -71,7 +71,7 @@ export function InvoicesView() {
           {
             label: "未入金",
             value: total("outstanding"),
-            sub: overdueTotal > 0 ? <span className="font-semibold text-orange">うち期限超過 {formatYen(overdueTotal)}</span> : undefined,
+            sub: overdueTotal > 0 ? <span className="font-semibold text-shu">うち期限超過 {formatYen(overdueTotal)}</span> : undefined,
           },
           { label: "入金済（累計）", value: total("paid") },
         ]}

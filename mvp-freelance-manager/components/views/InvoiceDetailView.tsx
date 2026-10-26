@@ -39,7 +39,7 @@ export function InvoiceDetailView({ id }: { id: string }) {
       <Page>
         <h1 className="py-16 text-center text-sm font-normal text-warm-500">
           請求書が見つかりません。
-          <Link href="/invoices" className="ml-1 text-blue underline">
+          <Link href="/invoices" className="ml-1 text-ink underline">
             請求一覧へ
           </Link>
         </h1>
@@ -66,7 +66,7 @@ export function InvoiceDetailView({ id }: { id: string }) {
 
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 print:hidden">
           <div className="min-w-0">
-            <h1 className="num text-[22px] font-bold tracking-[-0.025em] text-ink">請求書 {invoice.number}</h1>
+            <h1 className="num font-serif text-[24px] font-semibold text-ink">請求書 {invoice.number}</h1>
             <p className="mt-1.5 flex items-center gap-2.5 text-sm">
               <InvoiceStatusBadge status={invoiceStatus(invoice, today)} />
               <span className="num text-xs text-warm-500">
@@ -98,7 +98,7 @@ export function InvoiceDetailView({ id }: { id: string }) {
 
         {invoice.estimateNo &&
           (invoice.draft ? (
-            <div className="mb-5 rounded-xl border border-line bg-canvas px-4 py-3 text-sm print:hidden">
+            <div className="mb-5 border-y border-line px-1 py-3 text-sm print:hidden">
               <p className="text-ink">
                 見積 <span className="num">{invoice.estimateNo}</span> が承認されると発行されます。
               </p>

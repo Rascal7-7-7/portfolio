@@ -47,7 +47,7 @@ export function DateInput({ id, name, value, onChange, min, required, className 
         aria-hidden
         className={cn(
           buttonStyles.input,
-          "pointer-events-none flex items-center justify-between gap-2 whitespace-nowrap peer-focus-visible:border-blue peer-focus-visible:ring-2 peer-focus-visible:ring-blue-tint",
+          "pointer-events-none flex items-center justify-between gap-2 whitespace-nowrap peer-focus-visible:border-ink peer-focus-visible:ring-2 peer-focus-visible:ring-ink/15",
         )}
       >
         <span className={value ? "num" : "text-warm-300"}>{value ? formatInputDate(value) : "日付を選択"}</span>
