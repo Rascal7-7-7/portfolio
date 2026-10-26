@@ -32,8 +32,8 @@ function ActivityFeed({ items, today }: { items: readonly ActivityItem[]; today:
         const Icon = ACTIVITY_ICON[a.kind];
         return (
           <li key={a.key} className="relative flex gap-3 py-2">
-            {i < items.length - 1 && <span aria-hidden className="absolute top-[30px] -bottom-2 left-[9px] w-px bg-black/15" />}
-            <Icon size={19} aria-hidden className={a.kind === "paid" ? "shrink-0 text-blue" : "shrink-0 text-warm-500"} />
+            {i < items.length - 1 && <span aria-hidden className="absolute top-[30px] -bottom-2 left-[9px] w-px bg-line" />}
+            <Icon size={19} aria-hidden className={a.kind === "paid" ? "shrink-0 text-moss" : "shrink-0 text-warm-500"} />
             <p className="min-w-0 flex-1 text-sm break-words text-ink">{a.text}</p>
             <time dateTime={a.date} title={formatDate(a.date)} className="num shrink-0 text-xs text-warm-500">
               {formatAgo(today, a.date)}
@@ -57,7 +57,7 @@ export function ProjectDetailView({ id }: { id: string }) {
       <Page>
         <h1 className="py-16 text-center text-sm font-normal text-warm-500">
           案件が見つかりません。
-          <Link href="/projects" className="ml-1 text-blue underline">
+          <Link href="/projects" className="ml-1 text-ink underline">
             案件一覧へ
           </Link>
         </h1>
@@ -88,7 +88,7 @@ export function ProjectDetailView({ id }: { id: string }) {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p className="text-sm text-warm-500">{project.client}</p>
-            <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-ink sm:text-2xl">{project.name}</h1>
+            <h1 className="mt-0.5 font-serif text-[22px] font-semibold text-ink sm:text-[26px]">{project.name}</h1>
             {(project.estimateNo || project.deliverableUrl) && (
               <div className="mt-2 flex flex-col gap-1 text-xs">
                 {project.estimateNo && <EstimateSource estimateNo={project.estimateNo} />}
@@ -154,7 +154,7 @@ export function ProjectDetailView({ id }: { id: string }) {
           }
         >
           {showInvoiceForm && (
-            <div className="border-b border-line bg-warm-50">
+            <div className="border-b border-line bg-warm-100/60">
               <InvoiceForm
                 key={prog.invoiced}
                 projects={[project]}
