@@ -12,7 +12,7 @@ import { isNew, needsAttention } from '@/components/ReservationRow';
 import StatusBadge from '@/components/StatusBadge';
 import { PageHeader, STAFF_TONE, StatStrip, btn } from '@/components/ui';
 import Icon, { type IconName } from '@/components/Icon';
-import WeekGrid, { WeekLegend } from '@/components/WeekGrid';
+import WeekGrid, { KIND, WeekLegend, menuKind } from '@/components/WeekGrid';
 
 const SLOT_H = 112;
 /** これより低いカードは1行目に名前まで詰める */
@@ -21,12 +21,10 @@ const COMPACT_H = 100;
 const SHORTEST = MENUS.reduce((a, b) => (b.minutes < a.minutes ? b : a));
 const OPEN_HOURS = Array.from({ length: (CLOSE_MIN - OPEN_MIN) / 60 }, (_, i) => OPEN_MIN / 60 + i);
 
-/** 予定ブロックの見た目。色は「要対応」だけに使い、ほかは地の色と枠の形（キャンセル=破線）で区別する */
+/** 予定ブロックの見た目。週表示と同じくメニュー種別の色で塗る。状態は札（確定待ち）と枠の形（キャンセル=破線）で見せる */
 function blockCls(r: Reservation): string {
-  if (r.status === 'canceled')  return 'bg-canvas border border-dashed border-line-strong';
-  if (r.status === 'pending')   return 'bg-attn-soft border border-attn-bg';
-  if (r.status === 'completed') return 'bg-canvas border border-line';
-  return 'bg-subtle border border-line';
+  if (r.status === 'canceled') return 'bg-canvas border border-dashed border-line-strong';
+  return `border ${KIND[menuKind(r.service_name)].block}`;
 }
 
 function minutesNow(): number {
@@ -198,16 +196,16 @@ function DaySection({ date, offset, today, reservations, now, nowMin, staff, onS
       ]} />
 
       {list.length === 0 ? (
-        <p className="border border-line rounded-lg px-6 py-14 text-center text-sm text-dim">この日の予約はありません</p>
+        <p className="bg-canvas border border-line rounded-xl px-6 py-14 text-center text-sm text-dim">この日の予約はありません</p>
       ) : (
         <>
           <Timeline byStaff={byStaff} nowMin={nowMin} />
           <div className="md:hidden">
             <StaffSwitcher current={staff} counts={STAFF.map(s => byStaff(s).length)} onChange={setStaff} />
             {byStaff(staff).length === 0 ? (
-              <p className="border border-line rounded-lg px-6 py-10 text-center text-sm text-dim">{staff} さんの予約はありません</p>
+              <p className="bg-canvas border border-line rounded-xl px-6 py-10 text-center text-sm text-dim">{staff} さんの予約はありません</p>
             ) : (
-              <ul className="border border-line rounded-lg divide-y divide-line">
+              <ul className="rounded-xl bg-canvas divide-y divide-line shadow-[0_0_0_1px_var(--color-line)]">
                 {byStaff(staff).map(r => <li key={r.id}><MobileRow r={r} /></li>)}
               </ul>
             )}
@@ -252,11 +250,11 @@ function Timeline({ byStaff, nowMin }: { byStaff: (s: Staff) => Reservation[]; n
   const nowTop = nowMin === null ? null : ((nowMin - OPEN_MIN) / 60) * SLOT_H + 3;
   const cols = { gridTemplateColumns: `64px repeat(${STAFF.length}, minmax(0, 1fr))` };
   return (
-    <div className="hidden md:block border border-line rounded-lg overflow-hidden">
-      <div className="grid border-b border-line bg-muted" style={cols}>
+    <div className="hidden md:block rounded-xl overflow-hidden bg-canvas shadow-[0_0_0_1px_var(--color-line),0_1px_2px_rgba(60,45,30,0.04)]">
+      <div className="grid border-b border-line" style={cols}>
         <div className="border-r border-line" />
         {STAFF.map((s, i) => (
-          <p key={s} className={`flex items-center gap-2 px-3 py-2 text-sm font-medium text-ink ${i > 0 ? 'border-l border-line' : ''}`}>
+          <p key={s} className={`flex items-center gap-2 px-3 py-3 text-sm font-medium text-ink ${i > 0 ? 'border-l border-line' : ''}`}>
             <span className={`size-2 rounded-full ${STAFF_TONE[s].dot}`} aria-hidden="true" />{s}<span className="ml-1.5 text-xs font-normal text-dim tabular-nums">{byStaff(s).length}件</span>
           </p>
         ))}
@@ -290,7 +288,7 @@ function StaffColumn({ list, divider, nowTop }: { list: Reservation[]; divider: 
       {OPEN_HOURS.map((h, i) => (
         <div key={h}>
           {i > 0 && <div className="absolute left-0 right-0 border-t border-line" style={{ top: i * SLOT_H + 3 }} />}
-          <div className="absolute left-0 right-0 border-t border-dotted border-line" style={{ top: i * SLOT_H + SLOT_H / 2 + 3 }} />
+          <div className="absolute left-0 right-0 border-t border-dotted border-line/70" style={{ top: i * SLOT_H + SLOT_H / 2 + 3 }} />
         </div>
       ))}
       {placeInLanes(list).map(({ r, lane, lanes }) => {
@@ -315,7 +313,7 @@ function Block({ r, compact }: { r: Reservation; compact: boolean }) {
   const canceled = r.status === 'canceled';
   return (
     <Link href={`/reservations/${r.id}`}
-      className={`block h-full overflow-hidden rounded-md px-3 ${compact ? 'py-1.5' : 'py-2.5'} hover:brightness-[0.98] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${blockCls(r)}`}>
+      className={`block h-full overflow-hidden rounded-lg px-3 ${compact ? 'py-1.5' : 'py-2.5'} hover:brightness-[0.98] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${blockCls(r)}`}>
       <p className="flex items-center gap-2 min-w-0">
         <span className="text-xs text-body tabular-nums shrink-0">{r.reservation_time}–{endTime(r)}</span>
         {compact && <Name r={r} canceled={canceled} />}

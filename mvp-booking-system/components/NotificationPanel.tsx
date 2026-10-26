@@ -15,7 +15,7 @@ export default function NotificationPanel({ reservation: r, today, onSend }: Pro
   const via = notifyVia(r);
   const disabled = r.status === 'canceled' || !via;
   return (
-    <section className="border border-line rounded-lg" aria-labelledby="notice-title">
+    <section className="bg-canvas border border-line rounded-xl" aria-labelledby="notice-title">
       <h2 id="notice-title" className="px-5 py-3 border-b border-line text-sm font-medium text-ink">お客様への連絡</h2>
       <ul className="divide-y divide-line">
         <Row label="予約確認" sent={r.confirmation_sent} via={via} disabled={disabled} onSend={() => onSend('confirmation')} />
