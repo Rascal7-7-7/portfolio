@@ -40,12 +40,12 @@ export function InvoiceDetailView({ id }: { id: string }) {
     <Page>
       <div className="max-w-3xl">
         <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-3 print:hidden">
-          <Link href="/invoices" className="inline-flex items-center gap-1 text-xs text-warm-500 hover:text-ink">
+          <Link href="/invoices" className="hit inline-flex items-center gap-1 text-xs text-warm-500 hover:text-ink">
             <ArrowLeft size={14} aria-hidden />
             請求一覧
           </Link>
           {project && (
-            <Link href={`/projects/${project.id}`} className="min-w-0 truncate text-xs text-warm-500 hover:text-ink hover:underline">
+            <Link href={`/projects/${project.id}`} className="hit min-w-0 truncate text-xs text-warm-500 hover:text-ink hover:underline">
               案件「{project.name}」
             </Link>
           )}

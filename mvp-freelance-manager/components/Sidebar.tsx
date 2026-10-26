@@ -28,7 +28,7 @@ function Logo() {
     // 名前の由来「控え」を、帳票の控え印のような小さな枠付きの「控」で添える。画像は使わず文字組みだけで作る
     <Link
       href="/dashboard"
-      className="inline-flex items-center gap-1.5 rounded text-ink"
+      className="hit inline-flex items-center gap-1.5 rounded text-ink"
       aria-label="Hikae ダッシュボード"
     >
       <span className="text-[18px] leading-none font-bold tracking-[-0.035em]">Hikae</span>
@@ -80,7 +80,7 @@ export function Sidebar() {
           <button
             type="button"
             onClick={resetDemo}
-            className="mt-1.5 -ml-1 inline-flex items-center gap-1 rounded px-1 py-0.5 text-xs font-medium text-ink hover:bg-black/[0.05]"
+            className="hit mt-1.5 -ml-1 inline-flex items-center gap-1 rounded px-1 py-0.5 text-xs font-medium text-ink hover:bg-black/[0.05]"
           >
             <RotateCcw size={12} aria-hidden />
             デモデータに戻す
@@ -94,7 +94,7 @@ export function Sidebar() {
         <button
           type="button"
           onClick={resetDemo}
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-warm-500 hover:bg-black/5"
+          className="hit inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-warm-500 hover:bg-black/5"
         >
           <RotateCcw size={12} aria-hidden />
           デモデータに戻す

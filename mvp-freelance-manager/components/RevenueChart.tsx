@@ -17,16 +17,16 @@ interface RevenueChartProps {
   data: readonly MonthlyRevenue[];
   /** 今月の入金が増えた直後だけ渡す。増える前の高さ（比率 0〜1）から伸ばす */
   growFrom?: number | null;
-  /** 目盛りの上限に含める額。今月の入金＋未回収の合計を渡すと、どの請求を入金済にしても目盛りが変わらない */
-  ceiling?: number;
 }
 
 /**
  * CSS の棒グラフ。Stripe ホームの売上グラフに倣い、目盛りは「¥0 / ¥60万 / ¥120万」の3本、
  * 罫線は点線で薄く、底辺だけ実線。値と月のラベルは小さな灰色の数字で、今月だけ濃くする
  */
-export function RevenueChart({ data, growFrom, ceiling = 0 }: RevenueChartProps) {
-  const max = niceMax(Math.max(ceiling, ...data.map((m) => m.paid + m.expected)));
+export function RevenueChart({ data, growFrom }: RevenueChartProps) {
+  // 目盛りは表示中の6か月に合わせる（未回収の総額まで取ると、ふだんの棒がグラフの下1/4に潰れる）。
+  // 入金で目盛りが変わったときは、棒の高さの transition で全体が滑らかに縮む
+  const max = niceMax(Math.max(...data.map((m) => m.paid + m.expected)));
   const pct = (v: number) => `${(v / max) * 100}%`;
   const summary = data.map((m) => `${formatMonthLabel(m.month)} 入金${formatYen(m.paid)}`).join("、");
 
@@ -65,7 +65,10 @@ export function RevenueChart({ data, growFrom, ceiling = 0 }: RevenueChartProps)
                   >
                     {total > 0 ? formatManYen(total) : "—"}
                   </span>
-                  <div className="flex w-full max-w-9 flex-col" style={{ height: pct(total) }}>
+                  <div
+                    className="flex w-full max-w-9 flex-col transition-[height] duration-500 ease-out motion-reduce:transition-none"
+                    style={{ height: pct(total) }}
+                  >
                     {m.expected > 0 && (
                       <div
                         className="rounded-t-[4px] border border-b-0 border-dashed border-blue/60"

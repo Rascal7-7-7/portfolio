@@ -78,7 +78,7 @@ export function ProjectDetailView({ id }: { id: string }) {
 
   return (
     <Page>
-      <Link href="/projects" className="mb-4 inline-flex items-center gap-1 text-xs text-warm-500 hover:text-ink">
+      <Link href="/projects" className="hit mb-4 inline-flex items-center gap-1 text-xs text-warm-500 hover:text-ink">
         <ArrowLeft size={14} aria-hidden />
         案件一覧
       </Link>
@@ -149,7 +149,7 @@ export function ProjectDetailView({ id }: { id: string }) {
               type="button"
               onClick={() => setShowInvoiceForm((v) => !v)}
               aria-expanded={showInvoiceForm}
-              className="rounded text-xs font-medium text-ink hover:underline"
+              className="hit rounded text-xs font-medium text-ink hover:underline"
             >
               {showInvoiceForm ? "閉じる" : "＋ 請求書を作成"}
             </button>

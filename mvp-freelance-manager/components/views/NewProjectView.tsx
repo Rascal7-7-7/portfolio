@@ -48,7 +48,7 @@ export function NewProjectView() {
 
   return (
     <Page>
-      <Link href="/projects" className="mb-4 inline-flex items-center gap-1 text-xs text-warm-500 hover:text-ink">
+      <Link href="/projects" className="hit mb-4 inline-flex items-center gap-1 text-xs text-warm-500 hover:text-ink">
         <ArrowLeft size={14} aria-hidden />
         案件一覧
       </Link>
