@@ -6,6 +6,7 @@ import { ProductVisual } from '@/components/ProductVisual';
 import { PlanBadge } from '@/components/PlanBadge';
 import { TotalsTable } from '@/components/TotalsTable';
 import { CheckoutSteps } from '@/components/CheckoutSteps';
+import { EmptyState } from '@/components/EmptyState';
 import { RecurringSummary } from '@/components/RecurringSummary';
 import { DEMO_USER, findProduct } from '@/lib/catalog';
 import { formatJaLong } from '@/lib/date';
@@ -17,14 +18,7 @@ export default function CompletePage() {
 
   const order = state.lastOrder;
   if (!order) {
-    return (
-      <main className="mx-auto max-w-lg px-4 py-24 text-center">
-        <p className="text-on-surface-variant">表示できるご注文がありません</p>
-        <Link href="/products" className="mt-4 inline-block text-sm text-on-surface underline underline-offset-4">
-          商品一覧へ
-        </Link>
-      </main>
-    );
+    return <EmptyState title="表示できるご注文がありません" body="ご注文を確定すると、ここに内容とお届け予定が表示されます。" />;
   }
 
   const subscriptionCount = order.lines.filter((l) => l.interval !== 'once').length;

@@ -15,6 +15,13 @@
     color: #30332f;
   }
 
+  /* スマホの固定バー（購入手続き・商品ページ）が出ている間は、その高さぶん下を空け、フッター最下段の注記に重ねない */
+  @media (max-width: 1023px) {
+    body:has([data-fixed-bar]) {
+      padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    }
+  }
+
   * {
     scrollbar-width: thin;
     scrollbar-color: #c1c9bb transparent;

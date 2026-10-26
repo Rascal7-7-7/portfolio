@@ -33,10 +33,14 @@ const STEPS = [
   { n: '3', title: 'マイページで調整', body: '在庫が余ったらスキップ。お休みも解約もワンタップ。' },
 ];
 
+const HERO_ID = 'herb-tea';
+
 export const metadata: Metadata = { title: '商品一覧' };
 
 export default function ProductsPage() {
-  const hero = PRODUCTS[0];
+  // 一覧の1枚目（コーヒー）と同じ商品をヒーローに出すと、広い画面で同じ絵が上下に並ぶ。
+  // 一覧では最後に来るハーブティーを出す（ティーバッグなのでポスト投函の説明とも合う）
+  const hero = PRODUCTS.find((p) => p.id === HERO_ID) ?? PRODUCTS[0];
   const heroPrice = unitPrice(hero.price, 'monthly');
   const heroServing = perServing(heroPrice, hero.specs);
   const heroSize = hero.specs.find((s) => s.label === '内容量')?.value.replace(/（.*）/, '');

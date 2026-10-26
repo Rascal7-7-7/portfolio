@@ -7,6 +7,7 @@ import { QuantityStepper } from '@/components/QuantityStepper';
 import { TotalsTable } from '@/components/TotalsTable';
 import { PlanBadge } from '@/components/PlanBadge';
 import { CheckoutSteps } from '@/components/CheckoutSteps';
+import { EmptyState } from '@/components/EmptyState';
 import { cartTotals, toCartLines } from '@/lib/cart';
 import { remainingForFreeShipping, yen } from '@/lib/pricing';
 
@@ -15,7 +16,7 @@ export default function CartPage() {
   if (!loaded) return <main className="min-h-[60vh]" aria-busy="true" />;
 
   const lines = toCartLines(state.cart);
-  if (lines.length === 0) return <EmptyCart />;
+  if (lines.length === 0) return <EmptyState title="カートは空です" body="気になる商品を、定期便か単品でカートに入れてください。" />;
 
   const totals = cartTotals(lines);
   const hasSubscription = lines.some((l) => l.interval !== 'once');
@@ -101,21 +102,6 @@ export default function CartPage() {
           </div>
         </aside>
       </div>
-    </main>
-  );
-}
-
-function EmptyCart() {
-  return (
-    <main className="mx-auto max-w-lg px-4 py-24 text-center">
-      <h1 className="font-headline text-2xl font-light text-on-surface">カートは空です</h1>
-      <p className="mt-2 text-sm text-on-surface-variant">気になる商品を、定期便か単品でカートに入れてください。</p>
-      <Link
-        href="/products"
-        className="mt-8 inline-flex items-center btn-primary px-6 py-3 text-sm font-medium"
-      >
-        商品を見る
-      </Link>
     </main>
   );
 }

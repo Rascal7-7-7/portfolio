@@ -39,7 +39,7 @@ export default async function ProductDetailPage({ params }: Params) {
   const endWidth = Math.max(...product.taste.flatMap((t) => [t.low.length, t.high.length]));
 
   return (
-    <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 sm:pt-10 lg:pb-10 lg:pt-6">
+    <main className="mx-auto max-w-6xl px-4 pb-10 pt-6 sm:px-6 sm:pt-10 lg:pt-6">
       <Link
         href="/products"
         className="mb-4 inline-flex items-center gap-1 text-sm text-on-surface-variant transition-colors hover:text-on-surface"

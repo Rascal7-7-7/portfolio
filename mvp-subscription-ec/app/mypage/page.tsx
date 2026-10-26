@@ -59,7 +59,7 @@ export default function MyPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <div className="max-w-3xl">
+      <div className="mx-auto max-w-3xl">
         <div>
           <p className="text-xs text-on-surface-variant">マイページ（デモユーザー）</p>
           <h1 className="mt-1 font-headline text-2xl font-light text-on-background sm:text-3xl">{DEMO_USER.name} 様</h1>
@@ -112,11 +112,12 @@ export default function MyPage() {
         </div>
       </div>
 
-      {/* 操作結果は画面下のトーストで返す（操作したカードの近くで目に入るように）。読み上げ用に枠は常に置く */}
+      {/* 操作結果はヘッダー直下のトーストで返す。画面下だと、スマホで一番下の定期便の操作ボタンに重なるため。
+          読み上げ用に枠は常に置く */}
       <div
         role="status"
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+        className="pointer-events-none fixed inset-x-0 top-16 z-40 flex justify-center px-4 pt-3"
       >
         {notice && (
           <p
