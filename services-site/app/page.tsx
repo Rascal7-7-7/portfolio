@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
 import { Profile } from "@/components/Profile";
+import { Promises } from "@/components/Promises";
 import { Steps } from "@/components/Steps";
 import { Works } from "@/components/Works";
 
@@ -15,6 +16,7 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <Promises />
         <Works />
         <Flow />
         <Steps />

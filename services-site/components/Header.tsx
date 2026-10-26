@@ -1,4 +1,4 @@
-import { mailto, owner } from "@/content/site";
+import { owner } from "@/content/site";
 import { cn } from "@/lib/cn";
 import { container } from "./ui";
 
@@ -26,7 +26,7 @@ export function Header() {
             ))}
           </ul>
           <a
-            href={mailto}
+            href="#contact"
             className="inline-flex min-h-10 items-center rounded-full bg-ink px-4 text-sm font-medium text-white hover:bg-black"
           >
             相談する

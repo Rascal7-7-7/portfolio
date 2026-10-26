@@ -1,9 +1,8 @@
-import { ArrowUpRight } from "lucide-react";
 import { owner, profile } from "@/content/site";
 import { Phrase } from "./Phrase";
 import { Section, SectionHeader } from "./ui";
 
-/** 作っている人。学生であることを隠さず、確かめられる事実だけを並べる */
+/** 作っている人。本人の希望で、出す経歴は NPO とデジタル推進委員の 2 つだけにする */
 export function Profile() {
   return (
     <Section id="profile" labelledBy="profile-heading" tone="soft">
@@ -24,13 +23,12 @@ export function Profile() {
             ))}
           </ul>
           <a
-            href={owner.portfolio}
+            href={owner.x}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-5 inline-flex min-h-11 items-center gap-1 text-[15px] font-medium underline decoration-ink/30 underline-offset-[6px] hover:decoration-ink"
           >
-            技術的な取り組み（ポートフォリオ）
-            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            X で制作の様子を発信しています（{owner.xHandle}）
             <span className="sr-only">（新しいタブで開く）</span>
           </a>
         </div>

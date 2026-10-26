@@ -1,28 +1,35 @@
-import { prices } from "@/content/site";
+import { pricing } from "@/content/site";
 import { Phrase } from "./Phrase";
 import { Section, SectionHeader } from "./ui";
 
-/** 料金の目安。金額は「〜」付きの目安として出し、決まり方を一文で添える */
+/** 料金は要相談。金額は出さず、何で決まるかを 3 つに分けて見せる */
 export function Pricing() {
   return (
     <Section id="pricing" labelledBy="pricing-heading">
-      <SectionHeader
-        id="pricing-heading"
-        eyebrow="料金の目安"
-        title="作る量に合わせて、先にお見積りします"
-        description="お話を伺ってから、作るものと金額をお伝えします。お見積りまでは無料です。"
-      />
-      <ul className="mt-12 grid gap-5 md:grid-cols-3">
-        {prices.map(({ title, price, note }) => (
-          <li key={title} className="flex flex-col rounded-xl bg-canvas p-7 shadow-card">
-            <h3 className="font-bold">
-              <Phrase text={title} />
-            </h3>
-            <p className="mt-5 text-[34px] font-bold leading-none tabular-nums">{price}</p>
-            <p className="mt-5 border-t border-line pt-5 text-[15px] leading-[1.8] text-ink-muted">{note}</p>
-          </li>
-        ))}
-      </ul>
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
+        <SectionHeader
+          id="pricing-heading"
+          eyebrow="料金"
+          title="料金はご相談のうえで決めます"
+          description={pricing.lead}
+          className="lg:col-span-5"
+        />
+        <ol className="divide-y divide-line rounded-xl bg-canvas shadow-card lg:col-span-7">
+          {pricing.factors.map(({ title, body }, i) => (
+            <li key={title} className="grid grid-cols-[2.5rem_1fr] gap-x-2 px-6 py-5 sm:px-7">
+              <span className="pt-0.5 text-sm font-medium tabular-nums text-ink-subtle">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <h3 className="font-bold">
+                  <Phrase text={title} />
+                </h3>
+                <p className="mt-1 text-[15px] leading-[1.8] text-ink-muted">{body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
     </Section>
   );
 }

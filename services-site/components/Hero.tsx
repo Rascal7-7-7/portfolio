@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { mailto } from "@/content/site";
+import { owner } from "@/content/site";
 import { cn } from "@/lib/cn";
 import { Phrase } from "./Phrase";
 import { ButtonLink, container } from "./ui";
@@ -31,15 +31,16 @@ export function Hero() {
             予約・見積・請求・お店の紹介ページ。いまのやり方を伺って、必要なものだけを作ります。下の作例は、どれも実際に触れます。
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
-            <ButtonLink href={mailto}>
-              無料で相談する
+            <ButtonLink href={owner.x} target="_blank" rel="noopener noreferrer">
+              X の DM で相談する
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <span className="sr-only">（新しいタブで開く）</span>
             </ButtonLink>
             <ButtonLink href="#works" variant="secondary">
               作例を見る
             </ButtonLink>
           </div>
-          <p className="mt-4 text-sm text-ink-subtle">ご相談・お見積りは無料です。メールで24時間受け付けています。</p>
+          <p className="mt-4 text-sm text-ink-subtle">ご相談・お見積りは無料です。メールでも受け付けています。</p>
         </div>
 
         {/* 作例の実際の画面。PC の予定表の上に、お客様のスマホの予約画面を重ねる */}

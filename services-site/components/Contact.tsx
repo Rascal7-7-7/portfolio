@@ -16,14 +16,25 @@ export function Contact() {
           <p className="mt-5 max-w-xl text-[17px] leading-[1.9] text-white/80">
             <Phrase text="「こんなことはできる？」の段階でも大丈夫です。ご相談とお見積りは無料です。" />
           </p>
-          <ButtonLink href={mailto} variant="secondary" className="mt-9">
-            メールで相談する
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </ButtonLink>
-          <p className="mt-4 text-sm text-white/70">{owner.email}</p>
+          <div className="mt-9 flex flex-wrap gap-3">
+            <ButtonLink href={owner.x} target="_blank" rel="noopener noreferrer" variant="secondary">
+              X の DM で相談する
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <span className="sr-only">（新しいタブで開く）</span>
+            </ButtonLink>
+            <a
+              href={mailto}
+              className="inline-flex min-h-12 items-center rounded-full px-6 text-[15px] font-medium text-white ring-1 ring-white/30 hover:ring-white/70"
+            >
+              メールで相談する
+            </a>
+          </div>
+          <p className="mt-4 text-sm text-white/70">
+            X：{owner.xHandle}　メール：{owner.email}
+          </p>
         </div>
         <div className="lg:col-span-5">
-          <p className="text-sm font-medium text-white/70">メールに書いていただくこと</p>
+          <p className="text-sm font-medium text-white/70">はじめに教えていただきたいこと</p>
           <ul className="mt-3 divide-y divide-white/15 border-y border-white/15">
             {inquiry.body.split("\n").map((line) => (
               <li key={line} className="py-3 text-[15px]">
@@ -31,7 +42,7 @@ export function Contact() {
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-sm text-white/70">上のボタンから開くと、この項目が最初から入っています。</p>
+          <p className="mt-3 text-sm text-white/70">メールのボタンから開くと、この項目が最初から入っています。DM なら一言目は「相談です」だけでも大丈夫です。</p>
         </div>
       </div>
     </section>
