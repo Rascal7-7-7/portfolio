@@ -172,7 +172,7 @@ dd {
     .reveal {
       animation: reveal linear both;
       animation-timeline: view();
-      animation-range: entry 0% entry 40%;
+      animation-range: entry 0px entry 160px;
     }
   }
 }

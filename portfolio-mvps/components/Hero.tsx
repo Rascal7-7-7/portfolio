@@ -23,7 +23,7 @@ function Interests() {
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pb-20 sm:pb-28" aria-labelledby="hero-heading">
+    <section className="relative overflow-hidden pb-12 sm:pb-16" aria-labelledby="hero-heading">
       {/*
         上部の 3D の舞台。WebGL が使えない環境や読み込み前は、背後の方眼と光だけが見える。
         見出しは舞台の下端に少し重ねて置く。
@@ -81,17 +81,22 @@ export function Hero() {
 
         {/* 上の 3D が何を表しているか。色の意味を一度だけ言葉で示す */}
         <div className="hero-in [animation-delay:480ms] mb-10 text-sm leading-[1.8] text-ink-subtle">
-          <p>上の図は、代表作 JARVIS の設計を表したものです。</p>
-          <ul>
-            <li>
-              <span className="mr-2 inline-block size-2 rounded-full bg-accent align-middle" aria-hidden="true" />
-              通常の入力は、中心の LLM まで届く
+          <p className="phrase">上の図は、代表作 JARVIS の構成を立体にした図解です（計測値ではありません）。</p>
+          <ul className="mt-1">
+            <li className="flex">
+              <span className="mr-2 inline-block size-2 shrink-0 translate-y-[0.55em] rounded-full bg-accent" aria-hidden="true" />
+              <span>通常の発話は、実行まで届く</span>
             </li>
-            <li>
-              <span className="mr-2 inline-block size-2 rounded-full bg-danger align-middle" aria-hidden="true" />
-              注入された命令は、手前のポリシー層で止まる
+            <li className="flex">
+              <span className="mr-2 inline-block size-2 shrink-0 translate-y-[0.55em] rounded-full bg-danger" aria-hidden="true" />
+              <span>危険な発話は、前段のポリシー層（発話のキーワード照合）で止まる</span>
+            </li>
+            <li className="flex">
+              <span className="mr-2 inline-block size-2 shrink-0 translate-y-[0.55em] rounded-full bg-caution" aria-hidden="true" />
+              <span>言い換えた危険な発話は前段をすり抜けうるため、後段のポリシー層（コマンドの拒否リスト）で止める</span>
             </li>
           </ul>
+          <p className="phrase mt-1">どちらも照合式のため、すべてを止められるわけではありません。</p>
         </div>
 
         <div className="hero-in [animation-delay:600ms] space-y-1.5 border-t border-rule pt-6">

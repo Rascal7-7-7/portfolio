@@ -21,12 +21,18 @@ export const ouchiCafe: Project = {
     { label: "商品692件", type: "data" },
   ],
   verification: "code-only",
-  evidence: [
-    "taste_vector   12 次元",
-    "products       692 件",
-    "tables         101",
-    "commits        556 / 610（本人）",
-  ],
+  evidence: {
+    rows: [
+      { label: "味覚診断のベクトル", value: "12 次元" },
+      { label: "商品データ", value: "692 件" },
+      { label: "テーブル", value: "101" },
+      { label: "コミット（本人 / 全体）", value: "556 / 610" },
+    ],
+    source: {
+      label: "GitHub の main ブランチ（2026-10 時点）",
+      href: "https://github.com/Rascal7-7-7/ouchi-cafe",
+    },
+  },
   links: {
     github: "https://github.com/Rascal7-7-7/ouchi-cafe",
   },

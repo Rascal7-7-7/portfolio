@@ -68,7 +68,7 @@ export function FlowRow({
                   x={x + boxW / 2}
                   y={TOP - 6}
                   fill={COLOR.boundary}
-                  fontSize={11}
+                  fontSize={12.5}
                   fontWeight={700}
                   textAnchor="middle"
                 >
@@ -140,7 +140,7 @@ export function FlowRow({
                     x={x + SIDE_W / 2}
                     y={sideY + 19}
                     fill={COLOR.label}
-                    fontSize={12}
+                    fontSize={13}
                     fontWeight={700}
                     textAnchor="middle"
                   >
@@ -150,7 +150,7 @@ export function FlowRow({
                     x={x + SIDE_W / 2}
                     y={sideY + 36}
                     fill={COLOR.note}
-                    fontSize={11}
+                    fontSize={12.5}
                     textAnchor="middle"
                   >
                     {note}

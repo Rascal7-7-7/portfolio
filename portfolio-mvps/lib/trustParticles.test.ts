@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { CORE_R, SHELL_R, SPAWN_R, spawn, step, type Particle } from "./trustParticles";
+import {
+  EXEC_HALF,
+  EXEC_X,
+  GATE1_X,
+  GATE2_X,
+  LLM_X,
+  funnel,
+  spawn,
+  step,
+  type Particle,
+  type Stage,
+} from "./trustParticles";
 
 /** 再現できる乱数（線形合同法） */
 function seeded(seed = 1) {
@@ -10,58 +21,62 @@ function seeded(seed = 1) {
   };
 }
 
-/** 入れ替わるまで進め、入れ替わる直前の半径と hit を返す */
+/** 入れ替わるまで進め、入れ替わる直前の x と hit を返す */
 function runUntilRespawn(p: Particle, rand: () => number) {
   let cur = p;
   for (let i = 0; i < 10_000; i++) {
     const { particle, hit } = step(cur, 1 / 60, rand);
-    // 半径が増えた = 外側で生まれ直した
-    if (particle.r > cur.r) {
-      return { lastR: cur.r, hit };
-    }
+    if (hit) return { lastX: cur.x, stage: hit.stage as Stage, atX: hit.at[0] };
     cur = particle;
   }
   throw new Error("入れ替わらなかった");
 }
 
+const base = { x: -8, offset: [0.5, 0.5] as const, speed: 3 };
+
 describe("trustParticles", () => {
-  it("向きは単位ベクトル", () => {
-    const rand = seeded(7);
-    for (let i = 0; i < 100; i++) {
-      const [x, y, z] = spawn(rand).dir;
-      expect(Math.hypot(x, y, z)).toBeCloseTo(1, 6);
-    }
+  it("通常の発話は実行まで届く", () => {
+    const r = runUntilRespawn({ ...base, kind: "allowed" }, seeded(3));
+    expect(r.stage).toBe("exec");
+    expect(r.lastX).toBeGreaterThan(GATE2_X);
+    expect(r.atX).toBe(EXEC_X - EXEC_HALF);
   });
 
-  it("allowed は中心まで届き、波紋は出さない", () => {
-    const rand = seeded(3);
-    const p: Particle = { dir: [0, 0, 1], r: SPAWN_R, speed: 2, kind: "allowed" };
-    const { lastR, hit } = runUntilRespawn(p, rand);
-    expect(lastR).toBeLessThan(SHELL_R);
-    expect(lastR).toBeGreaterThan(CORE_R);
-    expect(hit).toBeNull();
+  it("危険な発話は前段ゲートで止まる", () => {
+    const r = runUntilRespawn({ ...base, kind: "blocked" }, seeded(5));
+    expect(r.stage).toBe("gate1");
+    expect(r.atX).toBe(GATE1_X);
+    expect(r.lastX).toBeLessThan(GATE1_X);
   });
 
-  it("blocked は外側のポリシー層で止まり、その位置に波紋を出す", () => {
-    const rand = seeded(5);
-    const p: Particle = { dir: [1, 0, 0], r: SPAWN_R, speed: 2, kind: "blocked" };
-    const { lastR, hit } = runUntilRespawn(p, rand);
-    expect(lastR).toBeGreaterThan(SHELL_R);
-    expect(hit).toEqual([SHELL_R, 0, 0]);
+  it("言い換えた危険な発話は前段を越え、後段ゲートで止まる", () => {
+    const r = runUntilRespawn({ ...base, kind: "evasive" }, seeded(7));
+    expect(r.stage).toBe("gate2");
+    expect(r.lastX).toBeGreaterThan(GATE1_X);
+    expect(r.atX).toBe(GATE2_X);
+  });
+
+  it("流れは LLM の位置で最も細く、両端では元の太さ", () => {
+    expect(funnel(LLM_X)).toBeCloseTo(0.3);
+    expect(funnel(-8)).toBeCloseTo(1);
+    expect(funnel(EXEC_X)).toBeCloseTo(1);
+    expect(funnel(GATE1_X)).toBeLessThan(1);
   });
 
   it("元の粒を書き換えない", () => {
-    const p: Particle = { dir: [0, 1, 0], r: SPAWN_R, speed: 2, kind: "allowed" };
+    const p: Particle = { ...base, kind: "allowed" };
     step(p, 0.5, seeded());
-    expect(p.r).toBe(SPAWN_R);
+    expect(p.x).toBe(-8);
   });
 
-  it("おおむね BLOCKED_RATIO の割合で blocked が生まれる", () => {
+  it("3種類がおおむね決めた割合で生まれる", () => {
     const rand = seeded(11);
-    const n = 5000;
-    let blocked = 0;
-    for (let i = 0; i < n; i++) if (spawn(rand).kind === "blocked") blocked++;
-    expect(blocked / n).toBeGreaterThan(0.25);
-    expect(blocked / n).toBeLessThan(0.35);
+    const n = 6000;
+    const count = { allowed: 0, blocked: 0, evasive: 0 };
+    for (let i = 0; i < n; i++) count[spawn(rand).kind]++;
+    expect(count.blocked / n).toBeGreaterThan(0.2);
+    expect(count.blocked / n).toBeLessThan(0.3);
+    expect(count.evasive / n).toBeGreaterThan(0.08);
+    expect(count.evasive / n).toBeLessThan(0.16);
   });
 });

@@ -12,19 +12,26 @@ export const jarvisVoiceAgent: Project = {
   period: { start: "2026-09" },
   stack: ["Python", "Swift (SwiftUI)", "Ollama (ローカルLLM)", "launchd", "pytest"],
   highlights: [
-    { label: "Prompt Injection の検証（流出0件）", type: "check" },
+    {
+      label: "命令を5つ仕込んだ HTML を要約させる Prompt Injection の検証で、実行・流出とも0件（1回の試行）",
+      type: "check",
+    },
     { label: "日本語入力でゲートをすり抜ける不具合3件を修正", type: "check" },
     { label: "CIで297件成功（マイク不要の10スイート）", type: "data" },
   ],
   verification: "code-only",
-  evidence: [
-    "$ bench router=gemma4:e2b",
-    "「gitで強制プッシュして」 → 実行系に分類",
-    "→ 前後を決定的なポリシー層で挟む",
-    "$ gate（決定的なポリシー層）",
-    "危険な発話の検出  25 / 25（見逃し 0）",
-    "通常の発話の通過  17 / 17（誤検知 0）",
-  ],
+  evidence: {
+    rows: [
+      { label: "危険な発話の検出", value: "25 / 25（見逃し 0）" },
+      { label: "通常の発話の通過", value: "17 / 17（誤検知 0）" },
+      { label: "仕込んだ命令の実行", value: "0 / 5" },
+      { label: "命令を拒否リストだけで止められるか", value: "4 / 4（コマンドになる4つ）" },
+    ],
+    source: {
+      label: "DELEGATION_SECURITY.md（2026-08-29 計測）",
+      href: "https://github.com/Rascal7-7-7/jarvis-voice-agent/blob/main/hermes-jarvis/DELEGATION_SECURITY.md",
+    },
+  },
   links: {
     github: "https://github.com/Rascal7-7-7/jarvis-voice-agent",
     docs: [
@@ -89,7 +96,7 @@ export const jarvisVoiceAgent: Project = {
     },
   ],
   security: [
-    "プロンプトインジェクションを仕込んだ HTML を要約経路に通して検証（ペイロードの実行なし、ログ中の SSH 鍵素材0件、シェル履歴の流出先ドメイン0件、Codex の設定ファイルは sha256 が一致し改変なし）",
+    "プロンプトインジェクションを仕込んだ HTML（SSH 鍵の読み出しなど命令5つ）を要約経路に通して検証。1回の試行で、ペイロードの実行なし、ログ中の SSH 鍵素材0件、シェル履歴の流出先ドメイン0件、Codex の設定ファイルは sha256 が一致し改変なし）",
     "設定値ではなく実効的な制御を特定。Codex の approval_policy は非対話の codex exec には適用されないため、書き込みを防いでいるのは argv に固定した --sandbox read-only だと確かめた（ファイルの変更を指示しても sha256 は変わらなかった）",
     "呼び出しのたびに設定の解決経路を検証し、想定と異なれば停止する（fail-closed）",
     "状態ファイルの権限を絞り、同一マシンの他アカウントから読めないようにした",

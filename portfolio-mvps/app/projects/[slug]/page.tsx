@@ -211,8 +211,8 @@ export default function ProjectDetail({ params }: { params: Params }) {
           </div>
 
           {/* 一覧の代表作と同じ根拠を、ここでも最初に見せる（画像の代わり） */}
-          {project.evidence?.length ? (
-            <EvidenceLog lines={project.evidence} className="mt-6" />
+          {project.evidence ? (
+            <EvidenceLog evidence={project.evidence} className="mt-6" />
           ) : null}
 
           {/* 目次。カードにはせず、罫線の間に並べる */}

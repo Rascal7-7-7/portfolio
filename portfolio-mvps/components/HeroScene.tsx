@@ -1,25 +1,30 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { HeroScene as Scene, HeroStats } from "@/lib/heroScene";
+import type { HeroScene as Scene, ScreenPoint } from "@/lib/heroScene";
 import { cn } from "@/lib/cn";
-import { container } from "./ui/container";
 
-const STATS_INTERVAL_MS = 250;
-const number = new Intl.NumberFormat("ja-JP");
+/** 3D の各段に重ねるラベル。並び順は lib/heroScene.ts の ANCHORS と揃える */
+const LABELS: readonly { text: string; boundary?: boolean }[] = [
+  { text: "発話" },
+  { text: "ポリシー層（前段）", boundary: true },
+  { text: "LLM ルーター" },
+  { text: "ポリシー層（後段）", boundary: true },
+  { text: "実行" },
+];
 
 /**
  * トップの 3D を載せる canvas。three.js は表示後に読み込み、最初の表示を遅らせない。
- * - WebGL が使えない環境では何も描かず、背後の光（CSS）だけが残る
+ * - WebGL が使えない環境では何も描かず、背後の方眼と光（CSS）だけが残る
  * - 動きを減らす設定の利用者には静止画を 1 枚だけ描く
  * - 画面外やタブが裏にあるあいだは描画を止める
- * 左上に、図の中で数えた件数を等幅で出す（動いているあいだだけ）。
+ * ラベルは 3D の座標を画面へ写した位置に、毎コマ style を直接書き換えて重ねる（再描画しない）。
  */
 export function HeroScene({ className }: { className?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const labelRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [ready, setReady] = useState(false);
-  const [stats, setStats] = useState<HeroStats | null>(null);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -31,6 +36,13 @@ export function HeroScene({ className }: { className?: string }) {
     const cleanups: (() => void)[] = [];
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    const placeLabels = (points: readonly ScreenPoint[]) => {
+      points.forEach(({ x, y }, i) => {
+        const el = labelRefs.current[i];
+        if (el) el.style.transform = `translate(${x}px, ${y}px) translate(-50%, 0)`;
+      });
+    };
+
     (async () => {
       const [T, { createHeroScene }] = await Promise.all([
         import("three"),
@@ -38,9 +50,9 @@ export function HeroScene({ className }: { className?: string }) {
       ]);
       if (cancelled) return;
       try {
-        scene = createHeroScene(T, canvas);
+        scene = createHeroScene(T, canvas, placeLabels);
       } catch {
-        // WebGL を作れない環境。3D は諦め、CSS の光だけを見せる
+        // WebGL を作れない環境。3D は諦め、CSS の方眼と光だけを見せる
         return;
       }
       const s = scene;
@@ -74,10 +86,7 @@ export function HeroScene({ className }: { className?: string }) {
       };
       window.addEventListener("pointermove", onPointer, { passive: true });
 
-      const timer = window.setInterval(() => setStats(s.getStats()), STATS_INTERVAL_MS);
-
       cleanups.push(
-        () => window.clearInterval(timer),
         () => io.disconnect(),
         () => document.removeEventListener("visibilitychange", sync),
         () => window.removeEventListener("pointermove", onPointer),
@@ -105,24 +114,22 @@ export function HeroScene({ className }: { className?: string }) {
           ready ? "opacity-100" : "opacity-0",
         )}
       />
-      {stats && (
-        <div className={cn(container, "absolute inset-x-0 top-6 sm:top-10")}>
-          <dl className="grid w-fit grid-cols-[auto_auto] gap-x-6 gap-y-1 font-mono text-[12px] leading-5 text-ink-subtle tabular-nums">
-            <dt>
-              <span className="mr-2 inline-block size-1.5 rounded-full bg-accent align-middle" />
-              核に届いた入力
-            </dt>
-            <dd className="text-right text-ink-muted">{number.format(stats.reached)}</dd>
-            <dt>
-              <span className="mr-2 inline-block size-1.5 rounded-full bg-danger align-middle" />
-              層で止めた注入
-            </dt>
-            <dd className="text-right text-ink-muted">{number.format(stats.blocked)}</dd>
-            <dt className="pl-3.5">注入の到達</dt>
-            <dd className="text-right text-ink">0</dd>
-          </dl>
-        </div>
-      )}
+      <div className={cn("transition-opacity duration-1000", ready ? "opacity-100" : "opacity-0")}>
+        {LABELS.map(({ text, boundary }, i) => (
+          <span
+            key={text}
+            ref={(el) => {
+              labelRefs.current[i] = el;
+            }}
+            className={cn(
+              "absolute left-0 top-0 whitespace-nowrap text-[12px] sm:text-[13px] font-medium",
+              boundary ? "text-accent" : "text-ink-muted",
+            )}
+          >
+            {text}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

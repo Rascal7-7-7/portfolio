@@ -27,6 +27,18 @@ export type Highlight = {
   readonly type: "check" | "data";
 };
 
+/** 根拠の1行。value には母数を含める（「25 / 25」のように）。 */
+export type EvidenceRow = {
+  readonly label: string;
+  readonly value: string;
+};
+
+export type Evidence = {
+  readonly rows: readonly EvidenceRow[];
+  /** どこで確かめられるか。計測日や対象のブランチを label に含める */
+  readonly source: { readonly label: string; readonly href: string };
+};
+
 /** 制作時期。進行中の作品は end を省略する。 */
 export type Period = {
   /** "2026-03" 形式 */
@@ -102,10 +114,10 @@ export type Project = {
   readonly links: ProjectLinks;
   readonly thumbnail?: string;
   /**
-   * 代表作の右側に、画像の代わりに等幅で出す根拠の行。
-   * Case Study に書いた実測値・事実だけを書く。
+   * 代表作に添える根拠。実測値・事実だけを「項目と値」で持ち、どこで確かめられるかを必ず添える。
+   * 自分の解釈や結論は混ぜない（それは summary や decisions に書く）。
    */
-  readonly evidence?: readonly string[];
+  readonly evidence?: Evidence;
 
   // ---- 旧レイアウト互換（Phase 6 で見直す） ----
   /** 制作にかけた期間の表示。 */

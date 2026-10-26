@@ -1,67 +1,93 @@
 /**
- * トップの 3D で飛ぶ「入力」の粒の動き。three.js に依存しない純粋な計算だけを置く。
+ * トップの 3D で流れる「発話」の粒の動き。three.js に依存しない純粋な計算だけを置く。
  *
- * - allowed（通常の入力）: 外から飛んできて、ポリシー層を抜け、中心の LLM まで届く
- * - blocked（注入された命令）: 外側のポリシー層で止まり、そこで散る
+ * JARVIS の構成（発話 → 前段ゲート → LLM ルーター → 後段ゲート → 実行）を左から右へ並べ、
+ * 粒は x 軸に沿って右へ進む。
+ * - allowed（通常の発話）: 実行まで届く
+ * - blocked（危険な発話）: 前段ゲート（発話のキーワード照合）で止まる
+ * - evasive（言い換えた危険な発話）: 前段をすり抜けうるため、後段ゲート（コマンドの拒否リスト）で止める
  *
- * JARVIS の「LLM の判断を信頼境界にしない（決定的なポリシー層で止める）」を図にしたもの。
+ * どちらのゲートも照合式で完全ではない。図はその設計意図を示すもので、計測値ではない。
  */
 
 export type Vec3 = readonly [number, number, number];
-export type ParticleKind = "allowed" | "blocked";
+export type ParticleKind = "allowed" | "blocked" | "evasive";
+export type Stage = "gate1" | "gate2" | "exec";
 
 export type Particle = {
-  readonly dir: Vec3;
-  readonly r: number;
+  readonly x: number;
+  /** 流れの軸からのずれ（y, z）。LLM の前後で絞り込む */
+  readonly offset: readonly [number, number];
   readonly speed: number;
   readonly kind: ParticleKind;
 };
 
-/** 粒が生まれる半径 */
-export const SPAWN_R = 7;
-/** 中心の LLM の半径。allowed はここで消える */
-export const CORE_R = 0.95;
-/** 外側のポリシー層の半径。blocked はここで止まる */
-export const SHELL_R = 2.6;
-/** 注入された命令の割合 */
-export const BLOCKED_RATIO = 0.3;
+/** 各段の x 座標 */
+export const SPAWN_X = -8;
+export const GATE1_X = -3.2;
+export const LLM_X = 0;
+export const GATE2_X = 3.2;
+export const EXEC_X = 6.4;
+/** 実行の箱の半分の大きさ。allowed はこの手前で消える */
+export const EXEC_HALF = 0.6;
 
-export function stopRadius(kind: ParticleKind): number {
-  return kind === "allowed" ? CORE_R : SHELL_R;
+/** 粒の種類の割合（残りが allowed） */
+export const BLOCKED_RATIO = 0.25;
+export const EVASIVE_RATIO = 0.12;
+
+export function stopX(kind: ParticleKind): number {
+  if (kind === "blocked") return GATE1_X;
+  if (kind === "evasive") return GATE2_X;
+  return EXEC_X - EXEC_HALF;
 }
 
-/** 球面上で偏りのない向き（z を一様に取り、方位角を回す） */
-function randomDir(rand: () => number): Vec3 {
-  const z = rand() * 2 - 1;
-  const phi = rand() * Math.PI * 2;
-  const s = Math.sqrt(1 - z * z);
-  return [s * Math.cos(phi), s * Math.sin(phi), z];
+function stageOf(kind: ParticleKind): Stage {
+  if (kind === "blocked") return "gate1";
+  if (kind === "evasive") return "gate2";
+  return "exec";
 }
 
-/** offset は生まれる位置を外側へずらす量。最初に全粒が同時に飛び込むのを避けるために使う */
+/**
+ * 流れの太さの倍率。両端で 1、LLM の位置で 0.3 まで絞る（ルーターに集まって見えるように）。
+ */
+export function funnel(x: number): number {
+  const d = Math.min(1, Math.abs(x - LLM_X) / 4);
+  return 0.3 + 0.7 * d * d * (3 - 2 * d);
+}
+
+export function position(p: Particle): Vec3 {
+  const k = funnel(p.x);
+  return [p.x, p.offset[0] * k, p.offset[1] * k];
+}
+
+/** offset は生まれる位置を左へずらす量。最初に全粒が同時に流れ込むのを避けるために使う */
 export function spawn(rand: () => number, offset = 0): Particle {
+  const r = Math.sqrt(rand()) * 1.5;
+  const a = rand() * Math.PI * 2;
+  const roll = rand();
+  const kind: ParticleKind =
+    roll < BLOCKED_RATIO ? "blocked" : roll < BLOCKED_RATIO + EVASIVE_RATIO ? "evasive" : "allowed";
   return {
-    dir: randomDir(rand),
-    r: SPAWN_R + offset,
-    speed: 1.6 + rand() * 1.4,
-    kind: rand() < BLOCKED_RATIO ? "blocked" : "allowed",
+    x: SPAWN_X - offset,
+    offset: [Math.cos(a) * r, Math.sin(a) * r],
+    speed: 2.2 + rand() * 1.6,
+    kind,
   };
 }
 
 /**
- * dt 秒進める。止まる半径に着いたら新しい粒に入れ替え、
- * blocked だった場合は止まった位置を hit として返す（そこに波紋を出す）。
+ * dt 秒進める。止まる位置に着いたら新しい粒に入れ替え、着いた位置と段を hit として返す
+ * （ゲートでは波紋、実行では光を出す）。
  */
 export function step(
   p: Particle,
   dt: number,
   rand: () => number,
-): { particle: Particle; hit: Vec3 | null } {
-  const r = p.r - p.speed * dt;
-  const stop = stopRadius(p.kind);
-  if (r > stop) return { particle: { ...p, r }, hit: null };
+): { particle: Particle; hit: { at: Vec3; stage: Stage } | null } {
+  const x = p.x + p.speed * dt;
+  const stop = stopX(p.kind);
+  if (x < stop) return { particle: { ...p, x }, hit: null };
 
-  const hit: Vec3 | null =
-    p.kind === "blocked" ? [p.dir[0] * stop, p.dir[1] * stop, p.dir[2] * stop] : null;
-  return { particle: spawn(rand), hit };
+  const at = position({ ...p, x: stop });
+  return { particle: spawn(rand), hit: { at, stage: stageOf(p.kind) } };
 }

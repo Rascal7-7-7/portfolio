@@ -14,7 +14,7 @@ export function FeaturedProject({ project }: { project: Project }) {
 
   return (
     <article className="reveal py-12 sm:py-16 border-t border-rule">
-      <ProjectTitle project={project} as="h3" className="text-xl sm:text-2xl" />
+      <ProjectTitle project={project} as="h3" className="text-2xl sm:text-[28px]" />
       <p className="phrase mt-2 text-[17px] sm:text-lg font-medium leading-relaxed text-ink">{headline}</p>
 
       {diagram && (
@@ -36,7 +36,7 @@ export function FeaturedProject({ project }: { project: Project }) {
         ))}
       </ul>
 
-      {evidence && <EvidenceLog lines={evidence} className="mt-8" />}
+      {evidence && <EvidenceLog evidence={evidence} className="mt-8" />}
 
       <MetaLine project={project} className="mt-8" />
       <div className="mt-2">

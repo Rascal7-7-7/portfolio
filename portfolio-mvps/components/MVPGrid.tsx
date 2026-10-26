@@ -11,11 +11,10 @@ export function MVPGrid() {
   const standard = getProjectsByTier("standard");
 
   return (
-    <section id="projects" className="py-20 sm:py-28" aria-labelledby="projects-heading">
+    <section id="projects" className="py-16 sm:py-24" aria-labelledby="projects-heading">
       <div className={container}>
         <SectionHeader
           id="projects-heading"
-          index="01"
           title="作ったもの"
           description="関心のある領域で手を動かしたものと、個人で作った業務系Webアプリです。"
           className="mb-4"

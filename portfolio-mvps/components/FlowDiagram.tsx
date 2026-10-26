@@ -129,7 +129,7 @@ export function FlowDiagram({
                   x={W - PAD - 14}
                   y={y + labelY}
                   fill={COLOR.boundary}
-                  fontSize={12}
+                  fontSize={13}
                   fontWeight={700}
                   textAnchor="end"
                 >
@@ -137,7 +137,7 @@ export function FlowDiagram({
                 </text>
               )}
               {!compact && (
-                <text x={PAD + 16} y={y + 44} fill={COLOR.note} fontSize={12}>
+                <text x={PAD + 16} y={y + 44} fill={COLOR.note} fontSize={13}>
                   {note}
                 </text>
               )}
@@ -193,7 +193,7 @@ export function FlowDiagram({
                     x={x + sideW / 2}
                     y={y + sideNoteY}
                     fill={COLOR.note}
-                    fontSize={11}
+                    fontSize={12.5}
                     textAnchor="middle"
                   >
                     {note}
@@ -214,7 +214,7 @@ export function FlowDiagram({
               x={W / 2}
               y={sideY + SIDE_BOX_H + 22}
               fill={COLOR.note}
-              fontSize={12}
+              fontSize={13}
               textAnchor="middle"
             >
               {sidePath.note}

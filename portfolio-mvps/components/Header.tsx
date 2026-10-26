@@ -14,7 +14,7 @@ const navItems = [
 ];
 
 const navLink =
-  "inline-flex items-center py-2 text-ink-muted hover:text-ink transition-colors";
+  "inline-flex min-h-11 items-center px-1 text-ink-muted hover:text-ink transition-colors";
 
 export function Header() {
   return (
@@ -25,7 +25,7 @@ export function Header() {
       >
         メインコンテンツへスキップ
       </a>
-      <header id="top" className="sticky top-0 z-30 border-b border-rule/60 bg-paper/70 backdrop-blur-md">
+      <header id="top" className="sticky top-0 z-30 border-b border-rule bg-paper/95 backdrop-blur-sm">
         {/* 幅と余白は本文と同じ container を使い、名前の左端を本文に揃える */}
         <div className={cn(container, "h-16 flex items-center justify-between gap-3")}>
           <a
@@ -45,17 +45,6 @@ export function Header() {
                   </a>
                 </li>
               ))}
-              <li>
-                <a
-                  href={profile.links.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={navLink}
-                  aria-label="GitHub（新しいタブで開く）"
-                >
-                  GitHub
-                </a>
-              </li>
             </ul>
           </nav>
         </div>

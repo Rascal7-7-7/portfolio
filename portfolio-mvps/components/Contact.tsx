@@ -6,11 +6,10 @@ import { container } from "./ui/container";
 
 export function Contact() {
   return (
-    <section id="contact" className="py-20 sm:py-28 border-t border-rule" aria-labelledby="contact-heading">
+    <section id="contact" className="py-16 sm:py-24 border-t border-rule" aria-labelledby="contact-heading">
       <div className={container}>
         <SectionHeader
           id="contact-heading"
-          index="03"
           title="連絡先"
           description="インターン・選考のご連絡、作品やコードについてのご質問は、メールでお願いします。"
         />
