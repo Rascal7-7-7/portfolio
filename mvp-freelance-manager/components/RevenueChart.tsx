@@ -11,7 +11,7 @@ function niceMax(value: number): number {
 
 const TICKS = [1, 0.5, 0] as const;
 /** 過去の棒はアクセントの青を薄めたもの。色相を増やさず「今月だけ濃い」で差を付ける */
-const PAST_BAR = "bg-blue/25";
+const PAST_BAR = "bg-blue/[0.18]";
 
 interface RevenueChartProps {
   data: readonly MonthlyRevenue[];
@@ -33,7 +33,7 @@ export function RevenueChart({ data, growFrom }: RevenueChartProps) {
   return (
     <figure>
       <div className="flex gap-2 sm:gap-3" role="img" aria-label={`月次の入金推移: ${summary}`}>
-        <div className="num relative h-52 w-10 shrink-0 text-right text-[11px] tracking-tight text-warm-500" aria-hidden>
+        <div className="num relative h-60 w-10 shrink-0 text-right text-[11px] tracking-tight text-warm-500" aria-hidden>
           <div className="absolute inset-x-0 top-7 bottom-7 flex flex-col justify-between">
             {TICKS.map((r) => (
               <span key={r} className="h-0 leading-[0]">
@@ -42,10 +42,10 @@ export function RevenueChart({ data, growFrom }: RevenueChartProps) {
             ))}
           </div>
         </div>
-        <div className="relative flex h-52 flex-1 items-end gap-2 sm:gap-5" aria-hidden>
+        <div className="relative flex h-60 flex-1 items-end gap-2.5 sm:gap-8" aria-hidden>
           <div className="pointer-events-none absolute inset-x-0 top-7 bottom-7 flex flex-col justify-between">
             {TICKS.map((r) => (
-              <div key={r} className={cn("border-t", r === 0 ? "border-black/20" : "border-dashed border-black/[0.09]")} />
+              <div key={r} className={cn("border-t", r === 0 ? "border-black/15" : "border-dashed border-black/[0.07]")} />
             ))}
           </div>
           {data.map((m, i) => {
@@ -58,20 +58,22 @@ export function RevenueChart({ data, growFrom }: RevenueChartProps) {
                   <span
                     key={isCurrent ? m.paid : undefined}
                     className={cn(
-                      "num mb-1.5 text-[11px] tracking-tight",
-                      isCurrent ? "font-semibold text-ink" : "text-warm-500",
+                      "num mb-2 tracking-tight",
+                      isCurrent
+                        ? "text-[13px] font-semibold text-blue-active"
+                        : "text-[11px] text-warm-500",
                       grow && "anim-rise",
                     )}
                   >
                     {total > 0 ? formatManYen(total) : "—"}
                   </span>
                   <div
-                    className="flex w-full max-w-9 flex-col transition-[height] duration-500 ease-out motion-reduce:transition-none"
+                    className="flex w-full max-w-14 flex-col transition-[height] duration-500 ease-out motion-reduce:transition-none"
                     style={{ height: pct(total) }}
                   >
                     {m.expected > 0 && (
                       <div
-                        className="rounded-t-[4px] border border-b-0 border-dashed border-blue/60"
+                        className="rounded-t-md border-[1.5px] border-b-0 border-dashed border-blue/50 bg-blue/[0.04]"
                         style={{ flexGrow: m.expected }}
                       />
                     )}
@@ -79,14 +81,14 @@ export function RevenueChart({ data, growFrom }: RevenueChartProps) {
                       key={isCurrent ? m.paid : undefined}
                       className={cn(
                         isCurrent ? "bg-blue" : PAST_BAR,
-                        m.expected > 0 ? "" : "rounded-t-[4px]",
+                        m.expected > 0 ? "" : "rounded-t-md",
                         grow && "anim-grow",
                       )}
                       style={{ flexGrow: m.paid, ...(grow ? ({ "--grow-from": growFrom } as CSSProperties) : {}) }}
                     />
                   </div>
                 </div>
-                <span className={cn("num h-7 pt-2 text-[11px]", isCurrent ? "font-semibold text-ink" : "text-warm-500")}>
+                <span className={cn("num h-7 pt-2.5 text-xs", isCurrent ? "font-semibold text-ink" : "text-warm-500")}>
                   {formatMonthLabel(m.month)}
                 </span>
               </div>
@@ -94,7 +96,7 @@ export function RevenueChart({ data, growFrom }: RevenueChartProps) {
           })}
         </div>
       </div>
-      <figcaption className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-warm-500">
+      <figcaption className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-warm-500">
         <span className="flex items-center gap-1.5">
           <span className={cn("h-2 w-2 rounded-[2px]", PAST_BAR)} aria-hidden />
           過去の入金
@@ -104,7 +106,7 @@ export function RevenueChart({ data, growFrom }: RevenueChartProps) {
           今月の入金
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-[2px] border border-dashed border-blue/60" aria-hidden />
+          <span className="h-2 w-2 rounded-[2px] border border-dashed border-blue/50" aria-hidden />
           今月期日の未入金（見込み）
         </span>
       </figcaption>

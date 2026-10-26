@@ -44,9 +44,9 @@ export function ProjectsView() {
       <MetricStrip
         className="mb-6"
         items={[
-          { label: "進行中の受注額", value: formatYen(sum("in_progress")), sub: `${count("in_progress")}件` },
-          { label: "見積中（見込み）", value: formatYen(sum("estimate")), sub: `${count("estimate")}件` },
-          { label: "完了した案件", value: formatYen(sum("completed")), sub: `${count("completed")}件` },
+          { label: "進行中の受注額", value: sum("in_progress"), sub: `${count("in_progress")}件` },
+          { label: "見積中（見込み）", value: sum("estimate"), sub: `${count("estimate")}件` },
+          { label: "完了した案件", value: sum("completed"), sub: `${count("completed")}件` },
         ]}
       />
 
@@ -67,13 +67,13 @@ export function ProjectsView() {
               const prog = projectProgress(p, data);
               return (
                 <li key={p.id}>
-                  <Link href={`/projects/${p.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-warm-50 sm:gap-4 sm:px-5">
-                    <div className="hidden w-16 shrink-0 sm:block">
+                  <Link href={`/projects/${p.id}`} className="group flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-warm-50/70 sm:gap-4 sm:px-5">
+                    <div className="hidden w-[4.5rem] shrink-0 sm:block">
                       <ProjectStatusBadge status={p.status} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium break-words text-ink">{p.name}</p>
-                      <div className="mt-0.5 sm:hidden">
+                      <p className="text-sm font-semibold break-words text-ink">{p.name}</p>
+                      <div className="mt-1 sm:hidden">
                         <ProjectStatusBadge status={p.status} />
                       </div>
                       {/* 区切りごとに折り返し、語の途中で改行しない。行頭に「・」が来ないよう記号ではなく余白で区切る */}
@@ -84,10 +84,10 @@ export function ProjectsView() {
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="num text-sm font-medium text-ink">{formatYen(p.amount)}</p>
+                      <p className="num text-[15px] font-semibold tracking-[-0.01em] text-ink">{formatYen(p.amount)}</p>
                       <p className="num text-xs text-warm-500">入金 {formatYen(prog.paid)}</p>
                     </div>
-                    <ChevronRight size={16} className="hidden shrink-0 text-warm-300 sm:block" aria-hidden />
+                    <ChevronRight size={16} className="hidden shrink-0 text-warm-300 transition-transform group-hover:translate-x-0.5 group-hover:text-ink sm:block" aria-hidden />
                   </Link>
                 </li>
               );

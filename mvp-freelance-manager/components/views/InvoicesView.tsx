@@ -70,10 +70,10 @@ export function InvoicesView() {
         items={[
           {
             label: "未入金",
-            value: formatYen(total("outstanding")),
+            value: total("outstanding"),
             sub: overdueTotal > 0 ? <span className="font-semibold text-orange">うち期限超過 {formatYen(overdueTotal)}</span> : undefined,
           },
-          { label: "入金済（累計）", value: formatYen(total("paid")) },
+          { label: "入金済（累計）", value: total("paid") },
         ]}
       />
 
@@ -103,11 +103,11 @@ export function InvoicesView() {
             <tbody className="divide-y divide-line">
               {revenue.toReversed().map((m) => (
                 <tr key={m.month}>
-                  <th scope="row" className="num px-5 py-2 text-left font-normal text-warm-500">
+                  <th scope="row" className="num px-5 py-2.5 text-left font-normal text-warm-500">
                     {formatMonthLabel(m.month)}
                   </th>
-                  <td className="num px-5 py-2 text-right font-medium text-ink">{formatYen(m.paid)}</td>
-                  <td className="num px-5 py-2 text-right text-warm-500">{m.expected ? formatYen(m.expected) : "—"}</td>
+                  <td className="num px-5 py-2.5 text-right font-semibold text-ink">{formatYen(m.paid)}</td>
+                  <td className="num px-5 py-2.5 text-right text-warm-500">{m.expected ? formatYen(m.expected) : "—"}</td>
                 </tr>
               ))}
             </tbody>

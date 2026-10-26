@@ -35,12 +35,12 @@ export function InvoiceList({ invoices, data, today, empty, withProject = true }
         const project = data.projects.find((p) => p.id === inv.projectId);
         const status = invoiceStatus(inv, today);
         return (
-          <li key={inv.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 sm:flex-nowrap sm:px-5">
+          <li key={inv.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3.5 transition-colors hover:bg-warm-50/70 sm:flex-nowrap sm:px-5">
             {/* 行の左側から請求書の紙面を開く。請求番号を青くしてリンクだと分かるようにする */}
             <Link href={`/invoices/${inv.id}`} className="hit group min-w-0 flex-1 basis-full rounded sm:basis-auto">
               {withProject ? (
                 <>
-                  <p className="text-sm font-medium break-words text-ink">{project?.client ?? "—"}</p>
+                  <p className="text-sm font-semibold break-words text-ink">{project?.client ?? "—"}</p>
                   <p className="text-xs break-words text-warm-500">{project?.name}</p>
                   <p className="num mt-0.5 text-xs text-warm-500">
                     <span className="text-blue group-hover:underline">{inv.number}</span> ・{" "}
@@ -56,7 +56,7 @@ export function InvoiceList({ invoices, data, today, empty, withProject = true }
             </Link>
             <div className="flex flex-1 items-center gap-3 sm:flex-none sm:flex-col sm:items-end sm:gap-1">
               <InvoiceStatusBadge status={status} />
-              <p className="num ml-auto text-sm font-medium whitespace-nowrap text-ink sm:order-first sm:ml-0">
+              <p className="num ml-auto text-[15px] font-semibold tracking-[-0.01em] whitespace-nowrap text-ink sm:order-first sm:ml-0">
                 {formatYen(inv.amount)}
               </p>
             </div>
