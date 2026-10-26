@@ -4,7 +4,7 @@ import { calcTotals, lineAmount, monthlyWon, summarize } from "./calc.ts";
 import { hikaeInvoiceNumber, hikaeInvoiceUrl } from "./utils.ts";
 
 test("Hikae の請求書リンクは連携済みの EST-0014 だけ", () => {
-  assert.equal(hikaeInvoiceUrl(14), "https://mvp-freelance-manager.vercel.app/invoices/est-0014");
+  assert.equal(hikaeInvoiceUrl(14), "https://mvp-freelance-manager.vercel.app/invoices/est-0014?from=approved");
   assert.equal(hikaeInvoiceUrl(13), null);
   assert.equal(hikaeInvoiceNumber(14), "INV-0017");
   assert.equal(hikaeInvoiceNumber(13), null);
