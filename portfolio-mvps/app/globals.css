@@ -32,7 +32,7 @@ body {
   /*
    * 本文は通常の日本語の折り返し（どの字の間でも折り返し、句読点は行頭に来ない）。
    * 文節単位の折り返し（auto-phrase）を長い段落にかけると行末がガタガタになるため、
-   * 見出しと短い文（.phrase）だけに限る。
+   * 見出しと短い文（Phrase コンポーネント）だけに限る。
    */
   line-break: strict;
   overflow-wrap: break-word;
@@ -60,12 +60,6 @@ h2,
 h3,
 h4 {
   word-break: auto-phrase;
-}
-
-/* Phrase コンポーネント用。<wbr> の位置以外では折り返さず、1 文節が行に収まらないときだけ字の間で折る */
-.phrase {
-  word-break: keep-all;
-  overflow-wrap: anywhere;
 }
 
 h1,

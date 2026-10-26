@@ -3,6 +3,7 @@ import { profile } from "@/content/profile";
 import { ButtonLink } from "./ui/Button";
 import { HeroScene } from "./HeroScene";
 import { Phrase } from "./Phrase";
+import { RichText } from "./RichText";
 import { containerWide } from "./ui/container";
 import { cn } from "@/lib/cn";
 
@@ -23,7 +24,7 @@ function Interests() {
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pb-12 sm:pb-16" aria-labelledby="hero-heading">
+    <section className="relative overflow-hidden pb-8 sm:pb-10" aria-labelledby="hero-heading">
       {/*
         上部の 3D の舞台。WebGL が使えない環境や読み込み前は、背後の方眼と光だけが見える。
         見出しは舞台の下端に少し重ねて置く。
@@ -78,7 +79,10 @@ export function Hero() {
           </div>
 
           <p className="hero-in [animation-delay:360ms] max-w-2xl text-[17px] leading-[1.9] text-ink-muted">
-            生成AIをアプリに組み込むなかで、Prompt Injection や Jailbreak といったAI特有のセキュリティ問題に関心を持つようになり、AI と作った音声エージェントで実際に Prompt Injection を流して防御を検証しました。小さな作品は公開デモで、代表作はソースコードで確認できます。
+            <RichText
+              text="生成AIをアプリに組み込むなかで、Prompt Injection や Jailbreak といったAI特有のセキュリティ問題に関心を持つようになり、AI と作った音声エージェントで実際に Prompt Injection を流して防御を検証しました。小さな作品は公開デモで、代表作はソースコードで確認できます。"
+              terms={[]}
+            />
           </p>
         </div>
 

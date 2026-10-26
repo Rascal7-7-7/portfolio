@@ -8,7 +8,7 @@ describe("Phrase", () => {
     const html = renderToStaticMarkup(
       createElement(Phrase, { text: "危険な発話は、前段のポリシー層（発話のキーワード照合）で止まる" }),
     );
-    const chunks = html.replace(/^<span class="phrase">|<\/span>$/g, "").split("<wbr/>");
+    const chunks = Array.from(html.matchAll(/<span class="whitespace-nowrap">(.*?)<\/span>/g), (m) => m[1]);
     expect(chunks.join("")).toBe("危険な発話は、前段のポリシー層（発話のキーワード照合）で止まる");
     expect(chunks).toContain("ポリシー層");
     expect(chunks.some((c) => c.includes("キーワード"))).toBe(true);
