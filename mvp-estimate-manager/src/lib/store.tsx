@@ -9,7 +9,7 @@ import type { Summary } from "@/lib/calc";
 import { todayISO } from "@/lib/utils";
 
 // ponytail: localStorage のみ。複数端末・複数人で共有するならサーバー保存が必要
-const STORAGE_KEY = "mvp-estimate-manager:v5";
+const STORAGE_KEY = "mvp-estimate-manager:v6";
 
 interface EstimatesContextValue {
   /** マウント前（localStorage 読み込み前）は null */
