@@ -28,7 +28,7 @@ const WRAP = 'mx-auto max-w-4xl'
 /** 和文の見出しだけ。英字の小見出し（FEATURES 等）・下線などの飾りは置かず、左揃えの太字で組む */
 function H2({ text, lead, wide }: { text: string; lead?: string; wide: boolean }) {
   return (
-    <h2 className={cx('font-extrabold leading-snug', wide ? 'text-[32px]' : 'text-[24px]')}>
+    <h2 className={cx('font-extrabold leading-snug [font-feature-settings:"palt"]', wide ? 'text-[32px]' : 'text-[24px]')}>
       <Phrases text={text} lead={lead} />
     </h2>
   )
@@ -36,7 +36,7 @@ function H2({ text, lead, wide }: { text: string; lead?: string; wide: boolean }
 
 function Nav({ store, wide }: TemplateProps) {
   return (
-    <nav className={cx('sticky top-0 z-10 flex items-center justify-between gap-6 border-b bg-white', LINE, wide ? 'px-8 py-3' : 'px-4 py-3')}>
+    <nav className={cx('sticky top-0 z-10 flex items-center justify-between gap-6 border-b bg-white', LINE, wide ? 'px-8 py-3' : 'px-4 py-2')}>
       <span className="truncate text-lg font-extrabold">{storeName(store)}</span>
       <div className="flex shrink-0 items-center gap-6">
         {wide && store.phone && (
@@ -45,7 +45,7 @@ function Nav({ store, wide }: TemplateProps) {
             {store.hours && <p className={cx(MUTED, 'text-[11px] font-bold')}>{hoursWord(store)} {store.hours}</p>}
           </div>
         )}
-        <a href="#reserve" className="rounded-md bg-[#1f2a37] px-4 py-2 text-xs font-bold text-white hover:bg-[#33435a]">
+        <a href="#reserve" className="inline-flex min-h-11 items-center rounded-md bg-[#1f2a37] px-4 text-xs font-bold text-white transition-colors hover:bg-[#33435a]">
           {wide ? 'WEB予約' : '予約'}
         </a>
       </div>
@@ -99,7 +99,7 @@ function Hero(props: TemplateProps) {
             {store.description && <p className="mt-8 max-w-[30em] text-[15px] font-medium leading-[1.9]">{store.description}</p>}
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
               <a href="#reserve" className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
-              <a href="#menu" className={cx('border-b-2 pb-0.5 text-sm font-bold', RULE)}>料金を見る</a>
+              <a href="#menu" className="inline-flex min-h-11 items-center underline decoration-2 underline-offset-[6px] text-sm font-bold">料金を見る</a>
             </div>
           </div>
           <LeadMenu {...props} />
@@ -264,7 +264,7 @@ function Cta({ store, wide }: TemplateProps) {
   return (
     <section id="reserve" className={wide ? 'p-6' : 'p-3'}>
       <div className={cx('rounded-lg text-center', CORAL, wide ? 'px-14 py-20' : 'px-5 py-14')}>
-        <h2 className={cx('font-extrabold leading-snug', wide ? 'text-[36px]' : 'text-[26px]')}>
+        <h2 className={cx('font-extrabold leading-snug [font-feature-settings:"palt"]', wide ? 'text-[36px]' : 'text-[26px]')}>
           <Phrases text="まずはお気軽にご予約ください" />
         </h2>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">

@@ -4,6 +4,7 @@ const PATHS = {
   copy: 'M9 9h11v11H9zM5 15H4V4h11v1',
   external: 'M14 4h6v6M20 4l-9 9M18 14v6H4V6h6',
   check: 'M5 12l5 5 9-10',
+  lock: 'M6 11h12v10H6zM9 11V8a3 3 0 0 1 6 0v3',
 } as const
 
 export type IconName = keyof typeof PATHS

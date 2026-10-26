@@ -63,10 +63,13 @@ export default function PublishDialog({ doc, open, onClose, onPublished }: Props
       ref={ref}
       onClose={onClose}
       aria-labelledby="publish-title"
-      className="w-[min(440px,calc(100vw-32px))] rounded-lg border border-ed-line bg-ed-panel p-0 text-ed-ink shadow-lg backdrop:bg-black/40"
+      className="w-[min(440px,calc(100vw-32px))] rounded-lg border border-ed-line bg-ed-panel p-0 text-ed-ink shadow-[0_24px_48px_-16px_rgba(24,24,27,0.3)] backdrop:bg-black/40 open:motion-safe:animate-rise"
     >
       <div className="p-6">
-        <h2 id="publish-title" className="text-base font-semibold">{published ? '公開しました' : 'LPを公開する'}</h2>
+        <h2 id="publish-title" className="flex items-center gap-2 text-base font-semibold">
+          {published && <Icon name="check" className="h-4 w-4 text-[#067647] motion-safe:animate-fade-in" />}
+          {published ? '公開しました' : 'LPを公開する'}
+        </h2>
         <p className="mt-1 text-xs text-ed-muted">デモのため、実際にはインターネットへ公開されません</p>
 
         {!published ? (
@@ -80,10 +83,10 @@ export default function PublishDialog({ doc, open, onClose, onPublished }: Props
             </div>
           </div>
         ) : (
-          <div className="mt-6 rounded-md border border-ed-line bg-ed-bg p-4">
+          <div className="mt-6 rounded-md border border-ed-line bg-ed-bg p-4 motion-safe:animate-rise">
             <p className="text-xs text-ed-muted">公開URL</p>
             <p className="mt-1 break-all text-sm font-semibold">{mockPublicUrl(slug)}</p>
-            <button type="button" onClick={copy} className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-accent hover:underline">
+            <button type="button" onClick={copy} className="-mx-2 mt-1 inline-flex min-h-11 items-center gap-1.5 rounded px-2 text-xs font-medium text-accent hover:underline lg:min-h-9">
               <Icon name={copied ? 'check' : 'copy'} className="h-3.5 w-3.5" />
               {copied ? 'コピーしました' : 'URLをコピー'}
             </button>
@@ -93,15 +96,15 @@ export default function PublishDialog({ doc, open, onClose, onPublished }: Props
         {error && <p role="alert" className="mt-3 text-xs text-[#b42318]">{error}</p>}
 
         <div className="mt-6 flex gap-2">
-          <button type="button" onClick={onClose} className="flex-1 rounded-md border border-ed-line py-2.5 text-sm font-medium hover:bg-ed-bg">
+          <button type="button" onClick={onClose} className="min-h-11 flex-1 rounded-md border border-ed-line text-sm font-medium transition-colors hover:bg-ed-bg">
             閉じる
           </button>
           {!published ? (
-            <button type="button" onClick={publish} className="flex-1 rounded-md bg-ed-ink py-2.5 text-sm font-semibold text-white hover:bg-[#33333a]">
+            <button type="button" onClick={publish} className="min-h-11 flex-1 rounded-md bg-ed-ink text-sm font-semibold text-white transition-[background-color,transform] duration-150 hover:bg-[#33333a] active:scale-[0.98]">
               公開する
             </button>
           ) : (
-            <Link href={`/lp/${slug}`} className="flex flex-1 items-center justify-center gap-1.5 rounded-md bg-ed-ink py-2.5 text-sm font-semibold text-white hover:bg-[#33333a]">
+            <Link href={`/lp/${slug}`} className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-md bg-ed-ink text-sm font-semibold text-white transition-colors hover:bg-[#33333a]">
               公開ページを開く
               <Icon name="external" className="h-3.5 w-3.5" />
             </Link>
