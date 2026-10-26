@@ -125,6 +125,10 @@ export function Hero() {
             <dd className="text-ink-muted">
               <Phrase text={profile.activity} />
             </dd>
+            <dt className="text-ink-subtle">受賞</dt>
+            <dd className="text-ink-muted">
+              <Phrase text={profile.awardSummary} />
+            </dd>
             <dt className="text-ink-subtle">資格</dt>
             <dd className="text-ink-muted">
               {profile.certifications.map((part) => (

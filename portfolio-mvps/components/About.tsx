@@ -1,3 +1,4 @@
+import { Credentials } from "./Credentials";
 import { Phrase } from "./Phrase";
 import { SectionHeader } from "./ui/SectionHeader";
 import { containerWide } from "./ui/container";
@@ -34,6 +35,10 @@ export function About() {
           <p className="text-ink">
             <Phrase text={closing} />
           </p>
+        </div>
+
+        <div className="lg:col-span-8 lg:col-start-5">
+          <Credentials />
         </div>
       </div>
     </section>
