@@ -1,5 +1,4 @@
 'use client';
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreditCard, Loader2, Lock, Store } from 'lucide-react';
@@ -7,6 +6,7 @@ import { useStore } from '@/components/StoreProvider';
 import { TotalsTable } from '@/components/TotalsTable';
 import { PlanBadge } from '@/components/PlanBadge';
 import { CheckoutSteps } from '@/components/CheckoutSteps';
+import { EmptyState } from '@/components/EmptyState';
 import { RecurringSummary } from '@/components/RecurringSummary';
 import { DEMO_USER } from '@/lib/catalog';
 import { cartTotals, toCartLines } from '@/lib/cart';
@@ -44,14 +44,7 @@ export default function CheckoutPage() {
     );
   }
   if (lines.length === 0) {
-    return (
-      <main className="mx-auto max-w-lg px-4 py-24 text-center">
-        <h1 className="text-on-surface-variant">カートに商品がありません</h1>
-        <Link href="/products" className="mt-4 inline-block text-sm text-primary hover:underline">
-          商品一覧へ
-        </Link>
-      </main>
-    );
+    return <EmptyState title="カートに商品がありません" body="商品を選んでから、ご購入手続きに進んでください。" />;
   }
 
   const totals = cartTotals(lines);
@@ -83,7 +76,7 @@ export default function CheckoutPage() {
   );
 
   return (
-    <main className="mx-auto max-w-5xl px-4 pb-28 pt-8 sm:px-6 lg:pb-8">
+    <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       <CheckoutSteps current={1} />
       <h1 className="mb-6 font-headline text-2xl font-light text-on-background sm:text-3xl">ご購入手続き</h1>
 
@@ -187,7 +180,7 @@ export default function CheckoutPage() {
       </div>
 
       {/* スマホは確定ボタンと合計を画面下に固定し、どこまでスクロールしても押せるようにする */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant/60 bg-background px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 lg:hidden">
+      <div data-fixed-bar className="fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant/60 bg-background px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 lg:hidden">
         <div className="mx-auto flex max-w-xl items-center gap-3">
           <p className="min-w-0 flex-1 leading-tight">
             <span className="block text-xs text-on-surface-variant">合計（税込）</span>
