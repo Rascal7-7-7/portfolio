@@ -1,6 +1,6 @@
 import { profile } from "@/content/profile";
 import { cn } from "@/lib/cn";
-import { container } from "./ui/container";
+import { container, containerWide } from "./ui/container";
 
 /**
  * トップと Case Study の両方で使う。
@@ -16,7 +16,8 @@ const navItems = [
 const navLink =
   "inline-flex min-h-11 items-center px-1 text-ink-muted hover:text-ink transition-colors";
 
-export function Header() {
+/** wide はトップページ用。本文の幅（containerWide）に左端を揃える */
+export function Header({ wide = false }: { wide?: boolean }) {
   return (
     <>
       <a
@@ -27,7 +28,7 @@ export function Header() {
       </a>
       <header id="top" className="sticky top-0 z-30 border-b border-rule bg-paper/95 backdrop-blur-sm">
         {/* 幅と余白は本文と同じ container を使い、名前の左端を本文に揃える */}
-        <div className={cn(container, "h-16 flex items-center justify-between gap-3")}>
+        <div className={cn(wide ? containerWide : container, "h-16 flex items-center justify-between gap-3")}>
           <a
             href="/#top"
             className="font-semibold text-ink whitespace-nowrap"

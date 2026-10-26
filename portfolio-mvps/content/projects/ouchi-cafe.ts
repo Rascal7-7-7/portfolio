@@ -11,7 +11,7 @@ export const ouchiCafe: Project = {
   team: {
     kind: "team",
     members: 4,
-    myRole: "バックエンド（PHP・SQL）を担当。自分で書いた部分と、AI を使って直した部分があります。全 610 コミット中 556 件（main ブランチ、2026-10 時点）",
+    myRole: "バックエンド（PHP・SQL）を担当。自分で書いた部分と、AI を使って直した部分があります。",
   },
   period: { start: "2025-10", end: "2026-02" },
   stack: ["PHP 8.2", "MySQL 8.0", "FastAPI", "LightGBM", "Stripe"],
@@ -26,11 +26,10 @@ export const ouchiCafe: Project = {
       { label: "味覚診断のベクトル", value: "12 次元" },
       { label: "商品データ", value: "692 件" },
       { label: "テーブル", value: "101" },
-      { label: "コミット（本人 / 全体）", value: "556 / 610" },
     ],
     source: {
       label: "GitHub の main ブランチ（2026-10 時点）",
-      href: "https://github.com/Rascal7-7-7/ouchi-cafe",
+      href: "https://github.com/Rascal7-7-7/ouchi-cafe/tree/main",
     },
   },
   links: {

@@ -5,43 +5,43 @@ import { FlowRow } from "./FlowRow";
 import { MetaLine, ProjectLinks, ProjectTitle } from "./ProjectMeta";
 
 /**
- * 代表作。一覧の1行を少し大きくしたもの。カードにはせず、上の罫線で区切る。
- * スクリーンショットの代わりに、Case Study と同じ事実から描いた構成図を見た目の中心に置き、
- * 根拠を <pre> 1枚で添える。構成図は sm 以上で横1列、狭い画面では縦に詰めた版を出す。
+ * 代表作。広い画面では左に文章、右に構成図と根拠を置く 2 カラム（5:7）。
+ * 左の文章は sticky にし、右の図と根拠を読み進めるあいだも作品名と導線が見えるようにする。
+ * 狭い画面では 1 カラムに戻し、構成図は縦に詰めた版を出す。
  */
 export function FeaturedProject({ project }: { project: Project }) {
   const { slug, headline, summary, highlights, evidence, diagram } = project;
 
   return (
-    <article className="reveal py-12 sm:py-16 border-t border-rule">
-      <ProjectTitle project={project} as="h3" className="text-2xl sm:text-[28px]" />
-      <p className="phrase mt-2 text-[17px] sm:text-lg font-medium leading-relaxed text-ink">{headline}</p>
+    <article className="reveal grid gap-x-12 gap-y-8 border-t border-rule py-12 sm:py-16 lg:grid-cols-12">
+      <div className="lg:col-span-5 lg:sticky lg:top-24 lg:self-start">
+        <ProjectTitle project={project} as="h3" className="text-2xl sm:text-[28px]" />
+        <p className="phrase mt-2 text-[17px] sm:text-lg font-medium leading-relaxed text-ink">{headline}</p>
+        <p className="mt-6 leading-[1.9] text-ink-muted">{summary}</p>
 
-      {diagram && (
-        <>
-          <FlowRow id={`${slug}-row`} diagram={diagram} className="mt-8 hidden sm:block" />
-          <FlowDiagram
-            id={`${slug}-compact`}
-            diagram={diagram}
-            compact
-            className="mt-8 sm:hidden"
-          />
-        </>
-      )}
-      <p className="mt-6 leading-[1.9] text-ink-muted">{summary}</p>
+        <ul className="mt-5 list-disc pl-5 space-y-2 leading-relaxed text-ink-muted marker:text-ink-subtle">
+          {highlights.map(({ label }) => (
+            <li key={label}>{label}</li>
+          ))}
+        </ul>
 
-      <ul className="mt-5 list-disc pl-5 space-y-2 leading-relaxed text-ink-muted marker:text-ink-subtle">
-        {highlights.map(({ label }) => (
-          <li key={label}>{label}</li>
-        ))}
-      </ul>
-
-      {evidence && <EvidenceLog evidence={evidence} className="mt-8" />}
-
-      <MetaLine project={project} className="mt-8" />
-      <div className="mt-2">
-        <ProjectLinks project={project} />
+        <MetaLine project={project} className="mt-8" />
+        <div className="mt-2">
+          <ProjectLinks project={project} />
+        </div>
       </div>
+
+      {(diagram || evidence) && (
+        <div className="lg:col-span-7 space-y-8">
+          {diagram && (
+            <>
+              <FlowRow id={`${slug}-row`} diagram={diagram} className="hidden sm:block" />
+              <FlowDiagram id={`${slug}-compact`} diagram={diagram} compact className="sm:hidden" />
+            </>
+          )}
+          {evidence && <EvidenceLog evidence={evidence} />}
+        </div>
+      )}
     </article>
   );
 }
