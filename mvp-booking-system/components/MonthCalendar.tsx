@@ -50,7 +50,7 @@ export default function MonthCalendar({ month, today, selected, isAvailable, can
               className={`relative aspect-square max-h-12 w-full rounded-lg text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${
                 isSelected ? 'bg-accent text-white font-bold'
                   : available ? 'bg-accent-soft text-ink font-medium hover:bg-[#f1e0dc]'
-                  : 'text-dim cursor-not-allowed'
+                  : 'text-dim/40 cursor-not-allowed'
               }`}>
               {day}
               {d === today && (
