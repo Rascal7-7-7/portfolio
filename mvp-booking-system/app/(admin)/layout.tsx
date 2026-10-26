@@ -10,16 +10,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* モバイル: トップヘッダー */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-canvas flex items-center justify-between px-4 h-12 border-b border-line">
-        <span className="text-sm font-bold text-ink">予約管理</span>
-        <span className="text-xs text-dim">{SHOP.name} {SHOP.branch}</span>
+        <span className="font-serif text-lg leading-none text-ink">{SHOP.name}</span>
+        <span className="text-xs text-dim">{SHOP.branch} · 予約管理</span>
       </header>
 
       {/* デスクトップ: サイドバー。外側は本文と同じ高さまで伸ばして背景を途切れさせず、中身だけ画面に追従させる */}
       <aside className="hidden md:block w-56 shrink-0 bg-muted border-r border-line">
         <div className="sticky top-0 h-screen flex flex-col px-3 py-5">
-          <div className="px-2 mb-6">
-            <p className="text-sm font-bold text-ink leading-tight">予約管理</p>
-            <p className="text-xs text-dim mt-1">{SHOP.name} {SHOP.branch}</p>
+          <div className="px-2 mb-7 pt-1">
+            <p className="font-serif text-xl leading-none text-ink tracking-tight">{SHOP.name}</p>
+            <p className="text-xs text-dim mt-2">{SHOP.branch} · 予約管理</p>
           </div>
 
           <nav aria-label="画面の切り替え" className="flex flex-col gap-0.5 flex-1">
@@ -45,7 +45,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      <main className="flex-1 min-w-0 min-h-screen pt-12 pb-20 md:pt-0 md:pb-0">
+      <main className="flex-1 min-w-0 min-h-screen bg-page pt-12 pb-20 md:pt-0 md:pb-0">
         {children}
       </main>
 

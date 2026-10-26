@@ -8,19 +8,22 @@
  *   now    … スケジュールの現在時刻の線だけ
  */
 @theme {
+  /* 灰色は Notion と同じく、ほんのり温かい灰にした（青みの灰だとサロンの写真と並べたとき冷たく見える） */
   --color-canvas: #ffffff;
-  --color-muted: #f5f7f9;      /* サイドバー・区切り行・ホバー */
-  --color-subtle: #eceef1;     /* 予定ブロック・入力欄の無効状態 */
-  --color-emphasis: #e5e7eb;   /* 選択中のナビ */
-  --color-line: #e5e7eb;       /* 枠線・区切り線 */
-  --color-line-strong: #d1d5db;/* 入力欄の枠 */
+  --color-paper: #f6f3ee;      /* お客様の予約ページの地。生成りの紙の色 */
+  --color-page: #fbfaf8;       /* 管理画面の本文の地。白い表や数字の面が一段浮いて見える */
+  --color-muted: #f7f6f3;      /* サイドバー・区切り行・ホバー */
+  --color-subtle: #efede9;     /* 予定ブロック・入力欄の無効状態 */
+  --color-emphasis: #e8e5df;   /* 選択中のナビ */
+  --color-line: #e7e3dd;       /* 枠線・区切り線 */
+  --color-line-strong: #d3cec6;/* 入力欄の枠 */
 
-  --color-ink: #0b0f14;        /* 見出し・主要テキスト */
-  --color-body: #3c3f44;       /* 本文 */
-  --color-dim: #5b6270;        /* 補足（muted 背景でも AA を満たす濃さ） */
+  --color-ink: #1d1b18;        /* 見出し・主要テキスト */
+  --color-body: #45413b;       /* 本文 */
+  --color-dim: #6b655d;        /* 補足（muted 背景でも AA を満たす濃さ） */
 
-  --color-brand: #1c2836;      /* 主ボタン */
-  --color-brand-hover: #3c3f44;
+  --color-brand: #26231f;      /* 主ボタン */
+  --color-brand-hover: #45413b;
 
   --color-accent: #9b4f45;     /* ローズブラウン。白地 5.8:1 */
   --color-accent-hover: #823f37;
@@ -39,18 +42,20 @@
   /* 週表示のメニュー種別。状態色（attn）・accent・担当色と取り違えないよう、彩度は低いまま。
      色相だけだと見分けにくいので、カット→カラー→パーマ→ケアの順に地の明度を一段ずつ下げている。
      左の線は地に対して 3:1 以上。文字はいつもの ink / dim で、いちばん濃い care の地でも dim が 4.5:1 を超える */
-  --color-menu-cut: #e3eff1;
+  --color-menu-cut: #dbeceb;
   --color-menu-cut-line: #4e8088;
-  --color-menu-color: #e1e7ef;      /* 灰青。紫は避ける */
+  --color-menu-color: #dfe6f2;      /* 灰青。紫は避ける */
   --color-menu-color-line: #5a6e8c;
-  --color-menu-perm: #d9e4cd;
+  --color-menu-perm: #dceacd;
   --color-menu-perm-line: #617b4b;
-  --color-menu-care: #e4ddd3;
+  --color-menu-care: #ede4d7;
   --color-menu-care-line: #7f7262;
 
   --color-chat: #8de055;       /* 送信文面の吹き出し（LINE のトーク画面の緑）。この用途以外には使わない */
 
   /* Web フォントは読み込まない（外部通信なし）。OS の日本語フォントを使う */
+  /* 店名と大きな見出しだけ明朝。欧文は OS のセリフ体（macOS は New York）、和文はヒラギノ明朝 / 游明朝 */
+  --font-serif: ui-serif, 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', Georgia, serif;
   --font-sans: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic UI', Meiryo, system-ui, sans-serif;
 }
 

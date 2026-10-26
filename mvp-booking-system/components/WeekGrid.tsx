@@ -15,14 +15,15 @@ const SHORT_H = 48;
 type MenuKind = 'cut' | 'color' | 'perm' | 'care';
 
 /** 週表示はメニュー種別で色分けする（Airリザーブの週表示と同じ考え方）。クラスは Tailwind が拾えるよう文字列のまま書く */
-const KIND: Record<MenuKind, { label: string; block: string }> = {
-  cut:   { label: 'カット',     block: 'bg-menu-cut border-menu-cut-line' },
-  color: { label: 'カラー',     block: 'bg-menu-color border-menu-color-line' },
-  perm:  { label: 'パーマ',     block: 'bg-menu-perm border-menu-perm-line' },
-  care:  { label: 'スパ・ケア', block: 'bg-menu-care border-menu-care-line' },
+/** block は予定ブロック用（枠は同系色を薄く引いて面で見せる）、swatch は凡例用（小さいので枠を濃くして見分けやすくする） */
+export const KIND: Record<MenuKind, { label: string; block: string; swatch: string }> = {
+  cut:   { label: 'カット',     block: 'bg-menu-cut border-menu-cut-line/25',     swatch: 'bg-menu-cut border-menu-cut-line' },
+  color: { label: 'カラー',     block: 'bg-menu-color border-menu-color-line/25', swatch: 'bg-menu-color border-menu-color-line' },
+  perm:  { label: 'パーマ',     block: 'bg-menu-perm border-menu-perm-line/25',   swatch: 'bg-menu-perm border-menu-perm-line' },
+  care:  { label: 'スパ・ケア', block: 'bg-menu-care border-menu-care-line/25',   swatch: 'bg-menu-care border-menu-care-line' },
 };
 
-function menuKind(service: string): MenuKind {
+export function menuKind(service: string): MenuKind {
   if (service.includes('カラー')) return 'color';
   if (service.includes('パーマ')) return 'perm';
   if (service.includes('カット')) return 'cut';
@@ -34,7 +35,7 @@ export function WeekLegend() {
     <ul aria-label="色の見方" className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-dim">
       {(Object.keys(KIND) as MenuKind[]).map(k => (
         <li key={k} className="flex items-center gap-1.5">
-          <span aria-hidden="true" className={`size-3 rounded-[3px] border ${KIND[k].block}`} />{KIND[k].label}
+          <span aria-hidden="true" className={`size-3 rounded-[3px] border ${KIND[k].swatch}`} />{KIND[k].label}
         </li>
       ))}
       <li className="flex items-center gap-1.5"><span aria-hidden="true" className="size-2 rounded-full bg-attn" />確定待ち</li>
@@ -50,8 +51,8 @@ export default function WeekGrid({ days, reservations, today, nowMin, onPickDay 
   const cols = { gridTemplateColumns: `56px repeat(${days.length}, minmax(0, 1fr))` };
   const byDay = (d: string) => sortByDateTime(reservations.filter(r => r.reservation_date === d));
   return (
-    <div className="border border-line rounded-lg overflow-hidden">
-      <div className="grid border-b border-line bg-muted" style={cols}>
+    <div className="rounded-xl overflow-hidden bg-canvas shadow-[0_0_0_1px_var(--color-line),0_1px_2px_rgba(60,45,30,0.04)]">
+      <div className="grid border-b border-line" style={cols}>
         <div />
         {days.map(d => {
           const { day, weekday } = dayParts(d);
@@ -60,10 +61,10 @@ export default function WeekGrid({ days, reservations, today, nowMin, onPickDay 
           return (
             <button key={d} type="button" onClick={() => onPickDay(d)}
               aria-label={`${formatShortDate(d)}${isToday ? '（本日）' : ''} ${count}件。日表示で見る`}
-              className="border-l border-line px-2 py-2 text-left hover:bg-subtle focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand">
+              className="border-l border-line px-2.5 py-2.5 text-left hover:bg-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand">
               <span className="block text-xs text-dim">{weekday}</span>
               <span className="flex items-center gap-1.5 mt-0.5">
-                <span className={`inline-flex items-center justify-center h-7 min-w-7 px-1 rounded-md text-sm font-bold tabular-nums ${isToday ? 'bg-brand text-white' : 'text-ink'}`}>{day}</span>
+                <span className={`inline-flex items-center justify-center h-7 min-w-7 px-1 rounded-full text-[15px] font-bold tabular-nums ${isToday ? 'bg-brand text-white' : 'text-ink'}`}>{day}</span>
                 <span className="text-xs text-dim tabular-nums">{count > 0 ? `${count}件` : ''}</span>
               </span>
             </button>
@@ -94,7 +95,7 @@ function DayColumn({ list, nowMin, past }: { list: Reservation[]; nowMin: number
       {HOURS.map((h, i) => (
         <div key={h}>
           {i > 0 && <div className="absolute left-0 right-0 border-t border-line" style={{ top: i * HOUR_H + 3 }} />}
-          <div className="absolute left-0 right-0 border-t border-dotted border-line" style={{ top: i * HOUR_H + HOUR_H / 2 + 3 }} />
+          <div className="absolute left-0 right-0 border-t border-dotted border-line/70" style={{ top: i * HOUR_H + HOUR_H / 2 + 3 }} />
         </div>
       ))}
       {placeInLanes(list).map(({ r, lane, lanes }) => {
@@ -131,7 +132,7 @@ function WeekBlock({ r, tall, short, narrow }: { r: Reservation; tall: boolean; 
   return (
     <Link href={`/reservations/${r.id}`}
       aria-label={`${r.reservation_time}–${endTime(r)} ${r.customer_name}様 ${r.service_name} 担当${r.staff} ${STATUS_LABEL[r.status]}${needsAttention(r) ? ' 確認通知未送信' : ''}${fresh ? ' 新着' : ''}`}
-      className={`block h-full overflow-hidden rounded-[5px] px-1.5 py-1 text-[11px] leading-[15px] hover:brightness-[0.97] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${look} ${fresh ? 'ring-1 ring-accent' : ''}`}>
+      className={`block h-full overflow-hidden rounded-md px-1.5 py-1 text-[11px] leading-[15px] hover:brightness-[0.97] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${look} ${fresh ? 'ring-1 ring-accent' : ''}`}>
       <p className="flex items-center gap-1 min-w-0">
         {!(short && narrow) && <span className="tabular-nums text-body shrink-0">{r.reservation_time}</span>}
         {(!narrow || short) && name}

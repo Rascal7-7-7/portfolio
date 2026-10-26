@@ -38,7 +38,7 @@ export function PageHeader({ title, description, action }: {
   return (
     <div className="mb-6 md:mb-8">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-xl font-bold text-ink text-balance">{title}</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-ink text-balance">{title}</h1>
         {action && <div className="shrink-0">{action}</div>}
       </div>
       {description && <p className="text-sm text-dim mt-1 text-pretty max-w-2xl">{description}</p>}
@@ -52,18 +52,18 @@ export function StatStrip({ items }: {
   items: { label: string; value: number | string; unit?: string; note?: string; alert?: boolean }[];
 }) {
   return (
-    <dl className="grid grid-cols-3 border border-line rounded-lg divide-x divide-line mb-8">
+    <dl className="grid grid-cols-3 rounded-xl bg-canvas divide-x divide-line shadow-[0_0_0_1px_var(--color-line),0_1px_2px_rgba(60,45,30,0.04)] mb-8">
       {items.map(({ label, value, unit = '件', note, alert }) => (
-        <div key={label} className="px-3 py-3 md:px-5 md:py-4 min-w-0">
+        <div key={label} className="px-3 py-3 md:px-6 md:py-5 min-w-0">
           <dt className="text-xs text-dim">{label}</dt>
           {typeof value === 'string' ? (
             <dd className="mt-1 min-h-8 flex items-center text-sm font-bold text-ink text-pretty">{value}</dd>
           ) : (
-            <dd className={`mt-1 text-2xl font-bold tabular-nums ${alert ? 'text-attn' : 'text-ink'}`}>
+            <dd className={`mt-1.5 text-2xl md:text-[28px] leading-none font-bold tracking-tight tabular-nums ${alert ? 'text-attn' : 'text-ink'}`}>
               {value}<span className="text-xs font-normal text-dim ml-0.5">{unit}</span>
             </dd>
           )}
-          {note && <dd className={`hidden sm:block text-xs mt-1 ${alert ? 'text-attn font-medium' : 'text-dim'}`}>{note}</dd>}
+          {note && <dd className={`hidden sm:block text-xs mt-2 ${alert ? 'text-attn font-medium' : 'text-dim'}`}>{note}</dd>}
         </div>
       ))}
     </dl>

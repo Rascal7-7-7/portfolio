@@ -168,7 +168,7 @@ function DateInput({ id, name, defaultValue, min }: { id: string; name: string; 
 
 function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <fieldset className="border border-line rounded-lg">
+    <fieldset className="bg-canvas border border-line rounded-xl">
       <legend className="sr-only">{title}</legend>
       <p className="px-5 py-3 border-b border-line text-sm font-medium text-ink" aria-hidden="true">{title}</p>
       <div className="p-5">{children}</div>
