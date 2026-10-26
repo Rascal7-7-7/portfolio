@@ -22,11 +22,11 @@ const closing =
 /** カードにも小見出しにもせず、文章として読ませる。 */
 export function About() {
   return (
-    <section id="about" className="py-8 sm:py-10" aria-labelledby="about-heading">
+    <section id="about" className="py-20 sm:py-28 border-t border-rule" aria-labelledby="about-heading">
       <div className={container}>
-        <SectionHeader id="about-heading" title="自己紹介" className="mb-2" />
+        <SectionHeader id="about-heading" index="02" title="自己紹介" />
 
-        <div className="reveal space-y-4 leading-[1.8] text-ink-muted">
+        <div className="reveal space-y-6 leading-[1.9] text-ink-muted">
           {paragraphs.map((sentences) => (
             <p key={sentences[0]}>{sentences.join("")}</p>
           ))}

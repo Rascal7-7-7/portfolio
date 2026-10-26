@@ -30,12 +30,34 @@ body {
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   /*
-   * 日本語を文節の切れ目で折り返す（「コー／ヒー」のような語中改行を防ぐ）。
-   * auto-phrase は lang="ja" の要素でだけ効き、未対応ブラウザでは通常の折り返しになる。
-   * 文節が1行に収まらないときに横へはみ出さないよう break-word を併用する。
+   * 本文は通常の日本語の折り返し（どの字の間でも折り返し、句読点は行頭に来ない）。
+   * 文節単位の折り返し（auto-phrase）を長い段落にかけると行末がガタガタになるため、
+   * 見出しと短い文（.phrase）だけに限る。
    */
-  word-break: auto-phrase;
+  line-break: strict;
   overflow-wrap: break-word;
+}
+
+/*
+ * 和文と英字のあいだに小さな隙間を入れる（未対応ブラウザでは何も起きない）。
+ * 数字には入れない（「2028 年 3 月」のように日付が間延びするため）。
+ */
+@supports (text-autospace: ideograph-alpha) {
+  body {
+    text-autospace: ideograph-alpha;
+  }
+}
+
+/*
+ * 見出しと短い文は文節の切れ目で折り返す（「コー／ヒー」のような語中改行を防ぐ）。
+ * auto-phrase は lang="ja" の要素でだけ効き、未対応ブラウザでは通常の折り返しになる。
+ */
+h1,
+h2,
+h3,
+h4,
+.phrase {
+  word-break: auto-phrase;
 }
 
 h1,
@@ -66,6 +88,46 @@ dd {
 ::selection {
   background: #1d4a63;
   color: #ededeb;
+}
+
+/*
+ * 製図の方眼。トップの 3D の背後にだけ薄く敷き、中心から外へ溶かす。
+ * 罫の色は rule より薄くし、文字の読みやすさには影響させない。
+ */
+.blueprint {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center top;
+  mask-image: radial-gradient(ellipse 60% 70% at 50% 40%, #000 30%, transparent 75%);
+}
+
+/*
+ * 傾くカード（TiltCard）の光沢。マウスの位置に淡い光を置き、ガラス越しの画面写真に見せる。
+ * 光は hover しているあいだだけ出す。
+ */
+.tilt-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.375rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  background: radial-gradient(
+    circle at var(--glare-x, 50%) var(--glare-y, 50%),
+    rgb(255 255 255 / 0.16),
+    transparent 55%
+  );
+}
+
+.tilt-card:hover {
+  box-shadow: 0 24px 48px -24px rgb(92 203 255 / 0.25);
+}
+
+.tilt-card:hover::after {
+  opacity: 1;
 }
 
 /*

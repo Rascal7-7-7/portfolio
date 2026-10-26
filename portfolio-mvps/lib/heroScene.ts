@@ -26,8 +26,15 @@ const TRAIL = 0.7;
 /** 最初の 1 枚。動きを減らす設定の利用者にはこの時点の静止画を出す */
 const WARMUP_SECONDS = 4;
 
+/** 図の中で数えた件数。注入は層で止まるため、核に届くのは通常の入力だけ */
+export type HeroStats = {
+  readonly reached: number;
+  readonly blocked: number;
+};
+
 export type HeroScene = {
   start: () => void;
+  getStats: () => HeroStats;
   stop: () => void;
   renderStatic: () => void;
   setPointer: (x: number, y: number) => void;
@@ -229,12 +236,19 @@ export function createHeroScene(T: Three, canvas: HTMLCanvasElement): HeroScene 
 
   const pointer = { x: 0, y: 0 };
   let elapsed = 0;
+  let stats: HeroStats = { reached: 0, blocked: 0 };
 
   function advance(dt: number) {
     elapsed += dt;
     particles = particles.map((p) => {
       const { particle, hit } = step(p, dt, rand);
-      if (hit) fireBurst(hit);
+      if (hit) {
+        fireBurst(hit);
+        stats = { ...stats, blocked: stats.blocked + 1 };
+      } else if (particle.r > p.r) {
+        // 半径が増えた = 核に届いて、外側で生まれ直した
+        stats = { ...stats, reached: stats.reached + 1 };
+      }
       return particle;
     });
     writeParticles();
@@ -275,6 +289,7 @@ export function createHeroScene(T: Three, canvas: HTMLCanvasElement): HeroScene 
 
   // 粒が出そろった状態から始める
   for (let t = 0; t < WARMUP_SECONDS; t += 1 / 60) advance(1 / 60);
+  stats = { reached: 0, blocked: 0 };
 
   return {
     start() {
@@ -282,6 +297,7 @@ export function createHeroScene(T: Three, canvas: HTMLCanvasElement): HeroScene 
       last = 0;
       raf = requestAnimationFrame(frame);
     },
+    getStats: () => stats,
     stop() {
       cancelAnimationFrame(raf);
       raf = 0;

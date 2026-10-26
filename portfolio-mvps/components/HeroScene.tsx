@@ -1,19 +1,25 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { HeroScene as Scene } from "@/lib/heroScene";
+import type { HeroScene as Scene, HeroStats } from "@/lib/heroScene";
 import { cn } from "@/lib/cn";
+import { container } from "./ui/container";
+
+const STATS_INTERVAL_MS = 250;
+const number = new Intl.NumberFormat("ja-JP");
 
 /**
  * トップの 3D を載せる canvas。three.js は表示後に読み込み、最初の表示を遅らせない。
  * - WebGL が使えない環境では何も描かず、背後の光（CSS）だけが残る
  * - 動きを減らす設定の利用者には静止画を 1 枚だけ描く
  * - 画面外やタブが裏にあるあいだは描画を止める
+ * 左上に、図の中で数えた件数を等幅で出す（動いているあいだだけ）。
  */
 export function HeroScene({ className }: { className?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
+  const [stats, setStats] = useState<HeroStats | null>(null);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -68,7 +74,10 @@ export function HeroScene({ className }: { className?: string }) {
       };
       window.addEventListener("pointermove", onPointer, { passive: true });
 
+      const timer = window.setInterval(() => setStats(s.getStats()), STATS_INTERVAL_MS);
+
       cleanups.push(
+        () => window.clearInterval(timer),
         () => io.disconnect(),
         () => document.removeEventListener("visibilitychange", sync),
         () => window.removeEventListener("pointermove", onPointer),
@@ -96,6 +105,24 @@ export function HeroScene({ className }: { className?: string }) {
           ready ? "opacity-100" : "opacity-0",
         )}
       />
+      {stats && (
+        <div className={cn(container, "absolute inset-x-0 top-6 sm:top-10")}>
+          <dl className="grid w-fit grid-cols-[auto_auto] gap-x-6 gap-y-1 font-mono text-[12px] leading-5 text-ink-subtle tabular-nums">
+            <dt>
+              <span className="mr-2 inline-block size-1.5 rounded-full bg-accent align-middle" />
+              核に届いた入力
+            </dt>
+            <dd className="text-right text-ink-muted">{number.format(stats.reached)}</dd>
+            <dt>
+              <span className="mr-2 inline-block size-1.5 rounded-full bg-danger align-middle" />
+              層で止めた注入
+            </dt>
+            <dd className="text-right text-ink-muted">{number.format(stats.blocked)}</dd>
+            <dt className="pl-3.5">注入の到達</dt>
+            <dd className="text-right text-ink">0</dd>
+          </dl>
+        </div>
+      )}
     </div>
   );
 }

@@ -6,15 +6,16 @@ import { container } from "./ui/container";
 
 export function Contact() {
   return (
-    <section id="contact" className="pt-8 pb-14 sm:pt-10 sm:pb-16" aria-labelledby="contact-heading">
+    <section id="contact" className="py-20 sm:py-28 border-t border-rule" aria-labelledby="contact-heading">
       <div className={container}>
         <SectionHeader
           id="contact-heading"
+          index="03"
           title="連絡先"
           description="インターン・選考のご連絡、作品やコードについてのご質問は、メールでお願いします。"
         />
 
-        <div className="flex flex-col items-start sm:flex-row sm:gap-6">
+        <div className="reveal flex flex-col items-start gap-1 sm:flex-row sm:gap-8">
           <TextLink
             href={profile.links.github}
             target="_blank"

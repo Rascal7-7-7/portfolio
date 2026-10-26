@@ -13,33 +13,33 @@ export function FeaturedProject({ project }: { project: Project }) {
   const { slug, headline, summary, highlights, evidence, diagram } = project;
 
   return (
-    <article className="reveal py-8 border-t border-rule">
+    <article className="reveal py-12 sm:py-16 border-t border-rule">
       <ProjectTitle project={project} as="h3" className="text-xl sm:text-2xl" />
-      <p className="mt-1 text-[17px] font-medium leading-relaxed text-ink">{headline}</p>
+      <p className="phrase mt-2 text-[17px] sm:text-lg font-medium leading-relaxed text-ink">{headline}</p>
 
       {diagram && (
         <>
-          <FlowRow id={`${slug}-row`} diagram={diagram} className="mt-5 hidden sm:block" />
+          <FlowRow id={`${slug}-row`} diagram={diagram} className="mt-8 hidden sm:block" />
           <FlowDiagram
             id={`${slug}-compact`}
             diagram={diagram}
             compact
-            className="mt-5 sm:hidden"
+            className="mt-8 sm:hidden"
           />
         </>
       )}
-      <p className="mt-3 leading-[1.8] text-ink-muted">{summary}</p>
+      <p className="mt-6 leading-[1.9] text-ink-muted">{summary}</p>
 
-      <ul className="mt-4 list-disc pl-5 space-y-1 leading-relaxed text-ink-muted marker:text-ink-subtle">
+      <ul className="mt-5 list-disc pl-5 space-y-2 leading-relaxed text-ink-muted marker:text-ink-subtle">
         {highlights.map(({ label }) => (
           <li key={label}>{label}</li>
         ))}
       </ul>
 
-      {evidence && <EvidenceLog lines={evidence} className="mt-6" />}
+      {evidence && <EvidenceLog lines={evidence} className="mt-8" />}
 
-      <MetaLine project={project} className="mt-5" />
-      <div className="mt-1">
+      <MetaLine project={project} className="mt-8" />
+      <div className="mt-2">
         <ProjectLinks project={project} />
       </div>
     </article>

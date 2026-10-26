@@ -23,26 +23,29 @@ function Interests() {
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pb-6 sm:pb-8" aria-labelledby="hero-heading">
+    <section className="relative overflow-hidden pb-20 sm:pb-28" aria-labelledby="hero-heading">
       {/*
-        上部の 3D の舞台。WebGL が使えない環境や読み込み前は、背後の光（hero-glow）だけが見える。
+        上部の 3D の舞台。WebGL が使えない環境や読み込み前は、背後の方眼と光だけが見える。
         見出しは舞台の下端に少し重ねて置く。
       */}
+      <div className="blueprint absolute inset-x-0 top-0 h-[52svh] sm:h-[60svh]" aria-hidden="true" />
       <div className="hero-glow absolute inset-x-0 top-0 h-[52svh] sm:h-[60svh]" aria-hidden="true" />
       <HeroScene className="absolute inset-x-0 top-0 h-[52svh] sm:h-[60svh]" />
 
       <div className={cn(container, "relative pt-[42svh] sm:pt-[46svh]")}>
-        {/* 誰か。名前は控えめにし、主役は「何をする人か」の見出しにする */}
-        <p className="hero-in text-[15px] text-ink-muted mb-6">
-          <span className="font-medium text-ink">{profile.name}</span>
-          <span className="ml-2 text-ink-subtle">{profile.nameReading}</span>
-          <br />
-          <span className="inline-block">{profile.school}</span>{" "}
-          <span className="inline-block">{profile.department}</span>{" "}
-          <span className="inline-block">{profile.graduation}</span>
-          <br />
-          <span className="inline-block">{profile.aim}</span>
-        </p>
+        {/* 誰か。名前は控えめにし、主役は「何をする人か」の見出しにする。項目ごとに行を分け、途中で折り返さない */}
+        <div className="hero-in mb-6 text-[15px] leading-[1.7]">
+          <p>
+            <span className="font-medium text-ink">{profile.name}</span>
+            <span className="ml-2 text-ink-subtle">{profile.nameReading}</span>
+          </p>
+          <p className="text-ink-muted">{profile.aim}</p>
+          <p className="text-ink-subtle">
+            <span className="inline-block">{profile.school}</span>{" "}
+            <span className="inline-block">{profile.department}</span>{" "}
+            <span className="inline-block">{profile.graduation}</span>
+          </p>
+        </div>
 
         {/* 何をする人か。語の途中で折り返さないよう、意味の切れ目ごとに inline-block で区切る */}
         <h1
@@ -72,33 +75,26 @@ export function Hero() {
           </ButtonLink>
         </div>
 
-        <p className="hero-in [animation-delay:360ms] text-[17px] leading-[1.8] text-ink-muted mb-4">
-          生成AIをアプリに組み込むなかで、<span className="whitespace-nowrap">Prompt Injection</span> や Jailbreak といった
-          AI特有のセキュリティ問題に
-          {/*
-            390px 幅で「関心を／持つように」と折り返さないよう文節をまとめる。
-            auto-phrase は nowrap の直後で改行しないため、wbr で切れ目を明示する。
-          */}
-          <span className="whitespace-nowrap">関心を持つように</span>
-          <wbr />
-          なり、AI と作った音声エージェントで実際に{" "}
-          <span className="whitespace-nowrap">Prompt Injection を</span>流して防御を検証しました。小さな作品は公開デモで、代表作はソースコードで確認できます。
+        <p className="hero-in [animation-delay:360ms] mb-5 text-[17px] leading-[1.9] text-ink-muted">
+          生成AIをアプリに組み込むなかで、Prompt Injection や Jailbreak といったAI特有のセキュリティ問題に関心を持つようになり、AI と作った音声エージェントで実際に Prompt Injection を流して防御を検証しました。小さな作品は公開デモで、代表作はソースコードで確認できます。
         </p>
 
         {/* 上の 3D が何を表しているか。色の意味を一度だけ言葉で示す */}
-        <p className="hero-in [animation-delay:480ms] mb-8 text-sm text-ink-subtle">
-          <span className="inline-block">
-            <span className="mr-1.5 inline-block size-2 rounded-full bg-accent align-middle" aria-hidden="true" />
-            通常の入力は中心の LLM まで届き、
-          </span>
-          <span className="inline-block">
-            <span className="mr-1.5 inline-block size-2 rounded-full bg-danger align-middle" aria-hidden="true" />
-            注入された命令は手前のポリシー層で止まる
-          </span>
-          <span className="inline-block">（JARVIS の設計を図にしたもの）</span>
-        </p>
+        <div className="hero-in [animation-delay:480ms] mb-10 text-sm leading-[1.8] text-ink-subtle">
+          <p>上の図は、代表作 JARVIS の設計を表したものです。</p>
+          <ul>
+            <li>
+              <span className="mr-2 inline-block size-2 rounded-full bg-accent align-middle" aria-hidden="true" />
+              通常の入力は、中心の LLM まで届く
+            </li>
+            <li>
+              <span className="mr-2 inline-block size-2 rounded-full bg-danger align-middle" aria-hidden="true" />
+              注入された命令は、手前のポリシー層で止まる
+            </li>
+          </ul>
+        </div>
 
-        <div className="hero-in [animation-delay:600ms] space-y-1">
+        <div className="hero-in [animation-delay:600ms] space-y-1.5 border-t border-rule pt-6">
           <Interests />
           <p className="text-[15px] text-ink-subtle">{profile.activity}</p>
           <p className="text-[15px] text-ink-subtle">
