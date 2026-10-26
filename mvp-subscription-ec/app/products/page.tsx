@@ -98,7 +98,8 @@ export default function ProductsPage() {
             className="group mt-10 flex max-w-md items-center gap-4 border-t border-outline-variant/60 pt-6 sm:mt-12"
             aria-label={`${hero.name}の商品ページへ`}
           >
-            <ProductVisual product={hero} decorative className="h-20 w-16 flex-shrink-0" />
+            {/* 一覧の線画と同じパッケージを、ここだけ木のテーブルの写真に置いて「届いたときの姿」を見せる */}
+            <ProductVisual product={hero} decorative backdrop="/photos/table.webp" className="h-[120px] w-24 flex-shrink-0" />
             <div className="min-w-0">
               <p className="text-xs text-on-surface-variant">
                 <Phrases parts={['今月のおすすめ・', ...hero.nameParts, heroSize ? `（${heroSize}）` : '']} />

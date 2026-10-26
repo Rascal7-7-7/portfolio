@@ -125,6 +125,7 @@ export const SAMPLES: readonly LPDoc[] = [
       owner: {
         role: '院長',
         name: '日向 誠',
+        photo: '/samples/hidamari-owner.webp',
         message: '開業前は整形外科で8年間リハビリを担当していました。痛みを我慢しながら通う方を多く見てきたので、ここでは強く押したり鳴らしたりしない施術にこだわっています。まずはお体の状態を一緒に確かめるところから始めましょう。',
       },
     },
