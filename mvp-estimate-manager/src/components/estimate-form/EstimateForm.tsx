@@ -116,7 +116,7 @@ export default function EstimateForm({ initial }: Props) {
           <button
             type="button"
             onClick={() => appendItem(emptyItem())}
-            className="mt-2 inline-flex items-center gap-1 rounded py-1 text-sm font-semibold text-primary hover:text-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+            className="mt-2 inline-flex min-h-11 items-center gap-1 rounded py-1 text-sm font-semibold sm:min-h-0 text-primary hover:text-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
           >
             <Icon name="plus" />
             行を追加
@@ -130,7 +130,7 @@ export default function EstimateForm({ initial }: Props) {
                   key={preset.name}
                   type="button"
                   onClick={() => appendItem(toDraftItem(preset))}
-                  className="rounded border border-line bg-white px-2 py-1 text-xs text-body hover:border-slate-300 hover:bg-canvas hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                  className="min-h-11 rounded border border-line bg-white px-2.5 py-1 text-xs text-body sm:min-h-0 hover:border-slate-300 hover:bg-canvas hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                 >
                   + {preset.name}
                 </button>
@@ -149,7 +149,7 @@ export default function EstimateForm({ initial }: Props) {
             </p>
             <p className="mt-1 flex items-baseline justify-between border-t border-navy pt-2">
               <span className="font-semibold text-navy">合計（税込）</span>
-              <span className="text-2xl font-semibold text-navy">{formatYen(totals.total)}</span>
+              <span key={totals.total} className="num-tick text-2xl font-semibold text-navy">{formatYen(totals.total)}</span>
             </p>
           </section>
         </fieldset>
@@ -193,11 +193,11 @@ export default function EstimateForm({ initial }: Props) {
       <div className="fixed inset-x-0 bottom-[calc(3.8125rem+env(safe-area-inset-bottom))] z-30 flex items-center justify-between gap-3 border-t border-line bg-white px-4 py-2 md:bottom-0 md:left-60 md:pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:pl-8 md:pr-8 xl:hidden print:hidden">
         <p className="tnum min-w-0">
           <span className="block text-xs text-muted">合計（税込）</span>
-          <span className="block text-lg font-semibold leading-tight text-navy">{formatYen(totals.total)}</span>
+          <span key={totals.total} className="num-tick block text-lg font-semibold leading-tight text-navy">{formatYen(totals.total)}</span>
         </p>
         <a
           href="#estimate-preview"
-          className="inline-flex shrink-0 items-center gap-1 rounded border border-line px-3 py-2 text-sm font-semibold text-primary hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded border border-line px-3 py-2 text-sm font-semibold text-primary hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           見積書を確認
           <span aria-hidden="true">↓</span>
