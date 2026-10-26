@@ -76,7 +76,7 @@ const config: Config = {
         'inverse-primary': '#afd4a5',
       },
       fontFamily: {
-        headline: ['var(--font-headline)', 'var(--font-body-jp)', 'sans-serif'],
+        headline: ['var(--font-headline)', 'var(--font-display-jp)', 'var(--font-body-jp)', 'serif'],
         body: ['var(--font-body-jp)', 'var(--font-label)', 'sans-serif'],
         label: ['var(--font-label)', 'sans-serif'],
       },

@@ -1,4 +1,5 @@
 import type { Metadata, ResolvingMetadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
@@ -8,7 +9,7 @@ import { Phrases } from '@/components/Phrases';
 import { PlanPicker } from './_components/PlanPicker';
 import { unitPrice, yen } from '@/lib/pricing';
 import { cn } from '@/lib/cn';
-import type { TasteAxis } from '@/lib/types';
+import type { Product, TasteAxis } from '@/lib/types';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -49,8 +50,10 @@ export default async function ProductDetailPage({ params }: Params) {
       </Link>
 
       <div className="grid gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-14">
-        <div className="lg:sticky lg:top-24 lg:self-start">
+        {/* パッケージ（SVG）を主役に、広い画面では下に素材の写真を添えて左列の空白を埋める */}
+        <div className="space-y-4">
           <ProductVisual product={product} className="aspect-[3/2] sm:aspect-[5/4] lg:aspect-square" />
+          <ProductPhotoFigure product={product} className="hidden lg:block" />
         </div>
 
         <div>
@@ -58,17 +61,17 @@ export default async function ProductDetailPage({ params }: Params) {
             {product.category}
             {product.badge && <span>・{product.badge}</span>}
           </p>
-          <h1 className="mt-2 font-headline text-3xl font-light leading-snug tracking-[-0.01em] text-on-background sm:text-4xl">
+          <h1 className="mt-2 font-headline text-3xl font-normal leading-snug tracking-[0.02em] text-on-background sm:text-[2.5rem]">
             <Phrases parts={product.nameParts} />
           </h1>
-          <p className="mt-3 text-base text-on-surface">
+          <p className="mt-4 font-headline text-lg text-on-surface">
             <Phrases parts={product.taglineParts} />
           </p>
-          <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
+          <p className="mt-3 text-sm leading-loose text-on-surface-variant">
             <Phrases parts={product.descriptionParts} />
           </p>
 
-          <div className="mt-6">
+          <div className="mt-8">
             <PlanPicker product={product} />
           </div>
 
@@ -113,6 +116,8 @@ export default async function ProductDetailPage({ params }: Params) {
               <dd className="text-on-surface">{product.taxRate === 8 ? '8%（軽減税率対象）' : '10%'}</dd>
             </div>
           </dl>
+
+          <ProductPhotoFigure product={product} className="mt-10 lg:hidden" />
         </div>
       </div>
     </main>
@@ -123,4 +128,15 @@ export default async function ProductDetailPage({ params }: Params) {
 function tasteWord({ low, high, value }: TasteAxis): string {
   if (value === 3) return '中間';
   return `${value < 3 ? low : high}め`;
+}
+
+function ProductPhotoFigure({ product, className }: { product: Product; className?: string }) {
+  return (
+    <figure className={className}>
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <Image src={product.photo.src} alt={product.photo.alt} fill sizes="(min-width: 1024px) 540px, 100vw" className="object-cover" />
+      </div>
+      <figcaption className="mt-3 text-xs text-on-surface-variant">{product.photo.caption}</figcaption>
+    </figure>
+  );
 }
