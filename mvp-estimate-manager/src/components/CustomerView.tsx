@@ -194,9 +194,9 @@ interface ApprovalProps {
 function ApprovalArea({ estimate, onApprove }: ApprovalProps) {
   if (estimate.status === "won") {
     return (
-      <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm">
-        <p className="flex items-center gap-2 font-semibold text-emerald-900">
-          <Icon name="check" className="h-4 w-4 text-emerald-600" />
+      <div role="status" className="rounded-xl border border-shu-line bg-shu-soft p-4 text-sm">
+        <p className="flex items-center gap-2 font-semibold text-shu-ink">
+          <Icon name="check" className="h-4 w-4 text-shu" />
           ご承認ありがとうございました
         </p>
         <p className="mt-1 text-balance text-body">{ISSUER.name}に承認をお知らせしました（デモ）。</p>

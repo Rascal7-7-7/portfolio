@@ -62,7 +62,7 @@ export default function KpiCards({ summary, monthly, base = null }: Props) {
           <dd className="tnum mt-1.5 flex flex-wrap items-baseline gap-x-2 text-[22px] font-semibold tracking-tight text-navy sm:text-[28px] sm:leading-tight">
             {kpi.value}
             {kpi.delta ? (
-              <span className="delta-in rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold tracking-normal text-emerald-800">
+              <span className="delta-in rounded-full bg-shu-soft px-2 py-0.5 text-xs font-semibold tracking-normal text-shu-ink">
                 <span className="sr-only">承認前から</span>
                 {kpi.delta}
               </span>
@@ -101,7 +101,7 @@ function WonTrend({ monthly }: { monthly: MonthlyAmount[] }) {
 
   return (
     <dd className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-      <svg width={SPARK_W} height={SPARK_H} viewBox={`0 0 ${SPARK_W} ${SPARK_H}`} aria-hidden="true" className="shrink-0 text-emerald-600">
+      <svg width={SPARK_W} height={SPARK_H} viewBox={`0 0 ${SPARK_W} ${SPARK_H}`} aria-hidden="true" className="shrink-0 text-shu">
         <polygon
           points={`${points[0].x},${SPARK_H} ${points.map((p) => `${p.x},${p.y}`).join(" ")} ${last.x},${SPARK_H}`}
           fill="currentColor"

@@ -20,7 +20,7 @@ export default function StatusStepper({ status }: { status: EstimateStatus }) {
               aria-hidden="true"
               className={cn(
                 "block h-1 rounded-full",
-                !done ? "bg-line" : i === 2 && status === "won" ? "bg-emerald-500" : i === 2 && status === "lost" ? "bg-slate-400" : "bg-primary",
+                !done ? "bg-line" : i === 2 && status === "won" ? "bg-shu" : i === 2 && status === "lost" ? "bg-slate-400" : "bg-primary",
               )}
             />
             <span className={cn("mt-1.5 block", i === current ? "font-semibold text-navy" : done ? "text-body" : "text-muted")}>
