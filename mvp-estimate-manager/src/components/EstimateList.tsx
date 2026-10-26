@@ -92,7 +92,7 @@ export default function EstimateList() {
                 aria-pressed={filter === tab.key}
                 onClick={() => setFilter(tab.key)}
                 className={cn(
-                  "-mb-px inline-flex shrink-0 items-baseline gap-1.5 whitespace-nowrap border-b-2 px-2 py-2.5 text-sm first:pl-0 sm:px-3 sm:first:pl-0",
+                  "-mb-px inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-2 py-2.5 text-sm first:pl-0 sm:px-3 sm:first:pl-0",
                   "focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary",
                   filter === tab.key
                     ? "border-primary font-semibold text-primary"
@@ -115,7 +115,7 @@ export default function EstimateList() {
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="取引先・件名で検索"
-              className="w-full rounded border border-line py-1.5 pl-8 pr-2 text-sm text-navy placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded border border-line py-2.5 pl-8 pr-2 text-base sm:py-1.5 sm:text-sm text-navy placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </label>
         </div>
@@ -129,7 +129,22 @@ export default function EstimateList() {
         </div>
 
         {visible.length === 0 ? (
-          <p className="py-10 text-center text-sm text-muted">該当する見積がありません</p>
+          <div className="border-b border-line py-12 text-center text-sm">
+            <p className="font-semibold text-navy">該当する見積がありません</p>
+            <p className="mt-1 text-muted">
+              {q ? `「${q}」に一致する取引先・件名はありません。` : "このステータスの見積はまだありません。"}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setFilter("all");
+                setKeyword("");
+              }}
+              className="mt-4 inline-flex min-h-11 items-center rounded border border-line bg-white px-4 text-sm font-semibold text-navy hover:bg-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:min-h-9"
+            >
+              絞り込みを解除
+            </button>
+          </div>
         ) : (
           <ul className="divide-y divide-line border-b border-line">
             {visible.map((e) => (

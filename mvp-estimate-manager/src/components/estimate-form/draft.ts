@@ -1,7 +1,7 @@
 import type { Estimate, EstimateInput, LineItem } from "@/types";
 import { PRESET_ITEMS, VALID_DAYS } from "@/data/seed";
 import { addDays, todayISO } from "@/lib/utils";
-import { itemErrors, parseAmount } from "./item-check";
+import { groupDigits, itemErrors, parseAmount } from "./item-check";
 
 /** フォーム入力中の明細。数値は入力途中の文字列のまま持つ */
 export interface DraftItem {
@@ -25,7 +25,7 @@ export function toDraftItem(item: Omit<LineItem, "id">): DraftItem {
     id: newItemId(),
     name: item.name,
     unit: item.unit,
-    unitPrice: String(item.unitPrice),
+    unitPrice: groupDigits(String(item.unitPrice)),
     quantity: String(item.quantity),
   };
 }

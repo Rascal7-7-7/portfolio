@@ -1,12 +1,12 @@
 "use client";
 
 import type { DraftItem } from "./draft";
-import { itemErrors } from "./item-check";
+import { groupDigits, itemErrors } from "./item-check";
 import { cn, formatYen } from "@/lib/utils";
 import Icon from "@/components/Icon";
 
 export const INPUT_CLASS =
-  "w-full rounded border border-line bg-white px-2.5 py-2 text-sm text-navy placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
+  "w-full rounded border border-line bg-white px-2.5 py-2.5 text-base text-navy sm:py-2 sm:text-sm placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
 
 const INVALID_CLASS = "border-rose-500 focus:border-rose-500 focus:ring-rose-500/20";
 
@@ -48,7 +48,7 @@ export default function ItemRows({ items, amounts, onChange, onRemove }: Props) 
                 onClick={() => onRemove(item.id)}
                 disabled={items.length === 1}
                 aria-label={`明細${n}を削除`}
-                className="rounded p-2 text-muted hover:bg-canvas hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary disabled:invisible"
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded text-muted hover:bg-canvas sm:h-9 sm:w-9 hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary disabled:invisible"
               >
                 <Icon name="trash" />
               </button>
@@ -81,6 +81,7 @@ export default function ItemRows({ items, amounts, onChange, onRemove }: Props) 
                 inputMode="numeric"
                 value={item.unitPrice}
                 onChange={(e) => onChange(item.id, { unitPrice: e.target.value })}
+                onBlur={(e) => onChange(item.id, { unitPrice: groupDigits(e.target.value) })}
                 aria-label={`明細${n} 単価（税抜・円）`}
                 aria-invalid={err.unitPrice ? true : undefined}
                 aria-describedby={describedBy}
