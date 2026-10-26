@@ -35,6 +35,8 @@ export interface Invoice {
   readonly dueOn: ISODate;
   readonly paidOn: ISODate | null;
   readonly estimateNo?: string;
+  /** 下書き（元の見積が承認待ち）。集計・未入金一覧には入れない */
+  readonly draft?: boolean;
   /** 明細（税抜）。合計は amount の税抜額と一致させる。無い請求は「案件名 1式」で表示 */
   readonly items?: readonly InvoiceItem[];
 }
@@ -42,10 +44,12 @@ export interface Invoice {
 export interface InvoiceItem {
   readonly name: string;
   readonly qty: string;
+  /** 単価（税抜）。見積書の単価列とそろえる */
+  readonly unitPrice: number;
   readonly amount: number;
 }
 
-export type InvoiceStatus = "paid" | "unpaid" | "overdue";
+export type InvoiceStatus = "draft" | "paid" | "unpaid" | "overdue";
 
 export interface AppData {
   readonly projects: readonly Project[];
@@ -68,6 +72,7 @@ export const PROJECT_STATUS_LABEL: Record<ProjectStatus, string> = {
 };
 
 export const INVOICE_STATUS_LABEL: Record<InvoiceStatus, string> = {
+  draft: "下書き",
   paid: "入金済",
   unpaid: "未入金",
   overdue: "期限超過",

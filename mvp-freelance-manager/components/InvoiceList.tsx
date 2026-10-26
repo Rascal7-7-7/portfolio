@@ -19,6 +19,7 @@ interface InvoiceListProps {
 }
 
 function dueText(invoice: Invoice, today: ISODate): string {
+  if (invoice.draft) return `見積 ${invoice.estimateNo ?? ""} の承認待ち`;
   if (invoice.paidOn) return `入金 ${formatDate(invoice.paidOn)}`;
   return `期日 ${formatDate(invoice.dueOn)}（${formatRelative(today, invoice.dueOn)}）`;
 }
@@ -59,13 +60,18 @@ export function InvoiceList({ invoices, data, today, empty, withProject = true }
                 {formatYen(inv.amount)}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => actions.setInvoicePaid(inv.id, !inv.paidOn)}
-              className={inv.paidOn ? buttonStyles.rowActionQuiet : buttonStyles.rowAction}
-            >
-              {inv.paidOn ? "入金を取消" : "入金済にする"}
-            </button>
+            {/* 下書きは発行前なので入金を記録できない。列をそろえるため同じ幅の空きを置く */}
+            {inv.draft ? (
+              <span aria-hidden className="hidden w-24 shrink-0 sm:block" />
+            ) : (
+              <button
+                type="button"
+                onClick={() => actions.setInvoicePaid(inv.id, !inv.paidOn)}
+                className={inv.paidOn ? buttonStyles.rowActionQuiet : buttonStyles.rowAction}
+              >
+                {inv.paidOn ? "入金を取消" : "入金済にする"}
+              </button>
+            )}
           </li>
         );
       })}

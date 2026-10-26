@@ -2,6 +2,7 @@ import type { AppData, Invoice, InvoiceStatus, ISODate, Project, Task } from "@/
 import { diffDays, monthKey, shiftMonth } from "./dates.ts";
 
 export function invoiceStatus(invoice: Invoice, today: ISODate): InvoiceStatus {
+  if (invoice.draft) return "draft";
   if (invoice.paidOn) return "paid";
   return diffDays(today, invoice.dueOn) < 0 ? "overdue" : "unpaid";
 }
@@ -12,6 +13,11 @@ export interface MonthlyRevenue {
   readonly paid: number;
   /** その月が支払期日の未入金額（入金見込み） */
   readonly expected: number;
+}
+
+/** 発行済みで未入金（下書きは含めない）。未入金の集計・一覧はすべてこれを通す */
+export function isOutstanding(invoice: Invoice): boolean {
+  return !invoice.draft && !invoice.paidOn;
 }
 
 /** 今月を含む直近 months ヶ月の入金額・入金見込み */
@@ -26,43 +32,56 @@ export function monthlyRevenue(
       .filter((inv) => inv.paidOn && monthKey(inv.paidOn) === month)
       .reduce((sum, inv) => sum + inv.amount, 0);
     const expected = invoices
-      .filter((inv) => !inv.paidOn && monthKey(inv.dueOn) === month)
+      .filter((inv) => isOutstanding(inv) && monthKey(inv.dueOn) === month)
       .reduce((sum, inv) => sum + inv.amount, 0);
     return { month, paid, expected };
   });
 }
 
 export interface DashboardSummary {
+  /** 今月入金された額（月次グラフの今月の入金と同じ） */
   readonly thisMonthPaid: number;
-  readonly thisMonthExpected: number;
+  /** 今月が期日の請求（入金済・未入金の両方） */
+  readonly thisMonthDueTotal: number;
+  readonly thisMonthDueCount: number;
+  /** うち入金済の額 */
+  readonly thisMonthDuePaid: number;
+  /** 発行済みで未入金の合計（期限超過・今月期日・来月以降すべて） */
   readonly outstandingTotal: number;
-  readonly outstandingCount: number;
   readonly overdueCount: number;
   readonly overdueTotal: number;
-  /** 来月以降が期日の未入金（月次グラフの今月分には入らない額） */
+  /** 来月以降が期日の未入金（今後の入金予定） */
   readonly laterDueTotal: number;
+  readonly laterDueCount: number;
   readonly activeProjectCount: number;
   readonly activeProjectAmount: number;
   readonly todayTaskCount: number;
   readonly overdueTaskCount: number;
 }
 
+const sum = (invoices: readonly Invoice[]): number => invoices.reduce((total, inv) => total + inv.amount, 0);
+
 export function dashboardSummary(data: AppData, today: ISODate): DashboardSummary {
-  const [revenue] = monthlyRevenue(data.invoices, today, 1);
-  const unpaid = data.invoices.filter((inv) => !inv.paidOn);
+  const month = monthKey(today);
+  const issued = data.invoices.filter((inv) => !inv.draft);
+  const unpaid = issued.filter(isOutstanding);
   const overdue = unpaid.filter((inv) => invoiceStatus(inv, today) === "overdue");
+  const dueThisMonth = issued.filter((inv) => monthKey(inv.dueOn) === month);
+  const later = unpaid.filter((inv) => monthKey(inv.dueOn) > month);
   const active = data.projects.filter((p) => p.status === "in_progress");
   const openTasks = data.tasks.filter((t) => !t.done);
   return {
-    thisMonthPaid: revenue.paid,
-    thisMonthExpected: revenue.expected,
-    outstandingTotal: unpaid.reduce((sum, inv) => sum + inv.amount, 0),
-    outstandingCount: unpaid.length,
+    thisMonthPaid: sum(issued.filter((inv) => inv.paidOn && monthKey(inv.paidOn) === month)),
+    thisMonthDueTotal: sum(dueThisMonth),
+    thisMonthDueCount: dueThisMonth.length,
+    thisMonthDuePaid: sum(dueThisMonth.filter((inv) => inv.paidOn)),
+    outstandingTotal: sum(unpaid),
     overdueCount: overdue.length,
-    overdueTotal: overdue.reduce((sum, inv) => sum + inv.amount, 0),
-    laterDueTotal: unpaid.filter((inv) => monthKey(inv.dueOn) > revenue.month).reduce((sum, inv) => sum + inv.amount, 0),
+    overdueTotal: sum(overdue),
+    laterDueTotal: sum(later),
+    laterDueCount: later.length,
     activeProjectCount: active.length,
-    activeProjectAmount: active.reduce((sum, p) => sum + p.amount, 0),
+    activeProjectAmount: active.reduce((total, p) => total + p.amount, 0),
     todayTaskCount: openTasks.filter((t) => diffDays(today, t.dueDate) <= 0).length,
     overdueTaskCount: openTasks.filter((t) => diffDays(today, t.dueDate) < 0).length,
   };
@@ -77,7 +96,8 @@ export interface ProjectProgress {
 
 export function projectProgress(project: Project, data: AppData): ProjectProgress {
   const tasks = data.tasks.filter((t) => t.projectId === project.id);
-  const invoices = data.invoices.filter((inv) => inv.projectId === project.id);
+  // 下書きはまだ請求していないので請求済に数えない
+  const invoices = data.invoices.filter((inv) => inv.projectId === project.id && !inv.draft);
   return {
     done: tasks.filter((t) => t.done).length,
     total: tasks.length,
@@ -86,15 +106,15 @@ export function projectProgress(project: Project, data: AppData): ProjectProgres
   };
 }
 
-/** 受注額 − 既存の請求額合計。0 以下なら追加の請求はできない */
+/** 受注額 − 既存の請求額合計（下書きも含める。二重に請求しないため）。0 以下なら追加の請求はできない */
 export function remainingBillable(project: Project, invoices: readonly Invoice[]): number {
   const invoiced = invoices.filter((inv) => inv.projectId === project.id).reduce((sum, inv) => sum + inv.amount, 0);
   return project.amount - invoiced;
 }
 
-const STATUS_ORDER: Record<InvoiceStatus, number> = { overdue: 0, unpaid: 1, paid: 2 };
+const STATUS_ORDER: Record<InvoiceStatus, number> = { overdue: 0, unpaid: 1, draft: 2, paid: 3 };
 
-/** 期限超過 → 未入金（期日が近い順）→ 入金済（新しい順） */
+/** 期限超過 → 未入金（期日が近い順）→ 下書き → 入金済（新しい順） */
 export function sortInvoices(invoices: readonly Invoice[], today: ISODate): Invoice[] {
   return invoices.toSorted((a, b) => {
     const sa = invoiceStatus(a, today);
@@ -136,7 +156,7 @@ export interface ActivityItem {
 
 /** 案件の操作履歴を既存データから組み立てる（新しい順）。履歴テーブルは持たない */
 export function projectActivity(projectId: string, data: AppData, limit = 8): ActivityItem[] {
-  const invoices = data.invoices.filter((inv) => inv.projectId === projectId);
+  const invoices = data.invoices.filter((inv) => inv.projectId === projectId && !inv.draft);
   const items: ActivityItem[] = [
     ...invoices.flatMap((inv): ActivityItem[] => [
       { key: `${inv.id}-issued`, date: inv.issuedOn, kind: "issued", text: `請求書 ${inv.number} を発行` },

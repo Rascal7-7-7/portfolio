@@ -11,7 +11,7 @@ import { InvoiceList } from "@/components/InvoiceList";
 import { InvoiceForm } from "@/components/InvoiceForm";
 import { INVOICE_STATUS_LABEL, type InvoiceStatus } from "@/types";
 
-/** 「未入金」は期限超過を含む（ダッシュボードと同じ定義）。期限超過はその内訳 */
+/** 「未入金」は期限超過を含み、下書き（見積の承認待ち）は含まない（ダッシュボードと同じ定義）。期限超過はその内訳 */
 type Filter = "all" | "outstanding" | "overdue" | "paid";
 const FILTERS: { key: Filter; label: string }[] = [
   { key: "all", label: "すべて" },
@@ -20,7 +20,7 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: "paid", label: INVOICE_STATUS_LABEL.paid },
 ];
 const matches = (filter: Filter, status: InvoiceStatus): boolean =>
-  filter === "all" || (filter === "outstanding" ? status !== "paid" : status === filter);
+  filter === "all" || (filter === "outstanding" ? status === "unpaid" || status === "overdue" : status === filter);
 
 export function InvoicesView() {
   const store = useAppStore();

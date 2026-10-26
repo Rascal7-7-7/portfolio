@@ -2,23 +2,23 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowLeft, CircleCheck, FileText, Landmark } from "lucide-react";
+import { ArrowLeft, Check, FileText, Landmark } from "lucide-react";
 import { actions, useAppStore } from "@/lib/store";
 import { formatAgo, formatDate, formatRelative } from "@/lib/dates";
-import { dueLabel, projectActivity, projectProgress, sortTasks, sortInvoices, type ActivityItem } from "@/lib/selectors";
+import { dueLabel, projectActivity, projectProgress, remainingBillable, sortTasks, sortInvoices, type ActivityItem } from "@/lib/selectors";
 import { formatYen } from "@/lib/utils";
-import { buttonStyles, Card, Page, PageSkeleton } from "@/components/ui";
+import { Card, Page, PageSkeleton, SegmentButton } from "@/components/ui";
 import { TaskRow } from "@/components/TaskRow";
 import { TaskQuickAdd } from "@/components/TaskQuickAdd";
 import { InvoiceList } from "@/components/InvoiceList";
 import { InvoiceForm } from "@/components/InvoiceForm";
 import { EstimateSource, ExternalLink } from "@/components/ExternalLink";
-import { PROJECT_STATUS_LABEL, PROJECT_STATUSES, type ProjectStatus } from "@/types";
+import { PROJECT_STATUS_LABEL, PROJECT_STATUSES } from "@/types";
 
 const ACTIVITY_ICON: Record<ActivityItem["kind"], typeof FileText> = {
   issued: FileText,
   paid: Landmark,
-  task: CircleCheck,
+  task: Check,
 };
 
 /** Linear の案件アクティビティに倣い、何をしたかを相対時刻つきで新しい順に並べる */
@@ -68,7 +68,8 @@ export function ProjectDetailView({ id }: { id: string }) {
   const prog = projectProgress(project, data);
   const tasks = sortTasks(data.tasks.filter((t) => t.projectId === id));
   const invoices = sortInvoices(data.invoices.filter((inv) => inv.projectId === id), today);
-  const uninvoiced = Math.max(0, project.amount - prog.invoiced);
+  // 下書き（見積の承認待ち）の分は請求予定なので未請求に数えない
+  const uninvoiced = Math.max(0, remainingBillable(project, data.invoices));
   const meta = [
     { label: "受注額", value: formatYen(project.amount) },
     { label: "請求済", value: formatYen(prog.invoiced) },
@@ -100,20 +101,17 @@ export function ProjectDetailView({ id }: { id: string }) {
               </div>
             )}
           </div>
-          <label className="flex shrink-0 flex-col text-xs font-medium text-warm-900">
-            ステータス
-            <select
-              value={project.status}
-              onChange={(e) => actions.setProjectStatus(project.id, e.target.value as ProjectStatus)}
-              className={`${buttonStyles.input} mt-1 sm:w-36`}
-            >
+          {/* OS 標準の select ではなく、一覧の絞り込みと同じ切り替えボタンで選ぶ */}
+          <div className="shrink-0">
+            <p id="project-status-label" className="text-xs font-medium text-warm-900">ステータス</p>
+            <div role="group" aria-labelledby="project-status-label" className="mt-1 flex gap-1">
               {PROJECT_STATUSES.map((s) => (
-                <option key={s} value={s}>
+                <SegmentButton key={s} active={project.status === s} onClick={() => actions.setProjectStatus(project.id, s)}>
                   {PROJECT_STATUS_LABEL[s]}
-                </option>
+                </SegmentButton>
               ))}
-            </select>
-          </label>
+            </div>
+          </div>
         </div>
         <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-y border-line py-4 sm:grid-cols-4">
           {meta.map((m) => (
