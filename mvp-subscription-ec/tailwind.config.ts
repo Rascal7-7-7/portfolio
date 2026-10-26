@@ -12,6 +12,7 @@ const config: Config = {
         // MD3 Primary — forest green
         primary: {
           DEFAULT: '#4a6741',
+          hover: '#3c5535',
           container: '#cbeac0',
         },
         'on-primary': {
@@ -39,6 +40,7 @@ const config: Config = {
         // MD3 Error
         error: {
           DEFAULT: '#ba1a1a',
+          hover: '#9c1414',
           container: '#ffdad6',
         },
         'on-error': {
@@ -87,6 +89,15 @@ const config: Config = {
         '2xl': '1rem',
         '3xl': '1.5rem',
         full: '9999px',
+      },
+      // 控えめで速い動きだけ。prefers-reduced-motion では globals.css で実質止まる
+      keyframes: {
+        'fade-up': { from: { opacity: '0', transform: 'translateY(6px)' }, to: { opacity: '1', transform: 'none' } },
+        flash: { from: { backgroundColor: 'rgb(203 234 192 / 0.55)' }, to: { backgroundColor: 'transparent' } },
+      },
+      animation: {
+        'fade-up': 'fade-up 280ms cubic-bezier(0.2, 0, 0, 1) both',
+        flash: 'flash 1400ms ease-out',
       },
       aspectRatio: {
         '4/5': '4 / 5',

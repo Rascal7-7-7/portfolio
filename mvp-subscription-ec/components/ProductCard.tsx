@@ -11,7 +11,14 @@ export function ProductCard({ product }: { product: Product }) {
   const serving = perServing(subPrice, product.specs);
   return (
     <Link href={`/products/${product.id}`} className="group flex flex-col">
-      <ProductVisual product={product} decorative className="aspect-[4/5]" />
+      {/* hover で写真だけをわずかに寄せる（枠の大きさは変えない） */}
+      <div className="overflow-hidden">
+        <ProductVisual
+          product={product}
+          decorative
+          className="aspect-[4/5] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+        />
+      </div>
       <div className="flex flex-1 flex-col pt-3 sm:pt-4">
         <p className="text-xs text-on-surface-variant">
           {product.category}
@@ -33,7 +40,8 @@ export function ProductCard({ product }: { product: Product }) {
           <span className="whitespace-nowrap">
             定期便 <span className="font-semibold">{yen(subPrice)}</span>
           </span>
-          <span className="ml-3 whitespace-nowrap text-xs text-on-surface-variant">単品 {yen(product.price)}</span>
+          <span className="ml-2 whitespace-nowrap text-xs font-medium text-primary">10%OFF</span>
+          <span className="block whitespace-nowrap text-xs text-on-surface-variant sm:ml-2 sm:inline">単品 {yen(product.price)}</span>
         </p>
         {/* 送料ルールは lib/pricing.ts の shippingFee と同じ（定期便を含む注文は無料） */}
         <p className="mt-1 text-xs text-on-surface-variant">定期便なら送料無料</p>
