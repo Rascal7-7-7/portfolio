@@ -84,8 +84,9 @@ export default function ScheduleView() {
   const pickDay = (d: string) => { setOffset(diffDays(today, d)); setMode('day'); };
 
   return (
-    // 予定表は横幅がそのまま読みやすさになるので、ほかの画面（max-w-5xl）より一段広く取る
-    <div className="px-4 md:px-10 py-6 md:py-10 max-w-6xl">
+    // 予定表は横幅がそのまま読みやすさになるので、ほかの画面（max-w-5xl）より一段広く取る。
+    // どの画面も mx-auto で中央に置き、広い画面で右だけが空かないようにする
+    <div className="mx-auto w-full px-4 md:px-10 py-6 md:py-10 max-w-6xl">
       <PageHeader title="スケジュール" action={<ModeTabs mode={mode} onChange={setMode} />} />
       {mode === 'week' && (
         <div className="hidden md:block">

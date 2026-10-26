@@ -36,7 +36,7 @@ export default function NewReservationView() {
   };
 
   return (
-    <div className="px-4 md:px-10 py-6 md:py-10 max-w-5xl">
+    <div className="mx-auto w-full px-4 md:px-10 py-6 md:py-10 max-w-5xl">
       <PageHeader title="新規予約の登録" />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
