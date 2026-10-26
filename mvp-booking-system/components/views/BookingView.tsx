@@ -267,7 +267,7 @@ export default function BookingView() {
 function ShopHeader() {
   return (
     <header>
-      <img src="/salon.webp" alt="明るい店内。丸い鏡の並ぶセット面と黒い椅子" width={1600} height={1044}
+      <img src="/salon.webp" alt="木の床と植物のある、落ち着いた店内。丸い鏡のセット面と受付" width={1200} height={783}
         fetchPriority="high" className="block w-full h-44 sm:h-56 md:h-72 object-cover object-[center_45%]" />
       <div className="px-5 md:px-7 py-5 md:py-6 flex flex-col md:flex-row md:items-end md:justify-between gap-3">
         <div>
@@ -340,7 +340,7 @@ function Confirmed({ done, onAgain, onAdmin }: { done: Done; onAgain: () => void
   const end = toTime(toMinutes(done.time) + done.menu.minutes);
   return (
     <section aria-labelledby="done-title" className="mx-auto max-w-lg bg-canvas rounded-2xl overflow-hidden text-center shadow-[0_0_0_1px_rgba(60,45,30,0.06),0_12px_40px_-12px_rgba(60,45,30,0.18)]">
-      <img src="/salon.webp" alt="" width={1600} height={1044} className="block w-full h-36 object-cover object-[center_45%]" />
+      <img src="/salon.webp" alt="" width={1200} height={783} className="block w-full h-36 object-cover object-[center_45%]" />
       <div className="p-6 md:p-8">
       <p className="font-serif text-xl text-ink leading-none">{SHOP.name}</p>
       <h1 id="done-title" className="text-xl font-bold text-ink mt-4 inline-flex items-center gap-1.5">
