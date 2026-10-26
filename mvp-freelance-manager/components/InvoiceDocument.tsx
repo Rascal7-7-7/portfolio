@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { formatFullDate } from "@/lib/dates";
 import { formatYen, TAX_RATE, taxIncluded } from "@/lib/utils";
+import { Yen } from "@/components/ui";
 import type { Invoice, Project } from "@/types";
 
 /**
@@ -20,7 +21,7 @@ const BANK = [
   ["名義", "デモワークス"],
 ] as const;
 
-const CELL = "px-2 py-2";
+const CELL = "px-3 py-2.5";
 
 /**
  * 和文の請求書。組版は見積管理の見積書にそろえる：
@@ -35,7 +36,8 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
   return (
     <article
       aria-label={`請求書 ${invoice.number}`}
-      className="relative border border-line bg-white px-5 py-6 text-[13px] leading-relaxed text-ink sm:px-10 sm:py-10 print:border-0 print:p-0"
+      // 机に置いた1枚の紙として見せる。縁は罫線ではなく薄い影で、印刷時は影も余白も外す
+      className="relative rounded-[3px] bg-white px-5 py-7 text-[13px] leading-relaxed text-ink shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_2px_4px_rgba(0,0,0,0.03),0_16px_40px_-12px_rgba(0,0,0,0.14)] sm:px-14 sm:py-14 print:p-0 print:shadow-none"
     >
       <dl className="num ml-auto grid w-fit grid-cols-[auto_auto] gap-x-3 text-xs text-warm-500">
         <dt>請求番号</dt>
@@ -51,12 +53,14 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
       </dl>
 
       {/* 和文帳票の表題は字間を空けて中央に置くのが通例 */}
-      <h2 className="mt-4 pl-[0.5em] text-center text-xl font-semibold tracking-[0.5em] sm:text-2xl">御請求書</h2>
+      <h2 className="mx-auto mt-5 w-fit border-b-[3px] border-double border-ink pb-1 pl-[0.6em] text-center text-xl font-semibold tracking-[0.6em] sm:text-[26px]">
+        御請求書
+      </h2>
       {invoice.draft && <p className="mt-1 text-center text-xs text-warm-500">下書き（未発行）</p>}
 
-      <div className="mt-8 flex flex-wrap gap-x-10 gap-y-6">
+      <div className="mt-10 flex flex-wrap gap-x-12 gap-y-6">
         <div className="min-w-0 flex-[1_1_18rem]">
-          <p className="border-b border-ink pb-1 text-base font-semibold">
+          <p className="border-b border-ink pb-1.5 text-[17px] font-semibold">
             {project?.client ?? "—"}
             <span className="ml-2 font-normal">御中</span>
           </p>
@@ -70,12 +74,14 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
           </dl>
 
           <div className="relative mt-5">
-            <p className="flex items-stretch border border-ink">
-              <span className="flex items-center border-r border-ink bg-warm-50 px-3 text-xs font-semibold whitespace-nowrap sm:text-sm">
+            <p className="flex items-stretch border-y-2 border-ink">
+              <span className="flex items-center bg-warm-100 px-3 text-xs font-semibold whitespace-nowrap sm:px-4 sm:text-sm">
                 ご請求金額
               </span>
-              <span className="flex flex-1 items-baseline justify-end gap-2 px-3 py-2">
-                <span className="num text-xl font-bold sm:text-2xl">{formatYen(invoice.amount)}</span>
+              <span className="flex flex-1 items-baseline justify-end gap-2 px-3 py-2.5 sm:py-3">
+                <span className="text-[22px] font-bold tracking-[-0.02em] sm:text-[30px]">
+                  <Yen value={invoice.amount} />
+                </span>
                 <span className="text-xs whitespace-nowrap text-warm-500">（税込）</span>
               </span>
             </p>
@@ -107,7 +113,7 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
         <table className="w-full border-collapse">
           <caption className="sr-only">請求明細</caption>
           <thead>
-            <tr className="border-y border-ink text-xs">
+            <tr className="border-y border-ink bg-warm-100 text-xs [print-color-adjust:exact]">
               <th scope="col" className={`${CELL} w-full text-left font-semibold`}>品名</th>
               <th scope="col" className={`${CELL} text-right font-semibold whitespace-nowrap`}>数量</th>
               {/* 見積書と同じく、スマホでは単価を省いて品名の幅を確保する */}
@@ -117,7 +123,7 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
           </thead>
           <tbody>
             {items.map((item, i) => (
-              <tr key={i} className="border-b border-line align-top">
+              <tr key={i} className="border-b border-black/[0.08] align-top">
                 {/* 320px 幅では文節単位の折り返しだと品名列が縮まず表がはみ出すため、必要なときだけ文節の途中でも折る */}
                 <td className={`${CELL} [overflow-wrap:anywhere]`}>{item.name}</td>
                 <td className={`${CELL} num text-right whitespace-nowrap`}>{item.qty}</td>
@@ -129,7 +135,7 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
         </table>
       </div>
 
-      <dl className="num mt-3 ml-auto w-full max-w-[280px] text-sm">
+      <dl className="num mt-4 ml-auto w-full max-w-[300px] text-sm">
         <div className="flex justify-between px-2 py-1">
           <dt className="text-warm-500">小計</dt>
           <dd>{formatYen(subtotal)}</dd>
@@ -138,15 +144,15 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
           <dt className="text-warm-500">消費税（{TAX_RATE}%）</dt>
           <dd>{formatYen(tax)}</dd>
         </div>
-        <div className="mt-1 flex justify-between border-y border-ink px-2 py-1.5 text-base font-bold">
+        <div className="mt-1.5 flex items-baseline justify-between border-y-2 border-ink px-2 py-2 text-base font-bold">
           <dt>合計</dt>
-          <dd>{formatYen(invoice.amount)}</dd>
+          <dd className="text-lg tracking-[-0.01em]">{formatYen(invoice.amount)}</dd>
         </div>
       </dl>
 
-      <div className="mt-8 border border-line">
-        <p className="border-b border-line bg-warm-50 px-3 py-1 text-xs font-semibold">お振込先</p>
-        <dl className="grid grid-cols-[3em_minmax(0,1fr)] gap-y-0.5 px-3 py-2 text-xs">
+      <div className="mt-10 border-t border-ink pt-3">
+        <p className="px-1 text-xs font-semibold">お振込先</p>
+        <dl className="grid grid-cols-[3em_minmax(0,1fr)] gap-y-0.5 px-1 py-2 text-xs">
           {BANK.map(([label, value]) => (
             <div key={label} className="contents">
               <dt className="text-warm-500">{label}</dt>
@@ -154,7 +160,7 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
             </div>
           ))}
         </dl>
-        <p className="px-3 pb-2 text-[11px] text-warm-500">
+        <p className="px-1 text-[11px] text-warm-500">
           ※ デモ用の架空の口座です。振込手数料はご負担をお願いいたします。
         </p>
       </div>

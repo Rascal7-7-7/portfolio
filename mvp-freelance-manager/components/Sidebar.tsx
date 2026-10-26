@@ -50,11 +50,23 @@ export function Sidebar() {
       {/* 背景と罫線は外側（ページ全高に伸びる）、中身だけ sticky にして長いページでも背景が途切れない */}
       <aside className="hidden w-60 shrink-0 border-r border-line bg-warm-100 md:block print:hidden">
         <div className="sticky top-0 flex h-screen flex-col">
-        <div className="px-5 py-5">
+        <div className="px-5 pt-5 pb-4">
           <Logo />
-          <p className="mt-1.5 text-xs text-warm-500">個人事業のバックオフィス</p>
         </div>
-        <nav aria-label="メイン" className="flex-1 space-y-0.5 px-3">
+        {/* 誰の帳簿かを示す事業者の表示。発行元「デモワークス」は請求書・見積書と同じ値 */}
+        <div className="mx-3 mb-4 flex items-center gap-2.5 rounded-lg px-2 py-1.5">
+          <span
+            aria-hidden
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-warm-900 text-xs font-semibold text-white"
+          >
+            デ
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-[13px] leading-tight font-semibold text-ink">デモワークス</span>
+            <span className="block truncate text-[11px] leading-tight text-warm-500">個人事業のバックオフィス</span>
+          </span>
+        </div>
+        <nav aria-label="メイン" className="flex-1 space-y-px px-3">
           {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
             const active = isActive(href, pathname);
             return (
@@ -63,20 +75,25 @@ export function Sidebar() {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
+                  "group flex items-center gap-2.5 rounded-md px-2.5 py-[7px] text-[13.5px] transition-colors",
                   active
-                    ? "bg-black/[0.06] font-semibold text-ink"
-                    : "text-warm-500 hover:bg-black/[0.04] hover:text-ink",
+                    ? "bg-canvas font-semibold text-ink shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.06)]"
+                    : "text-warm-900 hover:bg-black/[0.04] hover:text-ink",
                 )}
               >
-                <Icon size={17} aria-hidden />
+                <Icon
+                  size={16}
+                  strokeWidth={active ? 2.25 : 1.75}
+                  className={active ? "text-blue" : "text-warm-500 group-hover:text-ink"}
+                  aria-hidden
+                />
                 {label}
               </Link>
             );
           })}
         </nav>
-        <div className="border-t border-line px-5 py-4">
-          <p className="text-xs leading-relaxed text-warm-500">{DEMO_NOTE}</p>
+        <div className="px-5 py-5">
+          <p className="text-[11px] leading-relaxed text-warm-500">{DEMO_NOTE}</p>
           <button
             type="button"
             onClick={resetDemo}
@@ -115,7 +132,7 @@ export function Sidebar() {
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex flex-col items-center gap-0.5 rounded-md py-1 text-[11px]",
-                active ? "font-semibold text-ink" : "text-warm-500",
+                active ? "font-semibold text-blue" : "text-warm-500",
               )}
             >
               <Icon size={20} strokeWidth={active ? 2.25 : 1.75} className="my-0.5" aria-hidden />

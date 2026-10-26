@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { cn, formatYen } from "@/lib/utils";
 
 interface CardProps {
   title?: string;
@@ -9,13 +9,16 @@ interface CardProps {
   children: ReactNode;
 }
 
-/** 1px の罫線だけで区切るパネル。影やアイコンで飾らない（Linear / Stripe のリスト面と同じ扱い） */
+/** パネルの縁。1px の罫線に、Notion の「ささやく影」程度の浮きだけを足す */
+export const SURFACE = "rounded-xl border border-line bg-canvas shadow-[0_1px_2px_rgba(15,15,15,0.04),0_4px_12px_-6px_rgba(15,15,15,0.06)]";
+
+/** 罫線で区切るパネル。アイコンや色帯で飾らない（Linear / Stripe のリスト面と同じ扱い） */
 export function Card({ title, action, className, children }: CardProps) {
   return (
-    <section className={cn("min-w-0 rounded-lg border border-line bg-canvas", className)} aria-label={title}>
+    <section className={cn("min-w-0", SURFACE, className)} aria-label={title}>
       {title && (
-        <header className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-4 py-2.5 sm:px-5">
-          <h2 className="text-[13px] font-semibold text-ink">{title}</h2>
+        <header className="flex min-h-12 items-center justify-between gap-2 border-b border-line px-4 py-3 sm:px-5">
+          <h2 className="text-sm font-semibold tracking-[-0.01em] text-ink">{title}</h2>
           {action}
         </header>
       )}
@@ -42,11 +45,11 @@ interface PageHeaderProps {
 
 export function PageHeader({ eyebrow, title, description, action }: PageHeaderProps) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+    <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
         {eyebrow && <p className="num mb-1 text-xs text-warm-500">{eyebrow}</p>}
-        <h1 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">{title}</h1>
-        {description && <p className="mt-1 text-sm text-warm-500">{description}</p>}
+        <h1 className="text-[22px] font-bold tracking-[-0.025em] text-ink sm:text-[28px]">{title}</h1>
+        {description && <p className="mt-1.5 text-sm text-warm-500">{description}</p>}
       </div>
       {action}
     </div>
@@ -62,9 +65,25 @@ export function Page({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * 大きく見せる金額。「¥」を小さく薄くして数字そのものを主役にする（Stripe の残高表示に倣う）。
+ * 読み上げは formatYen と同じ文字列になる
+ */
+export function Yen({ value, className }: { value: number; className?: string }) {
+  const text = formatYen(value);
+  return (
+    <span className={cn("num whitespace-nowrap", className)} aria-label={text}>
+      <span aria-hidden className="mr-[0.06em] align-[0.12em] text-[0.62em] font-medium opacity-55">
+        {text.startsWith("-") ? "-¥" : "¥"}
+      </span>
+      <span aria-hidden>{text.replace(/^-?¥/, "")}</span>
+    </span>
+  );
+}
+
 export interface Metric {
   label: string;
-  value: string;
+  value: number;
   sub?: ReactNode;
   href?: string;
 }
@@ -74,7 +93,8 @@ export function MetricStrip({ items, className }: { items: readonly Metric[]; cl
   return (
     <dl
       className={cn(
-        "grid divide-line overflow-hidden rounded-lg border border-line bg-canvas",
+        "grid divide-line overflow-hidden",
+        SURFACE,
         // 3項目はスマホで横に詰めると補足が切れるため、縦積みにする
         items.length === 3 ? "grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0" : "grid-cols-2 divide-x",
         className,
@@ -84,20 +104,22 @@ export function MetricStrip({ items, className }: { items: readonly Metric[]; cl
         const body = (
           <>
             <dt className="truncate text-xs text-warm-500">{m.label}</dt>
-            <dd className="num mt-1 truncate text-base font-semibold text-ink sm:text-xl">{m.value}</dd>
+            <dd className="mt-1.5 truncate text-xl leading-tight font-semibold tracking-[-0.02em] text-ink sm:text-[26px]">
+              <Yen value={m.value} />
+            </dd>
             {m.sub && (
-              <dd className="num mt-0.5 truncate text-xs text-warm-500">
+              <dd className="num mt-1 truncate text-xs text-warm-500">
                 {m.sub}
               </dd>
             )}
           </>
         );
         return m.href ? (
-          <Link key={m.label} href={m.href} className="block min-w-0 px-3 py-3 hover:bg-warm-50 sm:px-5 sm:py-4">
+          <Link key={m.label} href={m.href} className="block min-w-0 px-4 py-4 hover:bg-warm-50 sm:px-6 sm:py-5">
             {body}
           </Link>
         ) : (
-          <div key={m.label} className="min-w-0 px-3 py-3 sm:px-5 sm:py-4">
+          <div key={m.label} className="min-w-0 px-4 py-4 sm:px-6 sm:py-5">
             {body}
           </div>
         );
@@ -122,8 +144,8 @@ export function SegmentButton({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "hit shrink-0 rounded-md px-2.5 py-1.5 text-xs transition-colors",
-        active ? "bg-black/[0.07] font-semibold text-ink" : "text-warm-500 hover:bg-black/[0.04] hover:text-ink",
+        "hit shrink-0 rounded-md px-3 py-1.5 text-xs transition-colors",
+        active ? "bg-canvas font-semibold text-ink shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.05)]" : "text-warm-500 hover:bg-black/[0.04] hover:text-ink",
       )}
     >
       {children}
