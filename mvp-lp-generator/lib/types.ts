@@ -20,16 +20,28 @@ export interface Voice {
   readonly text: string
 }
 
-/** 施術者・店主のあいさつ。写真は持たないので、名前の1文字目を文字組みで見せる */
+/** 施術者・店主のあいさつ */
 export interface Owner {
   readonly role: string
   readonly name: string
   readonly message: string
+  /** サンプル用の写真（public/samples/*.webp）。ファイルが無いときは名前だけで組む */
+  readonly photo?: string
 }
 
 export interface StoreInfo {
   readonly storeName: string
+  /** 業種はテンプレートの言い回し（「お品書き」など）を決める内部の分類。LP には出さない */
   readonly category: CategoryKey
+  /** LP の見出しの上に出す「エリア・ジャンル」（例: 鎌倉の自家焙煎珈琲）。任意 */
+  readonly area?: string
+  /**
+   * ヒーローの写真。データに書けるのはサンプル用の public/samples/*.webp だけ（ファイルが無ければ線画のまま）。
+   * エディタで選んだ写真は object URL のままプレビューにだけ渡し、ここには保存しない
+   */
+  readonly photo?: string
+  /** 予約ボタンの行き先（外部の予約ページ）。無ければページ内の予約欄へ */
+  readonly reserveUrl?: string
   readonly catchCopy: string
   readonly description: string
   readonly address: string

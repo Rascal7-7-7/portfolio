@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { formatFullDate } from '@/lib/date';
 import { TIME_OPTIONS } from '@/lib/slots';
 import Icon from '@/components/Icon';
+import { FieldError, FieldErrorsProvider, useFieldErrors } from '@/components/FieldError';
 import {
   CHANNELS, CHANNEL_LABEL, MENUS, STAFF, isChannel, isStaff,
   type Reservation, type ReservationInput,
@@ -19,8 +20,9 @@ interface Props {
 }
 
 export const inputCls =
-  'w-full max-md:min-h-11 bg-canvas border border-line-strong rounded-md px-3 py-2 text-sm text-ink ' +
-  'focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none aria-[invalid=true]:border-attn ' +
+  'w-full min-h-10 max-md:min-h-11 bg-canvas border border-line-strong rounded-md px-3 py-2 text-sm text-ink ' +
+  'hover:border-[#b6bcc5] focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none ' +
+  'aria-[invalid=true]:border-attn aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-attn-bg ' +
   'placeholder:text-dim';
 
 function readForm(form: HTMLFormElement): ReservationInput {
@@ -41,10 +43,11 @@ function readForm(form: HTMLFormElement): ReservationInput {
   };
 }
 
-/** 新規登録と編集で共通のフォーム。必須チェックはブラウザ標準（required）、二重予約だけここで確かめる */
+/** 新規登録と編集で共通のフォーム。必須チェックはブラウザ標準（required）で、結果は入力欄の下に出す。二重予約だけここで確かめる */
 export default function ReservationForm({ id, defaults, minDate, findConflict, onSubmit }: Props) {
   const [conflict, setConflict] = useState<{ staff: string; hit: Reservation } | null>(null);
   const errorId = `${id}-conflict`;
+  const fieldErrors = useFieldErrors();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,7 +66,8 @@ export default function ReservationForm({ id, defaults, minDate, findConflict, o
   const invalid = conflict ? { 'aria-invalid': true, 'aria-describedby': errorId } : {};
 
   return (
-    <form id={id} onSubmit={handleSubmit} className="space-y-5">
+    <FieldErrorsProvider value={fieldErrors.errors}>
+    <form id={id} ref={fieldErrors.ref} onSubmit={handleSubmit} className="space-y-5">
       <FormSection title="お客様情報">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field id={`${id}-name`} label="お名前" required>
@@ -131,6 +135,7 @@ export default function ReservationForm({ id, defaults, minDate, findConflict, o
         </div>
       </FormSection>
     </form>
+    </FieldErrorsProvider>
   );
 }
 
@@ -153,7 +158,7 @@ function DateInput({ id, name, defaultValue, min }: { id: string; name: string; 
         onChange={e => setValue(e.target.value)} onClick={openPicker}
         className="peer absolute inset-0 h-full w-full cursor-pointer opacity-0" />
       <span aria-hidden="true"
-        className={`${inputCls} pointer-events-none flex items-center justify-between peer-focus:border-brand peer-focus:ring-2 peer-focus:ring-brand/20`}>
+        className={`${inputCls} pointer-events-none flex items-center justify-between peer-focus:border-brand peer-focus:ring-2 peer-focus:ring-brand/20 peer-aria-[invalid=true]:border-attn`}>
         <span className={value ? 'tabular-nums' : 'text-dim'}>{value ? formatFullDate(value) : '日付を選択'}</span>
         <Icon name="calendar_today" className="text-dim" />
       </span>
@@ -182,6 +187,7 @@ function Field({ id, label, required = false, wide = false, children }: {
         {!required && <span className="ml-1.5 text-xs font-normal text-dim">任意</span>}
       </label>
       {children}
+      <FieldError id={id} />
     </div>
   );
 }

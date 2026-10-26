@@ -30,7 +30,7 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
   const tax = taxIncluded(invoice.amount);
   const subtotal = invoice.amount - tax;
   const subject = project?.name ?? "（削除された案件）";
-  const items = invoice.items ?? [{ name: subject, qty: "1 式", amount: subtotal }];
+  const items = invoice.items ?? [{ name: subject, qty: "1 式", unitPrice: subtotal, amount: subtotal }];
 
   return (
     <article
@@ -52,6 +52,7 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
 
       {/* 和文帳票の表題は字間を空けて中央に置くのが通例 */}
       <h2 className="mt-4 pl-[0.5em] text-center text-xl font-semibold tracking-[0.5em] sm:text-2xl">御請求書</h2>
+      {invoice.draft && <p className="mt-1 text-center text-xs text-warm-500">下書き（未発行）</p>}
 
       <div className="mt-8 flex flex-wrap gap-x-10 gap-y-6">
         <div className="min-w-0 flex-[1_1_18rem]">
@@ -109,6 +110,8 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
             <tr className="border-y border-ink text-xs">
               <th scope="col" className={`${CELL} w-full text-left font-semibold`}>品名</th>
               <th scope="col" className={`${CELL} text-right font-semibold whitespace-nowrap`}>数量</th>
+              {/* 見積書と同じく、スマホでは単価を省いて品名の幅を確保する */}
+              <th scope="col" className={`${CELL} hidden text-right font-semibold whitespace-nowrap sm:table-cell`}>単価</th>
               <th scope="col" className={`${CELL} text-right font-semibold whitespace-nowrap`}>金額（税抜）</th>
             </tr>
           </thead>
@@ -118,6 +121,7 @@ export function InvoiceDocument({ invoice, project }: { invoice: Invoice; projec
                 {/* 320px 幅では文節単位の折り返しだと品名列が縮まず表がはみ出すため、必要なときだけ文節の途中でも折る */}
                 <td className={`${CELL} [overflow-wrap:anywhere]`}>{item.name}</td>
                 <td className={`${CELL} num text-right whitespace-nowrap`}>{item.qty}</td>
+                <td className={`${CELL} num hidden text-right whitespace-nowrap sm:table-cell`}>{formatYen(item.unitPrice)}</td>
                 <td className={`${CELL} num text-right whitespace-nowrap`}>{formatYen(item.amount)}</td>
               </tr>
             ))}

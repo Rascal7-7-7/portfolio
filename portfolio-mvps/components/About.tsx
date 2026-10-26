@@ -1,5 +1,7 @@
+import { Credentials } from "./Credentials";
+import { Phrase } from "./Phrase";
 import { SectionHeader } from "./ui/SectionHeader";
-import { container } from "./ui/container";
+import { containerWide } from "./ui/container";
 
 /*
  * 小見出し＋説明文を4つ並べる型をやめ、文章として段落に組む。
@@ -22,15 +24,21 @@ const closing =
 /** カードにも小見出しにもせず、文章として読ませる。 */
 export function About() {
   return (
-    <section id="about" className="py-8 sm:py-10" aria-labelledby="about-heading">
-      <div className={container}>
-        <SectionHeader id="about-heading" title="自己紹介" className="mb-2" />
+    <section id="about" className="py-16 sm:py-24 border-t border-rule" aria-labelledby="about-heading">
+      <div className={`${containerWide} grid gap-x-12 lg:grid-cols-12`}>
+        <SectionHeader id="about-heading" title="自己紹介" className="lg:col-span-4" />
 
-        <div className="space-y-4 leading-[1.8] text-ink-muted">
+        <div className="reveal max-w-2xl space-y-6 leading-[1.9] text-ink-muted lg:col-span-8 lg:pt-3">
           {paragraphs.map((sentences) => (
             <p key={sentences[0]}>{sentences.join("")}</p>
           ))}
-          <p className="text-ink">{closing}</p>
+          <p className="text-ink">
+            <Phrase text={closing} />
+          </p>
+        </div>
+
+        <div className="lg:col-span-8 lg:col-start-5">
+          <Credentials />
         </div>
       </div>
     </section>

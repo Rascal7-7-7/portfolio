@@ -1,8 +1,8 @@
 import type { Config } from "tailwindcss";
 
 /*
- * 明るい背景（paper）の上に文字を置く前提の配色。
- * コントラスト比はすべて paper(#fcfbf8) に対する値。
+ * 黒い背景（paper）の上に文字を置く前提の配色。トップの 3D の舞台として暗くしている。
+ * コントラスト比はすべて paper(#08090b) に対する値。
  * 色は「文字の濃さ3段＋アクセント1色＋罫線＋コード地」だけに絞っている。
  */
 const config: Config = {
@@ -14,37 +14,41 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        /** 地の色。真っ白より少しだけ黄みに寄せた生成り。 */
-        paper: "#fcfbf8",
+        /** 地の色。真っ黒より少しだけ青みに寄せた黒。 */
+        paper: "#08090b",
         ink: {
-          /** 見出し・本文。16.6:1 */
-          DEFAULT: "#1c1b19",
-          /** 説明文・補足。7.8:1（AA の 4.5:1 を余裕をもって満たす） */
-          muted: "#52504b",
-          /** 日付・技術名などのメタ情報。5.3:1。これより薄い色を文字に使わない */
-          subtle: "#6b6963",
+          /** 見出し・本文。17.0:1 */
+          DEFAULT: "#ededeb",
+          /** 説明文・補足。8.3:1（AA の 4.5:1 を余裕をもって満たす） */
+          muted: "#a6a7aa",
+          /** 日付・技術名などのメタ情報。6.0:1。これより薄い色を文字に使わない */
+          subtle: "#8b8d92",
         },
-        /** 罫線専用。文字には使わない（1.24:1） */
-        rule: "#e6e3dc",
-        /** 根拠の <pre> の地。ink.muted を載せて 7.1:1、ink.subtle は 4.8:1 */
-        code: "#f2f0ea",
+        /** 罫線専用。文字には使わない（1.32:1） */
+        rule: "#24262b",
+        /** 根拠の <pre> の地。ink.muted を載せて 7.7:1、ink.subtle は 5.6:1 */
+        code: "#111318",
         /**
-         * アクセントは1色だけ。旧 brand-700 を少し濃くした青。
-         * 文字色として 7.1:1、白文字を載せた塗りでも 7.4:1。
-         * hover はさらに濃い 9.9:1。
+         * アクセントは1色だけ。favicon と同じ系統の空色。
+         * 文字色として 10.9:1、hover はさらに明るい 13.3:1。
+         * 塗りに使うときは文字を paper（黒）にする。
          */
         accent: {
-          DEFAULT: "#035a8c",
-          hover: "#02446b",
+          DEFAULT: "#5ccbff",
+          hover: "#9adcff",
         },
+        /** トップの 3D と凡例で「注入された命令」を表す赤。意味を持つ箇所以外には使わない */
+        danger: "#ff5c7a",
+        /** トップの 3D と凡例で「言い換えた危険な発話」を表す琥珀色。意味を持つ箇所以外には使わない */
+        caution: "#ffb547",
       },
       fontFamily: {
         sans: [
-          "var(--font-inter)",
-          "var(--font-noto-sans-jp)",
+          "var(--font-plex-sans-jp)",
           "system-ui",
           "sans-serif",
         ],
+        mono: ["var(--font-plex-mono)", "ui-monospace", "monospace"],
       },
     },
   },

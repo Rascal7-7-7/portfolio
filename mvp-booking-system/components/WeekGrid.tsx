@@ -90,8 +90,12 @@ function DayColumn({ list, nowMin, past }: { list: Reservation[]; nowMin: number
   const y = (min: number) => ((min - OPEN_MIN) / 60) * HOUR_H + 3;
   return (
     <div className={`relative border-l border-line ${past ? 'bg-muted/60' : ''}`} style={{ height: HOUR_H * HOURS.length }}>
+      {/* 正時は実線、30分は点線（Notion Calendar と同じ）。いちばん上の正時は見出しの罫線と二重になるので引かない */}
       {HOURS.map((h, i) => (
-        <div key={h} className="absolute left-0 right-0 border-t border-line" style={{ top: i * HOUR_H + 3 }} />
+        <div key={h}>
+          {i > 0 && <div className="absolute left-0 right-0 border-t border-line" style={{ top: i * HOUR_H + 3 }} />}
+          <div className="absolute left-0 right-0 border-t border-dotted border-line" style={{ top: i * HOUR_H + HOUR_H / 2 + 3 }} />
+        </div>
       ))}
       {placeInLanes(list).map(({ r, lane, lanes }) => {
         const width = `calc((100% - 6px - ${(lanes - 1) * 3}px) / ${lanes})`;
@@ -108,7 +112,7 @@ function DayColumn({ list, nowMin, past }: { list: Reservation[]; nowMin: number
   );
 }
 
-/** 横に並ぶ（narrow）ときは姓を2行目に回し、担当の行は高いブロックだけに出す（45分枠で3行目が欠けるため）。低い（short）ときは1行に姓まで */
+/** 2行目はメニュー名（担当は高くて広いブロックだけ後ろに足す。担当で文字が切れるため）。横に並ぶ（narrow）ときは姓を2行目に回し、メニューの行は高いブロックだけに出す（45分枠で3行目が欠けるため）。低い（short）ときは1行に姓まで */
 function WeekBlock({ r, tall, short, narrow }: { r: Reservation; tall: boolean; short: boolean; narrow: boolean }) {
   const canceled = r.status === 'canceled';
   const kind = KIND[menuKind(r.service_name)];
@@ -135,7 +139,7 @@ function WeekBlock({ r, tall, short, narrow }: { r: Reservation; tall: boolean; 
         {r.status === 'pending' && <span aria-hidden="true" className="ml-auto size-2 shrink-0 rounded-full bg-attn" />}
       </p>
       {!short && narrow && <p className="flex items-center gap-1 min-w-0">{name}{!tall && fresh && freshMark}</p>}
-      {!short && (!narrow || tall) && <p className="text-dim truncate">{fresh && <span className="mr-1 font-medium text-accent-hover">新着</span>}{r.staff}{tall && !narrow && <><span aria-hidden="true"> · </span>{r.service_name}</>}</p>}
+      {!short && (!narrow || tall) && <p className="text-dim truncate">{fresh && <span className="mr-1 font-medium text-accent-hover">新着</span>}{r.service_name}{tall && !narrow && <><span aria-hidden="true"> · </span>{r.staff}</>}</p>}
     </Link>
   );
 }

@@ -1,13 +1,13 @@
-import { CATEGORIES } from '@/lib/categories'
 import { cx } from '@/lib/cx'
 import MobileBar, { HERO_CTA } from './MobileBar'
-import { catchCopy, ctaLabel, hoursWord, infoRows, initialOf, menuItems, menuTitle, ownerOf, Phrases, storeName, type TemplateProps } from './shared'
+import Photo, { usePhotoLoaded } from './Photo'
+import { areaOf, catchCopy, ctaLabel, hoursWord, infoRows, isLowPrice, menuItems, menuTitle, ownerOf, Phrases, reserveLink, storeName, type TemplateProps } from './shared'
 
 /*
  * ポップ: 街の整体院・教室のサイト（STUDIO「ぬくもり鍼灸・整骨院」の白い箱に載せた見出し・
  * ヘッダーの電話番号・角の小さいボタン、「SORA」の大きな色面）を手本にした構成。
  * 英字の小見出しと大きな通し番号は「AI 製 LP の型」に見えるため使わず、和文の見出しだけにする。
- * 写真の代わりに珊瑚色の大きな色面を置き、見出しだけを白い箱で切り抜く。差し色は珊瑚色の面の1色だけ。
+ * 珊瑚色の大きな色面を置き（写真があれば色面の右の列に載せる）、見出しだけを白い箱で切り抜く。差し色は珊瑚色の面の1色だけ。
  * カードは使わず、線と色面（白／クリーム）の切り替えで区切る。影・グラデーションは使わない。
  * 見出しは左揃え・飾りなし（中央寄せ＋短い下線はテンプレートの型に見える）。締めの色面だけ中央に組む。
  */
@@ -28,7 +28,7 @@ const WRAP = 'mx-auto max-w-4xl'
 /** 和文の見出しだけ。英字の小見出し（FEATURES 等）・下線などの飾りは置かず、左揃えの太字で組む */
 function H2({ text, lead, wide }: { text: string; lead?: string; wide: boolean }) {
   return (
-    <h2 className={cx('font-extrabold leading-snug', wide ? 'text-[32px]' : 'text-[24px]')}>
+    <h2 className={cx('font-extrabold leading-snug [font-feature-settings:"palt"]', wide ? 'text-[32px]' : 'text-[24px]')}>
       <Phrases text={text} lead={lead} />
     </h2>
   )
@@ -36,7 +36,7 @@ function H2({ text, lead, wide }: { text: string; lead?: string; wide: boolean }
 
 function Nav({ store, wide }: TemplateProps) {
   return (
-    <nav className={cx('sticky top-0 z-10 flex items-center justify-between gap-6 border-b bg-white', LINE, wide ? 'px-8 py-3' : 'px-4 py-3')}>
+    <nav className={cx('sticky top-0 z-10 flex items-center justify-between gap-6 border-b bg-white', LINE, wide ? 'px-8 py-3' : 'px-4 py-2')}>
       <span className="truncate text-lg font-extrabold">{storeName(store)}</span>
       <div className="flex shrink-0 items-center gap-6">
         {wide && store.phone && (
@@ -45,7 +45,7 @@ function Nav({ store, wide }: TemplateProps) {
             {store.hours && <p className={cx(MUTED, 'text-[11px] font-bold')}>{hoursWord(store)} {store.hours}</p>}
           </div>
         )}
-        <a href="#reserve" className="rounded-md bg-[#1f2a37] px-4 py-2 text-xs font-bold text-white hover:bg-[#33435a]">
+        <a {...reserveLink(store)} className="inline-flex min-h-11 items-center rounded-md bg-[#1f2a37] px-4 text-xs font-bold text-white transition-colors hover:bg-[#33435a]">
           {wide ? 'WEB予約' : '予約'}
         </a>
       </div>
@@ -53,19 +53,32 @@ function Nav({ store, wide }: TemplateProps) {
   )
 }
 
-/** 珊瑚色の面に直接載せた価格。白い箱で囲むと面の中に面が入るので、上の太線と大きな数字だけで区切る */
-function LeadMenu({ store, wide }: TemplateProps) {
+/**
+ * 珊瑚色の面に直接載せた価格。白い箱で囲むと面の中に面が入るので、上の太線と大きな数字だけで区切る。
+ * 安い品（¥580 のドリンクなど）や写真と並べるときは、品名と料金を 1 行に控えめに組む（特大の「¥580」だけが浮くのを避ける）
+ */
+function LeadMenu({ store, wide, compact }: TemplateProps & { compact: boolean }) {
   const lead = menuItems(store)[0]
   if (!lead) return null
+  const small = compact || isLowPrice(lead.price)
   return (
     <div className={cx('border-t-4 border-[#1f2a37] pt-5', !wide && 'mt-10')}>
       <p className="text-xs font-extrabold">おすすめメニュー</p>
-      <p className="mt-3 text-lg font-extrabold">
-        <Phrases text={lead.name} />
-      </p>
-      {/* 珊瑚色の上の文字は不透明の紺だけ（半透明にすると 4.5:1 を割る） */}
-      {lead.description && <p className="mt-1 text-xs font-medium">{lead.description}</p>}
-      <p className={cx('mt-4 border-b-2 pb-5 font-extrabold leading-none tabular-nums', RULE, wide ? 'text-[clamp(40px,5.6cqw,72px)]' : 'text-[56px]')}>{lead.price}</p>
+      {small ? (
+        <div className={cx('mt-3 flex items-baseline justify-between gap-4 border-b-2 pb-4', RULE)}>
+          <p className="min-w-0 text-lg font-extrabold"><Phrases text={lead.name} /></p>
+          <p className="shrink-0 text-2xl font-extrabold tabular-nums">{lead.price}</p>
+        </div>
+      ) : (
+        <>
+          <p className="mt-3 text-lg font-extrabold">
+            <Phrases text={lead.name} />
+          </p>
+          {/* 珊瑚色の上の文字は不透明の紺だけ（半透明にすると 4.5:1 を割る） */}
+          {lead.description && <p className="mt-1 text-xs font-medium">{lead.description}</p>}
+          <p className={cx('mt-4 border-b-2 pb-5 font-extrabold leading-none tabular-nums', RULE, wide ? 'text-[clamp(40px,5.6cqw,72px)]' : 'text-[56px]')}>{lead.price}</p>
+        </>
+      )}
       {/* 項目ごとに改行を禁止し、項目の間でだけ折り返す（「定休 毎週火／曜日」のような語中改行を防ぐ） */}
       {(store.hours || store.closed) && (
         <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold">
@@ -79,13 +92,12 @@ function LeadMenu({ store, wide }: TemplateProps) {
 
 function Hero(props: TemplateProps) {
   const { store, wide, headline: H } = props
+  const hasPhoto = usePhotoLoaded(store.photo)
   return (
     <section className={wide ? 'px-6 pt-6' : 'px-3 pt-3'}>
-      {/* 写真の代わりの大きな色面。装飾は置かず、白い見出し箱と太線で区切った価格だけで組む */}
+      {/* 大きな色面。白い見出し箱と太線で区切った価格で組み、写真があれば右の列（スマホでは見出しの下）に角を少し丸めて置く */}
       <div className={cx('rounded-lg', CORAL, wide ? 'px-14 pb-16 pt-12' : 'px-5 pb-10 pt-8')}>
-        <p className="text-sm font-bold">
-          {CATEGORIES[store.category].label}｜{storeName(store)}
-        </p>
+        <p className="text-sm font-bold">{[areaOf(store), storeName(store)].filter(Boolean).join('｜')}</p>
         <div className={cx(wide ? 'mt-16 grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-12' : 'mt-12')}>
           <div className="min-w-0">
             {/* 1行ずつ白い箱で切り抜く。折り返した行にも箱が付くよう box-decoration-break: clone。
@@ -98,11 +110,14 @@ function Hero(props: TemplateProps) {
             </H>
             {store.description && <p className="mt-8 max-w-[30em] text-[15px] font-medium leading-[1.9]">{store.description}</p>}
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
-              <a href="#reserve" className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
-              <a href="#menu" className={cx('border-b-2 pb-0.5 text-sm font-bold', RULE)}>料金を見る</a>
+              <a {...reserveLink(store)} className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
+              <a href="#menu" className="inline-flex min-h-11 items-center underline decoration-2 underline-offset-[6px] text-sm font-bold">料金を見る</a>
             </div>
           </div>
-          <LeadMenu {...props} />
+          <div className="min-w-0">
+            {hasPhoto && <Photo src={store.photo} alt={`${storeName(store)}の写真`} className={cx('block aspect-[4/3] w-full rounded-md', !wide && 'mt-10')} />}
+            <LeadMenu {...props} compact={hasPhoto} />
+          </div>
         </div>
       </div>
     </section>
@@ -140,25 +155,34 @@ function Features({ store, wide }: TemplateProps) {
 }
 
 /**
- * 院長のあいさつ。写真の代わりに姓の1文字目をクリームの角の面に大きく組む（丸い枠のアイコンにはしない）
+ * 院長のあいさつ。写真があれば角の小さい正方形の写真、無ければクリームの面に役職と名前を省略せずに組む
+ * （姓の1文字だけでは誰か分からないため。丸い枠のアイコンにはしない）
  */
 function Greeting({ store, wide }: TemplateProps) {
   const owner = ownerOf(store)
+  const hasPhoto = usePhotoLoaded(owner?.photo)
   if (!owner) return null
   return (
     <section className={cx(pad(wide), '!pt-0')}>
       <div className={WRAP}>
       <div className={cx('border-t-2 pt-12', RULE, wide && 'grid grid-cols-[180px_minmax(0,1fr)] gap-12')}>
-        <p aria-hidden className={cx(CREAM, 'flex aspect-square items-center justify-center rounded-lg font-extrabold leading-none', wide ? 'text-[88px]' : 'w-24 text-[48px]')}>
-          {initialOf(owner.name)}
-        </p>
+        {hasPhoto ? (
+          <Photo src={owner.photo} alt={`${owner.role} ${owner.name}`} className={cx('block aspect-square rounded-lg', wide ? 'w-full' : 'w-32')} />
+        ) : (
+          <p className={cx(CREAM, 'flex aspect-square flex-col justify-end rounded-lg p-4', wide ? 'w-full' : 'w-32')}>
+            <span className={cx(MUTED, 'text-xs font-bold')}>{owner.role}</span>
+            <span className={cx('mt-1 font-extrabold leading-tight', wide ? 'text-[26px]' : 'text-lg')}>{owner.name}</span>
+          </p>
+        )}
         <div className={cx(!wide && 'mt-8')}>
           <H2 text={`${owner.role}からのご挨拶`} wide={wide} />
           <p className="mt-6 max-w-[36em] text-[15px] font-medium leading-[1.95]">{owner.message}</p>
-          <p className="mt-6 text-sm font-extrabold">
-            <span className={cx(MUTED, 'mr-3')}>{owner.role}</span>
-            {owner.name}
-          </p>
+          {hasPhoto && (
+            <p className="mt-6 text-sm font-extrabold">
+              <span className={cx(MUTED, 'mr-3')}>{owner.role}</span>
+              {owner.name}
+            </p>
+          )}
         </div>
       </div>
       </div>
@@ -264,11 +288,11 @@ function Cta({ store, wide }: TemplateProps) {
   return (
     <section id="reserve" className={wide ? 'p-6' : 'p-3'}>
       <div className={cx('rounded-lg text-center', CORAL, wide ? 'px-14 py-20' : 'px-5 py-14')}>
-        <h2 className={cx('font-extrabold leading-snug', wide ? 'text-[36px]' : 'text-[26px]')}>
+        <h2 className={cx('font-extrabold leading-snug [font-feature-settings:"palt"]', wide ? 'text-[36px]' : 'text-[26px]')}>
           <Phrases text="まずはお気軽にご予約ください" />
         </h2>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
-          <a href="#reserve" className={BTN}>{ctaLabel(store)}</a>
+          <a {...reserveLink(store)} className={BTN}>{ctaLabel(store)}</a>
           {store.phone && (
             <p className={cx('leading-tight', wide && 'text-left')}>
               <span className="block text-xs font-bold">お電話でのご予約</span>

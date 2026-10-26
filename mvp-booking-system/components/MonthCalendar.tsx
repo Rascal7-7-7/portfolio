@@ -45,7 +45,7 @@ export default function MonthCalendar({ month, today, selected, isAvailable, can
           const [, m, day] = d.split('-').map(Number);
           return (
             <button key={d} type="button" disabled={!available} aria-pressed={isSelected}
-              aria-label={`${m}月${day}日${available ? '' : '（空きなし）'}`}
+              aria-label={`${m}月${day}日${available ? '' : d < today ? '（受付終了）' : '（空きなし）'}`}
               onClick={() => onSelect(d)}
               className={`relative aspect-square max-h-12 w-full rounded-md text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${
                 isSelected ? 'bg-accent text-white font-bold'

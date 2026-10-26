@@ -64,9 +64,10 @@ export const HIKAE_INVOICES_URL = "https://mvp-freelance-manager.vercel.app/invo
 /** 連携済みの見積 id → Hikae 側の請求書番号（Hikae の seed と一致させる） */
 const HIKAE_INVOICE_NUMBERS: Readonly<Record<number, string>> = { 14: "INV-0017" };
 
-/** 連携済みの見積なら Hikae の請求書 URL、それ以外は null */
+/** 連携済みの見積なら Hikae の請求書 URL、それ以外は null。
+ * 受注後にだけ出すリンクなので `?from=approved` を付け、Hikae 側で請求書を発行済みに切り替えさせる */
 export function hikaeInvoiceUrl(id: number): string | null {
-  return id in HIKAE_INVOICE_NUMBERS ? `${HIKAE_INVOICES_URL}/${estimateNumber(id).toLowerCase()}` : null;
+  return id in HIKAE_INVOICE_NUMBERS ? `${HIKAE_INVOICES_URL}/${estimateNumber(id).toLowerCase()}?from=approved` : null;
 }
 
 /** 連携済みの見積なら Hikae 側の請求書番号、それ以外は null */

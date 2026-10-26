@@ -1,10 +1,12 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { formatLongDate, formatMonthLabel } from "@/lib/dates";
 import {
   dashboardSummary,
+  isOutstanding,
   monthlyRevenue,
   projectName,
   sortTasks,
@@ -25,7 +27,7 @@ function signedYen(delta: number): string {
   return `${delta > 0 ? "+" : "−"}${formatYen(Math.abs(delta))}`;
 }
 
-interface FlowStep {
+interface Metric {
   label: string;
   value: number;
   sub: string;
@@ -34,76 +36,73 @@ interface FlowStep {
   warn?: boolean;
 }
 
+interface BillingDeltas {
+  duePaid: number;
+  overdue: number;
+  later: number;
+}
+
 /**
- * freee の「請求 → 入金 → 残り」に倣い、請求したお金がどこまで回収できたかを1行で見せる。
- * 請求額 = 今月の入金 + 未回収の合計（来月以降が期日の未回収も含む）なので、入金を記録すると「入金」が増え「残り」が同額減る。
- * 月次グラフの今月分（今月期日の分だけ）と額が違うため、その差を下に一行で書く。
+ * 今月の請求がどこまで回収できたかを、説明なしで読める3つの数字で見せる。
+ * 「今月期日の請求 = うち入金 + 残り」が常に成り立つ。期限超過は先月以前の分も含めて別に出し、
+ * 来月以降が期日の分は「今後の入金予定」として下の行に分ける。
  * 増減バッジは見出し行に出し、数字の行の高さは固定して下の要素を動かさない
  */
-function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
-  summary: DashboardSummary;
-  paidDelta: number;
-  outstandingDelta: number;
-}) {
-  const billed = s.thisMonthPaid + s.outstandingTotal;
-  const ratio = billed > 0 ? s.thisMonthPaid / billed : 0;
-  const steps: FlowStep[] = [
-    { label: "請求額", value: billed, sub: "今月の入金＋未回収" },
-    { label: "今月の入金", value: s.thisMonthPaid, delta: paidDelta, sub: `請求額の ${Math.round(ratio * 100)}%` },
+function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; deltas: BillingDeltas }) {
+  const ratio = s.thisMonthDueTotal > 0 ? s.thisMonthDuePaid / s.thisMonthDueTotal : 0;
+  const rest = s.thisMonthDueTotal - s.thisMonthDuePaid;
+  const metrics: Metric[] = [
+    { label: "今月期日の請求", value: s.thisMonthDueTotal, sub: `${s.thisMonthDueCount}件` },
     {
-      label: "残り",
-      value: s.outstandingTotal,
-      delta: outstandingDelta,
-      sub: s.overdueCount > 0 ? `うち期限超過 ${formatYen(s.overdueTotal)}` : "期限超過なし",
+      label: "うち入金",
+      value: s.thisMonthDuePaid,
+      delta: deltas.duePaid,
+      sub: rest > 0 ? `残り ${formatYen(rest)}` : "すべて入金済",
+    },
+    {
+      label: "期限超過",
+      value: s.overdueTotal,
+      delta: deltas.overdue,
+      sub: s.overdueCount > 0 ? `${s.overdueCount}件・要連絡` : "なし",
       warn: s.overdueCount > 0,
     },
   ];
 
   return (
-    <Card title="請求と回収" className="mb-6" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
-      <ol className="grid grid-cols-3">
-        {steps.map((st, i) => (
-          <li key={st.label} className={cn("relative min-w-0 px-3 pt-3 pb-3 sm:px-5 sm:pt-4", i > 0 && "border-l border-line")}>
-            {i > 0 && (
-              <ChevronRight
-                size={14}
-                aria-hidden
-                className="absolute top-1/2 -left-[8px] -translate-y-1/2 rounded-full bg-canvas text-warm-300"
-              />
-            )}
-            <p className="flex h-5 items-center justify-between gap-1 text-xs text-warm-500">
-              {st.label}
-              {st.delta ? (
-                <span className="num anim-rise rounded bg-blue-tint/60 px-1 text-[11px] font-semibold text-blue-active">
-                  {signedYen(st.delta)}
-                </span>
-              ) : null}
-            </p>
-            <p
-              key={st.value}
+    <Card title="今月の請求と入金" className="mb-6" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
+      <dl className="grid grid-cols-3">
+        {metrics.map((m, i) => (
+          <div key={m.label} className={cn("min-w-0 px-3 pt-3 pb-3 sm:px-5 sm:pt-4", i > 0 && "border-l border-line")}>
+            <dt className="flex h-5 items-center justify-between gap-1 text-xs text-warm-500">
+              {m.label}
+              <DeltaBadge delta={m.delta} />
+            </dt>
+            <dd
+              key={m.value}
               className={cn(
-                "num mt-0.5 flex h-7 items-center text-base font-semibold tracking-tight text-ink sm:text-[22px]",
-                st.delta && "anim-rise",
+                "num mt-0.5 flex h-7 items-center text-base font-semibold tracking-tight sm:text-[22px]",
+                m.warn ? "text-orange" : "text-ink",
+                m.delta && "anim-rise",
               )}
             >
-              {formatYen(st.value)}
-            </p>
-            {/* スマホの3列では補足が2行に折り返すため、2行分の高さを常に取っておく */}
-            <p
+              {formatYen(m.value)}
+            </dd>
+            {/* スマホの3列では補足が2行に折り返すことがあるため、2行分の高さを常に取っておく */}
+            <dd
               className={cn(
                 "num min-h-[2lh] text-[11px] sm:min-h-0 sm:text-xs",
-                st.warn ? "font-semibold text-orange" : "text-warm-500",
+                m.warn ? "font-semibold text-orange" : "text-warm-500",
               )}
             >
-              {st.sub}
-            </p>
-          </li>
+              {m.sub}
+            </dd>
+          </div>
         ))}
-      </ol>
+      </dl>
       <div
         className="mx-3 mb-4 h-1.5 overflow-hidden rounded-full bg-warm-200 sm:mx-5"
         role="progressbar"
-        aria-label="請求の回収率"
+        aria-label="今月期日の請求のうち入金済の割合"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(ratio * 100)}
@@ -113,12 +112,54 @@ function BillingFlow({ summary: s, paidDelta, outstandingDelta }: {
           style={{ width: `${ratio * 100}%` }}
         />
       </div>
-      {s.laterDueTotal > 0 && (
-        <p className="num border-t border-line px-3 py-2 text-[11px] text-warm-500 sm:px-5 sm:text-xs">
-          未回収には来月以降が期日の {formatYen(s.laterDueTotal)} を含みます。下のグラフの今月分は今月が期日の請求だけです。
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 border-t border-line px-3 py-2.5 sm:px-5">
+        <p className="flex items-center gap-2 text-xs text-warm-500">
+          今後の入金予定
+          <span className="num">来月以降が期日・{s.laterDueCount}件</span>
+          <DeltaBadge delta={deltas.later} />
         </p>
-      )}
+        <p key={s.laterDueTotal} className={cn("num text-sm font-semibold text-ink", deltas.later && "anim-rise")}>
+          {formatYen(s.laterDueTotal)}
+        </p>
+      </div>
     </Card>
+  );
+}
+
+function DeltaBadge({ delta }: { delta?: number }) {
+  if (!delta) return null;
+  return (
+    <span className="num anim-rise rounded bg-blue-tint/60 px-1 text-[11px] font-semibold text-blue-active">
+      {signedYen(delta)}
+    </span>
+  );
+}
+
+/** 「数値で見る」の開閉。ブラウザ標準の三角ではなく、ほかのリンクと同じ文字＋シェブロンにする */
+function MonthlyTableToggle({ rows }: { rows: readonly MonthlyRevenue[] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-4">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls="monthly-table"
+        onClick={() => setOpen((v) => !v)}
+        className="hit inline-flex items-center gap-1 rounded text-xs text-warm-500 hover:text-ink"
+      >
+        数値で見る
+        <ChevronDown
+          size={14}
+          aria-hidden
+          className={cn("transition-transform duration-200 motion-reduce:transition-none", open && "rotate-180")}
+        />
+      </button>
+      {open && (
+        <div id="monthly-table">
+          <MonthlyTable rows={rows} />
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -164,14 +205,19 @@ export function DashboardView() {
 
 function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
   const s = dashboardSummary(data, today);
+  // グラフの今月の棒を伸ばすための差分（入金日ベース）
   const paidDelta = useDelta(s.thisMonthPaid, "hikae-delta-paid");
-  const outstandingDelta = useDelta(s.outstandingTotal, "hikae-delta-outstanding");
+  const deltas: BillingDeltas = {
+    duePaid: useDelta(s.thisMonthDuePaid, "hikae-delta-due-paid"),
+    overdue: useDelta(s.overdueTotal, "hikae-delta-overdue"),
+    later: useDelta(s.laterDueTotal, "hikae-delta-later"),
+  };
   const revenue = monthlyRevenue(data.invoices, today);
   const focusTasks = sortTasks(
     data.tasks.filter((t) => ["overdue", "today"].includes(taskGroup(t, today)) || (t.done && (t.dueDate === today || t.doneOn === today))),
   );
   const unpaid = data.invoices
-    .filter((inv) => !inv.paidOn)
+    .filter(isOutstanding)
     .toSorted((a, b) => a.dueOn.localeCompare(b.dueOn));
   const sixMonthTotal = revenue.reduce((sum, m) => sum + m.paid, 0);
   const firstMonth = formatMonthLabel(revenue[0].month);
@@ -181,7 +227,7 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
     <Page>
       <PageHeader eyebrow={formatLongDate(today)} title="ダッシュボード" />
 
-      <BillingFlow summary={s} paidDelta={paidDelta} outstandingDelta={outstandingDelta} />
+      <BillingSummary summary={s} deltas={deltas} />
 
       <Card className="mb-6">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-4 pt-4 sm:px-5 sm:pt-5">
@@ -194,12 +240,8 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
           <RevenueChart
             data={revenue}
             growFrom={paidDelta > 0 ? (s.thisMonthPaid - paidDelta) / s.thisMonthPaid : null}
-            ceiling={s.thisMonthPaid + s.outstandingTotal}
           />
-          <details className="mt-4">
-            <summary className="cursor-pointer text-xs text-warm-500 hover:text-ink">数値で見る</summary>
-            <MonthlyTable rows={revenue} />
-          </details>
+          <MonthlyTableToggle rows={revenue} />
         </div>
       </Card>
 

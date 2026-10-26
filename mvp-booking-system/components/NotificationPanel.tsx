@@ -26,7 +26,7 @@ export default function NotificationPanel({ reservation: r, today, onSend }: Pro
       <figure className="px-5 pt-4 pb-5 border-t border-line">
         <figcaption className="text-xs text-dim mb-2">送られる文面（例）</figcaption>
         {via ? <Preview r={r} via={via} /> : (
-          <p className="bg-muted rounded-lg px-4 py-4 text-sm text-body text-pretty">
+          <p className="text-sm text-body text-pretty">
             連絡先が登録されていないため送れません。電話番号かメールアドレスを登録してください。
           </p>
         )}
@@ -48,14 +48,13 @@ function Preview({ r, via }: { r: Reservation; via: NotifyVia }) {
 
   if (via === 'メール') {
     return (
-      <div className="bg-muted rounded-lg p-3">
-        <div className="bg-canvas border border-line rounded-md text-sm">
-          <dl className="px-3.5 py-2.5 border-b border-line text-xs space-y-1">
-            <div className="flex gap-2"><dt className="w-8 shrink-0 text-dim">宛先</dt><dd className="text-ink break-all">{r.customer_email}</dd></div>
-            <div className="flex gap-2"><dt className="w-8 shrink-0 text-dim">件名</dt><dd className="text-ink">ご予約内容のご確認（{SHOP.name}）</dd></div>
-          </dl>
-          <p className="px-3.5 py-3 text-ink leading-relaxed">{body}</p>
-        </div>
+      // 灰色の面や枠で囲まず、宛先・件名と本文を罫線1本で分けるだけにする
+      <div className="text-sm">
+        <dl className="pb-2.5 border-b border-line text-xs space-y-1">
+          <div className="flex gap-2"><dt className="w-8 shrink-0 text-dim">宛先</dt><dd className="text-ink break-all">{r.customer_email}</dd></div>
+          <div className="flex gap-2"><dt className="w-8 shrink-0 text-dim">件名</dt><dd className="text-ink">ご予約内容のご確認（{SHOP.name}）</dd></div>
+        </dl>
+        <p className="pt-3 text-ink leading-relaxed">{body}</p>
         <p className="text-right text-[11px] text-dim mt-1.5">{status}</p>
       </div>
     );
@@ -63,8 +62,8 @@ function Preview({ r, via }: { r: Reservation; via: NotifyVia }) {
 
   const line = via === 'LINE';
   return (
-    <div className="bg-muted rounded-lg px-3 py-4">
-      <p className="text-center text-[11px] text-dim mb-3">
+    <div>
+      <p className="text-[11px] text-dim mb-3">
         {line ? `${r.customer_name} 様とのトーク（LINE）` : `${r.customer_phone} へのSMS`}
       </p>
       {/* お店から送る側なので右寄せ */}

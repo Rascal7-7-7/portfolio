@@ -1,6 +1,6 @@
 import { profile } from "@/content/profile";
 import { cn } from "@/lib/cn";
-import { container } from "./ui/container";
+import { containerWide } from "./ui/container";
 
 /**
  * トップと Case Study の両方で使う。
@@ -14,20 +14,21 @@ const navItems = [
 ];
 
 const navLink =
-  "inline-flex items-center py-2 text-ink-muted hover:text-ink transition-colors";
+  "inline-flex min-h-11 items-center px-1 text-ink-muted hover:text-ink transition-colors";
 
+/** 幅は全ページで containerWide に揃え、ページを移ってもロゴとナビの位置が動かないようにする */
 export function Header() {
   return (
     <>
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-3 focus:left-3 focus:px-4 focus:py-2 focus:rounded-md focus:bg-accent focus:text-white"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-3 focus:left-3 focus:px-4 focus:py-2 focus:rounded-md focus:bg-accent focus:text-paper"
       >
         メインコンテンツへスキップ
       </a>
-      <header id="top">
-        {/* 幅と余白は本文と同じ container を使い、名前の左端を本文に揃える */}
-        <div className={cn(container, "h-16 flex items-center justify-between gap-3")}>
+      <header id="top" className="sticky top-0 z-30 border-b border-rule bg-paper/95 backdrop-blur-sm">
+        {/* 幅と余白は本文と同じ containerWide を使い、名前の左端を本文に揃える */}
+        <div className={cn(containerWide, "h-16 flex items-center justify-between gap-3")}>
           <a
             href="/#top"
             className="font-semibold text-ink whitespace-nowrap"
@@ -45,17 +46,6 @@ export function Header() {
                   </a>
                 </li>
               ))}
-              <li>
-                <a
-                  href={profile.links.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={navLink}
-                  aria-label="GitHub（新しいタブで開く）"
-                >
-                  GitHub
-                </a>
-              </li>
             </ul>
           </nav>
         </div>

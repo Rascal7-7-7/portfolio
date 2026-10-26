@@ -43,7 +43,7 @@ export default function Sidebar() {
   const isActive = useIsActive();
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line bg-white px-4 py-6 md:flex print:hidden">
+    <aside className="sticky top-0 hidden h-screen w-[200px] shrink-0 flex-col border-r border-line bg-white px-4 py-6 md:flex print:hidden">
       <Link href="/estimates" className={cn("mb-8 rounded px-2", FOCUS_CLASS)}>
         <p className="text-lg font-bold tracking-tight text-navy">見積マネージャー</p>
         <p className="text-xs text-muted">見積作成から受注管理まで</p>

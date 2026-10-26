@@ -36,6 +36,22 @@ body {
   font-variant-numeric: tabular-nums lining-nums;
 }
 
+/* 文字だけのリンクや小さなボタンは、見た目を変えずに指で押せる範囲だけ 44px 四方まで広げる */
+@media (pointer: coarse) {
+  .hit {
+    position: relative;
+  }
+  .hit::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}
+
 /* 入金を記録した直後の控えめな動き。transform / opacity のみ、動きを減らす設定では出さない */
 @media (prefers-reduced-motion: no-preference) {
   .anim-rise {

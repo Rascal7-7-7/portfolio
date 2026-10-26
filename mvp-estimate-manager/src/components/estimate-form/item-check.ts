@@ -21,3 +21,9 @@ export function itemErrors(item: { quantity: string; unitPrice: string }): { qua
       : {}),
   };
 }
+
+/** 単価欄の表示用。整数として読めるときだけ3桁区切りにする（parseAmount はカンマを読み飛ばす） */
+export function groupDigits(value: string): string {
+  const n = parseAmount(value);
+  return value.trim() !== "" && Number.isSafeInteger(n) && n >= 0 ? n.toLocaleString("en-US") : value;
+}

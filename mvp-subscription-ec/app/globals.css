@@ -15,6 +15,13 @@
     color: #30332f;
   }
 
+  /* スマホの固定バー（購入手続き・商品ページ）が出ている間は、その高さぶん下を空け、フッター最下段の注記に重ねない */
+  @media (max-width: 1023px) {
+    body:has([data-fixed-bar]) {
+      padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    }
+  }
+
   * {
     scrollbar-width: thin;
     scrollbar-color: #c1c9bb transparent;
@@ -23,6 +30,13 @@
   :focus-visible {
     outline: 2px solid #4a6741;
     outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* 主ボタン。hover は濃く、押下はわずかに沈める（透明度で薄めない） */
+  .btn-primary {
+    @apply rounded-sm bg-primary font-medium text-on-primary transition-[background-color,transform] duration-150 hover:bg-primary-hover active:scale-[0.985] disabled:pointer-events-none disabled:bg-primary-hover;
   }
 }
 

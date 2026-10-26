@@ -3,13 +3,14 @@
 import { useSyncExternalStore } from "react";
 import type { AppData, Invoice, ISODate, Project, ProjectStatus, Task } from "@/types";
 import { todayISO } from "./dates.ts";
-import { createSeed } from "./seed.ts";
+import { createSeed, ESTIMATE_INVOICE_ID } from "./seed.ts";
 
 /**
  * デモ用のクライアント側ストア。API・DB は使わず、操作内容は localStorage に保存する。
  * ponytail: 日付が変わるとダミーデータを作り直す（相対日付を常に「今日」基準に保つため）。
  */
-const STORAGE_KEY = "freelancehub-demo-v4";
+// v5: 請求に draft（見積の承認待ち）と明細の unitPrice を追加
+const STORAGE_KEY = "freelancehub-demo-v5";
 
 interface Snapshot {
   readonly today: ISODate;
@@ -149,6 +150,8 @@ export const actions = {
   setInvoicePaid(id: string, paid: boolean): void {
     const { today, data } = getSnapshot();
     const invoice = data.invoices.find((inv) => inv.id === id);
+    // 下書きは発行前なので入金を記録できない
+    if (invoice?.draft) return;
     update((d) => ({
       ...d,
       invoices: d.invoices.map((inv) =>
@@ -162,6 +165,17 @@ export const actions = {
     } else if (paidToast?.invoiceId === id) {
       setPaidToast(null);
     }
+  },
+  /** 見積管理で EST-0014 が承認された（?from=approved で開かれた）ら、下書きの請求を発行済みにする。期日（翌月末）は変えない */
+  approveEstimateInvoice(): void {
+    const { today, data } = getSnapshot();
+    if (!data.invoices.some((inv) => inv.id === ESTIMATE_INVOICE_ID && inv.draft)) return;
+    update((d) => ({
+      ...d,
+      invoices: d.invoices.map((inv) =>
+        inv.id === ESTIMATE_INVOICE_ID ? { ...inv, draft: false, issuedOn: today } : inv,
+      ),
+    }));
   },
   clearPaidToast(): void {
     setPaidToast(null);

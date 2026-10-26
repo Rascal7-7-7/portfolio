@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PRODUCTS } from '@/lib/catalog';
 import { ProductCard } from '@/components/ProductCard';
+import { ProductVisual } from '@/components/ProductVisual';
 import { Phrases } from '@/components/Phrases';
 import { perServing, unitPrice, yen } from '@/lib/pricing';
 
@@ -32,10 +33,14 @@ const STEPS = [
   { n: '3', title: 'マイページで調整', body: '在庫が余ったらスキップ。お休みも解約もワンタップ。' },
 ];
 
+const HERO_ID = 'herb-tea';
+
 export const metadata: Metadata = { title: '商品一覧' };
 
 export default function ProductsPage() {
-  const hero = PRODUCTS[0];
+  // 一覧の1枚目（コーヒー）と同じ商品をヒーローに出すと、広い画面で同じ絵が上下に並ぶ。
+  // 一覧では最後に来るハーブティーを出す（ティーバッグなのでポスト投函の説明とも合う）
+  const hero = PRODUCTS.find((p) => p.id === HERO_ID) ?? PRODUCTS[0];
   const heroPrice = unitPrice(hero.price, 'monthly');
   const heroServing = perServing(heroPrice, hero.specs);
   const heroSize = hero.specs.find((s) => s.label === '内容量')?.value.replace(/（.*）/, '');
@@ -58,7 +63,7 @@ export default function ProductsPage() {
           <div className="mt-6 flex flex-wrap items-center gap-6 sm:mt-8">
             <Link
               href="#items"
-              className="inline-flex items-center rounded-sm bg-primary px-6 py-3 text-sm font-medium text-on-primary transition-opacity hover:opacity-90"
+              className="inline-flex items-center btn-primary px-6 py-3 text-sm font-medium"
             >
               商品を見る
             </Link>
@@ -68,9 +73,15 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* 商品は下の一覧で見せるので、ここは「毎月届く」体験と1杯の値段だけを置く */}
+        {/* 定番の1品を「写真」として大きく見せ、横に毎月の値段と1杯の値段だけを置く */}
         <div className="flex items-center gap-5 border-t border-outline-variant/60 pt-6 sm:gap-10 sm:pt-10 lg:border-t-0 lg:pt-0">
-          <ParcelIcon className="w-24 flex-shrink-0 text-primary sm:w-44 lg:w-56" />
+          <Link href={`/products/${hero.id}`} className="group w-28 flex-shrink-0 overflow-hidden sm:w-48 lg:w-60" aria-label={`${hero.name}の商品ページへ`}>
+            <ProductVisual
+              product={hero}
+              decorative
+              className="aspect-[4/5] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            />
+          </Link>
           <div className="min-w-0">
             <p className="text-xs text-on-surface-variant sm:text-sm">
               <Phrases parts={[...hero.nameParts, heroSize ? `（${heroSize}）の定期便` : 'の定期便']} />
@@ -160,20 +171,5 @@ export default function ProductsPage() {
         </div>
       </section>
     </main>
-  );
-}
-
-/** ポスト投函サイズの薄い箱。線は currentColor の1色だけ */
-function ParcelIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 200 140" fill="none" stroke="currentColor" strokeWidth={2} strokeLinejoin="round" aria-hidden className={className}>
-      <path d="M20 58 L110 28 L180 53 L90 83 Z" fill="currentColor" fillOpacity={0.08} />
-      <path d="M20 58 L90 83 L90 105 L20 80 Z" />
-      <path d="M90 83 L180 53 L180 75 L90 105 Z" />
-      {/* テープと宛名ラベル */}
-      <path d="M65 43 L135 68" strokeWidth={6} strokeOpacity={0.35} />
-      <path d="M135 68 L135 90" strokeWidth={6} strokeOpacity={0.35} />
-      <path d="M32 70 L58 79 L58 88 L32 79 Z" />
-    </svg>
   );
 }

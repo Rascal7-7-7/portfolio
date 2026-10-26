@@ -1,11 +1,12 @@
 import { profile } from "@/content/profile";
 import { TextLink } from "./ui/TextLink";
-import { container } from "./ui/container";
+import { containerWide } from "./ui/container";
 
+/** 幅はヘッダーと同じく全ページで containerWide に揃える */
 export function Footer() {
   return (
     <footer className="pb-12">
-      <div className={container}>
+      <div className={containerWide}>
         <div className="border-t border-rule pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <p className="text-sm text-ink-subtle">
             © {new Date().getFullYear()} {profile.name}

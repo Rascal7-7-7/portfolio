@@ -42,11 +42,45 @@ h3,
   .delta-in {
     animation: rise-in 400ms ease-out;
   }
+  /* 再計算された合計の数字だけを短く持ち上げ、入力に反応したことを見せる（key を変えて再生する） */
+  .num-tick {
+    animation: num-tick 220ms ease-out;
+  }
+  /* ホバー・押下の色の変化を一瞬だけなめらかにする */
+  a,
+  button,
+  summary,
+  input,
+  textarea {
+    transition-property: color, background-color, border-color, box-shadow, transform;
+    transition-duration: 120ms;
+    transition-timing-function: ease-out;
+  }
+  button:not(:disabled):active,
+  summary:active,
+  a[class*="bg-primary"]:active {
+    transform: translateY(1px);
+  }
 }
 
 @keyframes rise-in {
   from {
     opacity: 0;
     transform: translateY(6px);
+  }
+}
+
+@keyframes num-tick {
+  from {
+    opacity: 0.55;
+    transform: translateY(3px);
+  }
+}
+
+/* 明細の行・合計欄がページの境目で切れないようにする */
+@media print {
+  tr,
+  dl {
+    break-inside: avoid;
   }
 }

@@ -6,6 +6,7 @@ import { formatDate, formatRelative } from "@/lib/dates";
 import { invoiceStatus } from "@/lib/selectors";
 import { formatYen } from "@/lib/utils";
 import { InvoiceStatusBadge } from "@/components/StatusBadge";
+import { buttonStyles } from "@/components/ui";
 import type { AppData, Invoice, ISODate } from "@/types";
 
 interface InvoiceListProps {
@@ -18,6 +19,7 @@ interface InvoiceListProps {
 }
 
 function dueText(invoice: Invoice, today: ISODate): string {
+  if (invoice.draft) return `見積 ${invoice.estimateNo ?? ""} の承認待ち`;
   if (invoice.paidOn) return `入金 ${formatDate(invoice.paidOn)}`;
   return `期日 ${formatDate(invoice.dueOn)}（${formatRelative(today, invoice.dueOn)}）`;
 }
@@ -35,7 +37,7 @@ export function InvoiceList({ invoices, data, today, empty, withProject = true }
         return (
           <li key={inv.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 sm:flex-nowrap sm:px-5">
             {/* 行の左側から請求書の紙面を開く。請求番号を青くしてリンクだと分かるようにする */}
-            <Link href={`/invoices/${inv.id}`} className="group min-w-0 flex-1 basis-full rounded sm:basis-auto">
+            <Link href={`/invoices/${inv.id}`} className="hit group min-w-0 flex-1 basis-full rounded sm:basis-auto">
               {withProject ? (
                 <>
                   <p className="text-sm font-medium break-words text-ink">{project?.client ?? "—"}</p>
@@ -58,17 +60,18 @@ export function InvoiceList({ invoices, data, today, empty, withProject = true }
                 {formatYen(inv.amount)}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => actions.setInvoicePaid(inv.id, !inv.paidOn)}
-              className={
-                inv.paidOn
-                  ? "w-24 shrink-0 rounded-md px-2 py-1.5 text-xs text-warm-500 hover:bg-black/[0.04] hover:text-ink"
-                  : "w-24 shrink-0 rounded-md border border-line bg-canvas px-2 py-1.5 text-xs font-medium text-ink hover:bg-warm-100"
-              }
-            >
-              {inv.paidOn ? "入金を取消" : "入金済にする"}
-            </button>
+            {/* 下書きは発行前なので入金を記録できない。列をそろえるため同じ幅の空きを置く */}
+            {inv.draft ? (
+              <span aria-hidden className="hidden w-24 shrink-0 sm:block" />
+            ) : (
+              <button
+                type="button"
+                onClick={() => actions.setInvoicePaid(inv.id, !inv.paidOn)}
+                className={inv.paidOn ? buttonStyles.rowActionQuiet : buttonStyles.rowAction}
+              >
+                {inv.paidOn ? "入金を取消" : "入金済にする"}
+              </button>
+            )}
           </li>
         );
       })}

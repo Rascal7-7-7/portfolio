@@ -1,12 +1,12 @@
 'use client';
-import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CreditCard, Store } from 'lucide-react';
+import { CreditCard, Loader2, Lock, Store } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
 import { TotalsTable } from '@/components/TotalsTable';
 import { PlanBadge } from '@/components/PlanBadge';
 import { CheckoutSteps } from '@/components/CheckoutSteps';
+import { EmptyState } from '@/components/EmptyState';
 import { RecurringSummary } from '@/components/RecurringSummary';
 import { DEMO_USER } from '@/lib/catalog';
 import { cartTotals, toCartLines } from '@/lib/cart';
@@ -21,40 +21,59 @@ const PAYMENT_METHODS = [
 
 type PaymentId = (typeof PAYMENT_METHODS)[number]['id'];
 
+// 押した直後に画面が切り替わると「本当に通ったのか」が伝わらないため、短く処理中を見せる
+const PROCESSING_MS = 700;
+
 export default function CheckoutPage() {
   const { state, loaded, dispatch } = useStore();
   const router = useRouter();
   const [payment, setPayment] = useState<PaymentId>('card');
   const [placing, setPlacing] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
-  if (!loaded || placing) {
+  if (!loaded) return <main className="min-h-[60vh]" aria-busy="true" />;
+
+  const lines = toCartLines(state.cart);
+  // 確定後はカートが空になるので、完了画面へ移るまでの一瞬は処理中のまま見せる
+  if (lines.length === 0 && placing) {
     return (
       <main className="min-h-[60vh] py-24 text-center text-sm text-on-surface-variant" aria-busy="true">
-        {placing && '申し込みを処理しています…'}
+        申し込みを処理しています…
       </main>
     );
   }
-
-  const lines = toCartLines(state.cart);
   if (lines.length === 0) {
-    return (
-      <main className="mx-auto max-w-lg px-4 py-24 text-center">
-        <h1 className="text-on-surface-variant">カートに商品がありません</h1>
-        <Link href="/products" className="mt-4 inline-block text-sm text-primary hover:underline">
-          商品一覧へ
-        </Link>
-      </main>
-    );
+    return <EmptyState title="カートに商品がありません" body="商品を選んでから、ご購入手続きに進んでください。" />;
   }
 
   const totals = cartTotals(lines);
   const delivery = firstDelivery(todayIso());
 
   const placeOrder = () => {
+    if (placing) return;
     setPlacing(true);
-    dispatch({ type: 'placeOrder', today: todayIso(), orderId: `MA-${Date.now().toString().slice(-6)}` });
-    router.push('/complete');
+    timer.current = setTimeout(() => {
+      dispatch({ type: 'placeOrder', today: todayIso(), orderId: `MA-${Date.now().toString().slice(-6)}` });
+      router.push('/complete');
+    }, PROCESSING_MS);
   };
+
+  const confirmButton = (className: string) => (
+    <button type="button" onClick={placeOrder} disabled={placing} aria-busy={placing} className={cn('btn-primary flex items-center justify-center gap-2', className)}>
+      {placing ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+          処理しています…
+        </>
+      ) : (
+        <>
+          <Lock className="h-4 w-4" aria-hidden />
+          申し込みを確定する
+        </>
+      )}
+    </button>
+  );
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
@@ -107,11 +126,21 @@ export default function CheckoutPage() {
                       onChange={() => setPayment(id)}
                       className="sr-only"
                     />
-                    <Icon className="h-5 w-5 text-on-surface-variant" aria-hidden />
-                    <span>
+                    {/* 選択中は枠の太さに加え、ラジオの丸でも示す（色だけに頼らない） */}
+                    <span
+                      aria-hidden
+                      className={cn(
+                        'flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded-full border',
+                        payment === id ? 'border-on-surface' : 'border-on-surface-variant',
+                      )}
+                    >
+                      {payment === id && <span className="h-2.5 w-2.5 rounded-full bg-on-surface" />}
+                    </span>
+                    <span className="min-w-0 flex-1">
                       <span className="block text-sm font-medium text-on-surface">{label}</span>
                       <span className="block text-xs text-on-surface-variant">{note}</span>
                     </span>
+                    <Icon className="h-5 w-5 flex-shrink-0 text-on-surface-variant" aria-hidden />
                   </label>
                 ))}
               </div>
@@ -144,16 +173,21 @@ export default function CheckoutPage() {
             <div className="mt-4">
               <RecurringSummary lines={lines} firstDelivery={delivery} />
             </div>
-            <button
-              type="button"
-              onClick={placeOrder}
-              className="mt-5 flex w-full items-center justify-center rounded-sm bg-primary py-3.5 font-medium text-on-primary transition-opacity hover:opacity-90"
-            >
-              申し込みを確定する
-            </button>
+            {confirmButton('mt-5 hidden w-full py-3.5 lg:flex')}
             <p className="mt-3 text-center text-xs text-on-surface-variant">※ デモのため実際の決済は発生しません</p>
           </div>
         </aside>
+      </div>
+
+      {/* スマホは確定ボタンと合計を画面下に固定し、どこまでスクロールしても押せるようにする */}
+      <div data-fixed-bar className="fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant/60 bg-background px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 lg:hidden">
+        <div className="mx-auto flex max-w-xl items-center gap-3">
+          <p className="min-w-0 flex-1 leading-tight">
+            <span className="block text-xs text-on-surface-variant">合計（税込）</span>
+            <span className="tnum font-headline text-lg font-semibold text-on-surface">{yen(totals.total)}</span>
+          </p>
+          {confirmButton('flex-shrink-0 whitespace-nowrap px-5 py-3 text-sm')}
+        </div>
       </div>
     </main>
   );

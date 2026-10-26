@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <header className="flex h-12 items-center border-b border-line bg-white px-4 md:hidden print:hidden">
                 <p className="text-sm font-bold text-navy">見積マネージャー</p>
                 <span className="ml-2 rounded bg-canvas px-1.5 py-0.5 text-[11px] text-muted">デモ</span>
-                <ResetDemoButton className="ml-auto -mr-2 px-2 py-2" />
+                <ResetDemoButton className="ml-auto -mr-2 min-h-11 px-2" />
               </header>
               <main className="pb-20 md:pb-0 print:pb-0">
                 {children}

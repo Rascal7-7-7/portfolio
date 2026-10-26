@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
 import { DEMO_USER, INTERVAL_LABEL } from '@/lib/catalog';
@@ -13,8 +13,18 @@ import { SubscriptionCard, type SubscriptionCommand } from './_components/Subscr
 
 export default function MyPage() {
   const { state, loaded, dispatch } = useStore();
-  // 文節の配列で持ち、Phrases で日付の途中では改行させない
-  const [message, setMessage] = useState<ReadonlyArray<string>>([]);
+  // 文節の配列で持ち、Phrases で日付の途中では改行させない。
+  // seq は同じ定期便を続けて操作しても、ハイライトとトーストをやり直すための通し番号
+  const [notice, setNotice] = useState<Notice | null>(null);
+  const setMessage = (parts: ReadonlyArray<string>, subId?: string) =>
+    setNotice((prev) => ({ parts, subId, seq: (prev?.seq ?? 0) + 1 }));
+
+  useEffect(() => {
+    if (!notice) return;
+    const t = setTimeout(() => setNotice(null), TOAST_MS);
+    return () => clearTimeout(t);
+  }, [notice]);
+
   if (!loaded) return <main className="min-h-[60vh]" aria-busy="true" />;
 
   // 並べ替えない：操作したカードが動くと、デモ中に目で追えなくなる
@@ -36,7 +46,7 @@ export default function MyPage() {
             ? [`${name}の定期便を`, '再開しました']
             : [`${name}の定期便を`, '解約しました'];
     dispatch(command === 'resume' || command === 'unskip' ? { type: command, id: sub.id, today } : { type: command, id: sub.id });
-    setMessage(after);
+    setMessage(after, sub.id);
   };
 
   const changeInterval = (sub: Subscription, interval: SubscriptionInterval, name: string) => {
@@ -44,12 +54,12 @@ export default function MyPage() {
     const next = withInterval(sub, interval, today).nextDelivery;
     const dates = sub.nextDelivery && next && next !== sub.nextDelivery ? ['、次回', `${formatJa(sub.nextDelivery)} → ${formatJa(next)}`] : [];
     dispatch({ type: 'changeInterval', id: sub.id, interval, today });
-    setMessage([`${name}の`, 'お届け間隔を', '変更しました：', `${INTERVAL_LABEL[sub.interval]} → ${INTERVAL_LABEL[interval]}`, ...dates, ...(sub.skippedFrom ? ['（スキップは解除されました）'] : [])]);
+    setMessage([`${name}の`, 'お届け間隔を', '変更しました：', `${INTERVAL_LABEL[sub.interval]} → ${INTERVAL_LABEL[interval]}`, ...dates, ...(sub.skippedFrom ? ['（スキップは解除されました）'] : [])], sub.id);
   };
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <div className="max-w-3xl">
+      <div className="mx-auto max-w-3xl">
         <div>
           <p className="text-xs text-on-surface-variant">マイページ（デモユーザー）</p>
           <h1 className="mt-1 font-headline text-2xl font-light text-on-background sm:text-3xl">{DEMO_USER.name} 様</h1>
@@ -61,11 +71,7 @@ export default function MyPage() {
           <Stat label="月あたりの目安" value={yen(monthlySpend)} />
         </dl>
 
-        <p role="status" aria-live="polite" className="mt-4 min-h-[1.25rem] text-sm font-medium text-primary">
-          <Phrases parts={message} />
-        </p>
-
-        <div className="mb-3 mt-6 flex flex-wrap items-baseline justify-between gap-x-4">
+        <div className="mb-3 mt-8 flex flex-wrap items-baseline justify-between gap-x-4">
           <h2 className="text-sm font-semibold text-on-surface">定期便の管理</h2>
           <p className="text-xs text-on-surface-variant">金額は税込・送料無料</p>
         </div>
@@ -82,6 +88,7 @@ export default function MyPage() {
               <li key={sub.id}>
                 <SubscriptionCard
                   subscription={sub}
+                  flashKey={notice?.subId === sub.id ? notice.seq : undefined}
                   onCommand={(cmd, name) => run(sub, cmd, name)}
                   onChangeInterval={(interval, name) => changeInterval(sub, interval, name)}
                 />
@@ -104,9 +111,30 @@ export default function MyPage() {
           </button>
         </div>
       </div>
+
+      {/* 操作結果はヘッダー直下のトーストで返す。画面下だと、スマホで一番下の定期便の操作ボタンに重なるため。
+          読み上げ用に枠は常に置く */}
+      <div
+        role="status"
+        aria-live="polite"
+        className="pointer-events-none fixed inset-x-0 top-16 z-40 flex justify-center px-4 pt-3"
+      >
+        {notice && (
+          <p
+            key={notice.seq}
+            className="max-w-md animate-fade-up rounded-md bg-inverse-surface px-4 py-3 text-sm text-inverse-on-surface shadow-lg"
+          >
+            <Phrases parts={notice.parts} />
+          </p>
+        )}
+      </div>
     </main>
   );
 }
+
+const TOAST_MS = 4000;
+
+type Notice = { parts: ReadonlyArray<string>; subId?: string; seq: number };
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (

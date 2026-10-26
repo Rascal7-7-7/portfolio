@@ -68,6 +68,8 @@ export type {
   Category,
   Challenge,
   Decision,
+  Evidence,
+  EvidenceRow,
   FlowDiagram,
   Highlight,
   Period,

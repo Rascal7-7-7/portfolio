@@ -1,10 +1,12 @@
 'use client';
 import Link from 'next/link';
+import { Check } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
 import { ProductVisual } from '@/components/ProductVisual';
 import { PlanBadge } from '@/components/PlanBadge';
 import { TotalsTable } from '@/components/TotalsTable';
 import { CheckoutSteps } from '@/components/CheckoutSteps';
+import { EmptyState } from '@/components/EmptyState';
 import { RecurringSummary } from '@/components/RecurringSummary';
 import { DEMO_USER, findProduct } from '@/lib/catalog';
 import { formatJaLong } from '@/lib/date';
@@ -16,14 +18,7 @@ export default function CompletePage() {
 
   const order = state.lastOrder;
   if (!order) {
-    return (
-      <main className="mx-auto max-w-lg px-4 py-24 text-center">
-        <p className="text-on-surface-variant">表示できるご注文がありません</p>
-        <Link href="/products" className="mt-4 inline-block text-sm text-on-surface underline underline-offset-4">
-          商品一覧へ
-        </Link>
-      </main>
-    );
+    return <EmptyState title="表示できるご注文がありません" body="ご注文を確定すると、ここに内容とお届け予定が表示されます。" />;
   }
 
   const subscriptionCount = order.lines.filter((l) => l.interval !== 'once').length;
@@ -32,7 +27,9 @@ export default function CompletePage() {
     <main className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
       <CheckoutSteps current={2} />
 
-      <div className="text-center">
+      <div className="animate-fade-up text-center">
+        {/* 完了を示す印は線のチェックだけ（円で囲まない） */}
+        <Check className="mx-auto mb-3 h-8 w-8 text-primary" strokeWidth={1.75} aria-hidden />
         <h1 className="font-headline text-3xl font-light text-on-background [word-break:auto-phrase]">ご注文ありがとうございます</h1>
         <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
           {DEMO_USER.name} 様のお申し込みを受け付けました。
@@ -41,7 +38,7 @@ export default function CompletePage() {
         </p>
       </div>
 
-      <div className="mt-8 border-y border-outline-variant/60 py-6 text-center">
+      <div className="mt-8 animate-fade-up border-y border-outline-variant/60 py-6 text-center [animation-delay:80ms]">
         <div>
           <p className="text-xs text-on-surface-variant">初回お届け予定</p>
           <p className="tnum mt-1 font-headline text-2xl font-light text-on-surface">{formatJaLong(order.firstDelivery)}</p>
@@ -55,7 +52,7 @@ export default function CompletePage() {
         </div>
       </div>
 
-      <section className="mt-8 bg-surface-container-low p-5">
+      <section className="mt-8 animate-fade-up bg-surface-container-low p-5 [animation-delay:160ms]">
         <h2 className="mb-4 text-sm font-semibold text-on-surface">ご注文内容</h2>
         <ul className="mb-4 space-y-3 border-b border-outline-variant/60 pb-4">
           {order.lines.map((l) => {
@@ -86,13 +83,13 @@ export default function CompletePage() {
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <Link
           href="/mypage"
-          className="flex items-center justify-center rounded-sm bg-primary py-3.5 font-medium text-on-primary hover:opacity-90"
+          className="flex items-center justify-center btn-primary py-3.5 font-medium"
         >
           マイページで定期便を見る
         </Link>
         <Link
           href="/products"
-          className="flex items-center justify-center rounded-sm py-3.5 font-medium text-on-surface ring-1 ring-outline hover:ring-on-surface"
+          className="flex items-center justify-center rounded-sm py-3.5 font-medium text-on-surface ring-1 ring-outline transition-[box-shadow,transform] duration-150 hover:ring-on-surface active:scale-[0.985]"
         >
           ショップに戻る
         </Link>

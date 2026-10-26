@@ -18,7 +18,7 @@ interface Props {
 }
 
 // タッチ操作の幅では高さを 44px 以上にする
-const SEGMENT = 'flex min-h-11 shrink-0 items-center gap-2 rounded px-3 py-1.5 text-[13px] lg:min-h-0 font-medium transition-colors'
+const SEGMENT = 'flex min-h-11 shrink-0 items-center gap-2 rounded px-3 py-1.5 text-[13px] lg:min-h-0 font-medium transition-colors duration-150'
 const segmentState = (on: boolean) => (on ? 'bg-ed-ink text-white' : 'text-ed-muted hover:text-ed-ink')
 
 function TemplatePicker({ value, onChange }: { value: TemplateKey; onChange: (k: TemplateKey) => void }) {
@@ -52,7 +52,12 @@ function DeviceToggle({ value, onChange }: { value: Device; onChange: (d: Device
 
 export default function PreviewPane({ doc, generating, onTemplate }: Props) {
   const [device, setDevice] = useState<Device>('pc')
-  const page = <LandingPage key={`${doc.id}-${doc.template}`} doc={doc} headline="h2" />
+  // テンプレートを切り替えたときだけ、新しい LP を短くフェードで出す（入力中の再描画では動かさない）
+  const page = (
+    <div key={`${doc.id}-${doc.template}`} className="motion-safe:animate-fade-in">
+      <LandingPage doc={doc} headline="h2" />
+    </div>
+  )
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4 lg:p-6">
@@ -65,7 +70,13 @@ export default function PreviewPane({ doc, generating, onTemplate }: Props) {
         {device === 'pc' ? (
           // 1024px 未満は枠を外し、LP を画面幅でそのまま見せる。枠の上端には公開後の URL だけを出す
           <div className="flex w-full flex-col lg:overflow-hidden lg:rounded-lg lg:border lg:border-ed-line lg:bg-ed-panel lg:shadow-sm">
-            <p className="hidden truncate border-b border-ed-line px-4 py-2 text-center text-xs text-ed-muted lg:block">{mockPublicUrl(slugFor(doc))}</p>
+            <div className="hidden border-b border-ed-line px-4 py-2 lg:block">
+              {/* アドレス欄だけを模す（窓の丸ボタンなどの飾りは描かない） */}
+              <p className="mx-auto flex max-w-md items-center justify-center gap-1.5 truncate rounded bg-ed-bg px-3 py-1 text-xs text-ed-muted">
+                <Icon name="lock" className="h-3 w-3 shrink-0" />
+                <span className="truncate">{mockPublicUrl(slugFor(doc)).replace('https://', '')}</span>
+              </p>
+            </div>
             <div className="bg-white lg:min-h-0 lg:flex-1 lg:overflow-y-auto">{page}</div>
           </div>
         ) : (

@@ -21,7 +21,7 @@ interface Action {
 
 const ACTIONS: Record<EstimateStatus, Action[]> = {
   draft: [
-    { to: "sent", label: "送付済みにする", icon: "send", message: "送付済みにしました（デモのため実際のメールは送信されません）。「お客様の画面を見る」で先方に届く画面を確認できます" },
+    { to: "sent", label: "送付済みにする", icon: "send", message: "送付済みにしました（デモのため実際のメールは送信されません）。「お客様の画面（承認ボタンあり）」で先方に届く画面を開き、承認まで試せます" },
   ],
   sent: [
     { to: "won", label: "受注にする", icon: "check", message: "受注にしました。一覧の受注金額・受注率に反映されます" },
@@ -40,7 +40,7 @@ const TONE_CLASS: Record<"primary" | "neutral", string> = {
 const SAVED_NOTICE = "保存しました。";
 
 const BUTTON =
-  "inline-flex items-center justify-center gap-1.5 rounded px-3.5 py-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
+  "inline-flex min-h-11 items-center justify-center gap-1.5 rounded px-3.5 py-2 text-sm font-semibold sm:min-h-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
 
 interface Props {
   id: number;
@@ -71,7 +71,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
     <div className="mx-auto max-w-6xl p-4 sm:p-8 print:max-w-none print:p-0">
       {/* 一覧・作成画面と同じ max-w-6xl の枠で左右端を揃え、帳票だけ読みやすい幅に留める */}
       <div className="print:hidden">
-        <Link href="/estimates" className="inline-flex items-center gap-1 text-sm text-body hover:text-navy">
+        <Link href="/estimates" className="-my-3 inline-flex min-h-11 items-center gap-1 rounded text-sm text-body hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary sm:-my-0 sm:min-h-0">
           <Icon name="back" />
           見積一覧
         </Link>
@@ -103,8 +103,8 @@ export default function EstimateDetail({ id, justSaved }: Props) {
               <HikaeLink id={estimate.id} />
             ) : (
               // 受注は「その他」に入れてあるので、ふだんの流れ（先方の承認）を一言添える
-              <div className="flex flex-col gap-1">
-                <CustomerLink id={estimate.id} className={`${BUTTON} ${TONE_CLASS.primary}`} />
+              <div className="flex flex-col items-start gap-1">
+                <CustomerLink id={estimate.id} canApprove={estimate.status === "sent"} className={`${BUTTON} ${TONE_CLASS.primary}`} />
                 {estimate.status === "sent" && <p className="text-xs text-muted">お客様が承認すると受注になります（手動なら「その他」から）</p>}
               </div>
             )}
@@ -149,11 +149,12 @@ export default function EstimateDetail({ id, justSaved }: Props) {
   );
 }
 
-function CustomerLink({ id, className }: { id: number; className: string }) {
+/** 送付済みのときは、押すと承認まで試せることを文言で伝える */
+function CustomerLink({ id, className, canApprove = false }: { id: number; className: string; canApprove?: boolean }) {
   return (
     <Link href={`/estimates/${id}/customer`} className={className}>
       <Icon name="eye" />
-      お客様の画面を見る（デモ）
+      {canApprove ? "お客様の画面（承認ボタンあり）" : "お客様の画面を見る（デモ）"}
     </Link>
   );
 }
@@ -175,24 +176,24 @@ function HikaeLink({ id }: { id: number }) {
     );
   }
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col items-start gap-1">
       <a href={url} target="_blank" rel="noopener noreferrer" className={`${BUTTON} ${TONE_CLASS.primary}`}>
         <Icon name="file" />
         Hikae で請求書を見る（デモ）
         <span className="sr-only">（新しいタブで開きます）</span>
       </a>
       <p className="text-xs text-muted">
+        <span className="inline-block">Hikae で</span>{" "}
         <span className="inline-block">
-          請求書 <span className="tnum">{invoiceNumber}</span> を
-        </span>{" "}
-        <span className="inline-block">Hikae で発行済み（デモ）</span>
+          請求書 <span className="tnum">{invoiceNumber}</span> を発行（デモ）
+        </span>
       </p>
     </div>
   );
 }
 
 const MENU_ITEM =
-  "flex w-full items-center gap-2 whitespace-nowrap px-3 py-2 text-left text-sm text-navy hover:bg-canvas focus-visible:bg-canvas focus-visible:outline-none";
+  "flex w-full items-center gap-2 whitespace-nowrap px-3 py-3 text-left sm:py-2 text-sm text-navy hover:bg-canvas focus-visible:bg-canvas focus-visible:outline-none";
 
 /** ネイティブの details で作る「その他」メニュー。Esc・外側へのフォーカス移動で閉じる */
 function MoreMenu({ children }: { children: (close: () => void) => ReactNode }) {
@@ -232,7 +233,7 @@ function MoreMenu({ children }: { children: (close: () => void) => ReactNode }) 
         className={`${BUTTON} ${TONE_CLASS.neutral} cursor-pointer list-none [&::-webkit-details-marker]:hidden`}
       >
         その他
-        <Icon name="chevron" className={open ? "h-4 w-4 rotate-180" : "h-4 w-4"} />
+        <Icon name="chevron" className={open ? "h-4 w-4 rotate-180 transition-transform" : "h-4 w-4 transition-transform"} />
       </summary>
       <div className="absolute right-0 top-full z-20 mt-1 min-w-[12rem] overflow-hidden rounded border border-line bg-white py-1 shadow-lg">
         {children(close)}

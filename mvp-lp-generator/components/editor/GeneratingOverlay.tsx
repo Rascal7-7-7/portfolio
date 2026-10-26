@@ -15,12 +15,12 @@ export default function GeneratingOverlay() {
   }, [])
 
   return (
-    <div role="status" aria-live="polite" className="absolute inset-0 z-20 flex items-start justify-center bg-ed-bg/80 pt-24 lg:items-center lg:pt-0">
-      <div className="w-72 rounded-lg border border-ed-line bg-ed-panel p-5 shadow-sm">
+    <div role="status" aria-live="polite" className="absolute inset-0 z-20 flex items-start justify-center bg-ed-bg/80 pt-24 motion-safe:animate-fade-in lg:items-center lg:pt-0">
+      <div className="w-72 rounded-lg border border-ed-line bg-ed-panel p-5 shadow-[0_8px_24px_-12px_rgba(24,24,27,0.18)] motion-safe:animate-rise">
         <p className="text-sm font-semibold">LPを生成しています</p>
-        <p className="mt-1 text-xs text-ed-muted">{STEPS[step]}…</p>
+        <p key={step} className="mt-1 text-xs text-ed-muted motion-safe:animate-fade-in">{STEPS[step]}…</p>
         <div className="mt-4 h-1 overflow-hidden rounded-full bg-ed-line">
-          <div className="h-full bg-accent transition-[width] duration-300" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
+          <div className="h-full bg-accent transition-[width] duration-300 ease-out motion-reduce:transition-none" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
         </div>
       </div>
     </div>

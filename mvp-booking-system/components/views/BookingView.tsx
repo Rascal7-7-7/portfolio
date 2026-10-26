@@ -12,6 +12,7 @@ import MonthCalendar from '@/components/MonthCalendar';
 import { inputCls } from '@/components/ReservationForm';
 import { btn } from '@/components/ui';
 import Icon, { type IconName } from '@/components/Icon';
+import { FieldError, FieldErrorsProvider, useFieldErrors } from '@/components/FieldError';
 
 /** 予約を受け付ける期間（今日から何日先まで） */
 const BOOK_DAYS = 30;
@@ -53,6 +54,7 @@ export default function BookingView() {
   const [fields, setFields] = useState<Fields>({});
   const [restored, setRestored] = useState(false);
   const formHeading = useRef<HTMLHeadingElement>(null);
+  const fieldErrors = useFieldErrors();
 
   // 中身は信用しない。形が違うものは捨てる（時間が埋まっていれば申し込み時に弾かれる）
   useEffect(() => {
@@ -163,14 +165,6 @@ export default function BookingView() {
                 </div>
               </fieldset>
 
-              {/* スマホでは入力欄の見出しに日時が出るので省く */}
-              <ul className="hidden md:block mt-5 pt-5 border-t border-line space-y-2 text-sm text-body">
-                <li><DurationChip minutes={menu.minutes} /></li>
-                <Meta icon="calendar_today">
-                  {time ? <span className="text-ink font-medium tabular-nums">{formatShortDate(selectedDate)} {time}–{end}</span> : '日時を選んでください'}
-                </Meta>
-                <Meta icon="location_on">{SHOP.branch} · お支払いは店頭で</Meta>
-              </ul>
             </section>
 
             {time ? (
@@ -180,8 +174,9 @@ export default function BookingView() {
                   お客様情報の入力
                 </h2>
                 <p className="text-sm text-dim mt-1 tabular-nums">{formatFullDate(selectedDate)} {time}–{end}<span className="hidden md:inline" aria-hidden="true"> · </span><br className="md:hidden" /><span className="whitespace-nowrap">{menu.name}</span></p>
-                <p className="mt-2 md:hidden"><DurationChip minutes={menu.minutes} /></p>
-                <form onSubmit={handleSubmit}
+                <p className="mt-2"><DurationChip minutes={menu.minutes} /></p>
+                <FieldErrorsProvider value={fieldErrors.errors}>
+                <form ref={fieldErrors.ref} onSubmit={handleSubmit}
                   onChange={e => setFields(Object.fromEntries(new FormData(e.currentTarget)) as Fields)}
                   className="mt-5 space-y-4 max-w-md">
                   <TextField id="book-name" name="name" defaultValue={fields.name} label="お名前" required autoComplete="name" placeholder="山田 花子" />
@@ -202,6 +197,7 @@ export default function BookingView() {
                     <button type="submit" className={`${btn('accent', 'lg')} sm:min-w-40`}>予約を申し込む</button>
                   </div>
                 </form>
+                </FieldErrorsProvider>
               </section>
             ) : (
               <>
@@ -240,6 +236,15 @@ export default function BookingView() {
                       ))}
                     </ul>
                   )}
+                  {/* 空き時間が少ない日でも列が空かないよう、選んでいる内容をいつも下に出す（スマホは上のメニューで見えるので省く） */}
+                  <div className="hidden md:block mt-6 pt-5 border-t border-line text-sm">
+                    <p className="text-xs text-dim">選択中</p>
+                    <p className="mt-1 font-medium text-ink">{menu.name}</p>
+                    <p className="text-body tabular-nums">{menu.minutes}分・¥{menu.price.toLocaleString()}</p>
+                    <ul className="mt-3 text-body">
+                      <Meta icon="location_on">{SHOP.branch} · お支払いは店頭で</Meta>
+                    </ul>
+                  </div>
                 </section>
               </>
             )}
@@ -294,6 +299,7 @@ function TextField({ id, label, required = false, ...input }: {
         {!required && <span className="ml-1.5 text-xs font-normal text-dim">任意</span>}
       </label>
       <input id={id} required={required} {...input} className={inputCls} />
+      <FieldError id={id} />
     </div>
   );
 }

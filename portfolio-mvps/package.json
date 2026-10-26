@@ -13,19 +13,22 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "budoux": "^0.9.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.400.0",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
-    "tailwind-merge": "^2.4.0"
+    "tailwind-merge": "^2.4.0",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@types/node": "^24.13.4",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/three": "^0.186.0",
     "autoprefixer": "^10.0.1",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.5",
