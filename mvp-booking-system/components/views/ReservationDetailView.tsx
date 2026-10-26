@@ -79,7 +79,7 @@ export default function ReservationDetailView({ id }: { id: number }) {
   const next = NEXT_STEP[r.status];
 
   return (
-    <div className="px-4 md:px-10 py-6 md:py-10 max-w-5xl">
+    <div className="mx-auto w-full px-4 md:px-10 py-6 md:py-10 max-w-5xl">
       <nav aria-label="パンくず" className="flex items-center gap-1 text-xs text-dim mb-4">
         <Link href="/reservations" className="py-3.5 -my-3.5 md:py-0 md:my-0 hover:text-ink underline-offset-2 hover:underline">予約一覧</Link>
         <Icon name="chevron_right" size={14} />
@@ -165,7 +165,7 @@ function StatusSwitcher({ current, onChange }: { current: ReservationStatus; onC
 
 function NotFound() {
   return (
-    <div className="px-4 md:px-10 py-16 max-w-xl text-center">
+    <div className="mx-auto w-full px-4 md:px-10 py-16 max-w-xl text-center">
       <p className="text-lg font-bold text-ink">予約が見つかりません</p>
       <p className="text-sm text-dim mt-2">削除されたか、デモデータが初期化された可能性があります。</p>
       <Link href="/reservations" className={`${btn('primary')} mt-6`}>予約一覧に戻る</Link>

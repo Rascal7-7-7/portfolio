@@ -29,7 +29,7 @@ export default function ReservationsView() {
   };
 
   return (
-    <div className="px-4 md:px-10 py-6 md:py-10 max-w-5xl">
+    <div className="mx-auto w-full px-4 md:px-10 py-6 md:py-10 max-w-5xl">
       <PageHeader
         title="予約一覧"
         description={<span className="tabular-nums">{formatFullDate(today)}</span>}
