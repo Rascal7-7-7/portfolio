@@ -13,6 +13,8 @@ export interface Feature {
   readonly emoji: string
   readonly title: string
   readonly text: string
+  /** サンプル用の写真（public/samples/*.webp）。無ければ文字だけで組む */
+  readonly photo?: string
 }
 
 export interface Voice {
@@ -40,6 +42,8 @@ export interface StoreInfo {
    * エディタで選んだ写真は object URL のままプレビューにだけ渡し、ここには保存しない
    */
   readonly photo?: string
+  /** ギャラリーの写真（サンプル用の public/samples/*.webp だけ）。無ければギャラリーを出さない */
+  readonly gallery?: readonly string[]
   /** 予約ボタンの行き先（外部の予約ページ）。無ければページ内の予約欄へ */
   readonly reserveUrl?: string
   readonly catchCopy: string

@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  /* 上に固定したヘッダー（h-16）の下に、移動先の見出しが隠れないようにする */
+  scroll-padding-top: 4.5rem;
+}
+
+body {
+  background: #ffffff;
+  color: #1f1f1f;
+  -webkit-font-smoothing: antialiased;
+  /* 本文は通常の日本語の折り返し。短い文は Phrase コンポーネントで文節ごとに折り返す */
+  line-break: strict;
+  overflow-wrap: break-word;
+  letter-spacing: 0.02em;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+  /* 見出しだけ和文の字間を詰める */
+  font-feature-settings: "palt";
+  letter-spacing: 0.01em;
+}
+
+p,
+li,
+dd {
+  text-wrap: pretty;
+}
+
+:focus-visible {
+  outline: 2px solid #1f1f1f;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: #e7e5e0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

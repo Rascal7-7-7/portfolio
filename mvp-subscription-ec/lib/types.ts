@@ -37,7 +37,11 @@ export type Product = {
   /** 味・使い心地の目安。value は low 側を 1 とした 5 段階 */
   taste: ReadonlyArray<TasteAxis>;
   visual: Visual;
+  /** 素材や使う場面の写真（public/photos）。パッケージは SVG、写真は世界観の補助に使う */
+  photo: ProductPhoto;
 };
+
+export type ProductPhoto = { src: string; alt: string; caption: string };
 
 export type TasteAxis = { label: string; low: string; high: string; value: 1 | 2 | 3 | 4 | 5 };
 

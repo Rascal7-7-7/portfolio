@@ -1,9 +1,10 @@
 import type { MonthlyAmount, Summary } from "@/lib/calc";
 import { formatYen } from "@/lib/utils";
+import Money from "@/components/Money";
 
 interface Kpi {
   label: string;
-  value: string;
+  value: React.ReactNode;
   /** 承認直前からの差分の表示文字列（例「+¥1,243,000」「+2pt」）。変化がなければ出さない */
   delta?: string;
   note: string;
@@ -18,39 +19,50 @@ interface Props {
   base?: Summary | null;
 }
 
-/** Stripe Dashboard の概要欄にならい、カードではなく罫線で区切った1本の帯で並べる */
+/** Stripe Dashboard の概要欄にならい、1枚の白いパネルを縦の罫線で4つに区切る（カードを並べない） */
 export default function KpiCards({ summary, monthly, base = null }: Props) {
   const { count, pendingAmount, wonAmount, winRatePercent } = summary;
   const kpis: Kpi[] = [
     {
       label: "受注金額（税込）",
-      value: formatYen(wonAmount),
+      value: <Money amount={wonAmount} />,
       delta: base ? signed(wonAmount - base.wonAmount, formatYen) : undefined,
       note: `受注 ${count.won} 件`,
       extra: <WonTrend monthly={monthly} />,
     },
-    { label: "回答待ち（税込）", value: formatYen(pendingAmount), note: `送付済み ${count.sent} 件` },
+    { label: "回答待ち（税込）", value: <Money amount={pendingAmount} />, note: `送付済み ${count.sent} 件` },
     {
       label: "受注率",
-      value: winRatePercent === null ? "—" : `${winRatePercent}%`,
+      value:
+        winRatePercent === null ? "—" : (
+          <>
+            {winRatePercent}
+            <span className="ml-0.5 text-[0.6em] font-medium text-muted">%</span>
+          </>
+        ),
       delta:
         base && winRatePercent !== null && base.winRatePercent !== null
           ? signed(winRatePercent - base.winRatePercent, (n) => `${n}pt`)
           : undefined,
       note: `受注 ${count.won} / 決着 ${count.won + count.lost} 件`,
     },
-    { label: "下書き", value: `${count.draft} 件`, note: "送付前の見積" },
+    { label: "下書き", value: (
+        <>
+          {count.draft}
+          <span className="ml-1 text-[0.6em] font-medium text-muted">件</span>
+        </>
+      ), note: "送付前の見積" },
   ];
 
   return (
-    <dl className="grid grid-cols-2 gap-px border-y border-line bg-line lg:grid-cols-4">
+    <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line shadow-[0_1px_2px_rgba(6,27,49,0.04),0_8px_24px_-12px_rgba(6,27,49,0.12)] lg:grid-cols-4">
       {kpis.map((kpi) => (
-        <div key={kpi.label} className="bg-white px-4 py-4">
-          <dt className="text-xs text-muted">{kpi.label}</dt>
-          <dd className="tnum mt-1 flex flex-wrap items-baseline gap-x-2 text-xl font-semibold text-navy sm:text-2xl">
+        <div key={kpi.label} className="bg-white px-4 py-4 sm:px-5 sm:py-5">
+          <dt className="text-xs font-medium text-body">{kpi.label}</dt>
+          <dd className="tnum mt-1.5 flex flex-wrap items-baseline gap-x-2 text-[22px] font-semibold tracking-tight text-navy sm:text-[28px] sm:leading-tight">
             {kpi.value}
             {kpi.delta ? (
-              <span className="delta-in rounded bg-primary-soft px-1.5 py-0.5 text-xs font-semibold text-primary">
+              <span className="delta-in rounded-full bg-shu-soft px-2 py-0.5 text-xs font-semibold tracking-normal text-shu-ink">
                 <span className="sr-only">承認前から</span>
                 {kpi.delta}
               </span>
@@ -89,7 +101,12 @@ function WonTrend({ monthly }: { monthly: MonthlyAmount[] }) {
 
   return (
     <dd className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-      <svg width={SPARK_W} height={SPARK_H} viewBox={`0 0 ${SPARK_W} ${SPARK_H}`} aria-hidden="true" className="shrink-0 text-primary">
+      <svg width={SPARK_W} height={SPARK_H} viewBox={`0 0 ${SPARK_W} ${SPARK_H}`} aria-hidden="true" className="shrink-0 text-shu">
+        <polygon
+          points={`${points[0].x},${SPARK_H} ${points.map((p) => `${p.x},${p.y}`).join(" ")} ${last.x},${SPARK_H}`}
+          fill="currentColor"
+          opacity="0.1"
+        />
         <polyline
           points={points.map((p) => `${p.x},${p.y}`).join(" ")}
           fill="none"

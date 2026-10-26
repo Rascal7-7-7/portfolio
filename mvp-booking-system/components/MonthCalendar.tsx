@@ -27,7 +27,7 @@ export default function MonthCalendar({ month, today, selected, isAvailable, can
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-base font-bold text-ink tabular-nums" aria-live="polite">
+        <p className="font-serif text-lg text-ink tabular-nums" aria-live="polite">
           {first.getFullYear()}年{first.getMonth() + 1}月
         </p>
         <div className="flex gap-1">
@@ -47,10 +47,10 @@ export default function MonthCalendar({ month, today, selected, isAvailable, can
             <button key={d} type="button" disabled={!available} aria-pressed={isSelected}
               aria-label={`${m}月${day}日${available ? '' : d < today ? '（受付終了）' : '（空きなし）'}`}
               onClick={() => onSelect(d)}
-              className={`relative aspect-square max-h-12 w-full rounded-md text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${
+              className={`relative aspect-square max-h-12 w-full rounded-lg text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${
                 isSelected ? 'bg-accent text-white font-bold'
                   : available ? 'bg-accent-soft text-ink font-medium hover:bg-[#f1e0dc]'
-                  : 'text-dim cursor-not-allowed'
+                  : 'text-dim/40 cursor-not-allowed'
               }`}>
               {day}
               {d === today && (

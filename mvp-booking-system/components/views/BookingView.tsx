@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { addDays, formatFullDate, formatShortDate, toMinutes } from '@/lib/date';
 import { SHOP } from '@/lib/seed';
-import { availableSlots, toTime } from '@/lib/slots';
+import { CLOSE_MIN, OPEN_MIN, availableSlots, toTime } from '@/lib/slots';
 import { useStore } from '@/lib/store';
 import { MENUS, STAFF, type Menu, type Staff } from '@/lib/types';
 import LoadingState from '@/components/LoadingState';
@@ -125,129 +125,137 @@ export default function BookingView() {
   const end = time ? toTime(toMinutes(time) + menu.minutes) : null;
 
   return (
-    <div className="min-h-screen bg-muted">
+    <div className="min-h-screen bg-paper">
       <DemoBar />
-      <div className="px-4 py-6 md:py-12">
+      <div className="px-4 pt-4 pb-10 md:pt-8 md:pb-16">
         {done ? (
           <Confirmed done={done} onAgain={() => { setDone(null); setTime(null); }}
             onAdmin={() => notify(`${done.name} 様の Web 予約が入りました。確定してください`)} />
         ) : (
-          <div className="mx-auto max-w-5xl bg-canvas border border-line rounded-xl md:grid md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)_minmax(0,14rem)]">
+          <div className="mx-auto max-w-5xl bg-canvas rounded-2xl overflow-hidden shadow-[0_0_0_1px_rgba(60,45,30,0.06),0_12px_40px_-12px_rgba(60,45,30,0.18)]">
+            <ShopHeader />
 
-            {/* 左: お店・メニュー・選んだ内容 */}
-            <section aria-labelledby="book-title" className="p-5 md:p-6 border-b md:border-b-0 md:border-r border-line">
-              {/* 写真の代わりに、店名のワードマークと担当スタイリストで店の雰囲気を出す */}
-              <p className="font-serif text-2xl leading-none text-accent tracking-tight">{SHOP.name}</p>
-              <p className="text-xs text-dim mt-1.5">{SHOP.branch}</p>
-              <h1 id="book-title" className="text-xl font-bold text-ink mt-5">ご予約</h1>
-              <p className="mt-3 text-xs text-dim">スタイリスト {STAFF.join('・')}</p>
-
-              <fieldset className="mt-5">
-                <legend className="text-sm font-medium text-ink mb-2">メニュー</legend>
-                <div className="grid grid-cols-2 md:grid-cols-1 gap-1.5">
-                  {MENUS.map(m => (
-                    <label key={m.name}
-                      className={`flex items-center gap-3 rounded-md border px-3 py-2 cursor-pointer has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand ${
-                        m.name === menu.name ? 'border-accent bg-accent-soft' : 'border-line hover:bg-muted'
-                      }`}>
-                      <input type="radio" name="menu" value={m.name} checked={m.name === menu.name}
-                        onChange={() => chooseMenu(m)} className="sr-only" />
-                      <span className="flex-1 min-w-0">
-                        {/* 狭い幅では「＆」の後ろでだけ改行する（語の途中で折り返さない） */}
-                        <span className="block text-sm text-ink break-keep">
-                          {m.name.split('＆').map((part, i) => <span key={part}>{i > 0 && <>＆<wbr /></>}{part}</span>)}
-                        </span>
-                        <span className="block text-xs text-dim tabular-nums">{m.minutes}分 · ¥{m.price.toLocaleString()}</span>
-                      </span>
-                      {m.name === menu.name && <Icon name="check" className="hidden md:block text-accent" />}
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-
-            </section>
-
-            {time ? (
-              /* 右2列: 入力フォーム（Cal.com と同じく、時間を選ぶとカレンダーと入れ替わる） */
-              <section aria-labelledby="form-title" className="p-5 md:p-6 md:col-span-2">
-                <h2 id="form-title" ref={formHeading} tabIndex={-1} className="text-base font-bold text-ink outline-none">
-                  お客様情報の入力
-                </h2>
-                <p className="text-sm text-dim mt-1 tabular-nums">{formatFullDate(selectedDate)} {time}–{end}<span className="hidden md:inline" aria-hidden="true"> · </span><br className="md:hidden" /><span className="whitespace-nowrap">{menu.name}</span></p>
-                <p className="mt-2"><DurationChip minutes={menu.minutes} /></p>
-                <FieldErrorsProvider value={fieldErrors.errors}>
-                <form ref={fieldErrors.ref} onSubmit={handleSubmit}
-                  onChange={e => setFields(Object.fromEntries(new FormData(e.currentTarget)) as Fields)}
-                  className="mt-5 space-y-4 max-w-md">
-                  <TextField id="book-name" name="name" defaultValue={fields.name} label="お名前" required autoComplete="name" placeholder="山田 花子" />
-                  <TextField id="book-phone" name="phone" defaultValue={fields.phone} label="電話番号" type="tel" required autoComplete="tel" placeholder="090-0000-0000" />
-                  <TextField id="book-email" name="email" defaultValue={fields.email} label="メールアドレス" type="email" autoComplete="email" placeholder="hanako@example.jp" />
-                  <div>
-                    <label htmlFor="book-note" className="block text-sm font-medium text-ink mb-1.5">
-                      ご要望<span className="ml-1.5 text-xs font-normal text-dim">任意</span>
-                    </label>
-                    <textarea id="book-note" name="note" defaultValue={fields.note} rows={3} placeholder="髪の長さのご希望、アレルギーの有無など"
-                      className={`${inputCls} resize-none`} />
+            <div className="border-t border-line md:grid md:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,14.5rem)] lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,17rem)]">
+              {/* 左: メニュー（サロンの料金表のように、名前と料金を左右に振る） */}
+              <section aria-labelledby="menu-title" className="p-5 md:p-7 border-b md:border-b-0 md:border-r border-line">
+                <StepTitle id="menu-title">メニューを選ぶ</StepTitle>
+                <fieldset className="mt-3">
+                  <legend className="sr-only">メニュー</legend>
+                  <div className="-mx-2 flex flex-col">
+                    {MENUS.map(m => {
+                      const active = m.name === menu.name;
+                      return (
+                        <label key={m.name}
+                          className={`flex items-baseline gap-3 rounded-lg px-3 py-2.5 cursor-pointer has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand ${
+                            active ? 'bg-accent-soft' : 'hover:bg-muted'
+                          }`}>
+                          <input type="radio" name="menu" value={m.name} checked={active}
+                            onChange={() => chooseMenu(m)} className="sr-only" />
+                          <span className="flex-1 min-w-0">
+                            <span className={`block text-[15px] break-keep ${active ? 'text-accent-hover font-bold' : 'text-ink font-medium'}`}>
+                              {m.name.split('＆').map((part, i) => <span key={part}>{i > 0 && <>＆<wbr /></>}{part}</span>)}
+                            </span>
+                            <span className="block text-xs text-dim tabular-nums mt-0.5">{m.minutes}分</span>
+                          </span>
+                          <span className={`shrink-0 text-[15px] tabular-nums ${active ? 'text-accent-hover font-bold' : 'text-ink'}`}>
+                            ¥{m.price.toLocaleString()}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
-                  <p className="text-xs text-dim leading-relaxed">
-                    お店で内容を確認したあと、確定のご連絡をお送りします。デモのため、実際の連絡は届きません。
-                  </p>
-                  <div className="flex flex-col-reverse sm:flex-row gap-2 pt-1">
-                    <button type="button" onClick={() => setTime(null)} className={btn('ghost', 'lg')}>戻る</button>
-                    <button type="submit" className={`${btn('accent', 'lg')} sm:min-w-40`}>予約を申し込む</button>
-                  </div>
-                </form>
-                </FieldErrorsProvider>
+                </fieldset>
+                <p className="mt-4 px-1 text-xs text-dim">お支払いは店頭で承ります。</p>
               </section>
-            ) : (
-              <>
-                {/* 中央: カレンダー */}
-                <section aria-label="日付" className="px-4 py-5 md:p-6 border-b md:border-b-0 border-line">
-                  <MonthCalendar
-                    month={shownMonth} today={today} selected={selectedDate}
-                    isAvailable={d => slotsOf(d).length > 0}
-                    canPrev={shownMonth > monthOf(today)} canNext={shownMonth < monthOf(lastDay)}
-                    onMonth={delta => setMonth(shiftMonth(shownMonth, delta))}
-                    onSelect={chooseDate}
-                  />
-                  <p className="mt-4 text-xs text-dim leading-relaxed">
-                    スタイリスト2名の予定から、メニューの所要時間<span className="whitespace-nowrap">（{menu.minutes}分）</span>が丸ごと空いている時間だけを表示しています。
-                  </p>
-                </section>
 
-                {/* 右: 空き時間 */}
-                <section aria-labelledby="slots-title" className="p-5 md:p-6 md:border-l border-line">
-                  <h2 id="slots-title" className="text-sm font-bold text-ink tabular-nums">
-                    {formatShortDate(selectedDate)}<span className="font-normal text-dim ml-1.5">の空き時間</span>
+              {time ? (
+                /* 右2列: 入力フォーム（Cal.com と同じく、時間を選ぶとカレンダーと入れ替わる） */
+                <section aria-labelledby="form-title" className="p-5 md:p-7 md:col-span-2">
+                  <h2 id="form-title" ref={formHeading} tabIndex={-1} className="text-lg font-bold text-ink outline-none">
+                    お客様情報の入力
                   </h2>
-                  {error && <p role="alert" className="mt-3 text-sm text-attn">{error}</p>}
-                  {slots.length === 0 ? (
-                    <p className="mt-3 text-sm text-dim">この日は空きがありません</p>
-                  ) : (
-                    <ul className="mt-3 grid grid-cols-3 md:grid-cols-2 gap-2">
-                      {slots.map(s => (
-                        <li key={s.time}>
-                          <button type="button" onClick={() => { setTime(s.time); setError(null); }}
-                            aria-label={`${s.time}から予約する`}
-                            className="w-full h-10 rounded-md border border-line-strong text-sm font-medium text-ink tabular-nums hover:border-accent hover:bg-accent-soft focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand">
-                            {s.time}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {/* 空き時間が少ない日でも列が空かないよう、選んでいる内容をいつも下に出す（スマホは上のメニューで見えるので省く） */}
-                  <div className="hidden md:block mt-6 pt-5 border-t border-line text-sm">
-                    <p className="text-xs text-dim">選択中</p>
-                    <p className="mt-1 font-medium text-ink">{menu.name}</p>
-                    <p className="text-body tabular-nums">{menu.minutes}分・¥{menu.price.toLocaleString()}</p>
-                    <ul className="mt-3 text-body">
-                      <Meta icon="location_on">{SHOP.branch} · お支払いは店頭で</Meta>
-                    </ul>
+                  <div className="mt-3 inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-paper px-3.5 py-2.5 text-sm text-ink tabular-nums">
+                    <span className="font-medium">{formatFullDate(selectedDate)} {time}–{end}</span>
+                    <span className="whitespace-nowrap text-body">{menu.name}</span>
+                    <DurationChip minutes={menu.minutes} />
                   </div>
+                  <FieldErrorsProvider value={fieldErrors.errors}>
+                  <form ref={fieldErrors.ref} onSubmit={handleSubmit}
+                    onChange={e => setFields(Object.fromEntries(new FormData(e.currentTarget)) as Fields)}
+                    className="mt-6 space-y-4 max-w-md">
+                    <TextField id="book-name" name="name" defaultValue={fields.name} label="お名前" required autoComplete="name" placeholder="山田 花子" />
+                    <TextField id="book-phone" name="phone" defaultValue={fields.phone} label="電話番号" type="tel" required autoComplete="tel" placeholder="090-0000-0000" />
+                    <TextField id="book-email" name="email" defaultValue={fields.email} label="メールアドレス" type="email" autoComplete="email" placeholder="hanako@example.jp" />
+                    <div>
+                      <label htmlFor="book-note" className="block text-sm font-medium text-ink mb-1.5">
+                        ご要望<span className="ml-1.5 text-xs font-normal text-dim">任意</span>
+                      </label>
+                      <textarea id="book-note" name="note" defaultValue={fields.note} rows={3} placeholder="髪の長さのご希望、アレルギーの有無など"
+                        className={`${inputCls} resize-none`} />
+                    </div>
+                    <p className="text-xs text-dim leading-relaxed">
+                      お店で内容を確認したあと、確定のご連絡をお送りします。デモのため、実際の連絡は届きません。
+                    </p>
+                    <div className="flex flex-col-reverse sm:flex-row gap-2 pt-1">
+                      <button type="button" onClick={() => setTime(null)} className={btn('ghost', 'lg')}>戻る</button>
+                      <button type="submit" className={`${btn('accent', 'lg')} sm:min-w-44 h-11`}>予約を申し込む</button>
+                    </div>
+                  </form>
+                  </FieldErrorsProvider>
                 </section>
-              </>
-            )}
+              ) : (
+                <>
+                  {/* 中央: カレンダー */}
+                  <section aria-labelledby="date-title" className="px-4 py-5 md:p-7 border-b md:border-b-0 border-line">
+                    <StepTitle id="date-title">日付を選ぶ</StepTitle>
+                    <div className="mt-4">
+                      <MonthCalendar
+                        month={shownMonth} today={today} selected={selectedDate}
+                        isAvailable={d => slotsOf(d).length > 0}
+                        canPrev={shownMonth > monthOf(today)} canNext={shownMonth < monthOf(lastDay)}
+                        onMonth={delta => setMonth(shiftMonth(shownMonth, delta))}
+                        onSelect={chooseDate}
+                      />
+                    </div>
+                    <p className="mt-5 text-xs text-dim leading-relaxed">
+                      色の付いた日に空きがあります。スタイリスト2名の予定から、メニューの所要時間<span className="whitespace-nowrap">（{menu.minutes}分）</span>が丸ごと空いている時間だけを表示しています。
+                    </p>
+                  </section>
+
+                  {/* 右: 空き時間（午前・午後に分けて、目で探す距離を短くする） */}
+                  <section aria-labelledby="slots-title" className="p-5 md:p-7 md:border-l border-line">
+                    <StepTitle id="slots-title">
+                      時間を選ぶ<span className="ml-2 text-sm font-normal text-dim tabular-nums">{formatShortDate(selectedDate)}</span>
+                    </StepTitle>
+                    {error && <p role="alert" className="mt-3 text-sm text-attn">{error}</p>}
+                    {slots.length === 0 ? (
+                      <p className="mt-3 text-sm text-dim">この日は空きがありません</p>
+                    ) : (
+                      <div className="mt-4 space-y-4">
+                        {([['午前', slots.filter(s => s.time < '12:00')], ['午後', slots.filter(s => s.time >= '12:00')]] as const)
+                          .filter(([, list]) => list.length > 0)
+                          .map(([label, list]) => (
+                            <div key={label}>
+                              <p className="text-xs text-dim mb-2">{label}</p>
+                              <ul className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                {list.map(s => (
+                                  <li key={s.time}>
+                                    <button type="button" onClick={() => { setTime(s.time); setError(null); }}
+                                      aria-label={`${s.time}から予約する`}
+                                      className="w-full h-11 rounded-lg border border-line-strong bg-canvas text-[15px] font-medium text-ink tabular-nums hover:border-accent hover:text-accent-hover hover:bg-accent-soft focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand">
+                                      {s.time}
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </section>
+                </>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -255,11 +263,35 @@ export default function BookingView() {
   );
 }
 
+/** 店の写真と店名。お客様が最初に目にする「お店の顔」 */
+function ShopHeader() {
+  return (
+    <header>
+      <img src="/salon.webp" alt="木の床と植物のある、落ち着いた店内。丸い鏡のセット面と受付" width={1200} height={783}
+        fetchPriority="high" className="block w-full h-44 sm:h-56 md:h-72 object-cover object-[center_45%]" />
+      <div className="px-5 md:px-7 py-5 md:py-6 flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+          <p className="font-serif text-[28px] md:text-4xl leading-none text-ink tracking-tight">{SHOP.name}</p>
+          <h1 id="book-title" className="mt-2.5 text-sm text-body">{SHOP.branch}<span className="mx-2 text-line-strong" aria-hidden="true">|</span>Web 予約</h1>
+        </div>
+        <ul className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-body">
+          <Meta icon="schedule"><span className="tabular-nums">{toTime(OPEN_MIN)}–{toTime(CLOSE_MIN)}</span></Meta>
+          <li>スタイリスト {STAFF.join('・')}</li>
+        </ul>
+      </div>
+    </header>
+  );
+}
+
+function StepTitle({ id, children }: { id: string; children: React.ReactNode }) {
+  return <h2 id={id} className="text-base font-bold text-ink">{children}</h2>;
+}
+
 /** デモであることと、管理画面への戻り道 */
 function DemoBar() {
   return (
-    <div className="bg-canvas border-b border-line">
-      <div className="mx-auto max-w-5xl px-4 h-11 flex items-center justify-between gap-3 text-xs">
+    <div className="bg-paper">
+      <div className="mx-auto max-w-5xl px-4 md:px-0 h-11 flex items-center justify-between gap-3 text-xs">
         <p className="text-dim truncate">お客様が見る予約ページ（デモ）</p>
         <Link href="/reservations" className="shrink-0 self-stretch inline-flex items-center gap-1 text-ink font-medium underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-brand rounded">
           <Icon name="arrow_back" size={16} />
@@ -272,8 +304,8 @@ function DemoBar() {
 
 function Meta({ icon, children }: { icon: IconName; children: React.ReactNode }) {
   return (
-    <li className="flex items-start gap-2">
-      <Icon name={icon} className="text-dim mt-px" />
+    <li className="flex items-center gap-1.5">
+      <Icon name={icon} size={16} className="text-dim" />
       <span className="min-w-0">{children}</span>
     </li>
   );
@@ -307,9 +339,13 @@ function TextField({ id, label, required = false, ...input }: {
 function Confirmed({ done, onAgain, onAdmin }: { done: Done; onAgain: () => void; onAdmin: () => void }) {
   const end = toTime(toMinutes(done.time) + done.menu.minutes);
   return (
-    <section aria-labelledby="done-title" className="mx-auto max-w-lg bg-canvas border border-line rounded-xl p-6 md:p-8 text-center">
-      <Icon name="check" size={32} className="mx-auto text-accent" />
-      <h1 id="done-title" className="text-xl font-bold text-ink mt-2">ご予約を受け付けました</h1>
+    <section aria-labelledby="done-title" className="mx-auto max-w-lg bg-canvas rounded-2xl overflow-hidden text-center shadow-[0_0_0_1px_rgba(60,45,30,0.06),0_12px_40px_-12px_rgba(60,45,30,0.18)]">
+      <img src="/salon.webp" alt="" width={1200} height={783} className="block w-full h-36 object-cover object-[center_45%]" />
+      <div className="p-6 md:p-8">
+      <p className="font-serif text-xl text-ink leading-none">{SHOP.name}</p>
+      <h1 id="done-title" className="text-xl font-bold text-ink mt-4 inline-flex items-center gap-1.5">
+        <Icon name="check" size={22} className="text-accent" />ご予約を受け付けました
+      </h1>
       <p className="text-sm text-dim mt-1 text-balance">お店で確認したあと、確定のご連絡をお送りします。</p>
       <dl className="mt-6 text-left text-sm border-y border-line divide-y divide-line">
         <Row label="お名前">{done.name} 様</Row>
@@ -322,6 +358,7 @@ function Confirmed({ done, onAgain, onAdmin }: { done: Done; onAgain: () => void
           お店側の画面で確認する
         </Link>
         <button type="button" onClick={onAgain} className={btn('secondary', 'lg')}>別の予約をする</button>
+      </div>
       </div>
     </section>
   );

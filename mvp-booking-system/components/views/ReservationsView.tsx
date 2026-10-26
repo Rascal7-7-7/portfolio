@@ -49,7 +49,7 @@ export default function ReservationsView() {
       ]} />
 
       {/* デモ台本の起点：お客様側で予約 → ここに「Web・確定待ち」で入ってくる */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 px-4 py-3 border border-line rounded-lg">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 px-4 py-3 bg-canvas border border-line rounded-xl">
         <p className="text-sm text-body text-pretty">
           お客様がスマホから予約すると、<span className="font-medium text-ink">受付経路「Web」・確定待ち</span>でこの一覧に入ってきます。
         </p>
@@ -59,7 +59,7 @@ export default function ReservationsView() {
         </Link>
       </div>
 
-      <div className="border border-line rounded-lg overflow-hidden [&>section:last-child>:last-child]:border-b-0">
+      <div className="bg-canvas border border-line rounded-xl overflow-hidden [&>section:last-child>:last-child]:border-b-0">
         <ReservationTableHeader />
         <Group label="本日" rows={todayList} empty="本日の予約はまだありません。お客様の予約ページから予約すると、ここに表示されます" />
         <Group label="近日" rows={upcomingList} />

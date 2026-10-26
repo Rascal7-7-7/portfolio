@@ -17,6 +17,7 @@ export const SAMPLES: readonly LPDoc[] = [
       category: 'cafe',
       area: '鎌倉の自家焙煎珈琲',
       photo: '/samples/komorebi-coffee.webp',
+      gallery: ['/samples/komorebi-beans.webp', '/samples/komorebi-table.webp'],
       catchCopy: '朝の光と、一杯の深煎りを。',
       description:
         '鎌倉駅から徒歩3分。自家焙煎の豆で淹れるハンドドリップと、毎朝焼き上げるスコーンで、ゆっくりとした時間をお届けします。',
@@ -26,9 +27,9 @@ export const SAMPLES: readonly LPDoc[] = [
       phone: '0467-00-0000',
       ctaLabel: '席を予約する',
       features: [
-        { emoji: '🫘', title: '店内で毎朝焙煎', text: '季節ごとに選んだシングルオリジンを、小さな焙煎機で焼いています。' },
-        { emoji: '🥐', title: '焼きたての焼き菓子', text: 'スコーンとケーキは毎朝店内で。午前中は焼きたてに出会えます。' },
-        { emoji: '🔌', title: '電源・Wi-Fi完備', text: '窓際のカウンター席は全席電源つき。お仕事や読書にも。' },
+        { emoji: '🫘', title: '店内で毎朝焙煎', text: '季節ごとに選んだシングルオリジンを、小さな焙煎機で焼いています。', photo: '/samples/komorebi-roast.webp' },
+        { emoji: '🥐', title: '焼きたての焼き菓子', text: 'スコーンとケーキは毎朝店内で。午前中は焼きたてに出会えます。', photo: '/samples/komorebi-cake.webp' },
+        { emoji: '🔌', title: '電源・Wi-Fi完備', text: '窓際のカウンター席は全席電源つき。お仕事や読書にも。', photo: '/samples/komorebi-counter.webp' },
       ],
       menu: [
         { emoji: '☕', name: 'ハンドドリップ', description: '本日の豆から3種類', price: '¥580' },
@@ -57,6 +58,7 @@ export const SAMPLES: readonly LPDoc[] = [
       category: 'salon',
       area: '表参道の美容室',
       photo: '/samples/lien-omotesando.webp',
+      gallery: ['/samples/lien-color.webp', '/samples/lien-spa.webp'],
       reserveUrl: BOOKING_URL,
       catchCopy: '似合うを、毎日の自信に。',
       description:
@@ -67,9 +69,9 @@ export const SAMPLES: readonly LPDoc[] = [
       phone: '03-0000-0000',
       ctaLabel: 'WEB予約',
       features: [
-        { emoji: '💬', title: '15分の丁寧なカウンセリング', text: '骨格・髪質・普段のお手入れを伺ってから、似合わせを設計します。' },
-        { emoji: '✂️', title: '最初から最後まで同じ担当', text: 'カウンセリングから仕上げまで、ひとりのスタイリストが担当します。' },
-        { emoji: '🕗', title: '夜20時まで営業', text: 'お仕事帰りにも。空いている時間は24時間WEBで確認・予約できます。' },
+        { emoji: '💬', title: '15分の丁寧なカウンセリング', text: '骨格・髪質・普段のお手入れを伺ってから、似合わせを設計します。', photo: '/samples/lien-counsel.webp' },
+        { emoji: '✂️', title: '最初から最後まで同じ担当', text: 'カウンセリングから仕上げまで、ひとりのスタイリストが担当します。', photo: '/samples/lien-cut.webp' },
+        { emoji: '🕗', title: '夜20時まで営業', text: 'お仕事帰りにも。空いている時間は24時間WEBで確認・予約できます。', photo: '/samples/lien-interior.webp' },
       ],
       menu: [
         { emoji: '✂️', name: 'カット', description: 'シャンプー・ブロー込み', price: '¥5,500' },
@@ -97,6 +99,7 @@ export const SAMPLES: readonly LPDoc[] = [
       category: 'seitai',
       area: '吉祥寺の整体院',
       photo: '/samples/hidamari-seitai.webp',
+      gallery: ['/samples/hidamari-back.webp', '/samples/hidamari-bed.webp'],
       catchCopy: 'その肩こり、根本から軽くしませんか。',
       description:
         '吉祥寺駅から徒歩5分。姿勢と骨盤のバランスを確認し、ボキボキしないやさしい施術で、くり返す不調を根本からケアします。',
@@ -106,9 +109,9 @@ export const SAMPLES: readonly LPDoc[] = [
       phone: '0422-00-0000',
       ctaLabel: '初回予約はこちら',
       features: [
-        { emoji: '🩺', title: '姿勢チェックつき', text: '施術前後の姿勢を写真で比べて、変化を一緒に確認します。' },
-        { emoji: '🤲', title: 'ボキボキしない施術', text: '筋肉と関節にやさしくアプローチ。初めての方も安心です。' },
-        { emoji: '🌙', title: '夜21時まで営業', text: 'お仕事帰りにも通いやすい時間帯で営業しています。' },
+        { emoji: '🩺', title: '姿勢チェックつき', text: '施術前後の姿勢を写真で比べて、変化を一緒に確認します。', photo: '/samples/hidamari-posture.webp' },
+        { emoji: '🤲', title: 'ボキボキしない施術', text: '筋肉と関節にやさしくアプローチ。初めての方も安心です。', photo: '/samples/hidamari-care.webp' },
+        { emoji: '🌙', title: '夜21時まで営業', text: 'お仕事帰りにも通いやすい時間帯で営業しています。', photo: '/samples/hidamari-room.webp' },
       ],
       menu: [
         { emoji: '🎁', name: '初回お試し 60分', description: 'カウンセリング＋全身調整', price: '¥3,980' },
@@ -122,6 +125,7 @@ export const SAMPLES: readonly LPDoc[] = [
       owner: {
         role: '院長',
         name: '日向 誠',
+        photo: '/samples/hidamari-owner.webp',
         message: '開業前は整形外科で8年間リハビリを担当していました。痛みを我慢しながら通う方を多く見てきたので、ここでは強く押したり鳴らしたりしない施術にこだわっています。まずはお体の状態を一緒に確かめるところから始めましょう。',
       },
     },

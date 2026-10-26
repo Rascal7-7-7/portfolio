@@ -5,12 +5,14 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Estimate, EstimateStatus } from "@/types";
 import { useEstimates } from "@/lib/store";
 import { calcTotals } from "@/lib/calc";
-import { estimateNumber, formatShortDate, formatYen, HIKAE_INVOICES_URL, hikaeInvoiceNumber, hikaeInvoiceUrl } from "@/lib/utils";
+import { estimateNumber, formatShortDate, HIKAE_INVOICES_URL, hikaeInvoiceNumber, hikaeInvoiceUrl } from "@/lib/utils";
 import EstimateDocument from "@/components/EstimateDocument";
 import Icon, { type IconName } from "@/components/Icon";
 import LoadingState from "@/components/LoadingState";
 import NotFoundState from "@/components/NotFoundState";
 import StatusStepper from "@/components/StatusStepper";
+import StatusBadge from "@/components/StatusBadge";
+import Money from "@/components/Money";
 
 interface Action {
   to: EstimateStatus;
@@ -33,14 +35,14 @@ const ACTIONS: Record<EstimateStatus, Action[]> = {
 
 /** 1画面のアクセント色は1色だけ。主ボタンだけ primary、ほかは中立 */
 const TONE_CLASS: Record<"primary" | "neutral", string> = {
-  primary: "bg-primary text-white hover:bg-primary-hover",
-  neutral: "border border-line bg-white text-navy hover:bg-canvas",
+  primary: "bg-primary text-white shadow-[0_1px_2px_rgba(6,27,49,0.2)] hover:bg-primary-hover",
+  neutral: "border border-line bg-white text-navy shadow-[0_1px_1px_rgba(6,27,49,0.04)] hover:bg-canvas",
 };
 
 const SAVED_NOTICE = "保存しました。";
 
 const BUTTON =
-  "inline-flex min-h-11 items-center justify-center gap-1.5 rounded px-3.5 py-2 text-sm font-semibold sm:min-h-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
+  "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-semibold sm:min-h-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
 
 interface Props {
   id: number;
@@ -79,13 +81,16 @@ export default function EstimateDetail({ id, justSaved }: Props) {
         <section aria-label="ステータス" className="mt-4 space-y-5 border-b border-line pb-6">
           <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <div className="min-w-0">
-              <p className="tnum text-sm text-muted">{estimateNumber(estimate.id)}</p>
-              <h1 className="mt-1 text-2xl font-semibold text-navy">{estimate.subject}</h1>
+              <p className="flex items-center gap-2.5 text-sm text-muted">
+                <span className="tnum">{estimateNumber(estimate.id)}</span>
+                <StatusBadge status={estimate.status} />
+              </p>
+              <h1 className="mt-2 text-[28px] font-semibold leading-tight tracking-tight text-navy">{estimate.subject}</h1>
               <p className="mt-0.5 text-sm text-body">{estimate.clientName}</p>
             </div>
             <p className="sm:text-right">
               <span className="block text-xs text-muted">合計（税込）</span>
-              <span className="tnum text-2xl font-semibold text-navy">{formatYen(calcTotals(estimate.items).total)}</span>
+              <span className="tnum text-[32px] font-semibold leading-tight tracking-tight text-navy"><Money amount={calcTotals(estimate.items).total} /></span>
             </p>
           </div>
 
@@ -134,7 +139,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
           <p
             role="status"
             aria-live="polite"
-            className={shownNotice ? "text-balance flex items-start gap-2 rounded border border-line bg-canvas px-3 py-2 text-sm text-navy" : "sr-only"}
+            className={shownNotice ? "text-balance flex items-start gap-2 rounded-lg border border-line bg-canvas px-3 py-2 text-sm text-navy" : "sr-only"}
           >
             {shownNotice && <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-primary" />}
             {shownNotice}
@@ -142,7 +147,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
         </section>
       </div>
 
-      <div className="mt-6 max-w-4xl rounded bg-canvas p-3 sm:p-6 print:mt-0 print:max-w-none print:bg-white print:p-0">
+      <div className="mt-6 max-w-4xl rounded-xl border border-line bg-canvas p-3 sm:p-8 print:border-0 print:mt-0 print:max-w-none print:bg-white print:p-0">
         <EstimateDocument estimate={estimate} id={estimate.id} />
       </div>
     </div>
@@ -235,7 +240,7 @@ function MoreMenu({ children }: { children: (close: () => void) => ReactNode }) 
         その他
         <Icon name="chevron" className={open ? "h-4 w-4 rotate-180 transition-transform" : "h-4 w-4 transition-transform"} />
       </summary>
-      <div className="absolute right-0 top-full z-20 mt-1 min-w-[12rem] overflow-hidden rounded border border-line bg-white py-1 shadow-lg">
+      <div className="absolute right-0 top-full z-20 mt-1.5 min-w-[12rem] overflow-hidden rounded-lg border border-line bg-white py-1 shadow-[0_12px_32px_-8px_rgba(6,27,49,0.2)]">
         {children(close)}
       </div>
     </details>

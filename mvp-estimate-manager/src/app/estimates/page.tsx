@@ -9,14 +9,14 @@ export default function EstimatesPage() {
     <div className="mx-auto max-w-6xl space-y-5 p-4 sm:p-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-navy">見積一覧</h1>
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-navy">見積一覧</h1>
           <p className="mt-1 text-balance text-sm text-body">
             明細を入れるだけで税込金額を自動計算。送付から受注までを1画面で追えます。
           </p>
         </div>
         <Link
           href="/estimates/new"
-          className="inline-flex items-center justify-center gap-1.5 rounded bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(6,27,49,0.2)] hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           <Icon name="plus" />
           新規見積を作成

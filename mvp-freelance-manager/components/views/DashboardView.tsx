@@ -16,7 +16,7 @@ import {
 } from "@/lib/selectors";
 import { useDelta } from "@/lib/useDelta";
 import { cn, formatYen } from "@/lib/utils";
-import { Card, MoreLink, Page, PageHeader, PageSkeleton } from "@/components/ui";
+import { Card, MoreLink, Page, PageHeader, PageSkeleton, Yen } from "@/components/ui";
 import { RevenueChart } from "@/components/RevenueChart";
 import { TaskRow } from "@/components/TaskRow";
 import { InvoiceList } from "@/components/InvoiceList";
@@ -69,10 +69,10 @@ function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; del
   ];
 
   return (
-    <Card title="今月の請求と入金" className="mb-6" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
+    <Card title="今月の請求と入金" className="mb-5" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
       <dl className="grid grid-cols-3">
         {metrics.map((m, i) => (
-          <div key={m.label} className={cn("min-w-0 px-3 pt-3 pb-3 sm:px-5 sm:pt-4", i > 0 && "border-l border-line")}>
+          <div key={m.label} className={cn("min-w-0 px-3 pt-4 pb-3 sm:px-6 sm:pt-5", i > 0 && "border-l border-line")}>
             <dt className="flex h-5 items-center justify-between gap-1 text-xs text-warm-500">
               {m.label}
               <DeltaBadge delta={m.delta} />
@@ -80,18 +80,18 @@ function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; del
             <dd
               key={m.value}
               className={cn(
-                "num mt-0.5 flex h-7 items-center text-base font-semibold tracking-tight sm:text-[22px]",
-                m.warn ? "text-orange" : "text-ink",
+                "mt-1 flex h-7 items-center text-[17px] font-semibold tracking-[-0.025em] sm:h-11 sm:text-[32px]",
+                m.warn ? "text-shu" : "text-ink",
                 m.delta && "anim-rise",
               )}
             >
-              {formatYen(m.value)}
+              <Yen value={m.value} />
             </dd>
             {/* スマホの3列では補足が2行に折り返すことがあるため、2行分の高さを常に取っておく */}
             <dd
               className={cn(
-                "num min-h-[2lh] text-[11px] sm:min-h-0 sm:text-xs",
-                m.warn ? "font-semibold text-orange" : "text-warm-500",
+                "num mt-0.5 min-h-[2lh] text-[11px] sm:min-h-0 sm:text-xs",
+                m.warn ? "font-semibold text-shu" : "text-warm-500",
               )}
             >
               {m.sub}
@@ -99,8 +99,9 @@ function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; del
           </div>
         ))}
       </dl>
+      <div className="mx-3 mb-5 flex items-center gap-3 sm:mx-6">
       <div
-        className="mx-3 mb-4 h-1.5 overflow-hidden rounded-full bg-warm-200 sm:mx-5"
+        className="h-2 flex-1 overflow-hidden bg-warm-200"
         role="progressbar"
         aria-label="今月期日の請求のうち入金済の割合"
         aria-valuemin={0}
@@ -108,11 +109,15 @@ function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; del
         aria-valuenow={Math.round(ratio * 100)}
       >
         <div
-          className="h-full rounded-full bg-blue transition-[width] duration-500 motion-reduce:transition-none"
+          className="h-full bg-moss transition-[width] duration-500 motion-reduce:transition-none"
           style={{ width: `${ratio * 100}%` }}
         />
       </div>
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 border-t border-line px-3 py-2.5 sm:px-5">
+        <span aria-hidden className="num shrink-0 text-xs text-warm-500">
+          <span className="font-semibold text-ink">{Math.round(ratio * 100)}%</span> 回収
+        </span>
+      </div>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 border-t border-line px-3 py-3 sm:px-6">
         <p className="flex items-center gap-2 text-xs text-warm-500">
           今後の入金予定
           <span className="num">来月以降が期日・{s.laterDueCount}件</span>
@@ -129,7 +134,7 @@ function BillingSummary({ summary: s, deltas }: { summary: DashboardSummary; del
 function DeltaBadge({ delta }: { delta?: number }) {
   if (!delta) return null;
   return (
-    <span className="num anim-rise rounded bg-blue-tint/60 px-1 text-[11px] font-semibold text-blue-active">
+    <span className="num anim-rise rounded-[2px] bg-moss-tint px-1 text-[11px] font-semibold text-moss">
       {signedYen(delta)}
     </span>
   );
@@ -163,7 +168,7 @@ function MonthlyTableToggle({ rows }: { rows: readonly MonthlyRevenue[] }) {
   );
 }
 
-/** グラフの数値を確かめるための月別の表（Linear の小さな表に倣い、罫線は行の区切りだけ） */
+/** グラフの数値を確かめるための月別の表（帳簿の小さな表。罫線は行の区切りだけ） */
 function MonthlyTable({ rows }: { rows: readonly MonthlyRevenue[] }) {
   const th = "px-2 py-1.5 font-medium";
   return (
@@ -229,14 +234,19 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
 
       <BillingSummary summary={s} deltas={deltas} />
 
-      <Card className="mb-6">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-4 pt-4 sm:px-5 sm:pt-5">
-          <h2 className="text-[13px] font-semibold text-ink">入金の推移</h2>
-          <p className="num text-xs text-warm-500">
-            {firstMonth}から{lastMonth}の入金 <span className="font-medium text-ink">{formatYen(sixMonthTotal)}</span>
+      <Card className="mb-5">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1 px-4 pt-5 sm:px-6">
+          <div>
+            <h2 className="font-serif text-[15px] font-semibold text-ink">入金の推移</h2>
+            <p className="num mt-0.5 text-xs text-warm-500">
+              {firstMonth}から{lastMonth}の入金
+            </p>
+          </div>
+          <p className="text-2xl font-semibold tracking-[-0.025em] text-ink sm:text-[28px]">
+            <Yen value={sixMonthTotal} />
           </p>
         </div>
-        <div className="px-3 pt-2 pb-4 sm:px-5">
+        <div className="px-3 pt-3 pb-5 sm:px-6">
           <RevenueChart
             data={revenue}
             growFrom={paidDelta > 0 ? (s.thisMonthPaid - paidDelta) / s.thisMonthPaid : null}
@@ -245,7 +255,7 @@ function Dashboard({ data, today }: { data: AppData; today: ISODate }) {
         </div>
       </Card>
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-5 lg:items-start">
+      <div className="mb-5 grid gap-5 lg:grid-cols-5 lg:items-start">
         {/* 「入金済にする」がデモの山場なので、見た目もフォーカス順も今日やることより先に置く */}
         <Card title="未入金の請求" className="lg:col-span-3" action={<MoreLink href="/invoices">請求一覧</MoreLink>}>
           <InvoiceList invoices={unpaid} data={data} today={today} empty="未入金の請求はありません" />

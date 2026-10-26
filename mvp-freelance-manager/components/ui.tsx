@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { cn, formatYen } from "@/lib/utils";
 
 interface CardProps {
   title?: string;
@@ -9,13 +9,16 @@ interface CardProps {
   children: ReactNode;
 }
 
-/** 1px の罫線だけで区切るパネル。影やアイコンで飾らない（Linear / Stripe のリスト面と同じ扱い） */
+/** 帳面の一区画。箱で囲まず、上を墨の太罫、下を細罫で区切る（帳簿の見出し罫と締めの罫） */
+export const SURFACE = "border-t-2 border-b border-t-ink border-b-line";
+
+/** 罫線で区切るパネル。角丸の箱・影・アイコンで飾らない */
 export function Card({ title, action, className, children }: CardProps) {
   return (
-    <section className={cn("min-w-0 rounded-lg border border-line bg-canvas", className)} aria-label={title}>
+    <section className={cn("min-w-0", SURFACE, className)} aria-label={title}>
       {title && (
-        <header className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-4 py-2.5 sm:px-5">
-          <h2 className="text-[13px] font-semibold text-ink">{title}</h2>
+        <header className="flex min-h-12 items-center justify-between gap-2 border-b border-line px-4 py-3 sm:px-5">
+          <h2 className="font-serif text-[15px] font-semibold text-ink">{title}</h2>
           {action}
         </header>
       )}
@@ -42,11 +45,11 @@ interface PageHeaderProps {
 
 export function PageHeader({ eyebrow, title, description, action }: PageHeaderProps) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+    <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
         {eyebrow && <p className="num mb-1 text-xs text-warm-500">{eyebrow}</p>}
-        <h1 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">{title}</h1>
-        {description && <p className="mt-1 text-sm text-warm-500">{description}</p>}
+        <h1 className="font-serif text-[24px] font-semibold tracking-[0.01em] text-ink sm:text-[30px]">{title}</h1>
+        {description && <p className="mt-1.5 text-sm text-warm-500">{description}</p>}
       </div>
       {action}
     </div>
@@ -62,19 +65,36 @@ export function Page({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * 大きく見せる金額。「¥」を小さく薄くして数字そのものを主役にする（Stripe の残高表示に倣う）。
+ * 読み上げは formatYen と同じ文字列になる
+ */
+export function Yen({ value, className }: { value: number; className?: string }) {
+  const text = formatYen(value);
+  return (
+    <span className={cn("num whitespace-nowrap", className)} aria-label={text}>
+      <span aria-hidden className="mr-[0.06em] align-[0.12em] text-[0.62em] font-medium opacity-55">
+        {text.startsWith("-") ? "-¥" : "¥"}
+      </span>
+      <span aria-hidden>{text.replace(/^-?¥/, "")}</span>
+    </span>
+  );
+}
+
 export interface Metric {
   label: string;
-  value: string;
+  value: number;
   sub?: ReactNode;
   href?: string;
 }
 
-/** 集計値の横並び。タイルを並べず、1枚のパネルを縦罫で区切る（Stripe の概要表示に倣う） */
+/** 集計値の横並び。タイルを並べず、帳簿の欄のように縦罫で区切る */
 export function MetricStrip({ items, className }: { items: readonly Metric[]; className?: string }) {
   return (
     <dl
       className={cn(
-        "grid divide-line overflow-hidden rounded-lg border border-line bg-canvas",
+        "grid divide-line overflow-hidden",
+        SURFACE,
         // 3項目はスマホで横に詰めると補足が切れるため、縦積みにする
         items.length === 3 ? "grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0" : "grid-cols-2 divide-x",
         className,
@@ -84,20 +104,22 @@ export function MetricStrip({ items, className }: { items: readonly Metric[]; cl
         const body = (
           <>
             <dt className="truncate text-xs text-warm-500">{m.label}</dt>
-            <dd className="num mt-1 truncate text-base font-semibold text-ink sm:text-xl">{m.value}</dd>
+            <dd className="mt-1.5 truncate text-xl leading-tight font-semibold tracking-[-0.02em] text-ink sm:text-[26px]">
+              <Yen value={m.value} />
+            </dd>
             {m.sub && (
-              <dd className="num mt-0.5 truncate text-xs text-warm-500">
+              <dd className="num mt-1 truncate text-xs text-warm-500">
                 {m.sub}
               </dd>
             )}
           </>
         );
         return m.href ? (
-          <Link key={m.label} href={m.href} className="block min-w-0 px-3 py-3 hover:bg-warm-50 sm:px-5 sm:py-4">
+          <Link key={m.label} href={m.href} className="block min-w-0 px-4 py-4 hover:bg-warm-100/70 sm:px-6 sm:py-5">
             {body}
           </Link>
         ) : (
-          <div key={m.label} className="min-w-0 px-3 py-3 sm:px-5 sm:py-4">
+          <div key={m.label} className="min-w-0 px-4 py-4 sm:px-6 sm:py-5">
             {body}
           </div>
         );
@@ -106,7 +128,7 @@ export function MetricStrip({ items, className }: { items: readonly Metric[]; cl
   );
 }
 
-/** 絞り込みの切り替え。サイドバーの選択状態と同じ見た目にそろえる */
+/** 絞り込みの切り替え。選んだものだけ墨で塗る（主ボタンと同じ扱い） */
 export function SegmentButton({
   active,
   onClick,
@@ -122,8 +144,8 @@ export function SegmentButton({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "hit shrink-0 rounded-md px-2.5 py-1.5 text-xs transition-colors",
-        active ? "bg-black/[0.07] font-semibold text-ink" : "text-warm-500 hover:bg-black/[0.04] hover:text-ink",
+        "hit shrink-0 rounded-[3px] px-3 py-1.5 text-xs transition-colors",
+        active ? "bg-ink font-semibold text-canvas" : "text-warm-500 hover:bg-warm-100 hover:text-ink",
       )}
     >
       {children}
@@ -135,13 +157,13 @@ export function SegmentButton({
 const PRESS = "transition-[background-color,transform] duration-100 motion-safe:active:scale-[0.98]";
 
 export const buttonStyles = {
-  primary: `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-md bg-blue px-3.5 py-2 text-sm font-medium text-white hover:bg-blue-active active:bg-blue-active disabled:opacity-50 disabled:active:scale-100 sm:min-h-0 ${PRESS}`,
-  secondary: `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-md border border-line bg-canvas px-3.5 py-2 text-sm font-medium text-ink hover:bg-warm-100 active:bg-warm-200 sm:min-h-0 ${PRESS}`,
+  primary: `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[3px] bg-ink px-3.5 py-2 text-sm font-medium text-canvas hover:bg-warm-900 active:bg-warm-900 disabled:opacity-50 disabled:active:scale-100 sm:min-h-0 ${PRESS}`,
+  secondary: `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[3px] border border-rule bg-canvas px-3.5 py-2 text-sm font-medium text-ink hover:bg-warm-100 active:bg-warm-200 sm:min-h-0 ${PRESS}`,
   /** 一覧の行の中に置く小さなボタン（入金済にする 等）。スマホでは高さ 44px にする */
-  rowAction: `min-h-11 w-24 shrink-0 rounded-md border border-line bg-canvas px-2 py-1.5 text-xs font-medium text-ink hover:bg-warm-100 active:bg-warm-200 sm:min-h-0 ${PRESS}`,
-  rowActionQuiet: `min-h-11 w-24 shrink-0 rounded-md px-2 py-1.5 text-xs text-warm-500 hover:bg-black/[0.04] hover:text-ink active:bg-black/[0.07] sm:min-h-0 ${PRESS}`,
+  rowAction: `min-h-11 w-24 shrink-0 rounded-[3px] border border-rule bg-canvas px-2 py-1.5 text-xs font-medium text-ink hover:bg-warm-100 active:bg-warm-200 sm:min-h-0 ${PRESS}`,
+  rowActionQuiet: `min-h-11 w-24 shrink-0 rounded-[3px] px-2 py-1.5 text-xs text-warm-500 hover:bg-warm-100 hover:text-ink active:bg-warm-200 sm:min-h-0 ${PRESS}`,
   input:
-    "min-h-11 sm:min-h-0 w-full rounded-md border border-[#d9d7d4] bg-canvas px-3 py-2 text-sm text-ink placeholder:text-warm-300 focus:border-blue focus:outline-none focus:ring-2 focus:ring-blue-tint",
+    "min-h-11 sm:min-h-0 w-full rounded-[3px] border border-rule bg-canvas px-3 py-2 text-sm text-ink placeholder:text-warm-300 focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/15",
 } as const;
 
 export function PageSkeleton() {
@@ -149,8 +171,8 @@ export function PageSkeleton() {
     <Page>
       <div className="animate-pulse space-y-4" aria-busy="true" aria-label="読み込み中">
         <div className="h-8 w-48 rounded bg-warm-200" />
-        <div className="h-20 rounded-lg bg-warm-100" />
-        <div className="h-64 rounded-lg bg-warm-100" />
+        <div className="h-20 bg-warm-100" />
+        <div className="h-64 bg-warm-100" />
       </div>
     </Page>
   );

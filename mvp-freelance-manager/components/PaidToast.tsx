@@ -44,7 +44,7 @@ export function PaidToast() {
       {toast && (
         <div
           key={toast.key}
-          className="toast-in pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-lg bg-warm-900 px-4 py-3 text-sm text-white shadow-lg"
+          className="toast-in pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-[3px] bg-ink px-4 py-3 text-sm text-canvas shadow-lg"
         >
           <CircleCheck size={16} aria-hidden className="mt-0.5 shrink-0" />
           <div className="min-w-0 flex-1">
@@ -58,13 +58,13 @@ export function PaidToast() {
                 入金を記録しました <span className="num ml-1 font-normal">+{formatYen(toast.amount)}</span>
               </p>
             )}
-            <p className="mt-0.5 text-xs text-white/80">
+            <p className="mt-0.5 text-xs text-canvas/80">
               {toast.kind === "paid" && <span className="num">{toast.number}</span>}
               {toast.client && <span className="ml-1.5 inline-block">{toast.client}</span>}
             </p>
             <Link
               href={link.href}
-              className="mt-1 inline-block rounded text-xs font-semibold underline underline-offset-2 focus-visible:outline-white"
+              className="mt-1 inline-block rounded text-xs font-semibold underline underline-offset-2 focus-visible:outline-canvas"
             >
               {link.label}
             </Link>
@@ -73,7 +73,7 @@ export function PaidToast() {
             type="button"
             onClick={actions.clearPaidToast}
             aria-label="通知を閉じる"
-            className="-mr-1 rounded p-1 text-white/80 hover:text-white focus-visible:outline-white"
+            className="-mr-1 rounded p-1 text-canvas/80 hover:text-canvas focus-visible:outline-canvas"
           >
             <X size={16} aria-hidden />
           </button>

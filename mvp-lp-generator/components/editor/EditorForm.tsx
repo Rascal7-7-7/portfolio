@@ -2,6 +2,7 @@ import { CATEGORIES, CATEGORY_KEYS, SECTION_KEYS, SECTION_LABELS } from '@/lib/c
 import { cx } from '@/lib/cx'
 import { PHOTO_MAX_MB } from '@/lib/photo'
 import { SAMPLES } from '@/lib/samples'
+import { THEMES } from '@/lib/themes'
 import type { CategoryKey, LPDoc, MenuItem, SectionKey, StoreInfo } from '@/lib/types'
 import { Field, Group, Select, TextArea, TextInput, inputCls } from './fields'
 
@@ -112,13 +113,20 @@ export default function EditorForm({ doc, onStore, onMenu, onToggleSection, onSa
                     onSample(sample)
                   }}
                   className={cx(
-                    'flex min-h-11 items-center justify-between gap-3 rounded-md border px-3 text-left text-sm transition-colors lg:min-h-10',
-                    selected ? 'border-accent bg-accent/[0.06]' : 'border-ed-line hover:border-[#c9c9c4] hover:bg-ed-bg/60',
+                    'flex min-h-14 items-center gap-3 rounded-lg border p-2 pr-3 text-left text-sm transition-[border-color,background-color,box-shadow] duration-150',
+                    selected ? 'border-accent bg-accent/[0.05] ring-[3px] ring-accent/10' : 'border-ed-line hover:border-[#c9c9c4] hover:bg-ed-bg/60',
                   )}
                 >
-                  <span className="truncate font-medium">{sample.store.storeName}</span>
-                  <span className="shrink-0 text-xs text-ed-muted">
-                    {current && !selected ? '編集中・押すと元に戻す' : CATEGORIES[sample.store.category].label}
+                  {/* サンプルのヒーロー写真を小さく見せ、どんな LP になるかを押す前に分かるようにする */}
+                  {sample.store.photo && (
+                    // eslint-disable-next-line @next/next/no-img-element -- 小さな静的サンプル画像
+                    <img src={sample.store.photo} alt="" className="h-10 w-10 shrink-0 rounded object-cover" />
+                  )}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium">{sample.store.storeName}</span>
+                    <span className="block truncate text-xs text-ed-muted">
+                      {current && !selected ? '編集中・押すと元に戻す' : `${CATEGORIES[sample.store.category].label}・${THEMES[sample.template].label}`}
+                    </span>
                   </span>
                 </button>
               )

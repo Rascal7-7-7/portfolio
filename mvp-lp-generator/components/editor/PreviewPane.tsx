@@ -60,7 +60,8 @@ export default function PreviewPane({ doc, generating, onTemplate }: Props) {
   )
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 lg:p-6">
+    // キャンバスの地に細かい点を敷き、「作業台の上でページを組んでいる」見た目にする（Framer のキャンバスと同じ考え方）
+    <div className="flex h-full min-h-0 flex-col gap-4 lg:bg-[radial-gradient(#d6d6d1_1px,transparent_1px)] lg:p-6 lg:[background-size:16px_16px]">
       <div className="flex items-center justify-between gap-3 px-4 pt-4 lg:p-0">
         <TemplatePicker value={doc.template} onChange={onTemplate} />
         <DeviceToggle value={device} onChange={setDevice} />
@@ -69,7 +70,7 @@ export default function PreviewPane({ doc, generating, onTemplate }: Props) {
       <div className="relative flex min-h-0 flex-1 justify-center">
         {device === 'pc' ? (
           // 1024px 未満は枠を外し、LP を画面幅でそのまま見せる。枠の上端には公開後の URL だけを出す
-          <div className="flex w-full flex-col lg:overflow-hidden lg:rounded-lg lg:border lg:border-ed-line lg:bg-ed-panel lg:shadow-sm">
+          <div className="flex w-full flex-col lg:overflow-hidden lg:rounded-xl lg:border lg:border-ed-line lg:bg-ed-panel lg:shadow-[0_1px_2px_rgba(24,24,27,0.06),0_12px_32px_-12px_rgba(24,24,27,0.16)]">
             <div className="hidden border-b border-ed-line px-4 py-2 lg:block">
               {/* アドレス欄だけを模す（窓の丸ボタンなどの飾りは描かない） */}
               <p className="mx-auto flex max-w-md items-center justify-center gap-1.5 truncate rounded bg-ed-bg px-3 py-1 text-xs text-ed-muted">
@@ -81,7 +82,7 @@ export default function PreviewPane({ doc, generating, onTemplate }: Props) {
           </div>
         ) : (
           // 端末の枠は描かず、390px 幅のキャンバスだけを見せる（Wix / Squarespace のモバイル表示と同じ考え方）
-          <div data-phone className="h-[78vh] w-[390px] max-w-full overflow-hidden rounded-lg border border-ed-line bg-white shadow-sm lg:h-full lg:max-h-[844px]">
+          <div data-phone className="h-[78vh] w-[390px] max-w-full overflow-hidden rounded-2xl border border-ed-line bg-white shadow-[0_1px_2px_rgba(24,24,27,0.06),0_12px_32px_-12px_rgba(24,24,27,0.16)] lg:h-full lg:max-h-[844px]">
             <div className="h-full overflow-y-auto">{page}</div>
           </div>
         )}

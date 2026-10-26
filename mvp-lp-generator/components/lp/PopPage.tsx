@@ -1,7 +1,7 @@
 import { cx } from '@/lib/cx'
 import MobileBar, { HERO_CTA } from './MobileBar'
 import Photo, { usePhotoLoaded } from './Photo'
-import { areaOf, catchCopy, ctaLabel, hoursWord, infoRows, isLowPrice, menuItems, menuTitle, ownerOf, Phrases, reserveLink, storeName, type TemplateProps } from './shared'
+import { areaOf, catchCopy, featuresHavePhoto, galleryOf, ctaLabel, hoursWord, infoRows, isLowPrice, menuItems, menuTitle, ownerOf, Phrases, reserveLink, storeName, type TemplateProps } from './shared'
 
 /*
  * ポップ: 街の整体院・教室のサイト（STUDIO「ぬくもり鍼灸・整骨院」の白い箱に載せた見出し・
@@ -124,33 +124,73 @@ function Hero(props: TemplateProps) {
   )
 }
 
+/**
+ * 選ばれる理由（写真あり）。モダンの「左に写真・右に文の段」、ナチュラルの「縦長3枚」と骨格が重ならないよう、
+ * PC は 1 つ目を大きな写真で左に、残りを小さな写真で右に積む（大1＋小2）。
+ * スマホは 1 つ目だけ写真を大きく、残りは小さな正方形の写真を左に添える
+ */
+function PhotoFeatures({ store, wide }: Pick<TemplateProps, 'store' | 'wide'>) {
+  const [first, ...rest] = store.features
+  if (!first) return null
+  return (
+    <ul className={cx('mt-12', wide ? 'grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] gap-10' : 'space-y-8')}>
+      {/* 大きな写真は右の段の高さに合わせて伸ばす（h-0 + flex-1 で写真自身の高さを行に持ち込まない） */}
+      <li className={cx(wide && 'flex flex-col')} style={wide ? { gridRow: `span ${Math.max(rest.length, 1)}` } : undefined}>
+        <Photo src={first.photo} alt={first.title} className={cx('block w-full rounded-lg', wide ? 'h-0 min-h-[320px] flex-1' : 'aspect-[4/3]')} />
+        <h3 className={cx('mt-6 font-extrabold leading-snug', wide ? 'text-2xl' : 'text-xl')}><Phrases text={first.title} /></h3>
+        <p className={cx(MUTED, 'mt-2 text-[15px] leading-[1.9]')}>{first.text}</p>
+      </li>
+      {rest.map((f) => (
+        <li key={f.title} className={cx(wide ? cx('border-t-2 pt-6', RULE) : cx('grid grid-cols-[104px_minmax(0,1fr)] items-start gap-5 border-t pt-8', LINE))}>
+          <Photo src={f.photo} alt={f.title} className={cx('block w-full rounded-lg', wide ? 'mb-5 aspect-[2/1]' : 'aspect-square')} />
+          <div>
+            <h3 className="text-xl font-extrabold leading-snug"><Phrases text={f.title} /></h3>
+            <p className={cx(MUTED, 'mt-2 text-[15px] leading-[1.9]')}>{f.text}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function Features({ store, wide }: TemplateProps) {
   return (
     <section className={pad(wide)}>
       <div className={WRAP}>
       <H2 lead={`${storeName(store)}が`} text="選ばれる理由" wide={wide} />
-      {/*
-        「3列の特長カード」はテンプレートの型に見えるので使わない。PC では見出しと本文を横に組んだ段を
-        左端をそろえて縦に積む（左右交互のずらしは配置のずれに見えるのでやめた）
-      */}
-      {/* 下端の線は置かない（直後のあいさつの太線と二重になる） */}
-      <ul className={cx('mt-12', wide && 'space-y-12')}>
-        {store.features.map((f) => (
-          <li
-            key={f.title}
-            className={cx(
-              wide
-                ? cx('grid grid-cols-[minmax(0,15em)_minmax(0,1fr)] items-baseline gap-10 border-t-2 pt-6', RULE)
-                : cx('border-t py-7', LINE),
-            )}
-          >
-            <h3 className={cx('font-extrabold leading-snug', wide ? 'text-2xl' : 'text-xl')}><Phrases text={f.title} /></h3>
-            <p className={cx(MUTED, 'text-[15px] leading-[1.9]', !wide && 'mt-2')}>{f.text}</p>
-          </li>
-        ))}
-      </ul>
+      {featuresHavePhoto(store) ? (
+        <PhotoFeatures store={store} wide={wide} />
+      ) : (
+        /* 写真が無いときは、左に見出し・右に本文の段を積む。下端の線は置かない（直後のあいさつの太線と二重になる） */
+        <ul className={cx('mt-12', wide && 'space-y-12')}>
+          {store.features.map((f) => (
+            <li
+              key={f.title}
+              className={cx(wide ? cx('grid grid-cols-[minmax(0,15em)_minmax(0,1fr)] items-baseline gap-10 border-t-2 pt-8', RULE) : cx('border-t py-8', LINE))}
+            >
+              <h3 className={cx('font-extrabold leading-snug', wide ? 'text-2xl' : 'text-xl')}><Phrases text={f.title} /></h3>
+              <p className={cx(MUTED, 'text-[15px] leading-[1.9]', !wide && 'mt-2')}>{f.text}</p>
+            </li>
+          ))}
+        </ul>
+      )}
       </div>
     </section>
+  )
+}
+
+/** 院内の写真。白地に角を少し丸めた2枚を並べる（文字は載せない） */
+function Gallery({ store, wide }: TemplateProps) {
+  const photos = galleryOf(store).slice(0, 2)
+  if (photos.length === 0) return null
+  return (
+    <div className={wide ? 'px-14 pb-24' : 'px-5 pb-16'}>
+      <div className={cx(WRAP, 'grid grid-cols-2', wide ? 'gap-6' : 'gap-3')}>
+        {photos.map((src) => (
+          <Photo key={src} src={src} alt="" className={cx('block w-full rounded-lg', wide ? 'aspect-[4/3]' : 'aspect-square')} />
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -315,6 +355,7 @@ export default function PopPage(props: TemplateProps) {
       {sections.greeting && <Greeting {...props} />}
       {sections.menu && <Menu {...props} />}
       {sections.voices && <Voices {...props} />}
+      <Gallery {...props} />
       {sections.access && <Access {...props} />}
       {sections.cta && <Cta {...props} />}
       <footer className={cx(MUTED, 'px-6 py-10 text-center text-xs font-bold')}>© {storeName(store)}</footer>

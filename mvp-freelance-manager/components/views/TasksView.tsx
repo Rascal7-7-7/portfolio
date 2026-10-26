@@ -38,8 +38,8 @@ export function TasksView() {
           if (items.length === 0) return null;
           return (
             <section key={g.key} aria-label={g.label} className="[&:last-child>ul]:border-b-0">
-              <h2 className="flex items-center gap-2 border-b border-line bg-warm-100 px-4 py-2 text-xs font-semibold sm:px-5">
-                <span className={cn(g.alert ? "text-orange" : "text-ink")}>{g.label}</span>
+              <h2 className="flex items-center gap-2 border-b border-line bg-warm-100/60 px-4 py-2.5 text-xs font-semibold sm:px-5">
+                <span className={cn(g.alert ? "text-shu" : "text-ink")}>{g.label}</span>
                 <span className="num font-normal text-warm-500">{items.length}</span>
               </h2>
               <ul className="divide-y divide-line border-b border-line">
