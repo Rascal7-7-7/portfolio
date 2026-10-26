@@ -21,7 +21,7 @@ interface Action {
 
 const ACTIONS: Record<EstimateStatus, Action[]> = {
   draft: [
-    { to: "sent", label: "送付済みにする", icon: "send", message: "送付済みにしました（デモのため実際のメールは送信されません）。「お客様の画面を見る」で先方に届く画面を確認できます" },
+    { to: "sent", label: "送付済みにする", icon: "send", message: "送付済みにしました（デモのため実際のメールは送信されません）。「お客様の画面（承認ボタンあり）」で先方に届く画面を開き、承認まで試せます" },
   ],
   sent: [
     { to: "won", label: "受注にする", icon: "check", message: "受注にしました。一覧の受注金額・受注率に反映されます" },
@@ -104,7 +104,7 @@ export default function EstimateDetail({ id, justSaved }: Props) {
             ) : (
               // 受注は「その他」に入れてあるので、ふだんの流れ（先方の承認）を一言添える
               <div className="flex flex-col items-start gap-1">
-                <CustomerLink id={estimate.id} className={`${BUTTON} ${TONE_CLASS.primary}`} />
+                <CustomerLink id={estimate.id} canApprove={estimate.status === "sent"} className={`${BUTTON} ${TONE_CLASS.primary}`} />
                 {estimate.status === "sent" && <p className="text-xs text-muted">お客様が承認すると受注になります（手動なら「その他」から）</p>}
               </div>
             )}
@@ -149,11 +149,12 @@ export default function EstimateDetail({ id, justSaved }: Props) {
   );
 }
 
-function CustomerLink({ id, className }: { id: number; className: string }) {
+/** 送付済みのときは、押すと承認まで試せることを文言で伝える */
+function CustomerLink({ id, className, canApprove = false }: { id: number; className: string; canApprove?: boolean }) {
   return (
     <Link href={`/estimates/${id}/customer`} className={className}>
       <Icon name="eye" />
-      お客様の画面を見る（デモ）
+      {canApprove ? "お客様の画面（承認ボタンあり）" : "お客様の画面を見る（デモ）"}
     </Link>
   );
 }
@@ -182,10 +183,10 @@ function HikaeLink({ id }: { id: number }) {
         <span className="sr-only">（新しいタブで開きます）</span>
       </a>
       <p className="text-xs text-muted">
+        <span className="inline-block">Hikae で</span>{" "}
         <span className="inline-block">
-          請求書 <span className="tnum">{invoiceNumber}</span> を
-        </span>{" "}
-        <span className="inline-block">Hikae で発行済み（デモ）</span>
+          請求書 <span className="tnum">{invoiceNumber}</span> を発行（デモ）
+        </span>
       </p>
     </div>
   );
