@@ -1,4 +1,5 @@
 // 外部画像を使わず、商品ごとの配色とパッケージ形状をインライン SVG で描く。
+import Image from 'next/image';
 import { useId, type ReactNode } from 'react';
 import type { Motif, PackageShape, Product, Visual } from '@/lib/types';
 import { cn } from '@/lib/cn';
@@ -63,17 +64,20 @@ type Props = {
   className?: string;
   /** 隣に商品名がある一覧・サムネイルでは true にして読み上げを省く */
   decorative?: boolean;
+  /** 単色の地の代わりに敷く写真（木のテーブルなど）。容器の足元が写真の卓面に乗るよう、卓面が下 1/3 にある写真を使う */
+  backdrop?: string;
 };
 
-export function ProductVisual({ product, className, decorative = false }: Props) {
+export function ProductVisual({ product, className, decorative = false, backdrop }: Props) {
   const { visual } = product;
   // 同じページに複数並ぶため、紙の質感フィルタの id はインスタンスごとに分ける
   const paperId = `paper${useId().replace(/:/g, '')}`;
   return (
     <div
       className={cn('relative overflow-hidden', className)}
-      style={{ backgroundColor: visual.from }}
+      style={backdrop ? undefined : { backgroundColor: visual.from }}
     >
+      {backdrop && <Image src={backdrop} alt="" fill sizes="160px" className="object-cover" />}
       <svg
         viewBox="0 0 240 300"
         className="absolute inset-0 h-full w-full"

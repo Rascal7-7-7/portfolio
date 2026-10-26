@@ -36,7 +36,7 @@ export function ProductCard({ product }: { product: Product }) {
         </p>
         {size && <p className="mt-2 text-xs text-on-surface-variant">{size}</p>}
         {serving && (
-          <p className="tnum mt-0.5 text-xs text-on-surface-variant">
+          <p className="tnum mt-0.5 text-[13px] text-on-surface-variant">
             定期便で1{serving.unit}あたり約{yen(serving.amount)}
           </p>
         )}
@@ -44,8 +44,8 @@ export function ProductCard({ product }: { product: Product }) {
           <span className="whitespace-nowrap">
             定期便 <span className="font-semibold">{yen(subPrice)}</span>
           </span>
-          <span className="ml-2 whitespace-nowrap text-xs font-medium text-primary">10%OFF</span>
-          <span className="block whitespace-nowrap text-xs text-on-surface-variant sm:ml-2 sm:inline">単品 {yen(product.price)}</span>
+          <span className="ml-2 whitespace-nowrap text-[13px] font-medium text-primary">10%OFF</span>
+          <span className="block whitespace-nowrap text-[13px] text-on-surface-variant sm:ml-2 sm:inline">単品 {yen(product.price)}</span>
         </p>
         {/* 送料ルールは lib/pricing.ts の shippingFee と同じ（定期便を含む注文は無料） */}
         <p className="mt-1 text-xs text-on-surface-variant">定期便なら送料無料</p>
