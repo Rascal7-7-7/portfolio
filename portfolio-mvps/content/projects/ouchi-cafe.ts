@@ -16,6 +16,8 @@ export const ouchiCafe: Project = {
   period: { start: "2025-10", end: "2026-02" },
   stack: ["PHP 8.2", "MySQL 8.0", "FastAPI", "LightGBM", "Stripe"],
   highlights: [
+    // 受賞作品は本人に確認済み（2026-10-26）
+    { label: "卒業進級制作発表会2025で企業賞・理事長賞を受賞", type: "check" },
     { label: "味覚診断12次元ベクトル", type: "check" },
     { label: "LightGBMによる推薦", type: "check" },
     { label: "商品692件", type: "data" },
