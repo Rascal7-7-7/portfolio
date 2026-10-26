@@ -21,14 +21,12 @@ export function Hero() {
             id="hero-heading"
             className="mt-5 text-[32px] font-bold leading-[1.3] sm:text-[46px] sm:leading-[1.22]"
           >
-            {/* 意味の切れ目ごとに区切り、「紙・LINE・／Excel」のような割れ方をさせない */}
-            <span className="inline-block">紙・LINE・Excelの</span>
-            <span className="inline-block">手間を、</span>
-            <span className="inline-block">お店に合った</span>
-            <span className="inline-block">小さな仕組みに。</span>
+            {/* 店主の言葉（予約・見積・お店のページ）で言い切る。意味の切れ目ごとに区切って割れ方を固定する */}
+            <span className="inline-block">予約も、見積も、</span>
+            <span className="inline-block">お店のページも。</span>
           </h1>
           <p className="mt-6 max-w-xl text-[17px] leading-[1.9] text-ink-muted">
-            予約・見積・請求・お店の紹介ページ。いまのやり方を伺って、必要なものだけを作ります。下の作例は、どれも実際に触れます。
+            紙やLINE、Excelで回している業務を伺って、いまのやり方に合わせて必要なものだけを作ります。下の作例は、どれも実際に触れます。
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <ButtonLink href={owner.x} target="_blank" rel="noopener noreferrer">
@@ -43,7 +41,7 @@ export function Hero() {
           <p className="mt-4 text-sm text-ink-subtle">ご相談・お見積りは無料です。メールでも受け付けています。</p>
         </div>
 
-        {/* 作例の実際の画面。PC の予定表の上に、お客様のスマホの予約画面を重ねる */}
+        {/* 作例の実際の画面。PC の予定表の上に、お客様のスマホの予約画面を重ねる（スマホではスマホの画面 1 枚だけ） */}
         <div className="relative lg:col-span-6">
           <Image
             src="/works/hero-schedule.webp"
@@ -52,7 +50,7 @@ export function Hero() {
             height={1000}
             priority
             sizes="(min-width: 1024px) 560px, 100vw"
-            className="w-full rounded-xl bg-canvas shadow-shot"
+            className="hidden w-full rounded-xl bg-canvas shadow-shot sm:block"
           />
           <Image
             src="/works/flow-book.webp"
@@ -60,7 +58,7 @@ export function Hero() {
             width={720}
             height={1280}
             sizes="160px"
-            className="absolute -bottom-10 -left-4 w-[32%] max-w-[180px] rounded-[22px] border-[5px] border-ink bg-canvas shadow-shot sm:-left-8"
+            className="mx-auto w-[58%] max-w-[240px] rounded-[26px] border-[6px] border-ink bg-canvas shadow-shot sm:absolute sm:-bottom-10 sm:-left-8 sm:w-[32%] sm:max-w-[180px] sm:rounded-[22px] sm:border-[5px]"
           />
         </div>
       </div>

@@ -32,15 +32,16 @@ export function SectionHeader({
   className,
 }: {
   id: string;
-  eyebrow: string;
+  /** 何の節かを示す小さな語。節ごとに同じ型が続かないよう、要る節にだけ付ける */
+  eyebrow?: string;
   title: string;
   description?: string;
   className?: string;
 }) {
   return (
     <div className={cn("max-w-2xl", className)}>
-      <p className="text-sm font-medium text-ink-subtle">{eyebrow}</p>
-      <h2 id={id} className="mt-3 text-[28px] font-bold leading-[1.3] sm:text-[40px] sm:leading-[1.2]">
+      {eyebrow && <p className="mb-3 text-sm font-medium text-ink-subtle">{eyebrow}</p>}
+      <h2 id={id} className="text-[28px] font-bold leading-[1.3] sm:text-[40px] sm:leading-[1.2]">
         <Phrase text={title} />
       </h2>
       {description && (

@@ -7,7 +7,7 @@ export function Faq() {
   return (
     <Section id="faq" labelledBy="faq-heading">
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
-        <SectionHeader id="faq-heading" eyebrow="よくある質問" title="ご依頼の前に" className="lg:col-span-5" />
+        <SectionHeader id="faq-heading" title="よくある質問" className="lg:col-span-5" />
         <div className="divide-y divide-line border-y border-line lg:col-span-7">
           {faqs.map(({ question, answer }) => (
             <details key={question} className="group">

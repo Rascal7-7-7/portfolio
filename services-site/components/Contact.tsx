@@ -22,11 +22,13 @@ export function Contact() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
               <span className="sr-only">（新しいタブで開く）</span>
             </ButtonLink>
+            {/* X のアカウントを持たない方の窓口なので、DM と同じ大きさにする */}
             <a
               href={mailto}
-              className="inline-flex min-h-12 items-center rounded-full px-6 text-[15px] font-medium text-white ring-1 ring-white/30 hover:ring-white/70"
+              className="inline-flex min-h-12 items-center gap-2 rounded-full px-6 text-[15px] font-medium text-white ring-1 ring-white/40 transition-shadow hover:ring-white/80"
             >
               メールで相談する
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </div>
           <p className="mt-4 text-sm text-white/70">
@@ -34,12 +36,11 @@ export function Contact() {
           </p>
         </div>
         <div className="lg:col-span-5">
-          <p className="text-sm font-medium text-white/70">はじめに教えていただきたいこと</p>
-          <ul className="mt-3 divide-y divide-white/15 border-y border-white/15">
+          {/* 罫線の行にすると空の入力欄に見えるため、ふつうの箇条書きにする */}
+          <p className="text-sm font-medium text-white/70">DM・メールに書いていただくとスムーズなこと</p>
+          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[15px] marker:text-white/50">
             {inquiry.body.split("\n").map((line) => (
-              <li key={line} className="py-3 text-[15px]">
-                {line.replace(/：$/, "")}
-              </li>
+              <li key={line}>{line.replace(/：$/, "")}</li>
             ))}
           </ul>
           <p className="mt-3 text-sm text-white/70">メールのボタンから開くと、この項目が最初から入っています。DM なら一言目は「相談です」だけでも大丈夫です。</p>
