@@ -14,7 +14,7 @@ export function ProjectCard({ project }: { project: Project }) {
   const { name, headline, thumbnail, links } = project;
 
   return (
-    <article className="reveal flex flex-col">
+    <article className="group reveal flex flex-col">
       {thumbnail && (
         <TiltCard>
           <Image
@@ -23,7 +23,7 @@ export function ProjectCard({ project }: { project: Project }) {
             width={800}
             height={500}
             sizes="(min-width: 1024px) 200px, (min-width: 640px) 45vw, 100vw"
-            className="block w-full h-auto rounded-md border border-rule"
+            className="block w-full h-auto rounded-md border border-rule opacity-80 transition-opacity duration-300 group-hover:opacity-100"
           />
         </TiltCard>
       )}

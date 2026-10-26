@@ -56,6 +56,12 @@ describe("trustParticles", () => {
     expect(r.atX).toBe(GATE2_X);
   });
 
+  it("難読化された危険な発話は、どちらの層も越えて実行まで届く（限界を図でも隠さない）", () => {
+    const r = runUntilRespawn({ ...base, kind: "undetected" }, seeded(9));
+    expect(r.stage).toBe("exec");
+    expect(r.lastX).toBeGreaterThan(GATE2_X);
+  });
+
   it("流れは LLM の位置で最も細く、両端では元の太さ", () => {
     expect(funnel(LLM_X)).toBeCloseTo(0.3);
     expect(funnel(-8)).toBeCloseTo(1);
@@ -69,14 +75,16 @@ describe("trustParticles", () => {
     expect(p.x).toBe(-8);
   });
 
-  it("3種類がおおむね決めた割合で生まれる", () => {
+  it("4種類がおおむね決めた割合で生まれる", () => {
     const rand = seeded(11);
     const n = 6000;
-    const count = { allowed: 0, blocked: 0, evasive: 0 };
+    const count = { allowed: 0, blocked: 0, evasive: 0, undetected: 0 };
     for (let i = 0; i < n; i++) count[spawn(rand).kind]++;
     expect(count.blocked / n).toBeGreaterThan(0.2);
     expect(count.blocked / n).toBeLessThan(0.3);
     expect(count.evasive / n).toBeGreaterThan(0.08);
     expect(count.evasive / n).toBeLessThan(0.16);
+    expect(count.undetected / n).toBeGreaterThan(0.005);
+    expect(count.undetected / n).toBeLessThan(0.04);
   });
 });

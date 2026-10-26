@@ -4,7 +4,7 @@
 
 /*
  * フォントは next/font（app/layout.tsx）で読み込み、
- * --font-inter / --font-noto-sans-jp として注入している。
+ * --font-plex-sans-jp / --font-plex-mono として注入している。
  * 以前ここにあった Google Fonts の @import は、@tailwind の後ろに置かれており
  * CSS 仕様上（@import は先頭でなければ無効）読み込まれていなかったため削除した。
  */
@@ -36,6 +36,8 @@ body {
    */
   line-break: strict;
   overflow-wrap: break-word;
+  /* 本文はわずかに字間を空ける（デジタル庁デザインシステムの本文と同じ 0.02em） */
+  letter-spacing: 0.02em;
 }
 
 /*
@@ -65,6 +67,8 @@ h2,
 h3,
 h4 {
   text-wrap: balance;
+  /* 見出しだけ和文の字間を詰める（プロポーショナル）。本文は詰めない */
+  font-feature-settings: "palt";
 }
 
 p,

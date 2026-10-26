@@ -8,14 +8,14 @@ import { Footer } from "@/components/Footer";
 export default function Home() {
   return (
     <>
-      <Header wide />
+      <Header />
       <main id="main">
         <Hero />
         <MVPGrid />
         <About />
         <Contact />
       </main>
-      <Footer wide />
+      <Footer />
     </>
   );
 }

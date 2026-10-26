@@ -44,11 +44,11 @@ const config: Config = {
       },
       fontFamily: {
         sans: [
-          "var(--font-inter)",
-          "var(--font-noto-sans-jp)",
+          "var(--font-plex-sans-jp)",
           "system-ui",
           "sans-serif",
         ],
+        mono: ["var(--font-plex-mono)", "ui-monospace", "monospace"],
       },
     },
   },

@@ -22,7 +22,7 @@ type Three = typeof THREE_NS;
  * 左から 発話 → 前段ゲート → LLM ルーター → 後段ゲート → 実行 を並べ、発話の粒が右へ流れる。
  * 粒の動きは trustParticles.ts。ゲートは点で描いた円盤、LLM は多面体、実行は箱。
  *
- * 色は tailwind.config.ts の accent（通常）・danger（危険）・caution（言い換え）だけ。
+ * 色は tailwind.config.ts の accent（通常）・danger（危険・難読化）・caution（言い換え）だけ。
  */
 const ACCENT = 0x5ccbff;
 const DANGER = 0xff5c7a;
@@ -97,7 +97,8 @@ function seeded(seed: number): () => number {
 export function createHeroScene(
   T: Three,
   canvas: HTMLCanvasElement,
-  onAnchors: (points: readonly ScreenPoint[]) => void,
+  /** tall は縦長の配置。呼び出し側はラベルを図の左に右寄せで置く */
+  onAnchors: (points: readonly ScreenPoint[], tall: boolean) => void,
 ): HeroScene {
   const renderer = new T.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -108,11 +109,17 @@ export function createHeroScene(
   /**
    * 右手前の少し上から見る向き。画角を狭くして遠くから見ることで遠近の歪みを抑え、
    * 2 枚のゲートが同じ大きさの楕円に見えるようにする。距離は resize で縦横比に合わせて決める。
+   * 縦長の画面では図を上から下へ流すため、ゲートの円盤が潰れないよう上からの角度を強める。
    */
-  const viewDir = new T.Vector3(0.55, 0.32, 1).normalize();
-  const lookAt = new T.Vector3(-0.3, -0.9, 0);
+  const VIEW = {
+    wide: { dir: new T.Vector3(0.55, 0.32, 1).normalize(), lookAt: new T.Vector3(-0.3, -1.5, 0) },
+    tall: { dir: new T.Vector3(0.35, 0.55, 1).normalize(), lookAt: new T.Vector3(-1.1, -1.4, 0) },
+  };
 
+  // world はマウスに合わせて傾ける。stage はその中で、縦長の画面のときに図全体を 90° 回す
   const world = new T.Group();
+  const stage = new T.Group();
+  world.add(stage);
   scene.add(world);
 
   const dot = dotTexture(T, false);
@@ -159,7 +166,7 @@ export function createHeroScene(
     track(new T.LineDashedMaterial({ color: 0x5f636b, dashSize: 0.18, gapSize: 0.14 })),
   );
   axis.computeLineDistances();
-  world.add(axis);
+  stage.add(axis);
 
   // ゲート 2 枚。点の円盤と外周の輪
   const ringGeo = track(new T.RingGeometry(GATE_R, GATE_R + 0.03, 96));
@@ -175,7 +182,7 @@ export function createHeroScene(
     );
     rim.position.x = gx;
     rim.rotation.y = Math.PI / 2;
-    world.add(disc, rim);
+    stage.add(disc, rim);
   }
 
   // LLM ルーター。暗い多面体に稜線、背後に光
@@ -190,7 +197,7 @@ export function createHeroScene(
   llm.position.x = LLM_X;
   const llmGlow = glowSprite(ACCENT, 3.6, 0.35);
   llmGlow.position.x = LLM_X;
-  world.add(llmGlow, llm);
+  stage.add(llmGlow, llm);
 
   // 実行。箱の稜線。通常の発話が届くたびに光る
   const execGeo = track(new T.BoxGeometry(EXEC_HALF * 2, EXEC_HALF * 2, EXEC_HALF * 2));
@@ -204,7 +211,7 @@ export function createHeroScene(
   exec.position.x = EXEC_X;
   const execGlow = glowSprite(ACCENT, 3, 0);
   execGlow.position.x = EXEC_X;
-  world.add(execGlow, exec);
+  stage.add(execGlow, exec);
 
   // 発話の粒。頭（点）と尾（線分）を頂点色で塗り分ける
   const rand = seeded(20261026);
@@ -212,6 +219,8 @@ export function createHeroScene(
     allowed: new T.Color(ACCENT),
     blocked: new T.Color(DANGER),
     evasive: new T.Color(CAUTION),
+    // 実行まで届いてしまう危険な発話。赤を少し暗くして、通常の発話と見分けられるようにする
+    undetected: new T.Color(DANGER).multiplyScalar(0.75),
   };
   let particles: Particle[] = Array.from({ length: PARTICLES }, (_, i) =>
     spawn(rand, (i / PARTICLES) * (EXEC_X - SPAWN_X)),
@@ -222,14 +231,14 @@ export function createHeroScene(
   const headGeo = track(new T.BufferGeometry());
   headGeo.setAttribute("position", new T.BufferAttribute(headPos, 3));
   headGeo.setAttribute("color", new T.BufferAttribute(headCol, 3));
-  world.add(new T.Points(headGeo, additive({ map: dot, size: 0.17, vertexColors: true })));
+  stage.add(new T.Points(headGeo, additive({ map: dot, size: 0.17, vertexColors: true })));
 
   const trailPos = new Float32Array(PARTICLES * 6);
   const trailCol = new Float32Array(PARTICLES * 6);
   const trailGeo = track(new T.BufferGeometry());
   trailGeo.setAttribute("position", new T.BufferAttribute(trailPos, 3));
   trailGeo.setAttribute("color", new T.BufferAttribute(trailCol, 3));
-  world.add(
+  stage.add(
     new T.LineSegments(
       trailGeo,
       track(
@@ -258,14 +267,16 @@ export function createHeroScene(
     );
     const mesh = new T.Mesh(burstGeo, mat);
     mesh.rotation.y = Math.PI / 2;
-    world.add(mesh);
+    stage.add(mesh);
     return { mesh, mat, age: Infinity };
   });
   let nextBurst = 0;
   let execFlash = 0;
 
-  function onHit(at: Vec3, stage: Stage) {
+  function onHit(at: Vec3, stage: Stage, kind: ParticleKind) {
     if (stage === "exec") {
+      // 届いてしまった危険な発話は、実行の箱を赤く光らせる
+      execGlow.material.color.setHex(kind === "undetected" ? DANGER : ACCENT);
       execFlash = 1;
       return;
     }
@@ -279,7 +290,8 @@ export function createHeroScene(
   /** 生まれた直後と、実行に吸い込まれる直前を暗くする（端で急に現れたり消えたりしない） */
   function brightness(p: Particle): number {
     const fadeIn = Math.min(1, (p.x - SPAWN_X) / 1.5);
-    const fadeOut = p.kind === "allowed" ? Math.min(1, (EXEC_X - EXEC_HALF - p.x) / 0.8 + 0.25) : 1;
+    const reachesExec = p.kind === "allowed" || p.kind === "undetected";
+    const fadeOut = reachesExec ? Math.min(1, (EXEC_X - EXEC_HALF - p.x) / 0.8 + 0.25) : 1;
     return Math.max(0, Math.min(fadeIn, fadeOut));
   }
 
@@ -307,7 +319,7 @@ export function createHeroScene(
     elapsed += dt;
     particles = particles.map((p) => {
       const { particle, hit } = step(p, dt, rand);
-      if (hit) onHit(hit.at, hit.stage);
+      if (hit) onHit(hit.at, hit.stage, p.kind);
       return particle;
     });
     writeParticles();
@@ -339,16 +351,18 @@ export function createHeroScene(
   // ラベルの位置。3D の座標を画面の座標へ写して呼び出し側へ渡す
   const anchorVec = new T.Vector3();
   let size = { width: 1, height: 1 };
+  let tall = false;
   function render() {
     renderer.render(scene, camera);
     onAnchors(
       ANCHORS.map(([x, y, z]) => {
-        anchorVec.set(x, y, z).applyMatrix4(world.matrixWorld).project(camera);
+        anchorVec.set(x, y, z).applyMatrix4(stage.matrixWorld).project(camera);
         return {
           x: ((anchorVec.x + 1) / 2) * size.width,
           y: ((1 - anchorVec.y) / 2) * size.height,
         };
       }),
+      tall,
     );
   }
 
@@ -386,13 +400,18 @@ export function createHeroScene(
       size = { width, height };
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
-      // 横幅（発話〜実行の約 17）と高さ（ゲートの円盤の約 5）の両方が収まる距離まで引く
+      // 縦長なら図を 90° 回し、発話が上・実行が下になるよう流す
+      tall = width / height < 1;
+      const view = tall ? VIEW.tall : VIEW.wide;
+      stage.rotation.z = tall ? -Math.PI / 2 : 0;
+      // 流れの長さ（発話〜実行の約 17）と太さ（ゲートの円盤の約 5）の両方が収まる距離まで引く
       const halfV = Math.tan(T.MathUtils.degToRad(camera.fov / 2));
-      const fitWidth = 9.6 / (halfV * camera.aspect);
-      const fitHeight = 3.1 / halfV;
+      const [along, across] = [9.6, 3.1];
+      const fitWidth = (tall ? across + 1.2 : along) / (halfV * camera.aspect);
+      const fitHeight = (tall ? along + 1.4 : across) / halfV;
       const distance = Math.max(fitWidth, fitHeight);
-      camera.position.copy(lookAt).addScaledVector(viewDir, distance);
-      camera.lookAt(lookAt);
+      camera.position.copy(view.lookAt).addScaledVector(view.dir, distance);
+      camera.lookAt(view.lookAt);
       camera.updateProjectionMatrix();
       world.updateMatrixWorld();
     },

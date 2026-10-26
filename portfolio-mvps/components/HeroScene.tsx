@@ -36,10 +36,12 @@ export function HeroScene({ className }: { className?: string }) {
     const cleanups: (() => void)[] = [];
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const placeLabels = (points: readonly ScreenPoint[]) => {
+    // 横長の配置では各段の下に中央揃え、縦長の配置では各段の左に右寄せで置く
+    const placeLabels = (points: readonly ScreenPoint[], tall: boolean) => {
+      const align = tall ? "translate(-100%, -50%)" : "translate(-50%, 0)";
       points.forEach(({ x, y }, i) => {
         const el = labelRefs.current[i];
-        if (el) el.style.transform = `translate(${x}px, ${y}px) translate(-50%, 0)`;
+        if (el) el.style.transform = `translate(${x}px, ${y}px) ${align}`;
       });
     };
 

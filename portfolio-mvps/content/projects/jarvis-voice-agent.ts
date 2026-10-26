@@ -9,7 +9,8 @@ export const jarvisVoiceAgent: Project = {
   tier: "featured",
   categories: ["ai", "security"],
   team: { kind: "solo" },
-  period: { start: "2026-09" },
+  // 作業記録（hermes-jarvis/JOURNAL.md）の最初の記録が 2026-08-29。git 管理は 2026-09-09 から
+  period: { start: "2026-08" },
   stack: ["Python", "Swift (SwiftUI)", "Ollama (ローカルLLM)", "launchd", "pytest"],
   highlights: [
     {
@@ -25,7 +26,7 @@ export const jarvisVoiceAgent: Project = {
       { label: "危険な発話の検出", value: "25 / 25（見逃し 0）" },
       { label: "通常の発話の通過", value: "17 / 17（誤検知 0）" },
       { label: "仕込んだ命令の実行", value: "0 / 5" },
-      { label: "命令を拒否リストだけで止められるか", value: "4 / 4（コマンドになる4つ）" },
+      { label: "うちシェルコマンドになる命令を、拒否リストだけで止めた数", value: "4 / 4" },
     ],
     source: {
       label: "DELEGATION_SECURITY.md（2026-08-29 計測）",

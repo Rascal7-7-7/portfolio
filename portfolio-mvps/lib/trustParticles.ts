@@ -6,12 +6,14 @@
  * - allowed（通常の発話）: 実行まで届く
  * - blocked（危険な発話）: 前段ゲート（発話のキーワード照合）で止まる
  * - evasive（言い換えた危険な発話）: 前段をすり抜けうるため、後段ゲート（コマンドの拒否リスト）で止める
+ * - undetected（難読化された危険な発話）: どちらの照合にもかからず実行まで届く。
+ *   Case Study の「今後の課題」に書いた限界を、図でも隠さないために少数だけ流す
  *
- * どちらのゲートも照合式で完全ではない。図はその設計意図を示すもので、計測値ではない。
+ * 図は設計意図を示すもので、割合は計測値ではない。
  */
 
 export type Vec3 = readonly [number, number, number];
-export type ParticleKind = "allowed" | "blocked" | "evasive";
+export type ParticleKind = "allowed" | "blocked" | "evasive" | "undetected";
 export type Stage = "gate1" | "gate2" | "exec";
 
 export type Particle = {
@@ -34,6 +36,7 @@ export const EXEC_HALF = 0.6;
 /** 粒の種類の割合（残りが allowed） */
 export const BLOCKED_RATIO = 0.25;
 export const EVASIVE_RATIO = 0.12;
+export const UNDETECTED_RATIO = 0.02;
 
 export function stopX(kind: ParticleKind): number {
   if (kind === "blocked") return GATE1_X;
@@ -66,7 +69,13 @@ export function spawn(rand: () => number, offset = 0): Particle {
   const a = rand() * Math.PI * 2;
   const roll = rand();
   const kind: ParticleKind =
-    roll < BLOCKED_RATIO ? "blocked" : roll < BLOCKED_RATIO + EVASIVE_RATIO ? "evasive" : "allowed";
+    roll < BLOCKED_RATIO
+      ? "blocked"
+      : roll < BLOCKED_RATIO + EVASIVE_RATIO
+        ? "evasive"
+        : roll < BLOCKED_RATIO + EVASIVE_RATIO + UNDETECTED_RATIO
+          ? "undetected"
+          : "allowed";
   return {
     x: SPAWN_X - offset,
     offset: [Math.cos(a) * r, Math.sin(a) * r],

@@ -39,9 +39,10 @@ export function MVPGrid() {
             {`集客・予約・見積・販売・請求の業務を、1本ずつ画面にしたモックアップです。${standard.length}本とも API やデータベースを使わずブラウザ内のダミーデータで動き、公開デモで操作できます。見積から受注・請求までがつながっていて、見積管理ツールで受注した見積から、フリーランス管理ツールの請求書へリンクで移れます（デモでは1件のみ連携）。予約管理システムは、フリーランス管理ツールの中では取引先から受けた開発案件として登場します。`}
           </p>
           <MetaItems items={sharedMetaItems(standard)} className="mt-3 mb-10" />
-          <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-5">
+          {/* 狭い画面では縦に積むと長くなるため、横にスクロールする帯にする */}
+          <ul className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-5">
             {standard.map((project) => (
-              <li key={project.slug} className="flex">
+              <li key={project.slug} className="flex w-[72vw] shrink-0 snap-start sm:w-auto">
                 <ProjectCard project={project} />
               </li>
             ))}

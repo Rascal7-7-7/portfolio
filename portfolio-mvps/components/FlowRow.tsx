@@ -150,7 +150,7 @@ export function FlowRow({
                     x={x + SIDE_W / 2}
                     y={sideY + 36}
                     fill={COLOR.note}
-                    fontSize={12.5}
+                    fontSize={11}
                     textAnchor="middle"
                   >
                     {note}
@@ -171,7 +171,7 @@ export function FlowRow({
               x={PAD + sidePath.steps.length * (SIDE_W + ARROW_GAP) - ARROW_GAP + 14}
               y={sideY + SIDE_H / 2 + 4}
               fill={COLOR.note}
-              fontSize={12}
+              fontSize={11}
             >
               {sidePath.note}
             </text>
