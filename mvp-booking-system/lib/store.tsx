@@ -180,7 +180,8 @@ function Toast({ message }: { message: string | null }) {
       className="fixed z-[60] left-4 right-4 top-14 md:top-auto md:bottom-8 md:left-auto md:right-8 md:max-w-sm pointer-events-none"
     >
       {message && (
-        <div className="flex items-start gap-2.5 bg-ink text-white rounded-md px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+        // key で、続けて通知が出たときも毎回ふわっと出し直す
+        <div key={message} className="animate-rise-in flex items-start gap-2.5 bg-ink text-white rounded-md px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
           <Icon name="check" className="shrink-0 mt-px" />
           <p className="text-sm leading-relaxed">{message}</p>
         </div>

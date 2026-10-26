@@ -16,6 +16,8 @@ const VARIANT = {
   primary:   'bg-brand text-white font-medium hover:bg-brand-hover disabled:bg-subtle disabled:text-dim disabled:cursor-not-allowed',
   secondary: 'border border-line-strong bg-canvas text-ink font-medium hover:bg-muted',
   ghost:     'text-body hover:bg-muted',
+  /** 削除など取り消せない操作。普段は目立たせず、ホバーで赤みを出す */
+  danger:    'text-now hover:bg-[#fcf1f0]',
 } as const;
 
 const SIZE = {
@@ -26,7 +28,8 @@ const SIZE = {
 
 /** ボタン（とボタン風リンク）のクラス。Tailwind のクラス衝突を避けるため寸法は size でだけ決める */
 export function btn(variant: keyof typeof VARIANT, size: keyof typeof SIZE = 'md'): string {
-  return `inline-flex items-center justify-center gap-1.5 rounded-md whitespace-nowrap ${SIZE[size]} ${VARIANT[variant]} ${FOCUS}`;
+  // 押した瞬間だけ少し沈める（押下の手応え）。動きを減らす設定では沈めない
+  return `inline-flex items-center justify-center gap-1.5 rounded-md whitespace-nowrap select-none motion-safe:active:scale-[0.98] transition-[color,background-color,border-color,transform] duration-[120ms] ${SIZE[size]} ${VARIANT[variant]} ${FOCUS}`;
 }
 
 export function PageHeader({ title, description, action }: {

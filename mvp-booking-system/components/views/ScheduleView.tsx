@@ -84,7 +84,8 @@ export default function ScheduleView() {
   const pickDay = (d: string) => { setOffset(diffDays(today, d)); setMode('day'); };
 
   return (
-    <div className="px-4 md:px-10 py-6 md:py-10 max-w-5xl">
+    // 予定表は横幅がそのまま読みやすさになるので、ほかの画面（max-w-5xl）より一段広く取る
+    <div className="px-4 md:px-10 py-6 md:py-10 max-w-6xl">
       <PageHeader title="スケジュール" action={<ModeTabs mode={mode} onChange={setMode} />} />
       {mode === 'week' && (
         <div className="hidden md:block">
@@ -284,8 +285,12 @@ function Timeline({ byStaff, nowMin }: { byStaff: (s: Staff) => Reservation[]; n
 function StaffColumn({ list, divider, nowTop }: { list: Reservation[]; divider: boolean; nowTop: number | null }) {
   return (
     <div className={`relative ${divider ? 'border-l border-line' : ''}`} style={{ height: SLOT_H * OPEN_HOURS.length }}>
+      {/* 正時は実線、30分は点線。いちばん上の正時は見出しの罫線と二重になるので引かない */}
       {OPEN_HOURS.map((h, i) => (
-        <div key={h} className="absolute left-0 right-0 border-t border-line" style={{ top: i * SLOT_H + 3 }} />
+        <div key={h}>
+          {i > 0 && <div className="absolute left-0 right-0 border-t border-line" style={{ top: i * SLOT_H + 3 }} />}
+          <div className="absolute left-0 right-0 border-t border-dotted border-line" style={{ top: i * SLOT_H + SLOT_H / 2 + 3 }} />
+        </div>
       ))}
       {placeInLanes(list).map(({ r, lane, lanes }) => {
         const top = Math.max(0, ((toMinutes(r.reservation_time) - OPEN_MIN) / 60) * SLOT_H + 3);

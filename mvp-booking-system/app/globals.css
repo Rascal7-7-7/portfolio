@@ -62,3 +62,36 @@ body {
   word-break: auto-phrase;
   text-wrap: pretty;
 }
+
+@layer base {
+  /* 押せるものの色の変化を一瞬だけなめらかにする（Cal.com と同じ 150ms 前後）。位置や大きさは動かさない */
+  a, button, input, select, textarea, label {
+    transition-property: color, background-color, border-color, box-shadow, filter, opacity;
+    transition-duration: 120ms;
+    transition-timing-function: ease-out;
+  }
+
+  /* ネイティブの select は OS ごとに高さと矢印がばらつくので、入力欄と同じ箱に揃えて矢印だけ描く */
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6270' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.625rem center;
+    background-size: 16px;
+    padding-right: 2.25rem !important;
+  }
+}
+
+/* トースト・保存の反応など、出てくるものは下から 4px だけ浮かせて現す */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+.animate-rise-in { animation: rise-in 160ms ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
