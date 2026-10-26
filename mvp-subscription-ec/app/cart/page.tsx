@@ -89,7 +89,7 @@ export default function CartPage() {
             <TotalsTable totals={totals} />
             <Link
               href="/checkout"
-              className="mt-5 flex w-full items-center justify-center rounded-sm bg-primary py-3.5 font-medium text-on-primary transition-opacity hover:opacity-90"
+              className="mt-5 flex w-full items-center justify-center btn-primary py-3.5 font-medium"
             >
               ご購入手続きへ
             </Link>
@@ -112,7 +112,7 @@ function EmptyCart() {
       <p className="mt-2 text-sm text-on-surface-variant">気になる商品を、定期便か単品でカートに入れてください。</p>
       <Link
         href="/products"
-        className="mt-8 inline-flex items-center rounded-sm bg-primary px-6 py-3 text-sm font-medium text-on-primary hover:opacity-90"
+        className="mt-8 inline-flex items-center btn-primary px-6 py-3 text-sm font-medium"
       >
         商品を見る
       </Link>

@@ -26,6 +26,13 @@
   }
 }
 
+@layer components {
+  /* 主ボタン。hover は濃く、押下はわずかに沈める（透明度で薄めない） */
+  .btn-primary {
+    @apply rounded-sm bg-primary font-medium text-on-primary transition-[background-color,transform] duration-150 hover:bg-primary-hover active:scale-[0.985] disabled:pointer-events-none disabled:bg-primary-hover;
+  }
+}
+
 @layer utilities {
   /* 金額は桁がそろう等幅数字で（Stripe の tnum） */
   .tnum {

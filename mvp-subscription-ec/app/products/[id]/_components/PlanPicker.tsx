@@ -114,13 +114,13 @@ export function PlanPicker({ product }: { product: Product }) {
         ref={buttonRef}
         type="button"
         onClick={addToCart}
-        className="mt-4 flex w-full items-center justify-center rounded-sm bg-primary py-3.5 text-base font-medium text-on-primary transition-opacity hover:opacity-90"
+        className="mt-4 flex w-full items-center justify-center btn-primary py-3.5 text-base font-medium"
       >
         {buttonLabel}
       </button>
 
       {!buttonVisible && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant/60 bg-background px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 animate-fade-up border-t border-outline-variant/60 bg-background px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 lg:hidden">
           <div className="mx-auto flex max-w-xl items-center gap-3">
             <p className="min-w-0 flex-1 leading-tight">
               <span className="block truncate text-xs text-on-surface-variant">{priceLabel}</span>
@@ -130,7 +130,7 @@ export function PlanPicker({ product }: { product: Product }) {
             <button
               type="button"
               onClick={addToCart}
-              className="flex-shrink-0 whitespace-nowrap rounded-sm bg-primary px-5 py-3 text-sm font-medium text-on-primary transition-opacity hover:opacity-90"
+              className="flex-shrink-0 whitespace-nowrap btn-primary px-5 py-3 text-sm font-medium"
             >
               {buttonLabel}
             </button>

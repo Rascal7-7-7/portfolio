@@ -21,9 +21,11 @@ type Props = {
   subscription: Subscription;
   onCommand: (command: SubscriptionCommand, productName: string) => void;
   onChangeInterval: (interval: SubscriptionInterval, productName: string) => void;
+  /** 直前に操作された定期便なら通し番号が入る。値が変わるたびに淡いハイライトを1回流す */
+  flashKey?: number;
 };
 
-export function SubscriptionCard({ subscription: sub, onCommand, onChangeInterval }: Props) {
+export function SubscriptionCard({ subscription: sub, onCommand, onChangeInterval, flashKey }: Props) {
   const [confirming, setConfirming] = useState(false);
   const [editing, setEditing] = useState(false);
   const product = findProduct(sub.productId);
@@ -42,8 +44,10 @@ export function SubscriptionCard({ subscription: sub, onCommand, onChangeInterva
 
   return (
     <article
+      key={flashKey}
       className={cn(
-        'py-5',
+        '-mx-3 px-3 py-5 transition-opacity',
+        flashKey !== undefined && 'animate-flash',
         canceled && 'opacity-60',
       )}
       aria-label={`${product.name}の定期便`}
@@ -194,9 +198,9 @@ function ActionButton({ onClick, children, tone = 'neutral', pressed, className 
       aria-pressed={pressed}
       className={cn(
         // スマホは3列グリッドに収めるため、アイコンを上に積む
-        'inline-flex flex-col items-center justify-center gap-1 whitespace-nowrap rounded-sm px-1 py-2 text-xs font-medium transition-colors sm:flex-row sm:gap-1.5 sm:px-3 sm:text-sm',
-        tone === 'primary' && 'bg-primary text-on-primary hover:opacity-90',
-        tone === 'danger' && 'bg-error text-on-error hover:opacity-90',
+        'inline-flex min-h-11 flex-col items-center justify-center gap-1 whitespace-nowrap rounded-sm px-1 py-2 text-xs font-medium transition-[background-color,box-shadow,transform] duration-150 active:scale-[0.97] sm:flex-row sm:gap-1.5 sm:px-3 sm:text-sm',
+        tone === 'primary' && 'bg-primary text-on-primary hover:bg-primary-hover',
+        tone === 'danger' && 'bg-error text-on-error hover:bg-error-hover',
         tone === 'neutral' && 'text-on-surface ring-1 ring-outline-variant hover:ring-on-surface',
         className,
       )}
