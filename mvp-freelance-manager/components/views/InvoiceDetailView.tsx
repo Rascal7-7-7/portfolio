@@ -9,10 +9,22 @@ import { invoiceStatus } from "@/lib/selectors";
 import { buttonStyles, Page, PageSkeleton } from "@/components/ui";
 import { InvoiceStatusBadge } from "@/components/StatusBadge";
 import { InvoiceDocument } from "@/components/InvoiceDocument";
-import { EstimateSource } from "@/components/ExternalLink";
+import { ExternalLink } from "@/components/ExternalLink";
+import { ESTIMATE_INVOICE_ID } from "@/lib/seed";
+import { estimateUrl } from "@/lib/utils";
+
+/** 見積管理で承認すると /invoices/est-0014?from=approved へ飛んでくる。その時だけ下書きを発行済みにする */
+function useApprovedFromEstimate(id: string): void {
+  useEffect(() => {
+    if (id === ESTIMATE_INVOICE_ID && new URLSearchParams(window.location.search).get("from") === "approved") {
+      actions.approveEstimateInvoice();
+    }
+  }, [id]);
+}
 
 export function InvoiceDetailView({ id }: { id: string }) {
   const store = useAppStore();
+  useApprovedFromEstimate(id);
   const number = store?.data.invoices.find((inv) => inv.id === id)?.number;
   // 請求はブラウザ内にしかないため metadata では番号を出せない。読み込めたらタブ名に番号を入れる
   useEffect(() => {
@@ -57,18 +69,25 @@ export function InvoiceDetailView({ id }: { id: string }) {
             <p className="mt-1 flex items-center gap-3 text-sm">
               <InvoiceStatusBadge status={invoiceStatus(invoice, today)} />
               <span className="num text-xs text-warm-500">
-                {invoice.paidOn ? `${formatDate(invoice.paidOn)} に入金` : `期日 ${formatDate(invoice.dueOn)}`}
+                {invoice.draft
+                  ? `見積 ${invoice.estimateNo} の承認待ち`
+                  : invoice.paidOn
+                    ? `${formatDate(invoice.paidOn)} に入金`
+                    : `期日 ${formatDate(invoice.dueOn)}`}
               </span>
             </p>
           </div>
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => actions.setInvoicePaid(invoice.id, !invoice.paidOn)}
-              className={invoice.paidOn ? buttonStyles.secondary : buttonStyles.primary}
-            >
-              {invoice.paidOn ? "入金を取消" : "入金済にする"}
-            </button>
+            {/* 下書きは発行前なので入金を記録できない */}
+            {!invoice.draft && (
+              <button
+                type="button"
+                onClick={() => actions.setInvoicePaid(invoice.id, !invoice.paidOn)}
+                className={invoice.paidOn ? buttonStyles.secondary : buttonStyles.primary}
+              >
+                {invoice.paidOn ? "入金を取消" : "入金済にする"}
+              </button>
+            )}
             <button type="button" onClick={() => window.print()} className={invoice.paidOn ? buttonStyles.primary : buttonStyles.secondary}>
               <Printer size={16} aria-hidden />
               印刷
@@ -76,11 +95,25 @@ export function InvoiceDetailView({ id }: { id: string }) {
           </div>
         </div>
 
-        {invoice.estimateNo && (
-          <p className="mb-4 text-xs print:hidden">
-            <EstimateSource estimateNo={invoice.estimateNo} />
-          </p>
-        )}
+        {invoice.estimateNo &&
+          (invoice.draft ? (
+            <div className="mb-4 rounded-lg border border-line bg-canvas px-4 py-3 text-sm print:hidden">
+              <p className="text-ink">
+                見積 <span className="num">{invoice.estimateNo}</span> が承認されると発行されます。
+              </p>
+              <p className="mt-0.5 text-xs text-warm-500">デモでは、見積管理ツールでこの見積を承認すると発行済みに切り替わります。</p>
+              <p className="mt-2 text-xs">
+                <ExternalLink href={estimateUrl(invoice.estimateNo)}>見積 {invoice.estimateNo} を見積管理で開く</ExternalLink>
+              </p>
+            </div>
+          ) : (
+            <p className="mb-4 flex flex-wrap items-center gap-x-2 text-xs print:hidden">
+              <span className="text-warm-500">
+                見積 <span className="num">{invoice.estimateNo}</span> の承認を受けて発行
+              </span>
+              <ExternalLink href={estimateUrl(invoice.estimateNo)}>見積管理で見る（デモ）</ExternalLink>
+            </p>
+          ))}
 
         <InvoiceDocument invoice={invoice} project={project} />
         <p className="mt-3 text-xs text-warm-500 print:hidden">デモのため、実際の送付は行いません。</p>

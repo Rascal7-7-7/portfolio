@@ -88,15 +88,19 @@ function splitItems(projectId: string, amount: number): InvoiceItem[] | undefine
   const total = template.reduce((sum, [, w]) => sum + w, 0);
   const rows = template.map(([name, w]) => ({ name, qty: "1 式", amount: Math.floor((subtotal * w) / total / 1000) * 1000 }));
   const rest = subtotal - rows.reduce((sum, r) => sum + r.amount, 0);
-  return rows.map((r, i) => (i === rows.length - 1 ? { ...r, amount: r.amount + rest } : r));
+  // 1 式なので単価 = 金額
+  return rows.map((r, i) => {
+    const amount = i === rows.length - 1 ? r.amount + rest : r.amount;
+    return { ...r, unitPrice: amount, amount };
+  });
 }
 
 // 見積マネージャーの EST-0014 と同じ明細（税抜。合計 1,130,000 円＋消費税 113,000 円）
 const ESTIMATE_ITEMS: readonly InvoiceItem[] = [
-  { name: "Webサイト設計・ディレクション", qty: "1 式", amount: 180_000 },
-  { name: "ページデザイン", qty: "8 ページ", amount: 360_000 },
-  { name: "コーディング（レスポンシブ対応）", qty: "8 ページ", amount: 240_000 },
-  { name: "物件検索機能 開発", qty: "1 式", amount: 350_000 },
+  { name: "Webサイト設計・ディレクション", qty: "1 式", unitPrice: 180_000, amount: 180_000 },
+  { name: "ページデザイン", qty: "8 ページ", unitPrice: 45_000, amount: 360_000 },
+  { name: "コーディング（レスポンシブ対応）", qty: "8 ページ", unitPrice: 30_000, amount: 240_000 },
+  { name: "物件検索機能 開発", qty: "1 式", unitPrice: 350_000, amount: 350_000 },
 ];
 
 function invoices(today: ISODate): Invoice[] {
@@ -144,6 +148,8 @@ function invoices(today: ISODate): Invoice[] {
     dueOn: endOfNextMonth(today),
     paidOn: null,
     estimateNo: ESTIMATE_NO,
+    // 見積管理の初期状態では EST-0014 は送付済み（未承認）。承認されて ?from=approved で開かれたら発行済みにする
+    draft: true,
     items: ESTIMATE_ITEMS,
   };
   return [...numbered, fromEstimate];
