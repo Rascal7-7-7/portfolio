@@ -24,7 +24,7 @@ export default function EstimateDocument({ estimate, id, annotate = false }: Pro
   return (
     <article
       aria-label="見積書プレビュー"
-      className="border border-line bg-white px-5 py-6 text-[13px] leading-relaxed text-navy sm:px-8 sm:py-10 print:border-0 print:p-0"
+      className="rounded-[3px] border border-line/80 bg-white px-5 py-6 text-[13px] leading-relaxed text-navy shadow-[0_1px_2px_rgba(6,27,49,0.05),0_16px_40px_-16px_rgba(6,27,49,0.22)] sm:px-8 sm:py-10 print:rounded-none print:border-0 print:p-0 print:shadow-none"
     >
       <dl className="tnum ml-auto grid w-fit grid-cols-[auto_auto] gap-x-3 text-xs text-body">
         <dt className="relative">
@@ -63,7 +63,8 @@ export default function EstimateDocument({ estimate, id, annotate = false }: Pro
             </span>
             {/* 320px 幅では（税込）を金額の下へ折り返し、ページを横にはみ出させない */}
             <span className="flex min-w-0 flex-1 flex-wrap items-baseline justify-end gap-x-2 px-3 py-2">
-              <span className="tnum text-xl font-bold sm:text-2xl">{formatYen(total)}</span>
+              {/* プレビューでは再計算のたびに金額を小さく持ち上げ、入力が書類に届いたことを見せる */}
+              <span key={annotate ? total : undefined} className={`tnum text-xl font-bold sm:text-2xl ${annotate ? "num-tick" : ""}`}>{formatYen(total)}</span>
               <span className="whitespace-nowrap text-xs text-body">（税込）</span>
             </span>
           </p>
@@ -114,7 +115,8 @@ export default function EstimateDocument({ estimate, id, annotate = false }: Pro
               </tr>
             ) : (
               items.map((item, i) => (
-                <tr key={item.id} className="border-b border-line align-top">
+                // プレビューでは追加された行だけが下からふわっと入る（key が新しい行だけマウントされる）
+                <tr key={item.id} className={`border-b border-line align-top ${annotate ? "row-in" : ""}`}>
                   <td className={`${CELL} tnum hidden text-center text-body sm:table-cell`}>{i + 1}</td>
                   <td className={`${CELL} text-balance`}>{item.name}</td>
                   <td className={`${CELL} tnum whitespace-nowrap text-right`}>
@@ -140,7 +142,7 @@ export default function EstimateDocument({ estimate, id, annotate = false }: Pro
         </div>
         <div className="mt-1 flex justify-between border-y border-navy px-2 py-1.5 text-base font-bold">
           <dt>合計</dt>
-          <dd>{formatYen(total)}</dd>
+          <dd key={annotate ? total : undefined} className={annotate ? "num-tick" : undefined}>{formatYen(total)}</dd>
         </div>
       </dl>
 

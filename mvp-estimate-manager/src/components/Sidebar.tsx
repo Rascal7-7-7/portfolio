@@ -39,14 +39,28 @@ export function ResetDemoButton({ className }: { className?: string }) {
   );
 }
 
+/** favicon（app/icon.svg）と同じ角丸の正方形のマーク。画面と書類の作り手が同じだと分かるようにする */
+export function BrandMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" className={className}>
+      <rect width="32" height="32" rx="7" fill="#24467a" />
+      <path d="M10 8h9l4 4v12H10z" fill="#fff" />
+      <path d="M13 15h7M13 18h7M13 21h4" stroke="#24467a" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function Sidebar() {
   const isActive = useIsActive();
 
   return (
     <aside className="sticky top-0 hidden h-screen w-[200px] shrink-0 flex-col border-r border-line bg-white px-4 py-6 md:flex print:hidden">
-      <Link href="/estimates" className={cn("mb-8 rounded px-2", FOCUS_CLASS)}>
-        <p className="text-lg font-bold tracking-tight text-navy">見積マネージャー</p>
-        <p className="text-xs text-muted">見積作成から受注管理まで</p>
+      <Link href="/estimates" className={cn("mb-8 flex items-center gap-2.5 rounded px-1", FOCUS_CLASS)}>
+        <BrandMark className="h-8 w-8 shrink-0" />
+        <span className="min-w-0">
+          <span className="block text-[15px] font-bold leading-tight tracking-tight text-navy">見積マネージャー</span>
+          <span className="block text-[11px] text-muted">見積から受注まで</span>
+        </span>
       </Link>
       <nav aria-label="メイン" className="space-y-1">
         {NAV_ITEMS.map((item) => (
@@ -58,7 +72,7 @@ export default function Sidebar() {
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               FOCUS_CLASS,
               isActive(item.href)
-                ? "bg-primary-soft text-primary"
+                ? "bg-canvas text-navy ring-1 ring-inset ring-line"
                 : "text-body hover:bg-canvas hover:text-navy",
             )}
           >
