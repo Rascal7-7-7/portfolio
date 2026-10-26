@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cx } from '@/lib/cx'
 import Icon from '../Icon'
+import { photoError as checkPhoto } from '@/lib/photo'
 import { findSampleById } from '@/lib/samples'
 import { loadDraft, loadPublished, saveDraft } from '@/lib/storage'
 import type { LPDoc, MenuItem, SectionKey, StoreInfo, TemplateKey } from '@/lib/types'
@@ -35,8 +36,13 @@ export default function Editor({ initial }: { initial: LPDoc }) {
   const [save, setSave] = useState<Save>('idle')
   const timer = useRef<number | undefined>(undefined)
   const firstSave = useRef(true)
+  // 選んだ写真（object URL）。doc には入れないので、下書き（localStorage）にも公開データにも保存されない
+  const [photo, setPhoto] = useState<{ url: string; name: string } | null>(null)
+  const [photoError, setPhotoError] = useState('')
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
+  // 差し替え・取り外し・画面を離れるときに object URL を解放する
+  useEffect(() => (photo ? () => URL.revokeObjectURL(photo.url) : undefined), [photo])
   // localStorage はサーバー描画に無いので、マウント後に読む（ハイドレーションの不一致を避ける）
   useEffect(() => {
     const draft = loadDraft(initial.id)
@@ -73,7 +79,33 @@ export default function Editor({ initial }: { initial: LPDoc }) {
     timer.current = window.setTimeout(() => setGenerating(false), GENERATE_MS)
   }, [])
 
+  const choosePhoto = (file: File) => {
+    const error = checkPhoto(file)
+    if (error) {
+      setPhotoError(error)
+      return
+    }
+    const url = URL.createObjectURL(file)
+    // 種類が画像でも中身が壊れていることがあるので、実際に読めるか確かめてから使う
+    const img = new Image()
+    img.onload = () => {
+      setPhotoError('')
+      setPhoto({ url, name: file.name })
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      setPhotoError('この画像は読み込めませんでした。別の画像を選んでください')
+    }
+    img.src = url
+  }
+  const clearPhoto = () => {
+    setPhoto(null)
+    setPhotoError('')
+  }
+
   const loadSample = (sample: LPDoc) => {
+    // 写真は別のお店のものなので外す
+    clearPhoto()
     // URL だけ揃える（再マウントすると生成演出が消えるため、ルーター遷移はしない）
     window.history.replaceState(null, '', `/editor/${sample.id}`)
     // 別のサンプルに切り替えるときは、そのサンプルの下書きがあればそれを開く（素のサンプルで上書きしない）
@@ -92,6 +124,8 @@ export default function Editor({ initial }: { initial: LPDoc }) {
     setStep(3)
   }
   const canPublish = doc.store.storeName.trim() !== ''
+  // プレビューにだけ写真を差し込む（サンプル写真より、選んだ写真を優先）
+  const previewDoc = photo ? { ...doc, store: { ...doc.store, photo: photo.url } } : doc
 
   return (
     <div className="flex min-h-dvh flex-col bg-ed-bg text-ed-ink lg:h-dvh">
@@ -160,10 +194,14 @@ export default function Editor({ initial }: { initial: LPDoc }) {
             onToggleSection={toggleSection}
             onSample={loadSample}
             onGenerate={() => generate()}
+            photoName={photo?.name ?? null}
+            photoError={photoError}
+            onPhoto={choosePhoto}
+            onClearPhoto={clearPhoto}
           />
         </aside>
         <main className={cx('min-h-0 lg:block', tab === 'preview' ? 'block' : 'hidden')}>
-          <PreviewPane doc={doc} generating={generating} onTemplate={setTemplate} />
+          <PreviewPane doc={previewDoc} generating={generating} onTemplate={setTemplate} />
         </main>
       </div>
 

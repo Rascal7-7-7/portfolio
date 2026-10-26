@@ -57,8 +57,23 @@ const ORDER: readonly SectionKey[] = ['features', 'greeting', 'menu', 'voices', 
 
 /** あいさつ文があるときだけ返す（旧データ・空欄では描画しない） */
 export const ownerOf = (s: StoreInfo) => (s.owner?.message ? s.owner : null)
-/** 写真の代わりに出す名前の1文字目（姓の頭文字） */
-export const initialOf = (name: string) => Array.from(name.trim())[0] ?? ''
+
+/** エリア・ジャンル（任意入力）。業種の選択値は内部の分類なので LP には出さない */
+export const areaOf = (s: StoreInfo) => s.area?.trim() ?? ''
+
+/** 予約ボタンの行き先。外部の予約ページがあれば新しいタブで開き、無ければページ内の予約欄へ */
+export const reserveLink = (s: StoreInfo) =>
+  s.reserveUrl ? { href: s.reserveUrl, target: '_blank', rel: 'noopener noreferrer' } : { href: '#reserve' }
+
+/**
+ * 料金が安い品（飲み物 1 杯など）か。大きな料金表示にすると「¥580」だけが目立って間が抜けるので、控えめに組む。
+ * ponytail: 先頭の数字の並びだけで判定（「¥1,000〜」は 1000）。数字が無ければ安い扱いにしない
+ */
+export const LOW_PRICE_YEN = 2000
+export function isLowPrice(price: string): boolean {
+  const m = price.normalize('NFKC').replace(/,/g, '').match(/\d+/)
+  return m !== null && Number(m[0]) < LOW_PRICE_YEN
+}
 
 /** 実際に描画されるセクションだけを順に並べる（番号付きの見出しで使う）。品目0件のメニュー・文の無いあいさつは描画されないので除く */
 export const visibleSections = (sections: LPDoc['sections'], store: StoreInfo) =>

@@ -1,5 +1,8 @@
 import type { LPDoc } from './types'
 
+/** 予約システムのお客様画面（同じポートフォリオの別 MVP） */
+const BOOKING_URL = 'https://mvp-booking-system.vercel.app/book'
+
 const ALL_SECTIONS = { features: true, greeting: true, menu: true, voices: true, access: true, cta: true } as const
 
 // 住所・電話番号・人名はすべて架空のダミーです
@@ -12,6 +15,8 @@ export const SAMPLES: readonly LPDoc[] = [
     store: {
       storeName: '木漏れ日珈琲',
       category: 'cafe',
+      area: '鎌倉の自家焙煎珈琲',
+      photo: '/samples/komorebi-coffee.webp',
       catchCopy: '朝の光と、一杯の深煎りを。',
       description:
         '鎌倉駅から徒歩3分。自家焙煎の豆で淹れるハンドドリップと、毎朝焼き上げるスコーンで、ゆっくりとした時間をお届けします。',
@@ -38,43 +43,49 @@ export const SAMPLES: readonly LPDoc[] = [
         role: '店主',
         name: '森 和也',
         message: '焙煎機の前に立って十年になります。豆の具合は季節や天気で毎日変わるので、いちばんおいしい焼き加減を毎朝確かめています。「今日のおすすめは？」と気軽に聞いてください。',
+        photo: '/samples/komorebi-coffee-staff.webp',
       },
     },
   },
   {
     id: '2',
-    slug: 'lumiere-hair',
+    // 予約システム（mvp-booking-system）・Hikae（mvp-freelance-manager）と同じ店。LP で集客 → 予約システムで受付、の流れを見せる
+    slug: 'lien-omotesando',
     template: 'modern',
     sections: ALL_SECTIONS,
     store: {
-      storeName: 'Hair Salon Lumière',
+      storeName: 'Hair Salon Lien 表参道店',
       category: 'salon',
+      area: '表参道の美容室',
+      photo: '/samples/lien-omotesando.webp',
+      reserveUrl: BOOKING_URL,
       catchCopy: '似合うを、毎日の自信に。',
       description:
-        '表参道駅A2出口から徒歩2分。骨格と髪質を見極めるカウンセリングで、朝のスタイリングが楽になるデザインをご提案します。',
+        '表参道駅A2出口から徒歩2分。スタイリスト2名の小さなサロンです。骨格と髪質を見極めるカウンセリングで、朝のスタイリングが楽になるデザインをご提案します。',
       address: '東京都港区北青山 0-0-0 2F',
       hours: '10:00 – 20:00',
-      closed: '毎週火曜日',
+      closed: '年末年始',
       phone: '03-0000-0000',
-      ctaLabel: 'WEBで予約する',
+      ctaLabel: 'WEB予約',
       features: [
-        { emoji: '💬', title: '20分の丁寧なカウンセリング', text: '骨格・髪質・ライフスタイルを伺ってから、似合わせを設計します。' },
-        { emoji: '✨', title: '髪質改善トリートメント', text: 'うねり・パサつきを抑え、ツヤが続く髪へ導きます。' },
-        { emoji: '🪞', title: '完全個室も選べる', text: '周りを気にせず過ごせる個室ブースをご用意しています。' },
+        { emoji: '💬', title: '15分の丁寧なカウンセリング', text: '骨格・髪質・普段のお手入れを伺ってから、似合わせを設計します。' },
+        { emoji: '✂️', title: '最初から最後まで同じ担当', text: 'カウンセリングから仕上げまで、ひとりのスタイリストが担当します。' },
+        { emoji: '🕗', title: '夜20時まで営業', text: 'お仕事帰りにも。空いている時間は24時間WEBで確認・予約できます。' },
       ],
       menu: [
-        { emoji: '✂️', name: 'カット', description: 'シャンプー・ブロー込み', price: '¥6,600' },
-        { emoji: '🎨', name: 'カット＋カラー', description: '透明感カラーが人気', price: '¥13,200' },
-        { emoji: '💧', name: '髪質改善トリートメント', description: '持続期間 約1か月', price: '¥8,800' },
+        { emoji: '✂️', name: 'カット', description: 'シャンプー・ブロー込み', price: '¥5,500' },
+        { emoji: '🎨', name: 'カット＆カラー', description: '白髪ぼかし・透明感カラー', price: '¥12,100' },
+        { emoji: '💆', name: 'ヘッドスパ', description: '頭皮の汚れを落とし、血行を整えます', price: '¥4,400' },
       ],
       voices: [
         { name: '20代・会社員', text: 'くせ毛が悩みでしたが、乾かすだけでまとまるようになりました。' },
-        { name: '40代・主婦', text: '個室で落ち着いて過ごせます。カラーの提案がいつも的確です。' },
+        { name: '40代・主婦', text: '白髪ぼかしの提案が的確で、伸びてきても目立ちにくいです。' },
       ],
       owner: {
         role: '担当スタイリスト',
-        name: '篠原 葵',
+        name: '山本 葵',
         message: '「朝、乾かすだけでまとまる」を目標に、毎回カウンセリングから始めます。くせや生えぐせも、活かし方しだいで扱いやすいデザインになります。気になっていることは何でもお話しください。',
+        photo: '/samples/lien-omotesando-staff.webp',
       },
     },
   },
@@ -86,6 +97,8 @@ export const SAMPLES: readonly LPDoc[] = [
     store: {
       storeName: 'ひだまり整体院',
       category: 'seitai',
+      area: '吉祥寺の整体院',
+      photo: '/samples/hidamari-seitai.webp',
       catchCopy: 'その肩こり、根本から軽くしませんか。',
       description:
         '吉祥寺駅から徒歩5分。姿勢と骨盤のバランスを確認し、ボキボキしないやさしい施術で、くり返す不調を根本からケアします。',
@@ -112,6 +125,7 @@ export const SAMPLES: readonly LPDoc[] = [
         role: '院長',
         name: '日向 誠',
         message: '開業前は整形外科で8年間リハビリを担当していました。痛みを我慢しながら通う方を多く見てきたので、ここでは強く押したり鳴らしたりしない施術にこだわっています。まずはお体の状態を一緒に確かめるところから始めましょう。',
+        photo: '/samples/hidamari-seitai-staff.webp',
       },
     },
   },

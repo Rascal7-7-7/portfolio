@@ -1,4 +1,5 @@
 import { CATEGORIES } from './categories'
+import { isSamplePhotoPath } from './photo'
 import { findSampleById } from './samples'
 import { THEMES } from './themes'
 import type { LPDoc } from './types'
@@ -45,6 +46,18 @@ function isListOf(v: unknown, keys: readonly string[]): boolean {
   return Array.isArray(v) && v.every((item) => isObject(item) && keys.every((k) => typeof item[k] === 'string'))
 }
 
+const optional = (v: unknown, ok: (x: unknown) => boolean) => v === undefined || ok(v)
+
+/** 予約ボタンの外部リンクは https の URL だけ通す（javascript: などをリンクにしない） */
+export function isReserveUrl(v: unknown): v is string {
+  if (typeof v !== 'string') return false
+  try {
+    return new URL(v).protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 /** localStorage の中身は信用しない。描画で触る項目の形を確かめてから使う（壊れた下書きでエディタが開けなくならないように）。 */
 export function parseDoc(raw: string | null): LPDoc | null {
   if (!raw) return null
@@ -63,7 +76,10 @@ export function parseDoc(raw: string | null): LPDoc | null {
       isListOf(store.menu, ['emoji', 'name', 'description', 'price']) &&
       isListOf(store.features, ['emoji', 'title', 'text']) &&
       isListOf(store.voices, ['name', 'text']) &&
-      (store.owner === undefined || isListOf([store.owner], ['role', 'name', 'message']))
+      optional(store.area, (x) => typeof x === 'string') &&
+      optional(store.photo, isSamplePhotoPath) &&
+      optional(store.reserveUrl, isReserveUrl) &&
+      optional(store.owner, (o) => isListOf([o], ['role', 'name', 'message']) && optional((o as Record<string, unknown>).photo, isSamplePhotoPath))
     return ok ? (v as unknown as LPDoc) : null
   } catch {
     return null

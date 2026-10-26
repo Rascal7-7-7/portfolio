@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react'
-import { CATEGORIES } from '@/lib/categories'
 import { cx } from '@/lib/cx'
 import type { SectionKey } from '@/lib/types'
 import MobileBar, { HERO_CTA } from './MobileBar'
-import { catchCopy, ctaLabel, hoursWord, infoRows, initialOf, menuItems, menuTitle, num, ownerOf, Phrases, storeName, visibleSections, type TemplateProps } from './shared'
+import Photo, { usePhotoLoaded } from './Photo'
+import { areaOf, catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, num, ownerOf, Phrases, reserveLink, storeName, visibleSections, type TemplateProps } from './shared'
 
 /*
  * モダン: 美容室のエディトリアルなサイト（STUDIO「muku」の「02 — ABOUT」番号付き見出し）を手本にした構成。
- * 写真の代わりに「大きな見出し・罫線・左に番号列」で誌面のリズムを作る。
+ * 「大きな見出し・罫線・左に番号列」で誌面のリズムを作る（写真があれば見出しの下に横長で置く）。
  * 黒地は業種（美容室・バー）の雰囲気づくりとして選べるテンプレートの1つ。アクセント色は金1色だけ。
  */
 const MUTED = 'text-[#f2f0eb]/65' // #0e0e0e 上で約 7.5:1
@@ -37,15 +37,11 @@ function Hero({ store, wide, headline: H }: TemplateProps) {
   const rows = [store.hours && `${hoursWord(store)} ${store.hours}`, store.closed && `定休 ${store.closed}`, store.address].filter(Boolean)
   return (
     <section className={wide ? 'px-14 pb-20 pt-24' : 'px-6 pb-14 pt-14'}>
-      <p className={cx(MUTED, 'text-xs tracking-[0.08em]')}>
-        {CATEGORIES[store.category].label}
-        <span className="mx-2">/</span>
-        {CATEGORIES[store.category].en}
-      </p>
+      {areaOf(store) && <p className={cx(MUTED, 'mb-8 text-xs tracking-[0.08em]')}>{areaOf(store)}</p>}
       <H
         className={cx(
           // palt で「、」「。」の後ろの空きを詰め、大きな和文見出しの字間をそろえる
-          'mt-8 font-bold tracking-[-0.01em] [font-feature-settings:"palt"]',
+          'font-bold tracking-[-0.01em] [font-feature-settings:"palt"]',
           wide ? 'text-[clamp(44px,7cqw,84px)] leading-[1.18]' : 'text-[34px] leading-[1.35]',
         )}
       >
@@ -62,11 +58,16 @@ function Hero({ store, wide, headline: H }: TemplateProps) {
             </ul>
           )}
           <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-4">
-            <a href="#reserve" className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
+            <a {...reserveLink(store)} className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
             <a href="#menu" className="inline-flex min-h-11 items-center underline decoration-1 underline-offset-[6px] text-sm decoration-white/40 transition-colors hover:decoration-white">{menuTitle(store)}</a>
           </div>
         </div>
       </div>
+      {/*
+        写真は本文・予約ボタンの下に横長で置く（最初の画面で見出しと予約ボタンが見えるように）。
+        角は落とさず、文字も重ねない（雑誌の見開きのように、文字の段と写真の段を分ける）
+      */}
+      <Photo src={store.photo} alt={`${storeName(store)}の写真`} className={cx('block w-full', wide ? 'mt-16 aspect-[21/9]' : 'mt-12 aspect-[4/3]')} />
     </section>
   )
 }
@@ -90,6 +91,7 @@ export default function ModernPage(props: TemplateProps) {
   const idx = (k: SectionKey) => order.indexOf(k)
   const items = menuItems(store)
   const owner = ownerOf(store)
+  const ownerPhoto = usePhotoLoaded(owner?.photo)
   return (
     <div className="min-h-full bg-[#0e0e0e] text-[#f2f0eb]">
       <Nav {...props} />
@@ -110,15 +112,24 @@ export default function ModernPage(props: TemplateProps) {
 
       {sections.greeting && owner && (
         <Block index={idx('greeting')} title={<Phrases text={`${owner.role}からのご挨拶`} />} wide={wide}>
-          {/* 写真の代わりに姓の1文字目を金で大きく組む。枠や丸では囲まない */}
           <div className={cx(wide && 'grid grid-cols-[auto_minmax(0,1fr)] gap-10')}>
-            <p aria-hidden className={cx(ACCENT, 'font-mincho font-semibold leading-none', wide ? 'text-[88px]' : 'text-[56px]')}>{initialOf(owner.name)}</p>
+            {/* 写真があれば縦長の写真、無ければ役職と名前をそのまま組む（頭文字1字だけでは誰か分からないため） */}
+            {ownerPhoto ? (
+              <Photo src={owner.photo} alt={`${owner.role} ${owner.name}`} className={cx('block aspect-[3/4]', wide ? 'w-[180px]' : 'w-32')} />
+            ) : (
+              <p className={cx(wide && 'w-[180px]')}>
+                <span className={cx(MUTED, 'block text-xs')}>{owner.role}</span>
+                <span className={cx(ACCENT, 'mt-2 block font-mincho font-semibold leading-tight', wide ? 'text-[32px]' : 'text-[28px]')}>{owner.name}</span>
+              </p>
+            )}
             <div className={cx(!wide && 'mt-6')}>
               <p className={cx('leading-[1.9]', wide ? 'text-[19px]' : 'text-base')}>{owner.message}</p>
-              <p className="mt-6 text-sm">
-                <span className={cx(MUTED, 'mr-3 text-xs')}>{owner.role}</span>
-                {owner.name}
-              </p>
+              {ownerPhoto && (
+                <p className="mt-6 text-sm">
+                  <span className={cx(MUTED, 'mr-3 text-xs')}>{owner.role}</span>
+                  {owner.name}
+                </p>
+              )}
             </div>
           </div>
         </Block>
@@ -172,7 +183,7 @@ export default function ModernPage(props: TemplateProps) {
             <Phrases text="まずはお気軽にご予約ください" />
           </h2>
           <div className={cx('shrink-0', wide ? 'text-right' : 'mt-8')}>
-            <a href="#reserve" className={BTN}>{ctaLabel(store)}</a>
+            <a {...reserveLink(store)} className={BTN}>{ctaLabel(store)}</a>
             {store.phone && <p className={cx(MUTED, 'mt-4 text-sm')}>Tel. {store.phone}</p>}
           </div>
         </section>

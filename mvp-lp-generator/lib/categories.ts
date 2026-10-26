@@ -4,11 +4,11 @@ import type { CategoryKey, SectionKey } from './types'
  * menuTitle: メニューの見出し（カフェの「お品書き」が美容室に出ないよう業種で持つ）
  * hours: 営業時間の呼び方（整体は「受付」）。見出しは「受付時間」、短い表記は「受付 9:00 – 21:00」
  */
-export const CATEGORIES: Record<CategoryKey, { label: string; en: string; menuTitle: string; hours: '営業' | '受付' }> = {
-  cafe: { label: 'カフェ・飲食店', en: 'Café', menuTitle: 'お品書き', hours: '営業' },
-  salon: { label: '美容室・サロン', en: 'Hair & Beauty', menuTitle: 'メニュー・料金', hours: '営業' },
-  seitai: { label: '整体・マッサージ', en: 'Body Care', menuTitle: '施術メニュー', hours: '受付' },
-  other: { label: 'その他の店舗', en: 'Welcome', menuTitle: 'メニュー・料金', hours: '営業' },
+export const CATEGORIES: Record<CategoryKey, { label: string; menuTitle: string; hours: '営業' | '受付' }> = {
+  cafe: { label: 'カフェ・飲食店', menuTitle: 'お品書き', hours: '営業' },
+  salon: { label: '美容室・サロン', menuTitle: 'メニュー・料金', hours: '営業' },
+  seitai: { label: '整体・マッサージ', menuTitle: '施術メニュー', hours: '受付' },
+  other: { label: 'その他の店舗', menuTitle: 'メニュー・料金', hours: '営業' },
 }
 
 export const CATEGORY_KEYS = Object.keys(CATEGORIES) as CategoryKey[]

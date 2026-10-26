@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react'
-import { CATEGORIES } from '@/lib/categories'
 import type { CategoryKey } from '@/lib/types'
 import { cx } from '@/lib/cx'
 import MobileBar, { HERO_CTA } from './MobileBar'
-import { catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, ownerOf, Phrases, storeName, type TemplateProps } from './shared'
+import Photo, { usePhotoLoaded } from './Photo'
+import { areaOf, catchCopy, ctaLabel, hoursWord, infoRows, menuItems, menuTitle, ownerOf, Phrases, reserveLink, storeName, type TemplateProps } from './shared'
 
 /*
  * ナチュラル: 個人経営のカフェ・和の店のサイト（STUDIO「Cafe Flat」の細い額縁線、
- * 「鍼灸整体サロン SORA」の縦書きコピー）を手本にした、写真なしで成立する紙もの風の構成。
+ * 「鍼灸整体サロン SORA」の縦書きコピー）を手本にした、写真が無くても成立する紙もの風の構成（写真があればヒーローに縦長で置く）。
  * 装飾は「余白・細い罫線・明朝の縦書き」だけ。カード・影・角丸・グラデーションは使わない。
  */
 const MUTED = 'text-[#2e2620]/75' // #f7f3ec 上で約 6:1
@@ -19,16 +19,6 @@ const KANJI_NUM = ['一', '二', '三', '四', '五', '六']
 
 /** 「、」「。」などの直後で列を分ける（縦書きの見出しを句ごとの列にする） */
 const toLines = (text: string) => text.split(/(?<=[、。！？])/).filter(Boolean)
-
-/**
- * 紹介文を「お店の考え（最後の一文）」と「それ以外（駅からの距離など）」に分ける。入力項目は増やさない。
- * 紹介文は「駅から徒歩○分。」で始まり、想いで締めることが多いので、最後の一文を見出し側に出す。
- * ponytail: 「。」で区切るだけの判定。順序が逆の紹介文では案内文が上に出る（その場合も文章は欠けない）
- */
-const splitDescription = (text: string) => {
-  const sentences = text.trim().split(/(?<=。)/).filter((s) => s.trim())
-  return { concept: (sentences[sentences.length - 1] ?? '').trim(), rest: sentences.slice(0, -1).join('').trim() }
-}
 
 const LEAF = (
   <>
@@ -99,46 +89,54 @@ function Nav({ store, wide }: TemplateProps) {
 
 function Hero({ store, wide, roomy, headline: H }: TemplateProps) {
   const rows = [store.hours && `${hoursWord(store)} ${store.hours}`, store.closed && `定休 ${store.closed}`, store.address].filter(Boolean)
-  const { concept, rest } = splitDescription(store.description)
+  const area = areaOf(store)
+  const hasPhoto = usePhotoLoaded(store.photo)
   return (
     <section className={cx('grid', wide
           ? cx('min-h-[600px] px-16 pb-24 pt-16', roomy ? 'grid-cols-[minmax(0,26em)_minmax(0,1fr)] gap-16' : 'grid-cols-[minmax(0,22em)_minmax(0,1fr)] gap-12')
            : 'gap-12 px-6 pb-16 pt-10')}>
-      {/* 左上にお店の考えを一文、下に案内。縦書きの見出しと上端・下端をそろえる（GLITCH COFFEE の組み方） */}
+      {/* 上にエリア・ジャンルと紹介文（入力どおり 1 段落）、下に営業時間・住所と予約。縦書きの見出しと上端・下端をそろえる（GLITCH COFFEE の組み方） */}
       <div className={cx('flex flex-col justify-between gap-12', wide ? 'max-w-[30em] pt-3' : 'order-2')}>
-        {concept && (
-          <p className={cx('font-mincho leading-[2.1] tracking-[0.1em]', wide ? 'max-w-[20em] text-[17px]' : 'text-base')}>
-            <Phrases text={concept} />
-          </p>
-        )}
         <div>
-          <p className={cx(ACCENT, 'text-xs tracking-[0.2em]')}>{CATEGORIES[store.category].label}</p>
-          {rest && <p className={cx(MUTED, 'mt-6 text-[15px] leading-[2.1] tracking-[0.06em]')}>{rest}</p>}
+          {area && <p className={cx(ACCENT, 'mb-6 text-xs tracking-[0.2em]')}>{area}</p>}
+          {store.description && (
+            <p className={cx('font-mincho leading-[2.1] tracking-[0.08em]', wide ? 'text-[17px]' : 'text-base')}>{store.description}</p>
+          )}
+        </div>
+        <div>
           {rows.length > 0 && (
-            <ul className={cx(LINE, 'mt-8 space-y-1 border-y py-4 text-[13px] leading-relaxed tracking-[0.06em]')}>
+            <ul className={cx(LINE, 'space-y-1 border-y py-4 text-[13px] leading-relaxed tracking-[0.06em]')}>
               {rows.map((r) => (
                 <li key={r}>{r}</li>
               ))}
             </ul>
           )}
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-            <a href="#reserve" className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
+            <a {...reserveLink(store)} className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
             <a href="#menu" className="inline-flex min-h-11 items-center underline decoration-1 underline-offset-[6px] text-sm tracking-[0.12em] decoration-[#2e2620]/40 transition-colors hover:decoration-[#2e2620]">メニューを見る</a>
           </div>
         </div>
       </div>
-      {/* 縦書きのキャッチコピー。句読点で列を改め、長すぎる列は max-height で文節単位に折り返す。PC では右側の中央に線画と並べる（線画は幅に余裕があるときだけ） */}
-      <div className={cx(wide ? cx('flex items-center justify-center', roomy && 'gap-20') : 'order-1 flex justify-center')}>
-        {roomy && (
-          <svg aria-hidden viewBox="0 0 120 160" className="w-[150px] shrink-0 self-end" fill="none" stroke="#8a5526" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-            {LINE_ART[store.category]}
-          </svg>
+      {/*
+        縦書きのキャッチコピー。句読点で列を改め、長すぎる列は max-height で文節単位に折り返す。
+        写真があれば、角を落とさない縦長の写真の右に見出しを並べる（文字を写真に重ねず、紙の余白に組む）。
+        写真が無ければ、幅に余裕があるときだけ線画と並べる
+      */}
+      <div className={cx(wide ? cx('flex items-center justify-center', hasPhoto ? 'gap-10' : roomy && 'gap-20') : cx('order-1 flex justify-center', hasPhoto && 'items-start gap-5'))}>
+        {hasPhoto ? (
+          <Photo src={store.photo} alt={`${storeName(store)}の写真`} className={cx('aspect-[4/5] min-w-0 flex-1', wide && (roomy ? 'max-w-[400px]' : 'max-w-[320px]'))} />
+        ) : (
+          roomy && (
+            <svg aria-hidden viewBox="0 0 120 160" className="w-[150px] shrink-0 self-end" fill="none" stroke="#8a5526" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              {LINE_ART[store.category]}
+            </svg>
+          )
         )}
         <H
           className={cx(
-            'font-mincho font-semibold leading-[1.7] tracking-[0.2em] [writing-mode:vertical-rl]',
+            'shrink-0 font-mincho font-semibold leading-[1.7] tracking-[0.2em] [writing-mode:vertical-rl]',
             // エディタのプレビュー枠（wide だが roomy でない幅）では一段小さくし、初期表示で列の下が切れないようにする
-            wide ? cx('max-h-[10em]', roomy ? 'text-[56px]' : 'text-[44px]') : 'max-h-[10em] text-[32px]',
+            wide ? cx('max-h-[10em]', roomy ? 'text-[56px]' : 'text-[44px]') : cx('max-h-[10em]', hasPhoto ? 'text-[28px]' : 'text-[32px]'),
           )}
         >
           {toLines(catchCopy(store)).map((line, i) => (
@@ -179,6 +177,8 @@ function Greeting({ store, wide }: TemplateProps) {
     <section className={pad(wide)}>
       <div className="mx-auto max-w-2xl">
         <H2 text={`${owner.role}より`} wide={wide} />
+        {/* 写真があるときだけ、縦長の写真を添える（無ければ今までどおり文と署名だけ） */}
+        <Photo src={owner.photo} alt={`${owner.role} ${owner.name}`} className="mx-auto mt-12 block aspect-[3/4] w-40" />
         <p className={cx('mt-12 font-mincho leading-[2.2] tracking-[0.08em]', wide ? 'text-[17px]' : 'text-base')}>{owner.message}</p>
         <p className="mt-8 text-right font-mincho text-sm tracking-[0.14em]">
           <span className={cx(MUTED, 'mr-3 text-xs')}>{owner.role}</span>
@@ -247,7 +247,7 @@ function Cta({ store, wide }: TemplateProps) {
   return (
     <section id="reserve" className={cx(LINE, 'border-t text-center', pad(wide))}>
       <H2 text="ご来店をお待ちしております" wide={wide} />
-      <a href="#reserve" className={cx(BTN, 'mt-10')}>{ctaLabel(store)}</a>
+      <a {...reserveLink(store)} className={cx(BTN, 'mt-10')}>{ctaLabel(store)}</a>
       {store.phone && <p className={cx(MUTED, 'mt-6 text-sm tracking-[0.1em]')}>お電話 {store.phone}</p>}
     </section>
   )

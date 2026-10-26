@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { cx } from '@/lib/cx'
 import type { StoreInfo } from '@/lib/types'
-import { ctaLabel } from './shared'
+import { ctaLabel, reserveLink } from './shared'
 
 export interface BarTone {
   /** バー全体の地色と上の線 */
@@ -55,7 +55,7 @@ export default function MobileBar({ store, tone }: { store: StoreInfo; tone: Bar
           電話する
         </a>
       )}
-      <a href="#reserve" className={cx(btn, tone.web)}>
+      <a {...reserveLink(store)} className={cx(btn, tone.web)}>
         {ctaLabel(store)}
       </a>
     </div>
