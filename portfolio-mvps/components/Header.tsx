@@ -27,7 +27,7 @@ export function Header() {
         メインコンテンツへスキップ
       </a>
       <header id="top" className="sticky top-0 z-30 border-b border-rule bg-paper/95 backdrop-blur-sm">
-        {/* 幅と余白は本文と同じ container を使い、名前の左端を本文に揃える */}
+        {/* 幅と余白は本文と同じ containerWide を使い、名前の左端を本文に揃える */}
         <div className={cn(containerWide, "h-16 flex items-center justify-between gap-3")}>
           <a
             href="/#top"

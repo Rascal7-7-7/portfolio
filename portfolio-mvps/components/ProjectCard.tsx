@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import type { Project } from "@/content/projects";
+import { Phrase } from "./Phrase";
 import { TiltCard } from "./TiltCard";
 
 const cardLink =
@@ -23,12 +24,14 @@ export function ProjectCard({ project }: { project: Project }) {
             width={800}
             height={500}
             sizes="(min-width: 1024px) 200px, (min-width: 640px) 45vw, 100vw"
-            className="block w-full h-auto rounded-md border border-rule opacity-80 transition-opacity duration-300 group-hover:opacity-100"
+            className="block w-full h-auto rounded-md border border-rule sm:opacity-80 transition-opacity duration-300 sm:group-hover:opacity-100"
           />
         </TiltCard>
       )}
       <h4 className="mt-4 text-[15px] font-semibold text-ink">{name}</h4>
-      <p className="phrase mt-1 text-sm leading-relaxed text-ink-muted">{headline}</p>
+      <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+        <Phrase text={headline} />
+      </p>
       <div className="mt-auto flex gap-x-4 pt-2">
         {links.demo && (
           <a

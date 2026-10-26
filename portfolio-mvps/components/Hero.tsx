@@ -2,6 +2,7 @@ import { ArrowRight, Github } from "lucide-react";
 import { profile } from "@/content/profile";
 import { ButtonLink } from "./ui/Button";
 import { HeroScene } from "./HeroScene";
+import { Phrase } from "./Phrase";
 import { containerWide } from "./ui/container";
 import { cn } from "@/lib/cn";
 
@@ -51,7 +52,7 @@ export function Hero() {
           {/* 何をする人か。語の途中で折り返さないよう、意味の切れ目ごとに inline-block で区切る */}
           <h1
             id="hero-heading"
-            className="hero-in [animation-delay:120ms] text-[34px] leading-[1.25] sm:text-[52px] lg:text-[64px] sm:leading-[1.12] font-bold tracking-[-0.035em] text-ink mb-8"
+            className="hero-in [animation-delay:120ms] text-[34px] leading-[1.25] sm:text-[52px] lg:text-[64px] sm:leading-[1.12] font-bold tracking-[-0.01em] text-ink mb-8"
           >
             <span className="inline-block">AIを使う側から、</span>
             <span className="inline-block">仕組みと安全性を</span>
@@ -84,23 +85,26 @@ export function Hero() {
         <div className="mt-10 space-y-8 lg:col-span-5 lg:mt-[6.5rem]">
           {/* 上の 3D が何を表しているか。色の意味と、図の限界を言葉で示す */}
           <div className="hero-in [animation-delay:480ms] text-sm leading-[1.8] text-ink-subtle">
-            <p className="phrase text-ink-muted">上の図は、代表作 JARVIS の構成を立体にした図解です（割合は計測値ではありません）。</p>
+            <p className="text-ink-muted">
+              <Phrase text="上の図は、代表作 JARVIS の構成を立体にした図解です（割合は計測値ではありません）。" />
+            </p>
             <ul className="mt-2 space-y-0.5">
               <li className="flex">
                 <span className="mr-2 inline-block size-2 shrink-0 translate-y-[0.55em] rounded-full bg-accent" aria-hidden="true" />
-                <span>通常の発話は、実行まで届く</span>
+                <Phrase text="通常の発話は、実行まで届く" />
               </li>
               <li className="flex">
                 <span className="mr-2 inline-block size-2 shrink-0 translate-y-[0.55em] rounded-full bg-danger" aria-hidden="true" />
-                <span>危険な発話は、前段のポリシー層（発話のキーワード照合）で止まる</span>
+                <Phrase text="危険な発話は、前段のポリシー層（発話のキーワード照合）で止まる" />
               </li>
               <li className="flex">
                 <span className="mr-2 inline-block size-2 shrink-0 translate-y-[0.55em] rounded-full bg-caution" aria-hidden="true" />
-                <span>言い換えた危険な発話は前段をすり抜けうるため、後段のポリシー層（コマンドの拒否リスト）で止める</span>
+                <Phrase text="言い換えた危険な発話は前段をすり抜けうるため、後段のポリシー層（コマンドの拒否リスト）で止める" />
               </li>
               <li className="flex">
-                <span className="mr-2 inline-block size-2 shrink-0 translate-y-[0.55em] rounded-full bg-danger/70" aria-hidden="true" />
-                <span>難読化された発話は、どちらにもかからず実行まで届くことがある</span>
+                {/* 止まる赤（塗り）と区別できるよう、届いてしまうものは中抜きの輪にする */}
+                <span className="mr-2 inline-block size-2 shrink-0 translate-y-[0.55em] rounded-full border-[1.5px] border-danger" aria-hidden="true" />
+                <Phrase text="難読化された発話は、どちらにもかからず実行まで届くことがある" />
               </li>
             </ul>
           </div>
@@ -110,9 +114,13 @@ export function Hero() {
             <dt className="text-ink-subtle">関心</dt>
             <dd><Interests /></dd>
             <dt className="text-ink-subtle">報告</dt>
-            <dd className="text-ink-muted">{profile.disclosure}</dd>
+            <dd className="text-ink-muted">
+              <Phrase text={profile.disclosure} />
+            </dd>
             <dt className="text-ink-subtle">活動</dt>
-            <dd className="text-ink-muted">{profile.activity}</dd>
+            <dd className="text-ink-muted">
+              <Phrase text={profile.activity} />
+            </dd>
             <dt className="text-ink-subtle">資格</dt>
             <dd className="text-ink-muted">
               {profile.certifications.map((part) => (

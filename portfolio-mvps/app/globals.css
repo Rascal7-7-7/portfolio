@@ -51,15 +51,21 @@ body {
 }
 
 /*
- * 見出しと短い文は文節の切れ目で折り返す（「コー／ヒー」のような語中改行を防ぐ）。
- * auto-phrase は lang="ja" の要素でだけ効き、未対応ブラウザでは通常の折り返しになる。
+ * 見出しは文節の切れ目で折り返す（「コー／ヒー」のような語中改行を防ぐ）。
+ * auto-phrase は Chromium 系だけで効き、Safari では通常の折り返しになる。
+ * 短い文は Phrase コンポーネント（BudouX で <wbr> を入れる）で、Safari でも文節で折り返す。
  */
 h1,
 h2,
 h3,
-h4,
-.phrase {
+h4 {
   word-break: auto-phrase;
+}
+
+/* Phrase コンポーネント用。<wbr> の位置以外では折り返さず、1 文節が行に収まらないときだけ字の間で折る */
+.phrase {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 h1,

@@ -1,3 +1,4 @@
+import { Phrase } from "./Phrase";
 import { SectionHeader } from "./ui/SectionHeader";
 import { containerWide } from "./ui/container";
 
@@ -30,7 +31,9 @@ export function About() {
           {paragraphs.map((sentences) => (
             <p key={sentences[0]}>{sentences.join("")}</p>
           ))}
-          <p className="phrase text-ink">{closing}</p>
+          <p className="text-ink">
+            <Phrase text={closing} />
+          </p>
         </div>
       </div>
     </section>

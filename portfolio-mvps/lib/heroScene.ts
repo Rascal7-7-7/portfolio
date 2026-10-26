@@ -112,7 +112,7 @@ export function createHeroScene(
    * 縦長の画面では図を上から下へ流すため、ゲートの円盤が潰れないよう上からの角度を強める。
    */
   const VIEW = {
-    wide: { dir: new T.Vector3(0.55, 0.32, 1).normalize(), lookAt: new T.Vector3(-0.3, -1.5, 0) },
+    wide: { dir: new T.Vector3(0.55, 0.32, 1).normalize(), lookAt: new T.Vector3(-0.3, -1.1, 0) },
     tall: { dir: new T.Vector3(0.35, 0.55, 1).normalize(), lookAt: new T.Vector3(-1.1, -1.4, 0) },
   };
 
@@ -199,15 +199,13 @@ export function createHeroScene(
   llmGlow.position.x = LLM_X;
   stage.add(llmGlow, llm);
 
-  // 実行。箱の稜線。通常の発話が届くたびに光る
+  // 実行。箱の稜線。通常の発話が届くたびに光り、危険な発話が届いたときは稜線が一瞬赤くなる
   const execGeo = track(new T.BoxGeometry(EXEC_HALF * 2, EXEC_HALF * 2, EXEC_HALF * 2));
   const exec = new T.Mesh(execGeo, track(new T.MeshBasicMaterial({ color: 0x0b0f14 })));
-  exec.add(
-    new T.LineSegments(
-      track(new T.EdgesGeometry(execGeo)),
-      track(new T.LineBasicMaterial({ color: 0xededeb, transparent: true, opacity: 0.75 })),
-    ),
-  );
+  const execEdgeColor = new T.Color(0xededeb);
+  const breachColor = new T.Color(DANGER);
+  const execEdges = track(new T.LineBasicMaterial({ color: execEdgeColor, transparent: true, opacity: 0.75 }));
+  exec.add(new T.LineSegments(track(new T.EdgesGeometry(execGeo)), execEdges));
   exec.position.x = EXEC_X;
   const execGlow = glowSprite(ACCENT, 3, 0);
   execGlow.position.x = EXEC_X;
@@ -272,12 +270,14 @@ export function createHeroScene(
   });
   let nextBurst = 0;
   let execFlash = 0;
+  let breachFlash = 0;
 
   function onHit(at: Vec3, stage: Stage, kind: ParticleKind) {
     if (stage === "exec") {
       // 届いてしまった危険な発話は、実行の箱を赤く光らせる
       execGlow.material.color.setHex(kind === "undetected" ? DANGER : ACCENT);
       execFlash = 1;
+      if (kind === "undetected") breachFlash = 1;
       return;
     }
     const b = bursts[nextBurst];
@@ -339,6 +339,9 @@ export function createHeroScene(
 
     execFlash = Math.max(0, execFlash - dt * 2.5);
     execGlow.material.opacity = execFlash * 0.45;
+    // 赤い稜線は約 0.3 秒で元の色に戻す
+    breachFlash = Math.max(0, breachFlash - dt * 3.3);
+    execEdges.color.copy(execEdgeColor).lerp(breachColor, breachFlash);
     llm.rotation.set(elapsed * 0.2, elapsed * 0.3, 0);
     llmGlow.material.opacity = 0.32 + Math.sin(elapsed * 1.4) * 0.05;
 
@@ -408,7 +411,8 @@ export function createHeroScene(
       const halfV = Math.tan(T.MathUtils.degToRad(camera.fov / 2));
       const [along, across] = [9.6, 3.1];
       const fitWidth = (tall ? across + 1.2 : along) / (halfV * camera.aspect);
-      const fitHeight = (tall ? along + 1.4 : across) / halfV;
+      // 横長では上下に余白を取り、ゲートの輪が舞台の上端で切れないようにする
+      const fitHeight = (tall ? along + 1.4 : across + 0.6) / halfV;
       const distance = Math.max(fitWidth, fitHeight);
       camera.position.copy(view.lookAt).addScaledVector(view.dir, distance);
       camera.lookAt(view.lookAt);

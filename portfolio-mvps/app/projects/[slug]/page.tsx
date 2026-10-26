@@ -18,7 +18,7 @@ import { MetaLine, periodLabel, teamLabel } from "@/components/ProjectMeta";
 import { RichText } from "@/components/RichText";
 import { boundaryTerms } from "@/lib/projectText";
 import { TextLink, textLink } from "@/components/ui/TextLink";
-import { container } from "@/components/ui/container";
+import { containerWide } from "@/components/ui/container";
 
 type Params = { slug: string };
 
@@ -152,7 +152,8 @@ export default function ProjectDetail({ params }: { params: Params }) {
     <>
       <Header />
       <main id="main" className="pt-4 pb-16 sm:pt-8">
-        <div className={container}>
+        {/* ヘッダーと左端を揃えたまま、本文は 1 行約 40 字（max-w-2xl）に抑える */}
+        <div className={cn(containerWide, "[&>*]:max-w-2xl")}>
           <TextLink href="/#projects" className="text-sm mb-6">
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             作品一覧へ戻る

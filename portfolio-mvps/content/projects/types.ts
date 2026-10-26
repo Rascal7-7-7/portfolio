@@ -37,6 +37,8 @@ export type Evidence = {
   readonly rows: readonly EvidenceRow[];
   /** どこで確かめられるか。計測日や対象のブランチを label に含める */
   readonly source: { readonly label: string; readonly href: string };
+  /** 出典を開いた人が戸惑いそうな点（履歴の日付の差など）を先回りして 1 行で書く */
+  readonly note?: string;
 };
 
 /** 制作時期。進行中の作品は end を省略する。 */

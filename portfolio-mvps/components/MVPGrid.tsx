@@ -40,7 +40,7 @@ export function MVPGrid() {
           </p>
           <MetaItems items={sharedMetaItems(standard)} className="mt-3 mb-10" />
           {/* 狭い画面では縦に積むと長くなるため、横にスクロールする帯にする */}
-          <ul className="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-5">
+          <ul className="-mx-5 flex snap-x snap-mandatory scroll-pl-5 gap-5 overflow-x-auto px-5 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-5">
             {standard.map((project) => (
               <li key={project.slug} className="flex w-[72vw] shrink-0 snap-start sm:w-auto">
                 <ProjectCard project={project} />

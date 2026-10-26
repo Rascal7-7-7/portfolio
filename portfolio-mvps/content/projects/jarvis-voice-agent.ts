@@ -32,6 +32,7 @@ export const jarvisVoiceAgent: Project = {
       label: "DELEGATION_SECURITY.md（2026-08-29 計測）",
       href: "https://github.com/Rascal7-7-7/jarvis-voice-agent/blob/main/hermes-jarvis/DELEGATION_SECURITY.md",
     },
+    note: "作業記録（JOURNAL.md）は 2026-08-29 から。リポジトリでの git 管理は 2026-09-09 から始めたため、履歴の日付は計測日より後になっています。",
   },
   links: {
     github: "https://github.com/Rascal7-7-7/jarvis-voice-agent",

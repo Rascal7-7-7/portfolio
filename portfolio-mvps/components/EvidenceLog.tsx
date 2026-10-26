@@ -14,7 +14,7 @@ export function EvidenceLog({
   evidence: Evidence;
   className?: string;
 }) {
-  const { rows, source } = evidence;
+  const { rows, source, note } = evidence;
   return (
     <figure className={cn("rounded-lg border border-rule bg-code", className)}>
       <dl className="divide-y divide-rule">
@@ -37,6 +37,7 @@ export function EvidenceLog({
           <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="sr-only">（新しいタブで開く）</span>
         </a>
+        {note && <span className="mt-1 block leading-relaxed">{note}</span>}
       </figcaption>
     </figure>
   );
