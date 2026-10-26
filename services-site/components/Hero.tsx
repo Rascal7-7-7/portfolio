@@ -46,8 +46,8 @@ export function Hero() {
         {/* 作例の実際の画面。PC の予定表の上に、お客様のスマホの予約画面を重ねる */}
         <div className="relative lg:col-span-6">
           <Image
-            src="/works/booking.webp"
-            alt="予約管理の作例。週の予定表に、その週の予約が並んでいる"
+            src="/works/hero-schedule.webp"
+            alt="予約管理の作例。お店の週の予定表に、その週の予約が並んでいる"
             width={1600}
             height={1000}
             priority

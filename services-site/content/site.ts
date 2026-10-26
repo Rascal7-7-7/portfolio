@@ -62,7 +62,7 @@ export const works: readonly Work[] = [
     detail: "SNSだけで案内していて、営業時間やメニュー、場所がすぐに伝わらない。",
     name: "お店の紹介ページ",
     solution: "店名・メニュー・営業時間・写真を入れるだけで、スマホで見やすい紹介ページになります。予約ボタンから予約の仕組みにもつなげられます。",
-    demo: "https://mvp-lp-generator.vercel.app/lp/lien-omotesando",
+    demo: "https://mvp-lp-generator.vercel.app/lp/komorebi-coffee",
     image: "/works/lp.webp",
   },
   {
