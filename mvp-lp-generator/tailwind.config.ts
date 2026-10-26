@@ -21,6 +21,15 @@ const config: Config = {
         'ed-muted': '#5c5c57', // 白で約 6.6:1、ed-bg で約 6:1
       },
       fontFamily: { gothic, mincho },
+      // 控えめで速い出現だけ。使う側で motion-safe: を付け、prefers-reduced-motion では動かさない
+      keyframes: {
+        'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } },
+        rise: { from: { opacity: '0', transform: 'translateY(4px)' }, to: { opacity: '1', transform: 'none' } },
+      },
+      animation: {
+        'fade-in': 'fade-in 180ms ease-out',
+        rise: 'rise 200ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+      },
     },
   },
   plugins: [],

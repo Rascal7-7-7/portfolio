@@ -28,19 +28,19 @@ export default function PublishedView({ slug }: { slug: string }) {
       <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-ed-bg px-6 text-center">
         <h1 className="text-lg font-semibold">ページが見つかりません</h1>
         <p className="text-sm text-ed-muted">このURLのLPは、このブラウザではまだ公開されていません。</p>
-        <Link href="/editor/1" className="mt-3 rounded-md bg-ed-ink px-5 py-2.5 text-sm font-semibold text-white">エディタでLPを作る</Link>
+        <Link href="/editor/1" className="mt-3 inline-flex min-h-11 items-center rounded-md bg-ed-ink px-5 text-sm font-semibold text-white hover:bg-[#33333a]">エディタでLPを作る</Link>
       </main>
     )
   }
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3 border-b border-ed-line bg-ed-bg px-4 py-2 text-xs text-ed-muted">
+      <div className="flex min-h-11 items-center justify-between gap-3 border-b border-ed-line bg-ed-bg px-4 text-xs text-ed-muted">
         <span className="truncate">
           <span className="mr-2 font-semibold text-ed-ink">公開イメージ</span>
           {mockPublicUrl(state.doc.slug)}
         </span>
-        <Link href={`/editor/${state.doc.id}`} className="shrink-0 underline-offset-2 hover:underline">← エディタに戻る</Link>
+        <Link href={`/editor/${state.doc.id}`} className="-mr-2 inline-flex min-h-11 shrink-0 items-center px-2 underline-offset-2 hover:text-ed-ink hover:underline">← エディタに戻る</Link>
       </div>
       <LandingPage doc={state.doc} />
     </>

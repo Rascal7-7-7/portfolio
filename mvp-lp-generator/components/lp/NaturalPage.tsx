@@ -86,11 +86,12 @@ function Nav({ store, wide }: TemplateProps) {
       <div className="flex shrink-0 items-center gap-8 text-[13px] tracking-[0.12em]">
         {wide && (
           <>
-            <a href="#menu" className="hover:underline hover:underline-offset-4">メニュー</a>
-            <a href="#access" className="hover:underline hover:underline-offset-4">店舗情報</a>
+            <a href="#menu" className="decoration-1 underline-offset-[6px] hover:underline">メニュー</a>
+            <a href="#access" className="decoration-1 underline-offset-[6px] hover:underline">店舗情報</a>
           </>
         )}
-        <a href="#reserve" className="border-b border-[#2e2620] pb-0.5">ご予約</a>
+        {/* 文字リンクも 44px のタップ領域を持たせる。下線は text-decoration にして文字の直下に残す */}
+        <a href="#reserve" className="-my-2 inline-flex min-h-11 items-center underline decoration-1 underline-offset-[6px]">ご予約</a>
       </div>
     </nav>
   )
@@ -122,7 +123,7 @@ function Hero({ store, wide, roomy, headline: H }: TemplateProps) {
           )}
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
             <a href="#reserve" className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
-            <a href="#menu" className="border-b border-[#2e2620]/40 pb-0.5 text-sm tracking-[0.12em] hover:border-[#2e2620]">メニューを見る</a>
+            <a href="#menu" className="inline-flex min-h-11 items-center underline decoration-1 underline-offset-[6px] text-sm tracking-[0.12em] decoration-[#2e2620]/40 transition-colors hover:decoration-[#2e2620]">メニューを見る</a>
           </div>
         </div>
       </div>

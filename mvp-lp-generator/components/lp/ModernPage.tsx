@@ -27,7 +27,7 @@ function Nav({ store, wide }: TemplateProps) {
             <a href="#access" className={cx(MUTED, 'hover:text-[#f2f0eb]')}>アクセス</a>
           </>
         )}
-        <a href="#reserve" className={cx(ACCENT, 'border-b border-[#d9b779] pb-0.5 font-semibold')}>予約する</a>
+        <a href="#reserve" className={cx(ACCENT, '-my-2 inline-flex min-h-11 items-center underline decoration-1 underline-offset-[6px] font-semibold')}>予約する</a>
       </div>
     </nav>
   )
@@ -44,7 +44,8 @@ function Hero({ store, wide, headline: H }: TemplateProps) {
       </p>
       <H
         className={cx(
-          'mt-8 font-bold tracking-[-0.01em]',
+          // palt で「、」「。」の後ろの空きを詰め、大きな和文見出しの字間をそろえる
+          'mt-8 font-bold tracking-[-0.01em] [font-feature-settings:"palt"]',
           wide ? 'text-[clamp(44px,7cqw,84px)] leading-[1.18]' : 'text-[34px] leading-[1.35]',
         )}
       >
@@ -62,7 +63,7 @@ function Hero({ store, wide, headline: H }: TemplateProps) {
           )}
           <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-4">
             <a href="#reserve" className={BTN} {...HERO_CTA}>{ctaLabel(store)}</a>
-            <a href="#menu" className="border-b border-white/40 pb-0.5 text-sm hover:border-white">{menuTitle(store)}</a>
+            <a href="#menu" className="inline-flex min-h-11 items-center underline decoration-1 underline-offset-[6px] text-sm decoration-white/40 transition-colors hover:decoration-white">{menuTitle(store)}</a>
           </div>
         </div>
       </div>
@@ -167,7 +168,7 @@ export default function ModernPage(props: TemplateProps) {
 
       {sections.cta && (
         <section id="reserve" className={cx(LINE, 'border-t', wide ? 'flex items-end justify-between gap-12 px-14 py-24' : 'px-6 py-16')}>
-          <h2 className={cx('font-bold', wide ? 'text-[clamp(28px,4.2cqw,46px)] leading-[1.3]' : 'text-[26px] leading-[1.4]')}>
+          <h2 className={cx('font-bold [font-feature-settings:"palt"]', wide ? 'text-[clamp(28px,4.2cqw,46px)] leading-[1.3]' : 'text-[26px] leading-[1.4]')}>
             <Phrases text="まずはお気軽にご予約ください" />
           </h2>
           <div className={cx('shrink-0', wide ? 'text-right' : 'mt-8')}>

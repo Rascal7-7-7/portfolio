@@ -87,11 +87,13 @@ export function loadPublished(slug: string): LPDoc | null {
   }
 }
 
-export function saveDraft(doc: LPDoc): void {
+/** 保存できない環境（プライベートモード等）では false。エディタは「保存できません」と出し、再読み込みで編集が消えるだけにする */
+export function saveDraft(doc: LPDoc): boolean {
   try {
     window.localStorage.setItem(DRAFT_PREFIX + doc.id, JSON.stringify(doc))
+    return true
   } catch {
-    // 保存できない環境（プライベートモード等）では、再読み込みで編集が消えるだけにする
+    return false
   }
 }
 
