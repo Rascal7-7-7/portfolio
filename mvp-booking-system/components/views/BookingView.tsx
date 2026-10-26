@@ -135,7 +135,7 @@ export default function BookingView() {
           <div className="mx-auto max-w-5xl bg-canvas rounded-2xl overflow-hidden shadow-[0_0_0_1px_rgba(60,45,30,0.06),0_12px_40px_-12px_rgba(60,45,30,0.18)]">
             <ShopHeader />
 
-            <div className="border-t border-line md:grid md:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,14.5rem)]">
+            <div className="border-t border-line md:grid md:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,14.5rem)] lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)_minmax(0,17rem)]">
               {/* 左: メニュー（サロンの料金表のように、名前と料金を左右に振る） */}
               <section aria-labelledby="menu-title" className="p-5 md:p-7 border-b md:border-b-0 md:border-r border-line">
                 <StepTitle id="menu-title">メニューを選ぶ</StepTitle>
@@ -237,7 +237,7 @@ export default function BookingView() {
                           .map(([label, list]) => (
                             <div key={label}>
                               <p className="text-xs text-dim mb-2">{label}</p>
-                              <ul className="grid grid-cols-3 md:grid-cols-2 gap-2">
+                              <ul className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-2">
                                 {list.map(s => (
                                   <li key={s.time}>
                                     <button type="button" onClick={() => { setTime(s.time); setError(null); }}

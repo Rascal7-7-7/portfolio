@@ -44,8 +44,8 @@
      左の線は地に対して 3:1 以上。文字はいつもの ink / dim で、いちばん濃い care の地でも dim が 4.5:1 を超える */
   --color-menu-cut: #dbeceb;
   --color-menu-cut-line: #4e8088;
-  --color-menu-color: #dfe6f2;      /* 灰青。紫は避ける */
-  --color-menu-color-line: #5a6e8c;
+  --color-menu-color: #e0e7eb;      /* 灰青（色相 202°・彩度を抑える）。紫に寄る 210° 超は避ける */
+  --color-menu-color-line: #56707e;
   --color-menu-perm: #dceacd;
   --color-menu-perm-line: #617b4b;
   --color-menu-care: #ede4d7;
