@@ -4,6 +4,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { Phrase } from "./Phrase";
 
 describe("Phrase", () => {
+  it("空白を含む欧文の文節は nowrap にせず、空白で折り返せるようにする", () => {
+    const html = renderToStaticMarkup(
+      createElement(Phrase, { text: "Microsoft Office Specialist Excel 365" }),
+    );
+    expect(html).not.toContain("whitespace-nowrap");
+    expect(html).toContain("Microsoft Office Specialist Excel 365");
+  });
+
   it("文節の切れ目にだけ <wbr> を入れ、カタカナ語を割らない", () => {
     const html = renderToStaticMarkup(
       createElement(Phrase, { text: "危険な発話は、前段のポリシー層（発話のキーワード照合）で止まる" }),

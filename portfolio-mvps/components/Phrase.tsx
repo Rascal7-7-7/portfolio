@@ -9,6 +9,8 @@ const parser = loadDefaultJapaneseParser();
  * keep-all だけに頼ると WebKit が開き括弧「（」の直後で折り返すため、文節ごとに nowrap にしている。
  * CSS の word-break: auto-phrase と違い Safari でも効く。サーバーで描画するため、ブラウザに解析器は送らない。
  * 長い段落には使わない（行末がガタガタになる）。見出し・凡例・一言説明など数行の文に使う。
+ * 空白を含む文節（「Microsoft Office Specialist Excel 365」のような欧文）は nowrap にしない。
+ * 1 文節として丸ごと折り返さないと、狭い画面で横にはみ出すため。欧文は空白の位置で折り返る。
  */
 export function Phrase({ text }: { text: string }) {
   return (
@@ -16,7 +18,7 @@ export function Phrase({ text }: { text: string }) {
       {parser.parse(text).map((chunk, i) => (
         <Fragment key={i}>
           {i > 0 && <wbr />}
-          <span className="whitespace-nowrap">{chunk}</span>
+          {/\s/.test(chunk) ? chunk : <span className="whitespace-nowrap">{chunk}</span>}
         </Fragment>
       ))}
     </span>
