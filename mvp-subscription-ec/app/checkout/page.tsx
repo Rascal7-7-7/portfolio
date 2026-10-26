@@ -8,6 +8,7 @@ import { PlanBadge } from '@/components/PlanBadge';
 import { CheckoutSteps } from '@/components/CheckoutSteps';
 import { EmptyState } from '@/components/EmptyState';
 import { RecurringSummary } from '@/components/RecurringSummary';
+import { ProductVisual } from '@/components/ProductVisual';
 import { DEMO_USER } from '@/lib/catalog';
 import { cartTotals, toCartLines } from '@/lib/cart';
 import { firstDelivery, formatJa, todayIso } from '@/lib/date';
@@ -78,9 +79,9 @@ export default function CheckoutPage() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       <CheckoutSteps current={1} />
-      <h1 className="mb-6 font-headline text-2xl font-light text-on-background sm:text-3xl">ご購入手続き</h1>
+      <h1 className="mb-8 font-headline text-[1.75rem] font-normal tracking-[0.02em] text-on-background sm:text-4xl">ご購入手続き</h1>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="grid gap-8 lg:grid-cols-[1fr_380px] lg:gap-12">
         <div className="divide-y divide-outline-variant/60 self-start border-y border-outline-variant/60">
           <Section title="お届け先">
             <div className="flex items-start justify-between gap-3">
@@ -102,7 +103,7 @@ export default function CheckoutPage() {
           </Section>
 
           <Section title="初回お届け予定">
-            <p className="tnum font-headline text-xl font-semibold text-on-surface">{formatJa(delivery)}</p>
+            <p className="tnum font-headline text-2xl font-medium text-on-surface">{formatJa(delivery)}</p>
             <p className="mt-1 text-xs text-on-surface-variant">定期便の2回目以降は、マイページでスキップ・お休みできます。</p>
           </Section>
 
@@ -152,12 +153,13 @@ export default function CheckoutPage() {
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="bg-surface-container-low p-5">
-            <h2 className="mb-4 text-sm font-semibold text-on-surface">ご注文内容</h2>
+          <div className="border border-outline-variant/70 bg-surface-container-lowest p-5 sm:p-6">
+            <h2 className="mb-5 font-headline text-lg font-medium text-on-surface">ご注文内容</h2>
             <ul className="mb-4 space-y-3 border-b border-outline-variant/60 pb-4">
               {lines.map((l) => (
-                <li key={`${l.productId}-${l.interval}`} className="flex justify-between gap-3 text-sm">
-                  <div className="min-w-0">
+                <li key={`${l.productId}-${l.interval}`} className="flex items-start gap-3 text-sm">
+                  <ProductVisual product={l.product} decorative className="h-16 w-[52px] flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-on-surface">
                       {l.product.name} <span className="tnum text-on-surface-variant">× {l.quantity}</span>
                     </p>
@@ -197,8 +199,8 @@ type SectionProps = { title: string; children: React.ReactNode };
 
 function Section({ title, children }: SectionProps) {
   return (
-    <section className="py-6">
-      <h2 className="mb-3 text-sm font-semibold text-on-surface">{title}</h2>
+    <section className="py-7">
+      <h2 className="mb-4 font-headline text-lg font-medium text-on-surface">{title}</h2>
       {children}
     </section>
   );

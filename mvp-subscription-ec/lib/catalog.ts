@@ -44,6 +44,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '苦味', low: '弱', high: '強', value: 4 },
     ],
     visual: { shape: 'bag', motif: 'bean', from: '#efe6d6', to: '#d9c6a5', ink: '#3d2c22', accent: '#c9925a' },
+    photo: { src: '/photos/coffee.webp', alt: 'ドリッパーで淹れたてのコーヒーと、陶器のカップ', caption: '朝、ドリッパーに湯を落とす時間に。' },
   },
   {
     id: 'uji-gyokuro',
@@ -68,6 +69,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '香り', low: '弱', high: '強', value: 3 },
     ],
     visual: { shape: 'tin', motif: 'tea', from: '#e4ecd9', to: '#c3d5ad', ink: '#2f4a2f', accent: '#b8cf8f' },
+    photo: { src: '/photos/tea.webp', alt: '茶葉と急須、湯呑みが並ぶ木の盆', caption: '茶葉がひらくのを、ゆっくり待って。' },
   },
   {
     id: 'honey-granola',
@@ -91,6 +93,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '食感', low: '軽', high: '硬', value: 4 },
     ],
     visual: { shape: 'jar', motif: 'wheat', from: '#f5e9d2', to: '#e8cf9f', ink: '#6b4a2b', accent: '#d9a556' },
+    photo: { src: '/photos/granola.webp', alt: '瓶いっぱいの焼きたてグラノーラ', caption: '瓶を開けると、はちみつの香ばしさ。' },
   },
   {
     id: 'hinoki-soap',
@@ -114,6 +117,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '洗い上がり', low: 'さっぱり', high: 'しっとり', value: 4 },
     ],
     visual: { shape: 'pump', motif: 'hinoki', from: '#e7eee8', to: '#c9d8cd', ink: '#4c6a5a', accent: '#a7c4b0' },
+    photo: { src: '/photos/soap.webp', alt: '白い皿の上の石けんと、木のブラシ', caption: '洗面所に、木の道具と並べて。' },
   },
   {
     id: 'wild-toner',
@@ -137,6 +141,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '使用感', low: 'さっぱり', high: 'しっとり', value: 3 },
     ],
     visual: { shape: 'bottle', motif: 'petal', from: '#efe5e7', to: '#d9c3c9', ink: '#7a5562', accent: '#e3b9c3' },
+    photo: { src: '/photos/botanical.webp', alt: '陶器の小鉢に入った、すりつぶした草の粉', caption: '草の力を、肌にやさしく。' },
   },
   {
     id: 'herb-tea',
@@ -162,6 +167,7 @@ export const PRODUCTS: ReadonlyArray<Product> = [
       { label: '渋み', low: '弱', high: '強', value: 1 },
     ],
     visual: { shape: 'box', motif: 'herb', from: '#f0ead8', to: '#dccfa6', ink: '#8a6b33', accent: '#e9c77b' },
+    photo: { src: '/photos/herb.webp', alt: 'カップいっぱいの乾いたハーブと花びら', caption: '乾かした和ハーブを、そのまま。' },
   },
 ];
 

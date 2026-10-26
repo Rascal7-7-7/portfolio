@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans, Noto_Sans_JP, Be_Vietnam_Pro } from 'next/font/google';
+import { Plus_Jakarta_Sans, Noto_Sans_JP, Be_Vietnam_Pro, Shippori_Mincho } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -26,6 +26,14 @@ const label = Be_Vietnam_Pro({
   weight: ['400', '500', '600'],
 });
 
+// 見出しの和文だけを明朝にする（欧文と数字は headline の欧文書体が先に当たる）
+const displayJP = Shippori_Mincho({
+  subsets: ['latin'],
+  variable: '--font-display-jp',
+  display: 'swap',
+  weight: ['400', '500', '600'],
+});
+
 const SITE_TITLE = 'MORI ATELIER — 森の定期便';
 const SITE_DESCRIPTION = '森が育てた素材を、暮らしの定期便に。架空ブランドによる D2C 定期購入 EC のデモサイトです。';
 
@@ -45,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja">
       <body
-        className={`${headline.variable} ${bodyJP.variable} ${label.variable} font-body bg-background text-on-surface min-h-screen flex flex-col`}
+        className={`${headline.variable} ${bodyJP.variable} ${label.variable} ${displayJP.variable} font-body bg-background text-on-surface min-h-screen flex flex-col`}
       >
         <StoreProvider>
           <a

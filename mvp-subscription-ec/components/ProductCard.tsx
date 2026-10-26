@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import type { Product } from '@/lib/types';
 import { perServing, unitPrice, yen } from '@/lib/pricing';
@@ -11,12 +12,15 @@ export function ProductCard({ product }: { product: Product }) {
   const serving = perServing(subPrice, product.specs);
   return (
     <Link href={`/products/${product.id}`} className="group flex flex-col">
-      {/* hover で写真だけをわずかに寄せる（枠の大きさは変えない） */}
-      <div className="overflow-hidden">
-        <ProductVisual
-          product={product}
-          decorative
-          className="aspect-[4/5] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+      {/* 一覧ではパッケージを見せ、hover で素材の写真に切り替えて使う場面を想像させる（枠の大きさは変えない） */}
+      <div className="relative overflow-hidden">
+        <ProductVisual product={product} decorative className="aspect-[4/5]" />
+        <Image
+          src={product.photo.src}
+          alt=""
+          fill
+          sizes="(min-width: 1024px) 360px, 50vw"
+          className="object-cover opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
         />
       </div>
       <div className="flex flex-1 flex-col pt-3 sm:pt-4">
@@ -24,7 +28,7 @@ export function ProductCard({ product }: { product: Product }) {
           {product.category}
           {product.badge && <span>・{product.badge}</span>}
         </p>
-        <h3 className="mt-1 font-headline text-[15px] font-semibold leading-snug text-on-surface underline-offset-4 group-hover:underline sm:text-base">
+        <h3 className="mt-1 font-headline text-base font-medium leading-snug text-on-surface underline-offset-4 group-hover:underline sm:text-lg">
           <Phrases parts={product.nameParts} />
         </h3>
         <p className="mt-1 flex-1 text-xs leading-relaxed text-on-surface-variant">
